@@ -10,7 +10,7 @@ function fail(message) {
   throw new Error(`Release validation failed: ${message}`)
 }
 
-if (!['bootstrap', 'stage'].includes(mode)) fail('mode must be bootstrap or stage')
+if (mode !== 'stage') fail('mode must be stage')
 if (!expectedVersion) fail('RELEASE_VERSION is required')
 if (!['next', 'latest'].includes(distTag)) fail('RELEASE_DIST_TAG must be next or latest')
 
@@ -69,10 +69,7 @@ for (const manifest of manifests) {
   if (![200, 404].includes(packageResponse.status)) {
     fail(`registry lookup for ${manifest.name} returned ${packageResponse.status}`)
   }
-  if (mode === 'bootstrap' && packageResponse.status !== 404) {
-    fail(`${manifest.name} already exists; bootstrap is one-time only`)
-  }
-  if (mode === 'stage' && packageResponse.status !== 200) {
+  if (packageResponse.status !== 200) {
     fail(`${manifest.name} does not exist yet and cannot use staged publishing`)
   }
 }

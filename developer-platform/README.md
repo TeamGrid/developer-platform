@@ -13,6 +13,19 @@ none imports Meteor runtime code.
 - `@teamgrid/mcp-server`: optional local stdio MCP adapter. It exposes only
   bounded read tools and delegates every request to the same API client.
 
+The current prerelease is available from npm through the explicit `next`
+channel:
+
+```sh
+npm install @teamgrid/api-client@next
+npm install --global @teamgrid/cli@next
+npm install --global @teamgrid/mcp-server@next
+```
+
+Use an exact version instead of `next` in reproducible deployments. Until the
+first stable release exists, npm also exposes the initial package version as
+`latest`; prerelease consumers should still select `next` explicitly.
+
 ## Credential and routing model
 
 Create a scoped API v1 credential in TeamGrid under Settings → Team →
@@ -127,9 +140,17 @@ packages.
 Before publishing, also run `npm audit --omit=dev` and `npm pack --dry-run` in
 each package directory, then inspect the file lists. Releases are submitted by
 the public repository's stage-only trusted publisher and require an explicit
-2FA-backed approval on npm before they become installable. Published alpha
-versions use the `next` dist-tag; `latest` is reserved for approved stable
-releases.
+2FA-backed approval on npm before they become installable. Traditional npm
+publish tokens are disabled for all three packages. Published prereleases use
+the `next` dist-tag; future stable releases use `latest`.
+
+To release, update all three package versions, commit and tag the exact source
+as `v<version>`, then dispatch `Stage npm release` from that tag with the
+matching version and dist-tag. Inspect the staged artifacts with `npm stage
+list`, `npm stage view`, and `npm stage download`, then approve each package
+with npm's 2FA-backed staged-release flow. Reject any stage whose contents or
+provenance do not match the tag. The workflow accepts prereleases only with
+`next` and stable versions only with `latest`.
 
 The destructive-safe staging proof is available as `npm run e2e:staging`. It
 refuses mutation outside a staging/loopback base URL unless explicitly
