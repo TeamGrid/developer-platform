@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module'
 import type { Readable, Writable } from 'node:stream'
 import { confirm, password } from '@inquirer/prompts'
 import {
@@ -12,7 +13,7 @@ import { Command, Option } from 'commander'
 import { type CliConfig, ConfigStore, normalizeProfileName } from './config.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
 import { readJsonObject, readStdin } from './input.js'
-import { type OutputMode, writeJsonLines, writeOutput } from './output.js'
+import { type OutputMode, sanitizeTerminalText, writeJsonLines, writeOutput } from './output.js'
 
 type GlobalOptions = {
   baseUrl?: string
@@ -35,12 +36,14 @@ const localUsageErrorCodes = new Set([
   'authentication_required',
   'confirmation_required',
   'input_too_large',
+  'insecure_base_url',
   'invalid_api_domain',
   'invalid_arguments',
   'invalid_base_url',
   'invalid_boolean',
   'invalid_config',
   'invalid_credential',
+  'invalid_input_file',
   'invalid_json',
   'invalid_number',
   'invalid_output',
@@ -55,6 +58,7 @@ export type ProgramDependencies = {
   configStore?: ConfigStore
   credentialStore?: CredentialStore
   environment?: NodeJS.ProcessEnv
+  errorOutput?: Writable
   input?: Readable & { isTTY?: boolean }
   output?: Writable
   promptConfirm?: typeof confirm
@@ -69,12 +73,17 @@ function positiveInteger(value: string) {
   return number
 }
 
-function nonNegativeInteger(value: string) {
-  const number = Number(value)
-  if (!Number.isInteger(number) || number < 0) {
-    throw new TeamGridClientError('invalid_number', 'Expected a non-negative integer.')
+function integerInRange(minimum: number, maximum: number, description: string) {
+  return (value: string) => {
+    const number = Number(value)
+    if (!Number.isInteger(number) || number < minimum || number > maximum) {
+      throw new TeamGridClientError(
+        'invalid_number',
+        `${description} must be an integer from ${minimum} to ${maximum}.`,
+      )
+    }
+    return number
   }
-  return number
 }
 
 function booleanValue(value: string) {
@@ -87,8 +96,13 @@ function addListOptions(command: Command) {
   return command
     .option('--all', 'read every page')
     .option('--cursor <cursor>', 'resume from an opaque cursor')
-    .option('--limit <number>', 'resources per page (1–200)', positiveInteger)
-    .option('--max-pages <number>', 'safety limit for --all', positiveInteger, 10_000)
+    .option('--limit <number>', 'resources per page (1–200)', integerInRange(1, 200, 'Limit'))
+    .option(
+      '--max-pages <number>',
+      'safety limit for --all (1–10000)',
+      integerInRange(1, 10_000, 'Maximum pages'),
+      10_000,
+    )
 }
 
 function globalOptions(command: Command): GlobalOptions {
@@ -113,17 +127,29 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   const environment = dependencies.environment || process.env
   const input = dependencies.input || process.stdin
   const output = dependencies.output || process.stdout
+  const errorOutput = dependencies.errorOutput || process.stderr
   const configStore = dependencies.configStore || new ConfigStore({ environment })
   const credentialStore = dependencies.credentialStore || new SystemCredentialStore()
   const clientFactory = dependencies.clientFactory || ((options) => new TeamGridClient(options))
   const askPassword = dependencies.promptPassword || password
   const askConfirm = dependencies.promptConfirm || confirm
   const program = new Command()
+  const packageVersion = (createRequire(import.meta.url)('../package.json') as { version: string })
+    .version
+
+  program.configureOutput({
+    writeErr: (value) => {
+      errorOutput.write(sanitizeTerminalText(value, true))
+    },
+    writeOut: (value) => {
+      output.write(value)
+    },
+  })
 
   program
     .name('teamgrid')
     .description('TeamGrid Developer Platform CLI')
-    .version('1.0.0-alpha.1')
+    .version(packageVersion)
     .addOption(
       new Option('-o, --output <format>', 'output format')
         .choices(['table', 'json', 'jsonl'])
@@ -132,7 +158,12 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     .option('--profile <name>', 'credential profile')
     .option('--base-url <url>', 'override the regional API v1 base URL')
     .option('--timeout <milliseconds>', 'request timeout', positiveInteger, 30_000)
-    .option('--retries <count>', 'safe-request retry count (0–5)', nonNegativeInteger, 2)
+    .option(
+      '--retries <count>',
+      'safe-request retry count (0–5)',
+      integerInRange(0, 5, 'Retry count'),
+      2,
+    )
 
   async function loadClient(command: Command) {
     const config = await configStore.load()
@@ -163,7 +194,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       ...(options.baseUrl || profile?.baseUrl
         ? { baseUrl: normalizeApiBaseUrl(options.baseUrl || profile?.baseUrl || '') }
         : {}),
-      retries: Math.min(options.retries, 5),
+      retries: options.retries,
       timeoutMs: options.timeout,
       token,
     })
@@ -217,7 +248,10 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
         'Use --yes for destructive operations from a non-interactive session.',
       )
     }
-    const accepted = await askConfirm({ message: `${action} ${resource} ${id}?`, default: false })
+    const accepted = await askConfirm({
+      message: `${action} ${resource} ${sanitizeTerminalText(id)}?`,
+      default: false,
+    })
     if (!accepted) throw new TeamGridClientError('cancelled', `${action} cancelled.`)
   }
 

@@ -145,8 +145,8 @@ export class ConfigStore {
   async save(config: CliConfig) {
     const validated = parseConfig(config)
     const directory = dirname(this.path)
-    await mkdir(directory, { mode: 0o700, recursive: true })
-    await chmod(directory, 0o700)
+    const createdDirectory = await mkdir(directory, { mode: 0o700, recursive: true })
+    if (createdDirectory !== undefined) await chmod(directory, 0o700)
     await assertNotSymlink(this.path)
     const temporaryPath = join(
       directory,

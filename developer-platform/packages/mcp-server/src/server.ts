@@ -1,6 +1,10 @@
+import { createRequire } from 'node:module'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import type { TeamGridClient } from '@teamgrid/api-client'
 import { z } from 'zod'
+
+const packageVersion = (createRequire(import.meta.url)('../package.json') as { version: string })
+  .version
 
 const listInput = {
   cursor: z.string().max(512).optional(),
@@ -60,7 +64,7 @@ export function createReadOnlyHandlers(client: TeamGridClient) {
 
 export function createTeamGridMcpServer(client: TeamGridClient) {
   const server = new McpServer(
-    { name: 'teamgrid', version: '1.0.0-alpha.1' },
+    { name: 'teamgrid', version: packageVersion },
     {
       instructions:
         'Read-only TeamGrid access. Results are tenant-scoped by the API credential and paginated; pass returned opaque cursors to continue.',
