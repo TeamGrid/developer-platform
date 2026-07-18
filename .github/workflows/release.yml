@@ -1,0 +1,76 @@
+name: Stage npm release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact package version to stage
+        required: true
+        type: string
+      dist_tag:
+        description: npm dist-tag
+        required: true
+        default: next
+        type: choice
+        options:
+          - next
+          - latest
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+
+jobs:
+  stage:
+    name: Verify and stage packages
+    if: github.repository == 'TeamGrid/developer-platform' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: npm
+    defaults:
+      run:
+        working-directory: developer-platform
+    steps:
+      - name: Check out source
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Set up Node.js and npm registry
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install npm 11.18.0
+        run: npm install --global npm@11.18.0
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify source and package artifacts
+        run: npm run verify
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Validate release
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_DIST_TAG: ${{ inputs.dist_tag }}
+        run: node scripts/validate-release.mjs --mode stage
+
+      - name: Stage API client
+        working-directory: developer-platform/packages/api-client
+        run: npm stage publish --tag "${{ inputs.dist_tag }}"
+
+      - name: Stage CLI
+        working-directory: developer-platform/packages/cli
+        run: npm stage publish --tag "${{ inputs.dist_tag }}"
+
+      - name: Stage MCP server
+        working-directory: developer-platform/packages/mcp-server
+        run: npm stage publish --tag "${{ inputs.dist_tag }}"

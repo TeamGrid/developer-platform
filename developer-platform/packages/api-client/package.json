@@ -1,0 +1,46 @@
+{
+  "name": "@teamgrid/api-client",
+  "version": "1.0.0-alpha.1",
+  "description": "Typed, cell-aware client for the TeamGrid Developer Platform API v1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeamGrid/developer-platform.git",
+    "directory": "developer-platform/packages/api-client"
+  },
+  "homepage": "https://github.com/TeamGrid/developer-platform/tree/main/developer-platform/packages/api-client#readme",
+  "bugs": {
+    "url": "https://github.com/TeamGrid/developer-platform/issues"
+  },
+  "keywords": [
+    "teamgrid",
+    "api",
+    "typescript",
+    "sdk"
+  ],
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "engines": {
+    "node": ">=22.13 <25"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  }
+}

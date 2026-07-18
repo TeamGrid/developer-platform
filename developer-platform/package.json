@@ -1,0 +1,28 @@
+{
+  "name": "@teamgrid/developer-platform-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run generate:types && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server",
+    "check": "npm run generate:types && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run typecheck -w @teamgrid/api-client && npm run typecheck -w @teamgrid/cli && npm run typecheck -w @teamgrid/mcp-server && biome check packages scripts/validate-release.mjs",
+    "e2e:staging": "node scripts/staging-e2e.mjs",
+    "generate:types": "openapi-typescript ../openapi/v1.json -o packages/api-client/src/generated/schema.ts",
+    "test": "npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && vitest run",
+    "pack:check": "node scripts/check-package-artifacts.mjs",
+    "verify": "npm run check && npm test && npm run build && npm run pack:check"
+  },
+  "packageManager": "npm@11.18.0",
+  "engines": {
+    "node": ">=22.13 <25"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.4",
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}

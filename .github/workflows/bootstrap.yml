@@ -1,0 +1,81 @@
+name: Bootstrap npm packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact package version to publish
+        required: true
+        type: string
+      dist_tag:
+        description: npm dist-tag
+        required: true
+        default: next
+        type: choice
+        options:
+          - next
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish initial package versions
+    if: github.repository == 'TeamGrid/developer-platform' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: npm-bootstrap
+    defaults:
+      run:
+        working-directory: developer-platform
+    steps:
+      - name: Check out source
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Set up Node.js and npm registry
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install npm 11.18.0
+        run: npm install --global npm@11.18.0
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify source and package artifacts
+        run: npm run verify
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Validate one-time bootstrap release
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_DIST_TAG: ${{ inputs.dist_tag }}
+        run: node scripts/validate-release.mjs --mode bootstrap
+
+      - name: Publish API client
+        working-directory: developer-platform/packages/api-client
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
+        run: npm publish --access public --tag "${{ inputs.dist_tag }}"
+
+      - name: Publish CLI
+        working-directory: developer-platform/packages/cli
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
+        run: npm publish --access public --tag "${{ inputs.dist_tag }}"
+
+      - name: Publish MCP server
+        working-directory: developer-platform/packages/mcp-server
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
+        run: npm publish --access public --tag "${{ inputs.dist_tag }}"

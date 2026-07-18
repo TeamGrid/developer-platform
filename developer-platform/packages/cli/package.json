@@ -1,0 +1,55 @@
+{
+  "name": "@teamgrid/cli",
+  "version": "1.0.0-alpha.1",
+  "description": "Official command-line interface for the TeamGrid Developer Platform",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeamGrid/developer-platform.git",
+    "directory": "developer-platform/packages/cli"
+  },
+  "homepage": "https://github.com/TeamGrid/developer-platform/tree/main/developer-platform/packages/cli#readme",
+  "bugs": {
+    "url": "https://github.com/TeamGrid/developer-platform/issues"
+  },
+  "keywords": [
+    "teamgrid",
+    "api",
+    "automation",
+    "cli"
+  ],
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "teamgrid": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
+    "postbuild": "node -e \"require('node:fs').chmodSync('dist/bin.js', 0o755)\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "engines": {
+    "node": ">=22.13 <25"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "8.5.2",
+    "@teamgrid/api-client": "1.0.0-alpha.1",
+    "commander": "15.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  }
+}
