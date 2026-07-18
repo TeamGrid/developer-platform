@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises'
+import { open } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { TeamGridClientError } from '@teamgrid/api-client'
 
@@ -23,11 +23,38 @@ export async function readJsonObject(source: string, stdin: NodeJS.ReadableStrea
   if (source === '-') text = await readStdin(stdin)
   else if (source.startsWith('@')) {
     const path = resolve(source.slice(1))
-    const file = await readFile(path)
-    if (file.length > maxInputBytes) {
-      throw new TeamGridClientError('input_too_large', 'CLI input must not exceed 1 MiB.')
+    let file: Awaited<ReturnType<typeof open>> | undefined
+    try {
+      file = await open(path, 'r')
+      const stats = await file.stat()
+      if (!stats.isFile()) {
+        throw new TeamGridClientError(
+          'invalid_input_file',
+          'The CLI input path must reference a regular file.',
+        )
+      }
+      if (stats.size > maxInputBytes) {
+        throw new TeamGridClientError('input_too_large', 'CLI input must not exceed 1 MiB.')
+      }
+      const buffer = Buffer.allocUnsafe(maxInputBytes + 1)
+      let total = 0
+      while (total < buffer.length) {
+        const { bytesRead } = await file.read(buffer, total, buffer.length - total, null)
+        if (bytesRead === 0) break
+        total += bytesRead
+      }
+      if (total > maxInputBytes) {
+        throw new TeamGridClientError('input_too_large', 'CLI input must not exceed 1 MiB.')
+      }
+      text = buffer.subarray(0, total).toString('utf8')
+    } catch (error) {
+      if (error instanceof TeamGridClientError) throw error
+      throw new TeamGridClientError('invalid_input_file', 'Could not read the CLI input file.', {
+        cause: error,
+      })
+    } finally {
+      await file?.close().catch(() => undefined)
     }
-    text = file.toString('utf8')
   } else text = source
 
   try {

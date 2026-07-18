@@ -4,10 +4,33 @@ import { TeamGridClientError } from '@teamgrid/api-client'
 
 export type OutputMode = 'json' | 'jsonl' | 'table'
 
+function isUnsafeTerminalCodePoint(codePoint: number) {
+  return (
+    codePoint <= 0x1f ||
+    (codePoint >= 0x7f && codePoint <= 0x9f) ||
+    codePoint === 0x061c ||
+    codePoint === 0x200e ||
+    codePoint === 0x200f ||
+    (codePoint >= 0x202a && codePoint <= 0x202e) ||
+    (codePoint >= 0x2066 && codePoint <= 0x2069)
+  )
+}
+
+export function sanitizeTerminalText(value: string, preserveLineFeeds = false) {
+  return Array.from(value, (character) => {
+    const codePoint = character.codePointAt(0) ?? 0
+    if (!isUnsafeTerminalCodePoint(codePoint)) return character
+    if (character === '\n') return preserveLineFeeds ? character : '\\n'
+    if (character === '\r') return '\\r'
+    if (character === '\t') return '\\t'
+    return `\\u${codePoint.toString(16).padStart(4, '0')}`
+  }).join('')
+}
+
 function scalar(value: unknown) {
   if (value === null || value === undefined) return ''
-  if (typeof value === 'object') return JSON.stringify(value)
-  return String(value)
+  const text = typeof value === 'object' ? JSON.stringify(value) : String(value)
+  return sanitizeTerminalText(text)
 }
 
 function rows(value: unknown): Record<string, unknown>[] {
@@ -27,7 +50,10 @@ export function renderTable(value: unknown) {
   if (!tableRows.length) return ''
   const columns = Array.from(new Set(tableRows.flatMap((row) => Object.keys(row)))).slice(0, 20)
   const widths = columns.map((column) =>
-    Math.min(48, Math.max(column.length, ...tableRows.map((row) => scalar(row[column]).length))),
+    Math.min(
+      48,
+      Math.max(scalar(column).length, ...tableRows.map((row) => scalar(row[column]).length)),
+    ),
   )
   const line = (row: Record<string, unknown>) =>
     columns

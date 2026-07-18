@@ -1,8 +1,8 @@
-import { mkdtemp, readFile, stat } from 'node:fs/promises'
+import { chmod, mkdtemp, readFile, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { PassThrough } from 'node:stream'
-import { TeamGridClientError } from '@teamgrid/api-client'
+import { TeamGridApiError, TeamGridClientError } from '@teamgrid/api-client'
 import { describe, expect, it, vi } from 'vitest'
 import { ConfigStore } from './config.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
@@ -64,6 +64,143 @@ describe('TeamGrid CLI', () => {
     expect(source).not.toContain(token)
     expect((await stat(path)).mode & 0o777).toBe(0o600)
     expect(await store.load()).toMatchObject({ currentProfile: 'default' })
+  })
+
+  it('does not change permissions on an existing config directory', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-existing-'))
+    const store = new ConfigStore({ configPath: join(directory, 'config.json') })
+    if (process.platform !== 'win32') await chmod(directory, 0o755)
+    await store.save({ profiles: {}, version: 1 })
+    if (process.platform !== 'win32') expect((await stat(directory)).mode & 0o777).toBe(0o755)
+  })
+
+  it('creates a new config directory with mode 0700', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'teamgrid-cli-new-'))
+    const directory = join(root, 'config')
+    const path = join(directory, 'config.json')
+    await new ConfigStore({ configPath: path }).save({ profiles: {}, version: 1 })
+    if (process.platform !== 'win32') {
+      expect((await stat(directory)).mode & 0o777).toBe(0o700)
+      expect((await stat(path)).mode & 0o777).toBe(0o600)
+    }
+  })
+
+  it.each([
+    { argv: ['--version'], label: 'version' },
+    { argv: ['-V'], label: 'short version' },
+    { argv: ['--help'], label: 'option help' },
+    { argv: ['help'], label: 'help command' },
+  ])('returns success for $label', async ({ argv }) => {
+    const output = capture()
+    const errorOutput = capture()
+    const code = await runCli(['node', 'teamgrid', ...argv], {
+      errorOutput: errorOutput.stream,
+      output: output.stream,
+    })
+    expect(code).toBe(0)
+    expect(output.value()).not.toBe('')
+    expect(errorOutput.value()).toBe('')
+  })
+
+  it('reads the displayed version from the package manifest', async () => {
+    const output = capture()
+    const packageManifest = JSON.parse(
+      await readFile(new URL('../package.json', import.meta.url), 'utf8'),
+    ) as { version: string }
+    expect(
+      await runCli(['node', 'teamgrid', '--version'], {
+        errorOutput: capture().stream,
+        output: output.stream,
+      }),
+    ).toBe(0)
+    expect(output.value().trim()).toBe(packageManifest.version)
+  })
+
+  it('reports Commander errors once and returns usage exit code 2', async () => {
+    const errorOutput = capture()
+    expect(
+      await runCli(['node', 'teamgrid', 'does-not-exist'], {
+        errorOutput: errorOutput.stream,
+        output: capture().stream,
+      }),
+    ).toBe(2)
+    expect(errorOutput.value().match(/unknown command/g)).toHaveLength(1)
+    expect(errorOutput.value()).not.toContain('teamgrid: error:')
+  })
+
+  it('renders control characters in Commander and API errors visibly', async () => {
+    const commanderError = capture()
+    expect(
+      await runCli(['node', 'teamgrid', 'unknown\u001b[31m'], {
+        errorOutput: commanderError.stream,
+        output: capture().stream,
+      }),
+    ).toBe(2)
+    expect(commanderError.value()).not.toContain('\u001b')
+    expect(commanderError.value()).toContain('\\u001b')
+
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const apiError = capture()
+    expect(
+      await runCli(['node', 'teamgrid', 'workspace'], {
+        clientFactory: () =>
+          ({
+            workspace: {
+              get: async () => {
+                throw new TeamGridApiError({
+                  errors: [
+                    {
+                      code: 'forbidden',
+                      detail: 'Denied\u001b[31m\nspoofed',
+                      status: '403',
+                      title: 'Forbidden',
+                    },
+                  ],
+                  requestId: 'request\u202e',
+                  status: 403,
+                })
+              },
+            },
+          }) as never,
+        configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+        environment: { TEAMGRID_API_TOKEN: token },
+        errorOutput: apiError.stream,
+        output: capture().stream,
+      }),
+    ).toBe(4)
+    expect(apiError.value()).not.toContain('\u001b')
+    expect(apiError.value()).not.toContain('\u202e')
+    expect(apiError.value()).toContain('Denied\\u001b[31m\\nspoofed')
+    expect(apiError.value()).toContain('request\\u202e')
+  })
+
+  it.each([
+    ['--retries', '6', 'tasks', 'list'],
+    ['tasks', 'list', '--limit', '201'],
+    ['tasks', 'list', '--all', '--max-pages', '10001'],
+  ])('rejects out-of-contract numeric options: %s', async (...argv) => {
+    const errorOutput = capture()
+    expect(
+      await runCli(['node', 'teamgrid', ...argv], {
+        errorOutput: errorOutput.stream,
+        output: capture().stream,
+      }),
+    ).toBe(2)
+    expect(errorOutput.value()).toContain('must be an integer')
+  })
+
+  it('classifies insecure remote base URLs as usage errors', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const errorOutput = capture()
+    expect(
+      await runCli(['node', 'teamgrid', '--base-url', 'http://api.example.com/v1', 'workspace'], {
+        configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+        environment: { TEAMGRID_API_TOKEN: token },
+        errorOutput: errorOutput.stream,
+        output: capture().stream,
+      }),
+    ).toBe(2)
+    expect(errorOutput.value()).toContain('Plain HTTP is allowed only for loopback')
   })
 
   it('passes keychain secrets over stdin and never as command arguments', async () => {

@@ -58,7 +58,8 @@ export function normalizeApiBaseUrl(value: string): string {
   if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) {
     throw new TeamGridClientError('invalid_base_url', 'The API base URL is invalid.')
   }
-  if (url.protocol === 'http:' && !['localhost', '127.0.0.1', '::1'].includes(url.hostname)) {
+  const hostname = url.hostname.replace(/^\[|\]$/g, '')
+  if (url.protocol === 'http:' && !['localhost', '127.0.0.1', '::1'].includes(hostname)) {
     throw new TeamGridClientError(
       'insecure_base_url',
       'Plain HTTP is allowed only for loopback development endpoints.',

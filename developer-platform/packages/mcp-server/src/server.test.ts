@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { describe, expect, it, vi } from 'vitest'
@@ -47,6 +48,13 @@ describe('TeamGrid read-only MCP adapter', () => {
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
     await Promise.all([server.connect(serverTransport), client.connect(clientTransport)])
     try {
+      const packageManifest = JSON.parse(
+        await readFile(new URL('../package.json', import.meta.url), 'utf8'),
+      ) as { version: string }
+      expect(client.getServerVersion()).toEqual({
+        name: 'teamgrid',
+        version: packageManifest.version,
+      })
       const tools = await client.listTools()
       expect(tools.tools.map((tool) => tool.name).sort()).toEqual([
         'teamgrid_audit_events_list',

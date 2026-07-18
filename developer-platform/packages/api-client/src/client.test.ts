@@ -30,6 +30,7 @@ describe('TeamGrid API client', () => {
     })
     expect(buildRegionalApiBaseUrl('us')).toBe('https://api.us.teamgrid.app/v1')
     expect(normalizeApiBaseUrl('http://localhost:2201/v1/')).toBe('http://localhost:2201/v1')
+    expect(normalizeApiBaseUrl('http://[::1]:2201/v1/')).toBe('http://[::1]:2201/v1')
     expect(() => normalizeApiBaseUrl('http://api.teamgrid.app/v1')).toThrow(TeamGridClientError)
   })
 
