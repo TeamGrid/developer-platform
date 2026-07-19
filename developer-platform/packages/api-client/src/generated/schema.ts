@@ -2042,6 +2042,107 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/events/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the scoped public event catalog
+         * @description Returns only webhook and change-feed events whose complete required-scope set is granted to this credential. Internal collections, automation implementation names, and unscoped product events remain private.
+         */
+        get: operations["getEventCatalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/system/capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get credential-aware system capabilities
+         * @description Intersects public product capability identifiers with workspace entitlement and this credential’s granted scopes. Raw plan, billing, feature-group, role, and permission identifiers are never exposed.
+         */
+        get: operations["getSystemCapabilities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspace/entitlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get public workspace entitlements
+         * @description Returns stable public capability identifiers and entitlement state without raw plan, billing, feature-group, or role details.
+         */
+        get: operations["getWorkspaceEntitlements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspace/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get public workspace settings */
+        get: operations["getWorkspaceSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update public workspace settings
+         * @description Atomically compares the complete public settings revision, applies only the six documented settings, durably audits the write, and retains a recoverable credential-owned idempotency record for seven days.
+         */
+        patch: operations["updateWorkspaceSettings"];
+        trace?: never;
+    };
+    "/webhooks/{id}/secret-rotation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotate a credential-owned webhook signing secret
+         * @description Rotates the signing-secret generation for a credential-owned v2 webhook. The secret is derived only for this no-store response, remains absent from URLs and persistent records, and is reproduced only for an exact idempotent replay.
+         */
+        post: operations["rotateWebhookSecret"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3037,18 +3138,23 @@ export interface components {
             /** @constant */
             type: "changeEvent";
         };
+        /** @description Credential-owned v2 webhook. List and get responses are secret-free and carry a strong whk1 revision. Only create may include the reveal-only initial signing secret. */
         Webhook: {
             attributes: {
                 actions: string[];
                 disabled: boolean;
                 failCount: number;
                 lastStatus: number | null;
-                /** @description Returned only by an idempotent webhook create response. */
+                /** @description Reveal-only initial signing secret returned by a no-store webhook create response. */
                 readonly signingSecret?: string;
-                /** Format: uri */
+                /**
+                 * Format: uri
+                 * @description HTTPS destination without URL credentials or a fragment.
+                 */
                 url: string;
                 /** @enum {integer} */
                 version: 1 | 2;
+                revision: string;
             };
             id: string;
             /** @constant */
@@ -3747,6 +3853,75 @@ export interface components {
                 event: "change" | "create";
             };
         };
+        EventDefinition: {
+            attributes: {
+                /** @enum {string} */
+                channel: "changeFeed" | "webhook";
+                /** @enum {string|null} */
+                operation: "created" | "deleted" | "updated" | null;
+                requiredScopes: string[];
+                resourceType: string | null;
+            } & unknown;
+            id: string;
+            /** @constant */
+            type: "eventDefinition";
+        };
+        SystemCapability: {
+            attributes: {
+                accessible: boolean;
+                entitled: boolean;
+            };
+            id: string;
+            /** @constant */
+            type: "systemCapability";
+        };
+        WebhookSecretRotation: {
+            attributes: {
+                replayed: boolean;
+                revision: string;
+                /** @description Reveal-only replacement signing secret. It is returned only by this no-store response and is never persisted as plaintext. */
+                signingSecret: string;
+            };
+            id: string;
+            /** @constant */
+            type: "webhookSecretRotation";
+        };
+        WorkspaceEntitlement: {
+            attributes: {
+                accessible: boolean;
+                enabled: boolean;
+            };
+            id: string;
+            /** @constant */
+            type: "workspaceEntitlement";
+        };
+        WorkspaceSettings: {
+            attributes: {
+                /** @enum {string|null} */
+                currency: "AUD" | "CAD" | "CHF" | "EUR" | "GBP" | "NZD" | "USD" | "ZAR" | null;
+                /** @enum {string|null} */
+                defaultLanguage: "de" | "de-XX" | "en" | null;
+                defaultPlannedTime: number | null;
+                defaultProductivity: number | null;
+                defaultShowInScheduling: boolean | null;
+                name: string;
+                revision: string;
+            };
+            /** @constant */
+            id: "current";
+            /** @constant */
+            type: "workspaceSettings";
+        };
+        WorkspaceSettingsUpdate: {
+            /** @enum {string} */
+            currency?: "AUD" | "CAD" | "CHF" | "EUR" | "GBP" | "NZD" | "USD" | "ZAR";
+            /** @enum {string} */
+            defaultLanguage?: "de" | "de-XX" | "en";
+            defaultPlannedTime?: number;
+            defaultProductivity?: number;
+            defaultShowInScheduling?: boolean;
+            name?: string;
+        };
     };
     responses: {
         /** @description The cell-local application returned an invalid response. */
@@ -3885,6 +4060,11 @@ export interface components {
         IfMatchAutomationRun: string;
         /** @description Short-lived opaque export capability returned by the download-intent endpoint. It is carried only in a header so it cannot enter URL or proxy logs. */
         ExportDownloadIntent: string;
+        /** @description Exactly one latest strong webhook ETag. Wildcards, weak validators, and lists are rejected. */
+        IfMatchWebhook: string;
+        /** @description Exactly one latest strong workspace settings ETag. Wildcards, weak validators, and lists are rejected. */
+        IfMatchWorkspaceSettings: string;
+        WebhookLimit: number;
     };
     requestBodies: never;
     headers: {
@@ -3908,6 +4088,10 @@ export interface components {
         AutomationDefinitionETag: string;
         /** @description Strong automation-run revision. */
         AutomationRunETag: string;
+        /** @description Strong credential-owned webhook revision including signing-secret generation. */
+        WebhookETag: string;
+        /** @description Strong revision of the complete public workspace settings allowlist. */
+        WorkspaceSettingsETag: string;
     };
     pathItems: never;
 }
@@ -9119,7 +9303,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
-                limit?: components["parameters"]["Limit"];
+                limit?: components["parameters"]["WebhookLimit"];
             };
             header?: never;
             path?: never;
@@ -9172,6 +9356,8 @@ export interface operations {
             200: {
                 headers: {
                     "Idempotency-Replayed"?: "true";
+                    "Cache-Control"?: "private, no-store";
+                    ETag: components["headers"]["WebhookETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9185,6 +9371,8 @@ export interface operations {
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
+                    "Cache-Control"?: "private, no-store";
+                    ETag: components["headers"]["WebhookETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9294,6 +9482,7 @@ export interface operations {
             /** @description The requested resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["WebhookETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9308,6 +9497,7 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
         };
     };
@@ -10680,6 +10870,224 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getEventCatalog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description An exact bounded public projection. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["EventDefinition"][];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getSystemCapabilities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description An exact bounded public projection. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SystemCapability"][];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getWorkspaceEntitlements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description An exact bounded public projection. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WorkspaceEntitlement"][];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getWorkspaceSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The exact public workspace settings allowlist. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["WorkspaceSettingsETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WorkspaceSettings"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateWorkspaceSettings: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong workspace settings ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchWorkspaceSettings"];
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkspaceSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated settings, or an exact replay of the original successful result. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["WorkspaceSettingsETag"];
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WorkspaceSettings"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    rotateWebhookSecret: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong webhook ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchWebhook"];
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description An exact replay of the completed secret rotation. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    ETag: components["headers"]["WebhookETag"];
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebhookSecretRotation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly completed signing-secret rotation. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    ETag: components["headers"]["WebhookETag"];
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["WebhookSecretRotation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

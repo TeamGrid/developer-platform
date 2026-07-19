@@ -11,6 +11,7 @@ import type {
   Availability,
   Comment,
   Document,
+  EventDefinition,
   ExportCreation,
   ExportDownloadIntent,
   ExportJob,
@@ -26,7 +27,14 @@ import type {
   ResourceEnvelope,
   Role,
   SearchResult,
+  SystemCapability,
   TransportMetadata,
+  Webhook,
+  WebhookCreate,
+  WebhookSecretRotation,
+  WorkspaceEntitlement,
+  WorkspaceSettings,
+  WorkspaceSettingsUpdate,
 } from './types.js'
 
 type ResourceValidator<T> = (value: unknown) => value is T
@@ -38,6 +46,14 @@ const administrationRevisionPattern = /^adm1-[a-f0-9]{64}$/
 const automationDefinitionRevisionPattern = /^aut1-[a-f0-9]{64}$/
 const automationRunRevisionPattern = /^aur1-[a-f0-9]{64}$/
 const automationDefinitionVersionPattern = /^dav1-[a-f0-9]{64}$/
+const workspaceSettingsRevisionPattern = /^wst1-[a-f0-9]{64}$/
+const webhookRevisionPattern = /^whk1-[a-f0-9]{64}$/
+const webhookSigningSecretPattern = /^whsec_v2_[A-Za-z0-9_-]{43}$/
+const publicCapabilityIdPattern = /^[A-Za-z][A-Za-z0-9-]{0,127}$/
+const webhookIdPattern = /^[A-Za-z0-9_.:-]{1,128}$/
+const eventDefinitionIdPattern = /^[A-Za-z][A-Za-z0-9_.:-]{0,255}$/
+const eventResourceTypePattern = /^[A-Za-z][A-Za-z0-9]{0,127}$/
+const scopePattern = /^[a-z][a-z0-9-]*(?::[a-z][a-z0-9-]*){1,2}$/
 const downloadIntentPattern = /^ex1\.\d{10}\.[a-f0-9]{32}\.[a-f0-9]{64}$/
 const canonicalDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
 const sensitiveKeyPattern = /authorization|cookie|credential|password|secret|token/i
@@ -185,6 +201,19 @@ function sortedUniqueStrings(
   )
 }
 
+function uniqueStrings(
+  value: unknown,
+  maximum: number,
+  predicate: (item: string) => boolean,
+): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length <= maximum &&
+    value.every((item) => typeof item === 'string' && predicate(item)) &&
+    new Set(value).size === value.length
+  )
+}
+
 function exactResource(
   value: unknown,
   type: string,
@@ -202,6 +231,10 @@ function exactResource(
 
 function requestMeta(value: unknown) {
   return hasExactKeys(value, ['requestId']) && boundedString(value.requestId, 256, false)
+}
+
+function resourceIdentity(resource: unknown) {
+  return isRecord(resource) && typeof resource.id === 'string' ? resource.id : ''
 }
 
 export function assertStrictResource<T>(
@@ -224,6 +257,7 @@ export function assertStrictResourceArray<T>(
   validator: ResourceValidator<T>,
   label: string,
   maximum: number,
+  identityKey: (resource: T) => string = resourceIdentity,
 ): ResourceEnvelope<T[]> {
   if (
     !hasExactKeys(value, ['data', 'meta']) ||
@@ -231,17 +265,37 @@ export function assertStrictResourceArray<T>(
     !Array.isArray(value.data) ||
     value.data.length > maximum ||
     value.data.some((item) => !validator(item)) ||
-    new Set(value.data.map((item) => (item as { id: string }).id)).size !== value.data.length
+    new Set(value.data.map((item) => identityKey(item))).size !== value.data.length
   ) {
     invalid(label)
   }
   return value as ResourceEnvelope<T[]>
 }
 
+export function assertStrictOrderedResourceArray<T>(
+  value: unknown,
+  validator: ResourceValidator<T>,
+  label: string,
+  maximum: number,
+  orderKey: (resource: T) => string,
+): ResourceEnvelope<T[]> {
+  const envelope = assertStrictResourceArray(value, validator, label, maximum, orderKey)
+  if (
+    envelope.data.some((resource, index) => {
+      const previous = envelope.data[index - 1]
+      return previous !== undefined && orderKey(previous) >= orderKey(resource)
+    })
+  ) {
+    invalid(label)
+  }
+  return envelope
+}
+
 export function assertStrictPage<T>(
   value: unknown,
   validator: ResourceValidator<T>,
   label: string,
+  maximumLimit = 200,
 ): ListEnvelope<T> {
   if (
     !hasExactKeys(value, ['data', 'meta']) ||
@@ -250,7 +304,7 @@ export function assertStrictPage<T>(
     !hasExactKeys(value.meta.page, ['limit', 'nextCursor']) ||
     !Number.isSafeInteger(value.meta.page.limit) ||
     Number(value.meta.page.limit) < 1 ||
-    Number(value.meta.page.limit) > 200 ||
+    Number(value.meta.page.limit) > maximumLimit ||
     !(value.meta.page.nextCursor === null || typeof value.meta.page.nextCursor === 'string') ||
     !Array.isArray(value.data) ||
     value.data.length > Number(value.meta.page.limit) ||
@@ -1212,6 +1266,233 @@ export const integrationInstallationValidator: ResourceValidator<IntegrationInst
       (attributes.updatedAt === undefined || canonicalDate(attributes.updatedAt)),
   )
 
+export const systemCapabilityValidator: ResourceValidator<SystemCapability> = (
+  value,
+): value is SystemCapability =>
+  exactResource(
+    value,
+    'systemCapability',
+    publicCapabilityIdPattern,
+    (attributes) =>
+      hasExactKeys(attributes, ['accessible', 'entitled']) &&
+      typeof attributes.accessible === 'boolean' &&
+      typeof attributes.entitled === 'boolean' &&
+      (!attributes.accessible || attributes.entitled),
+  )
+
+export const workspaceEntitlementValidator: ResourceValidator<WorkspaceEntitlement> = (
+  value,
+): value is WorkspaceEntitlement =>
+  exactResource(
+    value,
+    'workspaceEntitlement',
+    publicCapabilityIdPattern,
+    (attributes) =>
+      hasExactKeys(attributes, ['accessible', 'enabled']) &&
+      typeof attributes.accessible === 'boolean' &&
+      typeof attributes.enabled === 'boolean' &&
+      (!attributes.accessible || attributes.enabled),
+  )
+
+function nullableFiniteNumber(
+  value: unknown,
+  minimum: number,
+  maximum: number,
+  exclusiveMinimum = false,
+) {
+  return (
+    value === null ||
+    (typeof value === 'number' &&
+      Number.isFinite(value) &&
+      (exclusiveMinimum ? value > minimum : value >= minimum) &&
+      value <= maximum)
+  )
+}
+
+function validWorkspaceName(value: unknown) {
+  return (
+    typeof value === 'string' &&
+    value.length >= 1 &&
+    value.length <= 200 &&
+    Array.from(value).every((character) => {
+      const codePoint = character.codePointAt(0) ?? 0
+      return codePoint > 31 && codePoint !== 127
+    })
+  )
+}
+
+export const workspaceSettingsValidator: ResourceValidator<WorkspaceSettings> = (
+  value,
+): value is WorkspaceSettings =>
+  exactResource(
+    value,
+    'workspaceSettings',
+    /^current$/,
+    (attributes) =>
+      hasExactKeys(attributes, [
+        'currency',
+        'defaultLanguage',
+        'defaultPlannedTime',
+        'defaultProductivity',
+        'defaultShowInScheduling',
+        'name',
+        'revision',
+      ]) &&
+      (attributes.currency === null ||
+        (typeof attributes.currency === 'string' &&
+          ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'NZD', 'USD', 'ZAR'].includes(
+            attributes.currency,
+          ))) &&
+      (attributes.defaultLanguage === null ||
+        (typeof attributes.defaultLanguage === 'string' &&
+          ['de', 'de-XX', 'en'].includes(attributes.defaultLanguage))) &&
+      nullableFiniteNumber(attributes.defaultPlannedTime, 0, 525_600) &&
+      nullableFiniteNumber(attributes.defaultProductivity, 0, 200, true) &&
+      (attributes.defaultShowInScheduling === null ||
+        typeof attributes.defaultShowInScheduling === 'boolean') &&
+      validWorkspaceName(attributes.name) &&
+      typeof attributes.revision === 'string' &&
+      workspaceSettingsRevisionPattern.test(attributes.revision),
+  )
+
+export function isWorkspaceSettingsUpdate(value: unknown): value is WorkspaceSettingsUpdate {
+  if (
+    !hasAllowedKeys(
+      value,
+      [
+        'currency',
+        'defaultLanguage',
+        'defaultPlannedTime',
+        'defaultProductivity',
+        'defaultShowInScheduling',
+        'name',
+      ],
+      [],
+    ) ||
+    Object.keys(value).length === 0
+  ) {
+    return false
+  }
+  return (
+    (value.currency === undefined ||
+      (typeof value.currency === 'string' &&
+        ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'NZD', 'USD', 'ZAR'].includes(value.currency))) &&
+    (value.defaultLanguage === undefined ||
+      (typeof value.defaultLanguage === 'string' &&
+        ['de', 'de-XX', 'en'].includes(value.defaultLanguage))) &&
+    (value.defaultPlannedTime === undefined ||
+      (nullableFiniteNumber(value.defaultPlannedTime, 0, 525_600) &&
+        value.defaultPlannedTime !== null)) &&
+    (value.defaultProductivity === undefined ||
+      (nullableFiniteNumber(value.defaultProductivity, 0, 200, true) &&
+        value.defaultProductivity !== null)) &&
+    (value.defaultShowInScheduling === undefined ||
+      typeof value.defaultShowInScheduling === 'boolean') &&
+    (value.name === undefined || validWorkspaceName(value.name))
+  )
+}
+
+export const eventDefinitionValidator: ResourceValidator<EventDefinition> = (
+  value,
+): value is EventDefinition =>
+  exactResource(value, 'eventDefinition', eventDefinitionIdPattern, (attributes) => {
+    if (
+      !hasExactKeys(attributes, ['channel', 'operation', 'requiredScopes', 'resourceType']) ||
+      !uniqueStrings(attributes.requiredScopes, 20, (scope) => scopePattern.test(scope))
+    ) {
+      return false
+    }
+    if (attributes.channel === 'webhook') {
+      return attributes.operation === null && attributes.resourceType === null
+    }
+    return (
+      attributes.channel === 'changeFeed' &&
+      ['created', 'deleted', 'updated'].includes(String(attributes.operation)) &&
+      typeof attributes.resourceType === 'string' &&
+      eventResourceTypePattern.test(attributes.resourceType)
+    )
+  })
+
+export const webhookSecretRotationValidator: ResourceValidator<WebhookSecretRotation> = (
+  value,
+): value is WebhookSecretRotation =>
+  exactResource(
+    value,
+    'webhookSecretRotation',
+    webhookIdPattern,
+    (attributes) =>
+      hasExactKeys(attributes, ['replayed', 'revision', 'signingSecret']) &&
+      typeof attributes.replayed === 'boolean' &&
+      typeof attributes.revision === 'string' &&
+      webhookRevisionPattern.test(attributes.revision) &&
+      typeof attributes.signingSecret === 'string' &&
+      webhookSigningSecretPattern.test(attributes.signingSecret),
+  )
+
+function safeWebhookUrl(value: unknown) {
+  if (typeof value !== 'string' || value.length > 2048) return false
+  try {
+    const url = new URL(value)
+    return (
+      url.protocol === 'https:' &&
+      Boolean(url.hostname) &&
+      !url.username &&
+      !url.password &&
+      !url.hash
+    )
+  } catch {
+    return false
+  }
+}
+
+function webhookActions(value: unknown) {
+  return uniqueStrings(value, 100, (action) => /^[A-Za-z0-9_.:-]{1,100}$/.test(action))
+}
+
+export function webhookValidator(signingSecret: 'absent' | 'required'): ResourceValidator<Webhook> {
+  return (value): value is Webhook =>
+    exactResource(
+      value,
+      'webhook',
+      webhookIdPattern,
+      (attributes) =>
+        hasExactKeys(attributes, [
+          'actions',
+          'disabled',
+          'failCount',
+          'lastStatus',
+          'revision',
+          ...(signingSecret === 'required' ? ['signingSecret'] : []),
+          'url',
+          'version',
+        ]) &&
+        webhookActions(attributes.actions) &&
+        typeof attributes.disabled === 'boolean' &&
+        Number.isSafeInteger(attributes.failCount) &&
+        Number(attributes.failCount) >= 0 &&
+        (attributes.lastStatus === null ||
+          (Number.isSafeInteger(attributes.lastStatus) &&
+            Number(attributes.lastStatus) >= 100 &&
+            Number(attributes.lastStatus) <= 599)) &&
+        typeof attributes.revision === 'string' &&
+        webhookRevisionPattern.test(attributes.revision) &&
+        (signingSecret === 'absent' ||
+          (typeof attributes.signingSecret === 'string' &&
+            webhookSigningSecretPattern.test(attributes.signingSecret))) &&
+        safeWebhookUrl(attributes.url) &&
+        attributes.version === 2,
+    )
+}
+
+export function isWebhookCreate(value: unknown): value is WebhookCreate {
+  return (
+    hasExactKeys(value, ['actions', 'url']) &&
+    webhookActions(value.actions) &&
+    value.actions.length > 0 &&
+    safeWebhookUrl(value.url)
+  )
+}
+
 export function assertRevisionEtag(
   transport: Readonly<TransportMetadata>,
   revision: string,
@@ -1230,6 +1511,22 @@ export function canonicalAutomationDefinitionEtag(value: string) {
 
 export function canonicalAutomationRunEtag(value: string) {
   return canonicalEtag(value, automationRunRevisionPattern, 'automation-run')
+}
+
+export function canonicalWorkspaceSettingsEtag(value: string) {
+  return canonicalEtag(value, workspaceSettingsRevisionPattern, 'workspace-settings')
+}
+
+export function canonicalWebhookEtag(value: string) {
+  return canonicalEtag(value, webhookRevisionPattern, 'webhook')
+}
+
+export function isValidIdempotencyKey(value: string) {
+  return /^[\x21-\x7e]{1,128}$/.test(value)
+}
+
+export function isValidWebhookId(value: string) {
+  return webhookIdPattern.test(value)
 }
 
 function canonicalEtag(value: string, pattern: RegExp, label: string) {

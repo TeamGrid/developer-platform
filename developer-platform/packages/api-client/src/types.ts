@@ -67,6 +67,12 @@ export type ChangeCheckpoint = string
 export type Webhook = components['schemas']['Webhook']
 export type WebhookCreate = components['schemas']['WebhookCreate']
 export type WebhookDelivery = components['schemas']['WebhookDelivery']
+export type WebhookSecretRotation = components['schemas']['WebhookSecretRotation']
+export type SystemCapability = components['schemas']['SystemCapability']
+export type WorkspaceEntitlement = components['schemas']['WorkspaceEntitlement']
+export type WorkspaceSettings = components['schemas']['WorkspaceSettings']
+export type WorkspaceSettingsUpdate = components['schemas']['WorkspaceSettingsUpdate']
+export type EventDefinition = components['schemas']['EventDefinition']
 export type TaskCreate = components['schemas']['TaskCreate']
 export type TaskUpdate = components['schemas']['TaskUpdate']
 export type TimeEntryCreate = components['schemas']['TimeEntryCreate']
@@ -786,6 +792,17 @@ export type WebhookDeliveryListOptions = ListOptions & {
   event?: string
   state?: 'delivering' | 'failed' | 'retrying' | 'skipped' | 'succeeded'
   webhookId?: string
+}
+
+export type WorkspaceSettingsRevision = `wst1-${string}`
+export type WebhookRevision = `whk1-${string}`
+
+export type WorkspaceSettingsMutationOptions = MutationOptions & {
+  ifMatch: WorkspaceSettingsRevision | `"${WorkspaceSettingsRevision}"`
+}
+
+export type WebhookSecretRotationOptions = MutationOptions & {
+  ifMatch: WebhookRevision | `"${WebhookRevision}"`
 }
 
 export type MutationOptions = {

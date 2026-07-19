@@ -8,6 +8,8 @@ import {
   TeamGridClient,
   TeamGridClientError,
   type TeamGridClientOptions,
+  type WebhookCreate,
+  type WorkspaceSettingsUpdate,
 } from '@teamgrid/api-client'
 import { Command, Option } from 'commander'
 import { type CliConfig, ConfigStore, normalizeProfileName } from './config.js'
@@ -19,6 +21,7 @@ import {
 } from './exportDownload.js'
 import { readJsonObject, readStdin } from './input.js'
 import { type OutputMode, sanitizeTerminalText, writeJsonLines, writeOutput } from './output.js'
+import { revealWebhookSecret } from './webhookSecretOutput.js'
 
 type GlobalOptions = {
   baseUrl?: string
@@ -70,7 +73,7 @@ export type ProgramDependencies = {
   environment?: NodeJS.ProcessEnv
   errorOutput?: Writable
   input?: Readable & { isTTY?: boolean }
-  output?: Writable
+  output?: Writable & { isTTY?: boolean }
   promptConfirm?: typeof confirm
   promptPassword?: typeof password
 }
@@ -100,6 +103,122 @@ function booleanValue(value: string) {
   if (value === 'true') return true
   if (value === 'false') return false
   throw new TeamGridClientError('invalid_boolean', 'Expected true or false.')
+}
+
+function isWorkspaceCurrency(
+  value: unknown,
+): value is NonNullable<WorkspaceSettingsUpdate['currency']> {
+  return (
+    typeof value === 'string' &&
+    ['AUD', 'CAD', 'CHF', 'EUR', 'GBP', 'NZD', 'USD', 'ZAR'].includes(value)
+  )
+}
+
+function isWorkspaceLanguage(
+  value: unknown,
+): value is NonNullable<WorkspaceSettingsUpdate['defaultLanguage']> {
+  return typeof value === 'string' && ['de', 'de-XX', 'en'].includes(value)
+}
+
+function isWorkspaceName(value: unknown) {
+  return (
+    typeof value === 'string' &&
+    value.length >= 1 &&
+    value.length <= 200 &&
+    Array.from(value).every((character) => {
+      const codePoint = character.codePointAt(0) ?? 0
+      return codePoint > 31 && codePoint !== 127
+    })
+  )
+}
+
+function workspaceSettingsUpdate(value: Record<string, unknown>): WorkspaceSettingsUpdate {
+  const allowed = new Set([
+    'currency',
+    'defaultLanguage',
+    'defaultPlannedTime',
+    'defaultProductivity',
+    'defaultShowInScheduling',
+    'name',
+  ])
+  const keys = Object.keys(value)
+  if (
+    keys.length === 0 ||
+    keys.some((key) => !allowed.has(key)) ||
+    (value.currency !== undefined && !isWorkspaceCurrency(value.currency)) ||
+    (value.defaultLanguage !== undefined && !isWorkspaceLanguage(value.defaultLanguage)) ||
+    (value.defaultPlannedTime !== undefined &&
+      (typeof value.defaultPlannedTime !== 'number' ||
+        !Number.isFinite(value.defaultPlannedTime) ||
+        value.defaultPlannedTime < 0 ||
+        value.defaultPlannedTime > 525_600)) ||
+    (value.defaultProductivity !== undefined &&
+      (typeof value.defaultProductivity !== 'number' ||
+        !Number.isFinite(value.defaultProductivity) ||
+        value.defaultProductivity <= 0 ||
+        value.defaultProductivity > 200)) ||
+    (value.defaultShowInScheduling !== undefined &&
+      typeof value.defaultShowInScheduling !== 'boolean') ||
+    (value.name !== undefined && !isWorkspaceName(value.name))
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Workspace settings data must contain only one or more valid public settings.',
+    )
+  }
+  return {
+    ...(isWorkspaceCurrency(value.currency) ? { currency: value.currency } : {}),
+    ...(isWorkspaceLanguage(value.defaultLanguage)
+      ? { defaultLanguage: value.defaultLanguage }
+      : {}),
+    ...(typeof value.defaultPlannedTime === 'number'
+      ? { defaultPlannedTime: value.defaultPlannedTime }
+      : {}),
+    ...(typeof value.defaultProductivity === 'number'
+      ? { defaultProductivity: value.defaultProductivity }
+      : {}),
+    ...(typeof value.defaultShowInScheduling === 'boolean'
+      ? { defaultShowInScheduling: value.defaultShowInScheduling }
+      : {}),
+    ...(typeof value.name === 'string' ? { name: value.name } : {}),
+  }
+}
+
+function webhookCreate(value: Record<string, unknown>): WebhookCreate {
+  const keys = Object.keys(value)
+  const actions = value.actions
+  let url: URL | undefined
+  try {
+    url = typeof value.url === 'string' ? new URL(value.url) : undefined
+  } catch {
+    url = undefined
+  }
+  if (
+    keys.length !== 2 ||
+    !keys.includes('actions') ||
+    !keys.includes('url') ||
+    !Array.isArray(actions) ||
+    actions.length < 1 ||
+    actions.length > 100 ||
+    actions.some(
+      (action) => typeof action !== 'string' || !/^[A-Za-z0-9_.:-]{1,100}$/.test(action),
+    ) ||
+    new Set(actions).size !== actions.length ||
+    typeof value.url !== 'string' ||
+    value.url.length > 2048 ||
+    !url ||
+    url.protocol !== 'https:' ||
+    !url.hostname ||
+    url.username ||
+    url.password ||
+    url.hash
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Webhook data requires a bounded action set and a safe HTTPS URL.',
+    )
+  }
+  return { actions, url: value.url }
 }
 
 function commaSeparatedChoice(
@@ -544,13 +663,62 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       outputData(command, (await client.system.getApiVersion()).data)
     })
 
-  program
-    .command('workspace')
-    .description('get the authenticated workspace')
-    .action(async function action(_options: unknown, command: Command) {
+  const workspace = program.command('workspace').description('inspect the authenticated workspace')
+  workspace.action(async function action(_options: unknown, command: Command) {
+    const client = await loadClient(command)
+    outputData(command, (await client.workspace.get()).data)
+  })
+  workspace.command('entitlements').action(async function action(
+    _options: unknown,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.workspace.getEntitlements()).data)
+  })
+
+  const system = program.command('system').description('inspect API and product capabilities')
+  system.command('capabilities').action(async function action(_options: unknown, command: Command) {
+    const client = await loadClient(command)
+    outputData(command, (await client.system.getCapabilities()).data)
+  })
+
+  const workspaceSettings = program
+    .command('workspace-settings')
+    .description('read and update public workspace settings')
+  workspaceSettings.command('get').action(async function action(
+    _options: unknown,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.workspaceSettings.get()).data)
+  })
+  workspaceSettings
+    .command('update')
+    .requiredOption('--data <json|@file|->', 'workspace settings patch JSON')
+    .requiredOption(
+      '--if-match <revision|etag>',
+      'latest workspace settings revision or strong ETag',
+    )
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
       const client = await loadClient(command)
-      outputData(command, (await client.workspace.get()).data)
+      const data = workspaceSettingsUpdate(await readJsonObject(options.data, input))
+      outputData(
+        command,
+        (
+          await client.workspaceSettings.update(data, {
+            idempotencyKey: options.idempotencyKey,
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
     })
+
+  const events = program.command('events').description('inspect scoped public events')
+  events.command('catalog').action(async function action(_options: unknown, command: Command) {
+    const client = await loadClient(command)
+    outputData(command, (await client.events.getCatalog()).data)
+  })
 
   const projects = program.command('projects').description('read and mutate projects')
   addListOptions(projects.command('list'))
@@ -2383,7 +2551,10 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   })
 
   const webhooks = program.command('webhooks').description('read and manage webhooks')
-  addListOptions(webhooks.command('list')).action(async function action(options, command: Command) {
+  addListOptions(webhooks.command('list'), 100).action(async function action(
+    options,
+    command: Command,
+  ) {
     const client = await loadClient(command)
     await listResources(command, options, client.webhooks as never)
   })
@@ -2399,16 +2570,29 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     .command('create')
     .requiredOption('--data <json|@file|->', 'webhook create JSON')
     .option('--idempotency-key <key>', 'stable retry key')
+    .option('--secret-file <path>', 'create a new mode-0600 secret file without overwriting')
+    .option('--secret-stdout', 'write only the raw reveal-once secret to stdout')
     .action(async function action(options, command: Command) {
+      if (Boolean(options.secretFile) === Boolean(options.secretStdout)) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          'Choose exactly one reveal-only destination: --secret-file or --secret-stdout.',
+        )
+      }
       const client = await loadClient(command)
-      outputData(
-        command,
-        (
-          await client.webhooks.create((await readJsonObject(options.data, input)) as never, {
-            idempotencyKey: options.idempotencyKey,
-          })
-        ).data,
-      )
+      const data = webhookCreate(await readJsonObject(options.data, input))
+      const receipt = await revealWebhookSecret({
+        file: options.secretFile,
+        output,
+        rotate: async () =>
+          (
+            await client.webhooks.create(data, {
+              idempotencyKey: options.idempotencyKey,
+            })
+          ).data,
+        stdout: options.secretStdout,
+      })
+      if (receipt) outputData(command, receipt)
     })
   archiveOptions(webhooks.command('remove <id>')).action(async function action(
     id: string,
@@ -2419,6 +2603,37 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const client = await loadClient(command)
     await client.webhooks.remove(id)
     outputData(command, { id, removed: true, type: 'webhook' })
+  })
+  archiveOptions(
+    webhooks
+      .command('rotate-secret <id>')
+      .description('rotate and reveal a v2 webhook signing secret exactly once')
+      .requiredOption('--if-match <revision|etag>', 'latest webhook revision or strong ETag')
+      .option('--idempotency-key <key>', 'stable retry key')
+      .option('--secret-file <path>', 'create a new mode-0600 secret file without overwriting')
+      .option('--secret-stdout', 'write only the raw reveal-once secret to stdout'),
+  ).action(async function action(id: string, options, command: Command) {
+    if (Boolean(options.secretFile) === Boolean(options.secretStdout)) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'Choose exactly one reveal-only destination: --secret-file or --secret-stdout.',
+      )
+    }
+    await confirmDestructive(command, 'Rotate the signing secret for', 'webhook', id)
+    const client = await loadClient(command)
+    const receipt = await revealWebhookSecret({
+      file: options.secretFile,
+      output,
+      rotate: async () =>
+        (
+          await client.webhooks.rotateSecret(id, {
+            idempotencyKey: options.idempotencyKey,
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      stdout: options.secretStdout,
+    })
+    if (receipt) outputData(command, receipt)
   })
 
   // Commander does not propagate exitOverride() from the root to nested commands.

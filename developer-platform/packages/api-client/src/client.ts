@@ -4,6 +4,7 @@ import {
   activityEventValidator,
   appointmentValidator,
   assertRevisionEtag,
+  assertStrictOrderedResourceArray,
   assertStrictPage,
   assertStrictResource,
   assertStrictResourceArray,
@@ -15,9 +16,12 @@ import {
   canonicalAdministrationEtag,
   canonicalAutomationDefinitionEtag,
   canonicalAutomationRunEtag,
+  canonicalWebhookEtag,
+  canonicalWorkspaceSettingsEtag,
   commentValidator,
   documentEtag,
   documentValidator,
+  eventDefinitionValidator,
   exportCreationValidator,
   exportDownloadIntentValidator,
   exportJobValidator,
@@ -32,9 +36,18 @@ import {
   invitationValidator,
   isDownloadIntentToken,
   isSafeExportFileName,
+  isValidIdempotencyKey,
+  isValidWebhookId,
+  isWebhookCreate,
+  isWorkspaceSettingsUpdate,
   memberValidator,
   roleValidator,
   searchResultValidator,
+  systemCapabilityValidator,
+  webhookSecretRotationValidator,
+  webhookValidator,
+  workspaceEntitlementValidator,
+  workspaceSettingsValidator,
 } from './newDomainValidation.js'
 import { buildRegionalApiBaseUrl, normalizeApiBaseUrl, parseCredentialLocation } from './routing.js'
 import type {
@@ -169,12 +182,14 @@ import type {
   TimerAction,
   TransportMetadata,
   User,
-  Webhook,
   WebhookCreate,
   WebhookDelivery,
   WebhookDeliveryListOptions,
   WebhookListOptions,
+  WebhookSecretRotationOptions,
   Workspace,
+  WorkspaceSettingsMutationOptions,
+  WorkspaceSettingsUpdate,
 } from './types.js'
 import { apiClientVersion } from './version.js'
 
@@ -267,6 +282,17 @@ function newRequestId() {
     )
   }
   return globalThis.crypto.randomUUID()
+}
+
+function canonicalIdempotencyKey(value?: string) {
+  const key = value === undefined ? newRequestId() : value
+  if (!isValidIdempotencyKey(key)) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Idempotency key must contain 1 to 128 printable non-space ASCII characters.',
+    )
+  }
+  return key
 }
 
 function buildCombinedSignal(signal: AbortSignal | undefined, timeoutMs: number) {
@@ -428,7 +454,7 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 function isRetryableMethod(method: string, idempotencyKey?: string) {
-  return method === 'GET' || ((method === 'POST' || method === 'PUT') && Boolean(idempotencyKey))
+  return method === 'GET' || (['PATCH', 'POST', 'PUT'].includes(method) && Boolean(idempotencyKey))
 }
 
 function strongCustomFieldValueEtag(value: string) {
@@ -706,6 +732,7 @@ export class TeamGridClient {
   readonly customFieldDefinitions
   readonly customFieldValues
   readonly documents
+  readonly events
   readonly exports
   readonly files
   readonly fileUploadIntents
@@ -735,6 +762,7 @@ export class TeamGridClient {
   readonly webhookDeliveries
   readonly webhooks
   readonly workspace
+  readonly workspaceSettings
 
   readonly #baseUrl: string
   readonly #fetch: Fetch
@@ -766,12 +794,54 @@ export class TeamGridClient {
 
     this.workspace = {
       get: (options?: RequestOptions) => this.#resource<Workspace>('/workspace', options),
+      getEntitlements: (options: RequestOptions = {}) =>
+        this.#strictOrderedResourceArray(
+          '/workspace/entitlements',
+          workspaceEntitlementValidator,
+          'workspace entitlements',
+          100,
+          (resource) => resource.id,
+          options,
+        ),
     }
     this.system = {
       getApiVersion: async (options?: RequestOptions) => {
         const response = await this.#request('/', options)
         return attachTransport(assertApiVersion(response.payload), response.transport)
       },
+      getCapabilities: (options: RequestOptions = {}) =>
+        this.#strictOrderedResourceArray(
+          '/system/capabilities',
+          systemCapabilityValidator,
+          'system capabilities',
+          100,
+          (resource) => resource.id,
+          options,
+        ),
+    }
+    this.workspaceSettings = {
+      get: (options: RequestOptions = {}) =>
+        this.#strictResource(
+          '/workspace/settings',
+          workspaceSettingsValidator,
+          'workspace settings',
+          options,
+          200,
+          (resource) => resource.attributes.revision,
+        ),
+      update: (data: WorkspaceSettingsUpdate, options: WorkspaceSettingsMutationOptions) =>
+        this.#updateWorkspaceSettings(data, options),
+    }
+    this.events = {
+      getCatalog: (options: RequestOptions = {}) =>
+        this.#strictOrderedResourceArray(
+          '/events/catalog',
+          eventDefinitionValidator,
+          'event catalog',
+          1000,
+          (resource) => `${resource.attributes.channel === 'webhook' ? '0' : '1'}:${resource.id}`,
+          options,
+        ),
     }
     this.appointments = {
       archive: (id: string, options: AppointmentMutationOptions) => {
@@ -1987,15 +2057,171 @@ export class TeamGridClient {
     }
     this.webhooks = {
       create: (data: WebhookCreate, options?: MutationOptions) =>
-        this.#create<Webhook>('/webhooks', data, options),
-      get: (id: string, options?: RequestOptions) =>
-        this.#resource<Webhook>(`/webhooks/${encodeURIComponent(id)}`, options),
-      list: (options?: WebhookListOptions) => this.#page<Webhook>('/webhooks', options),
+        this.#createWebhook(data, options),
+      get: (id: string, options?: RequestOptions) => {
+        if (!isValidWebhookId(id)) {
+          throw new TeamGridClientError('invalid_arguments', 'Webhook id is invalid.')
+        }
+        return this.#strictResource(
+          `/webhooks/${encodeURIComponent(id)}`,
+          webhookValidator('absent'),
+          'webhook',
+          options,
+          200,
+          (resource) => resource.attributes.revision,
+        )
+      },
+      list: (options: WebhookListOptions = {}) =>
+        this.#strictPage('/webhooks', webhookValidator('absent'), 'webhook list', options, 100),
       pages: (options?: WebhookListOptions, pagination?: PaginationOptions) =>
-        this.#pages<Webhook>('/webhooks', options, pagination),
+        this.#strictPages(
+          '/webhooks',
+          webhookValidator('absent'),
+          'webhook list',
+          options,
+          pagination,
+          100,
+        ),
       remove: (id: string, options?: RequestOptions) =>
         this.#archive(`/webhooks/${encodeURIComponent(id)}`, options),
+      rotateSecret: (id: string, options: WebhookSecretRotationOptions) =>
+        this.#rotateWebhookSecret(id, options),
     }
+  }
+
+  async #strictOrderedResourceArray<T>(
+    path: string,
+    validator: (value: unknown) => value is T,
+    label: string,
+    maximum: number,
+    orderKey: (resource: T) => string,
+    options: InternalRequestOptions = {},
+  ) {
+    const response = await this.#request(path, options)
+    if (response.transport.status !== 200) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned an unexpected status for ${label}.`,
+      )
+    }
+    return attachTransport(
+      assertStrictOrderedResourceArray(response.payload, validator, label, maximum, orderKey),
+      response.transport,
+    )
+  }
+
+  async #updateWorkspaceSettings(
+    data: WorkspaceSettingsUpdate,
+    options: WorkspaceSettingsMutationOptions,
+  ) {
+    if (!isWorkspaceSettingsUpdate(data)) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'Workspace settings update must contain only one or more valid public settings.',
+      )
+    }
+    const { idempotencyKey, ifMatch, ...requestOptions } = options
+    const response = await this.#request('/workspace/settings', {
+      ...requestOptions,
+      body: data,
+      idempotencyKey: canonicalIdempotencyKey(idempotencyKey),
+      ifMatch: canonicalWorkspaceSettingsEtag(ifMatch),
+      method: 'PATCH',
+    })
+    const replayed = response.transport.headers['idempotency-replayed']
+    if (response.transport.status !== 200 || (replayed !== 'false' && replayed !== 'true')) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned invalid workspace settings mutation metadata.',
+      )
+    }
+    const envelope = assertStrictResource(
+      response.payload,
+      workspaceSettingsValidator,
+      'workspace settings update',
+    )
+    assertRevisionEtag(
+      response.transport,
+      envelope.data.attributes.revision,
+      'workspace settings update',
+    )
+    return attachTransport(envelope, response.transport)
+  }
+
+  async #createWebhook(data: WebhookCreate, options: MutationOptions = {}) {
+    if (!isWebhookCreate(data)) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'Webhook creation requires a bounded action set and a safe HTTPS URL.',
+      )
+    }
+    const { idempotencyKey, ...requestOptions } = options
+    const response = await this.#request('/webhooks', {
+      ...requestOptions,
+      body: data,
+      idempotencyKey: canonicalIdempotencyKey(idempotencyKey),
+      method: 'POST',
+    })
+    const isReplay = response.transport.status === 200
+    if (
+      (response.transport.status !== 200 && response.transport.status !== 201) ||
+      response.transport.headers['cache-control'] !== 'private, no-store' ||
+      response.transport.headers['idempotency-replayed'] !== (isReplay ? 'true' : 'false')
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned unsafe webhook creation metadata.',
+      )
+    }
+    const envelope = assertStrictResource(
+      response.payload,
+      webhookValidator('required'),
+      'webhook creation',
+    )
+    assertRevisionEtag(response.transport, envelope.data.attributes.revision, 'webhook creation')
+    return attachTransport(envelope, response.transport)
+  }
+
+  async #rotateWebhookSecret(id: string, options: WebhookSecretRotationOptions) {
+    if (!isValidWebhookId(id)) {
+      throw new TeamGridClientError('invalid_arguments', 'Webhook id is invalid.')
+    }
+    const { idempotencyKey, ifMatch, ...requestOptions } = options
+    const response = await this.#request(`/webhooks/${encodeURIComponent(id)}/secret-rotation`, {
+      ...requestOptions,
+      idempotencyKey: canonicalIdempotencyKey(idempotencyKey),
+      ifMatch: canonicalWebhookEtag(ifMatch),
+      method: 'POST',
+    })
+    const replayedHeader = response.transport.headers['idempotency-replayed']
+    const isReplay = response.transport.status === 200
+    if (
+      (response.transport.status !== 200 && response.transport.status !== 201) ||
+      response.transport.headers['cache-control'] !== 'private, no-store' ||
+      replayedHeader !== (isReplay ? 'true' : 'false')
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned unsafe webhook secret rotation metadata.',
+      )
+    }
+    const envelope = assertStrictResource(
+      response.payload,
+      webhookSecretRotationValidator,
+      'webhook secret rotation',
+    )
+    if (envelope.data.id !== id || envelope.data.attributes.replayed !== isReplay) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned an inconsistent webhook secret rotation.',
+      )
+    }
+    assertRevisionEtag(
+      response.transport,
+      envelope.data.attributes.revision,
+      'webhook secret rotation',
+    )
+    return attachTransport(envelope, response.transport)
   }
 
   async #strictResource<T>(
@@ -2053,6 +2279,7 @@ export class TeamGridClient {
     validator: (value: unknown) => value is T,
     label: string,
     options: ListOptions & Record<string, unknown> = {},
+    maximumLimit = 200,
   ) {
     const { requestId, signal, ...query } = options
     const response = await this.#request(path, {
@@ -2066,7 +2293,10 @@ export class TeamGridClient {
         `The TeamGrid API returned an unexpected status for ${label}.`,
       )
     }
-    return attachTransport(assertStrictPage(response.payload, validator, label), response.transport)
+    return attachTransport(
+      assertStrictPage(response.payload, validator, label, maximumLimit),
+      response.transport,
+    )
   }
 
   async *#strictPages<T>(
@@ -2075,16 +2305,23 @@ export class TeamGridClient {
     label: string,
     options: ListOptions & Record<string, unknown> = {},
     pagination: PaginationOptions = {},
+    maximumLimit = 200,
   ) {
     let cursor = options.cursor
     const seen = new Set<string>()
     const maxPages = Math.max(1, Math.min(Math.trunc(pagination.maxPages ?? 10_000), 10_000))
     for (let pageIndex = 0; pageIndex < maxPages; pageIndex += 1) {
-      const page = await this.#strictPage(path, validator, label, {
-        ...options,
-        cursor,
-        signal: pagination.signal || options.signal,
-      })
+      const page = await this.#strictPage(
+        path,
+        validator,
+        label,
+        {
+          ...options,
+          cursor,
+          signal: pagination.signal || options.signal,
+        },
+        maximumLimit,
+      )
       yield page
       const nextCursor = page.meta.page.nextCursor
       if (!nextCursor) return

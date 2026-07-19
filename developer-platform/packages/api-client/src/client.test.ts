@@ -216,7 +216,10 @@ describe('TeamGrid API client', () => {
               disabled: false,
               failCount: 0,
               lastStatus: null,
+              revision: `whk1-${'a'.repeat(64)}`,
+              signingSecret: `whsec_v2_${'A'.repeat(43)}`,
               url: 'https://hooks.example.com/teamgrid',
+              version: 2,
             },
             id: 'webhook-1',
             type: 'webhook',
@@ -224,7 +227,12 @@ describe('TeamGrid API client', () => {
           meta: { requestId: 'request-webhook' },
         },
         201,
-        { 'idempotency-replayed': 'true', 'x-request-id': 'request-webhook-header' },
+        {
+          'cache-control': 'private, no-store',
+          etag: `"whk1-${'a'.repeat(64)}"`,
+          'idempotency-replayed': 'false',
+          'x-request-id': 'request-webhook-header',
+        },
       )
     })
     const client = new TeamGridClient({ fetch, token })
@@ -234,7 +242,7 @@ describe('TeamGrid API client', () => {
     )
     expect(result.data.id).toBe('webhook-1')
     expect(result.transport).toMatchObject({
-      idempotencyReplayed: true,
+      idempotencyReplayed: false,
       requestId: 'request-webhook-header',
       status: 201,
     })

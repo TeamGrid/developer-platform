@@ -80,6 +80,22 @@
           "pattern": "^\"aur1-[a-f0-9]{64}\"$",
           "type": "string"
         }
+      },
+      "WebhookETag": {
+        "description": "Strong credential-owned webhook revision including signing-secret generation.",
+        "required": true,
+        "schema": {
+          "pattern": "^\"whk1-[a-f0-9]{64}\"$",
+          "type": "string"
+        }
+      },
+      "WorkspaceSettingsETag": {
+        "description": "Strong revision of the complete public workspace settings allowlist.",
+        "required": true,
+        "schema": {
+          "pattern": "^\"wst1-[a-f0-9]{64}\"$",
+          "type": "string"
+        }
       }
     },
     "parameters": {
@@ -136,6 +152,7 @@
         "schema": {
           "maxLength": 128,
           "minLength": 1,
+          "pattern": "^[!-~]+$",
           "type": "string"
         }
       },
@@ -287,6 +304,36 @@
         "schema": {
           "pattern": "^ex1\\.\\d{10}\\.[a-f0-9]{32}\\.[a-f0-9]{64}$",
           "type": "string"
+        }
+      },
+      "IfMatchWebhook": {
+        "description": "Exactly one latest strong webhook ETag. Wildcards, weak validators, and lists are rejected.",
+        "in": "header",
+        "name": "If-Match",
+        "required": true,
+        "schema": {
+          "pattern": "^\"whk1-[a-f0-9]{64}\"$",
+          "type": "string"
+        }
+      },
+      "IfMatchWorkspaceSettings": {
+        "description": "Exactly one latest strong workspace settings ETag. Wildcards, weak validators, and lists are rejected.",
+        "in": "header",
+        "name": "If-Match",
+        "required": true,
+        "schema": {
+          "pattern": "^\"wst1-[a-f0-9]{64}\"$",
+          "type": "string"
+        }
+      },
+      "WebhookLimit": {
+        "in": "query",
+        "name": "limit",
+        "schema": {
+          "default": 50,
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
         }
       }
     },
@@ -5104,13 +5151,19 @@
                 ]
               },
               "signingSecret": {
-                "description": "Returned only by an idempotent webhook create response.",
+                "description": "Reveal-only initial signing secret returned by a no-store webhook create response.",
                 "pattern": "^whsec_v2_[A-Za-z0-9_-]{43}$",
                 "readOnly": true,
                 "type": "string"
               },
               "url": {
+                "description": "HTTPS destination without URL credentials or a fragment.",
                 "format": "uri",
+                "maxLength": 2048,
+                "not": {
+                  "pattern": "^https://[^/]*@"
+                },
+                "pattern": "^https://[^#]+$",
                 "type": "string"
               },
               "version": {
@@ -5119,6 +5172,10 @@
                   2
                 ],
                 "type": "integer"
+              },
+              "revision": {
+                "pattern": "^whk1-[a-f0-9]{64}$",
+                "type": "string"
               }
             },
             "required": [
@@ -5127,7 +5184,8 @@
               "failCount",
               "lastStatus",
               "url",
-              "version"
+              "version",
+              "revision"
             ],
             "type": "object"
           },
@@ -5143,7 +5201,8 @@
           "id",
           "attributes"
         ],
-        "type": "object"
+        "type": "object",
+        "description": "Credential-owned v2 webhook. List and get responses are secret-free and carry a strong whk1 revision. Only create may include the reveal-only initial signing secret."
       },
       "WebhookDelivery": {
         "additionalProperties": false,
@@ -8696,6 +8755,368 @@
               "event"
             ],
             "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "EventDefinition": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "channel": {
+                "enum": [
+                  "changeFeed",
+                  "webhook"
+                ],
+                "type": "string"
+              },
+              "operation": {
+                "enum": [
+                  "created",
+                  "deleted",
+                  "updated",
+                  null
+                ],
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "requiredScopes": {
+                "items": {
+                  "maxLength": 128,
+                  "minLength": 3,
+                  "pattern": "^[a-z][a-z0-9-]*(?::[a-z][a-z0-9-]*){1,2}$",
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "resourceType": {
+                "maxLength": 128,
+                "pattern": "^[A-Za-z][A-Za-z0-9]*$",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "channel",
+              "operation",
+              "requiredScopes",
+              "resourceType"
+            ],
+            "type": "object",
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "channel": {
+                      "const": "webhook"
+                    }
+                  },
+                  "required": [
+                    "channel"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "operation": {
+                      "const": null
+                    },
+                    "resourceType": {
+                      "const": null
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "operation": {
+                      "enum": [
+                        "created",
+                        "deleted",
+                        "updated"
+                      ],
+                      "type": "string"
+                    },
+                    "resourceType": {
+                      "maxLength": 128,
+                      "pattern": "^[A-Za-z][A-Za-z0-9]*$",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "eventDefinition"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "SystemCapability": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "accessible": {
+                "type": "boolean"
+              },
+              "entitled": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "accessible",
+              "entitled"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z][A-Za-z0-9-]*$",
+            "type": "string"
+          },
+          "type": {
+            "const": "systemCapability"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "WebhookSecretRotation": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "replayed": {
+                "type": "boolean"
+              },
+              "revision": {
+                "pattern": "^whk1-[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "signingSecret": {
+                "description": "Reveal-only replacement signing secret. It is returned only by this no-store response and is never persisted as plaintext.",
+                "pattern": "^whsec_v2_[A-Za-z0-9_-]{43}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "replayed",
+              "revision",
+              "signingSecret"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "type": {
+            "const": "webhookSecretRotation"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "WorkspaceEntitlement": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "accessible": {
+                "type": "boolean"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "accessible",
+              "enabled"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z][A-Za-z0-9-]*$",
+            "type": "string"
+          },
+          "type": {
+            "const": "workspaceEntitlement"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "WorkspaceSettings": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "currency": {
+                "enum": [
+                  "AUD",
+                  "CAD",
+                  "CHF",
+                  "EUR",
+                  "GBP",
+                  "NZD",
+                  "USD",
+                  "ZAR",
+                  null
+                ],
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "defaultLanguage": {
+                "enum": [
+                  "de",
+                  "de-XX",
+                  "en",
+                  null
+                ],
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "defaultPlannedTime": {
+                "maximum": 525600,
+                "minimum": 0,
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "defaultProductivity": {
+                "exclusiveMinimum": 0,
+                "maximum": 200,
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "defaultShowInScheduling": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "name": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              "revision": {
+                "pattern": "^wst1-[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "currency",
+              "defaultLanguage",
+              "defaultPlannedTime",
+              "defaultProductivity",
+              "defaultShowInScheduling",
+              "name",
+              "revision"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "const": "current",
+            "type": "string"
+          },
+          "type": {
+            "const": "workspaceSettings"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "WorkspaceSettingsUpdate": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "currency": {
+            "enum": [
+              "AUD",
+              "CAD",
+              "CHF",
+              "EUR",
+              "GBP",
+              "NZD",
+              "USD",
+              "ZAR"
+            ],
+            "type": "string"
+          },
+          "defaultLanguage": {
+            "enum": [
+              "de",
+              "de-XX",
+              "en"
+            ],
+            "type": "string"
+          },
+          "defaultPlannedTime": {
+            "maximum": 525600,
+            "minimum": 0,
+            "type": "number"
+          },
+          "defaultProductivity": {
+            "exclusiveMinimum": 0,
+            "maximum": 200,
+            "type": "number"
+          },
+          "defaultShowInScheduling": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
           }
         },
         "type": "object"
@@ -21029,7 +21450,7 @@
             "$ref": "#/components/parameters/Cursor"
           },
           {
-            "$ref": "#/components/parameters/Limit"
+            "$ref": "#/components/parameters/WebhookLimit"
           }
         ],
         "responses": {
@@ -21167,6 +21588,15 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "private, no-store",
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "$ref": "#/components/headers/WebhookETag"
               }
             }
           },
@@ -21200,6 +21630,15 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "const": "private, no-store",
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "$ref": "#/components/headers/WebhookETag"
               }
             }
           },
@@ -21525,7 +21964,12 @@
                 }
               }
             },
-            "description": "The requested resource."
+            "description": "The requested resource.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/WebhookETag"
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -21541,6 +21985,9 @@
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
           },
           "503": {
             "$ref": "#/components/responses/ServiceUnavailable"
@@ -24775,6 +25222,504 @@
           "integrations:read"
         ]
       }
+    },
+    "/events/catalog": {
+      "get": {
+        "operationId": "getEventCatalog",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/EventDefinition"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "An exact bounded public projection."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get the scoped public event catalog",
+        "tags": [
+          "Events"
+        ],
+        "x-teamgrid-required-scopes": [
+          "events:read"
+        ],
+        "description": "Returns only webhook and change-feed events whose complete required-scope set is granted to this credential. Internal collections, automation implementation names, and unscoped product events remain private."
+      }
+    },
+    "/system/capabilities": {
+      "get": {
+        "operationId": "getSystemCapabilities",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/SystemCapability"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "An exact bounded public projection."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get credential-aware system capabilities",
+        "tags": [
+          "System"
+        ],
+        "x-teamgrid-required-scopes": [
+          "workspace:read"
+        ],
+        "description": "Intersects public product capability identifiers with workspace entitlement and this credential’s granted scopes. Raw plan, billing, feature-group, role, and permission identifiers are never exposed."
+      }
+    },
+    "/workspace/entitlements": {
+      "get": {
+        "operationId": "getWorkspaceEntitlements",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/WorkspaceEntitlement"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "An exact bounded public projection."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get public workspace entitlements",
+        "tags": [
+          "Workspace"
+        ],
+        "x-teamgrid-required-scopes": [
+          "workspace:read"
+        ],
+        "description": "Returns stable public capability identifiers and entitlement state without raw plan, billing, feature-group, or role details."
+      }
+    },
+    "/workspace/settings": {
+      "get": {
+        "operationId": "getWorkspaceSettings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/WorkspaceSettings"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The exact public workspace settings allowlist.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/WorkspaceSettingsETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get public workspace settings",
+        "tags": [
+          "Workspace"
+        ],
+        "x-teamgrid-required-scopes": [
+          "workspace-settings:read"
+        ]
+      },
+      "patch": {
+        "description": "Atomically compares the complete public settings revision, applies only the six documented settings, durably audits the write, and retains a recoverable credential-owned idempotency record for seven days.",
+        "operationId": "updateWorkspaceSettings",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatchWorkspaceSettings"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceSettingsUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/WorkspaceSettings"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The updated settings, or an exact replay of the original successful result.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/WorkspaceSettingsETag"
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "enum": [
+                    "false",
+                    "true"
+                  ],
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update public workspace settings",
+        "tags": [
+          "Workspace"
+        ],
+        "x-teamgrid-required-scopes": [
+          "workspace-settings:write"
+        ]
+      }
+    },
+    "/webhooks/{id}/secret-rotation": {
+      "post": {
+        "description": "Rotates the signing-secret generation for a credential-owned v2 webhook. The secret is derived only for this no-store response, remains absent from URLs and persistent records, and is reproduced only for an exact idempotent replay.",
+        "operationId": "rotateWebhookSecret",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchWebhook"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/WebhookSecretRotation"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "An exact replay of the completed secret rotation.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "private, no-store",
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "$ref": "#/components/headers/WebhookETag"
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "const": "true",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/WebhookSecretRotation"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A newly completed signing-secret rotation.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "private, no-store",
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "$ref": "#/components/headers/WebhookETag"
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "const": "false",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Rotate a credential-owned webhook signing secret",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-teamgrid-required-scopes": [
+          "webhooks:write"
+        ]
+      }
     }
   },
   "servers": [
@@ -24894,6 +25839,10 @@
     {
       "description": "Secret-free installation status for supported workspace integrations.",
       "name": "Integrations"
+    },
+    {
+      "description": "Credential-scoped public webhook and change-feed event discovery without internal implementation metadata.",
+      "name": "Events"
     }
   ]
 }

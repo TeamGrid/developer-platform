@@ -3,6 +3,8 @@
   "apiVersion": "v1",
   "scopes": [
     { "name": "workspace:read", "availability": "issuable" },
+    { "name": "workspace-settings:read", "availability": "issuable" },
+    { "name": "workspace-settings:write", "availability": "issuable", "sensitive": true },
     { "name": "projects:read", "availability": "issuable" },
     { "name": "projects:write", "availability": "issuable" },
     { "name": "projects:lifecycle", "availability": "issuable" },
@@ -77,7 +79,8 @@
     { "name": "webhooks:read", "availability": "issuable" },
     { "name": "webhooks:write", "availability": "issuable" },
     { "name": "audit:read", "availability": "issuable", "sensitive": true },
-    { "name": "changes:read", "availability": "issuable" }
+    { "name": "changes:read", "availability": "issuable" },
+    { "name": "events:read", "availability": "issuable" }
   ],
   "dynamicPolicies": [
     {
