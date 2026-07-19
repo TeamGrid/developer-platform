@@ -69,6 +69,9 @@ teamgrid changes checkpoint --resource-type project,task --output json
 teamgrid changes list --cursor "$CHECKPOINT" --resource-type project,task --output json
 teamgrid custom-field-values get project project-id field-id --output json
 teamgrid project-templates list --origin-project-id project-id --output json
+teamgrid tasks update task-id --data '{"name":"Reviewed"}' --if-match "$TASK_REVISION"
+teamgrid projects complete project-id --if-match "$PROJECT_REVISION" \
+  --idempotency-key complete-project-id-v1 --wait --output json
 teamgrid planned-work list --start 2026-07-20T00:00:00Z --end 2026-07-27T00:00:00Z \
   --user-id user-id --output json
 ```
@@ -101,8 +104,10 @@ payloads. Persist every returned checkpoint only after applying the page. Contin
 `page.meta.page.caughtUp` is true; an empty page alone is not the completion contract.
 
 GET requests, POST requests with an idempotency key, and compare-and-set planned-work PUTs with an
-idempotency key are retried for bounded transient failures. Other PUT, PATCH, and DELETE requests
-are not automatically retried. Errors do
+idempotency key are retried for bounded transient failures. Task, project, and project-template
+mutations require the latest typed `developerRevision` or strong ETag. Stale `If-Match` requests
+fail with HTTP `412`; callers must fetch, reconcile, and retry explicitly. Other PUT, PATCH, and
+DELETE requests are not automatically retried. Errors do
 not retain or print the bearer credential.
 
 ## Webhook v2 signatures
@@ -132,7 +137,7 @@ MCP is intentionally downstream of API v1 and is not required for automation.
 It reads the same CLI keychain profile and offers only bounded read tools.
 The default `core` tool profile includes workspace, projects, tasks, time
 entries, lists, and tags. `collaboration` additionally exposes contacts and
-users; `governance` adds audit, webhooks, and services. Service reads are kept
+users; `governance` adds webhooks, services, and custom-field definitions. Service reads are kept
 out of `core` because they include billing-rate data. `all` is the explicit
 union of the collaboration and governance profiles.
 

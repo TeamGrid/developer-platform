@@ -70,5 +70,36 @@ const accepted = await teamgrid.plannedWork.replaceForTask(
 await teamgrid.plannedWorkOperations.wait(accepted.data.id)
 ```
 
+Tasks, projects, and project templates use the same rule for every update and state transition.
+Their returned `developerRevision` values and canonical strong ETags are branded by resource type,
+so a project ETag cannot accidentally be supplied to a task mutation. All five project mutations,
+all five task mutations, and all four project-template mutations require `ifMatch` at compile time
+and validate it again before network I/O. Project lifecycle changes and template instantiation also
+require a stable idempotency key for safe retries:
+
+```ts
+const task = await teamgrid.tasks.get('task-id')
+const updated = await teamgrid.tasks.update(
+  task.data.id,
+  { name: 'Reviewed task' },
+  { ifMatch: task.data.attributes.developerRevision },
+)
+
+const project = await teamgrid.projects.get('project-id')
+const operation = await teamgrid.projects.complete(project.data.id, {
+  idempotencyKey: 'complete-project-id-v1',
+  ifMatch: project.data.attributes.developerRevision,
+})
+await teamgrid.projectLifecycleOperations.wait(operation.data.id, {
+  acceptedOperation: operation.data,
+})
+```
+
+HTTP `412` means the resource changed: fetch it again, re-apply the intended change, and retry with
+the new revision. The client never retries a stale mutation automatically. It also rejects a
+successful response when the body revision and ETag differ. Pass the accepted operation to `wait`
+as shown above: the client then binds every poll to the accepted operation ID, source revision,
+action, and target resource, and also rejects inconsistent result revisions or terminal states.
+
 Node.js 22.13–24 is supported. See the workspace README and checked OpenAPI v1
 contract for the complete resource and security model.

@@ -23,7 +23,7 @@ The default `core` profile exposes 15 bounded reads for workspace, projects,
 tasks, time entries, lists, tags, products, and product groups. Product purchase
 prices are never included without the finance overlay, which the MCP preset does
 not grant. Use `collaboration` for contact, call-note, contact-group, and user
-reads; `governance` for audit, webhook, service, and custom-field-definition
+reads; `governance` for webhook, service, and custom-field-definition
 reads; or `all` for the explicit 29-tool union. Project statements and webhook
 delivery history remain forbidden in every MCP profile. The adapter does not
 expose write or secret-bearing operations.

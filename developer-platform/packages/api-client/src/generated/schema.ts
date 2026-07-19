@@ -618,7 +618,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Update a project */
+        /**
+         * Update a project
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         patch: operations["updateProject"];
         trace?: never;
     };
@@ -745,11 +748,17 @@ export interface paths {
         get: operations["getProjectTemplate"];
         put?: never;
         post?: never;
-        /** Archive a project template */
+        /**
+         * Archive a project template
+         * @description Requires exactly one latest strong resource ETag and returns the post-archive revision in the ETag header.
+         */
         delete: operations["archiveProjectTemplate"];
         options?: never;
         head?: never;
-        /** Update project-template metadata */
+        /**
+         * Update project-template metadata
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         patch: operations["updateProjectTemplate"];
         trace?: never;
     };
@@ -762,7 +771,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived project template */
+        /**
+         * Restore an archived project template
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         post: operations["restoreProjectTemplate"];
         delete?: never;
         options?: never;
@@ -957,11 +969,17 @@ export interface paths {
         get: operations["getTask"];
         put?: never;
         post?: never;
-        /** Archive a task */
+        /**
+         * Archive a task
+         * @description Requires exactly one latest strong resource ETag and returns the post-archive revision in the ETag header.
+         */
         delete: operations["archiveTask"];
         options?: never;
         head?: never;
-        /** Update a task */
+        /**
+         * Update a task
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         patch: operations["updateTask"];
         trace?: never;
     };
@@ -974,7 +992,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived task */
+        /**
+         * Restore an archived task
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         post: operations["restoreTask"];
         delete?: never;
         options?: never;
@@ -991,7 +1012,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Complete a task */
+        /**
+         * Complete a task
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         post: operations["completeTask"];
         delete?: never;
         options?: never;
@@ -1008,7 +1032,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Reopen a completed task */
+        /**
+         * Reopen a completed task
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         post: operations["reopenTask"];
         delete?: never;
         options?: never;
@@ -2480,6 +2507,9 @@ export interface components {
                 /** Format: date-time */
                 createdAt: string | null;
                 description: string;
+                developerRevision: string;
+                /** Format: date-time */
+                developerUpdatedAt: string;
                 /** Format: date-time */
                 dueAt: string | null;
                 individualId: string | null;
@@ -2507,6 +2537,9 @@ export interface components {
                 /** Format: date-time */
                 createdAt: string | null;
                 description: string;
+                developerRevision: string;
+                /** Format: date-time */
+                developerUpdatedAt: string;
                 originProjectId: string | null;
                 /** @enum {integer|null} */
                 snapshotVersion: 1 | null;
@@ -2540,6 +2573,8 @@ export interface components {
                     tasksTotal: number;
                 };
                 projectId: string;
+                resultRevision: string | null;
+                sourceRevision: string;
                 /** @enum {string} */
                 state: "failed" | "pending" | "running" | "succeeded";
                 templateId: string;
@@ -2574,13 +2609,15 @@ export interface components {
                 readonly finishedAt?: string;
                 noOp: boolean;
                 projectId: string;
+                resultRevision: string | null;
+                sourceRevision: string;
                 /** Format: date-time */
                 readonly startedAt?: string;
                 /** @enum {string} */
                 state: "failed" | "pending" | "running" | "succeeded";
                 /** Format: date-time */
                 updatedAt: string;
-            };
+            } & (unknown & unknown & unknown);
             id: string;
             /** @constant */
             type: "projectLifecycleOperation";
@@ -2594,6 +2631,9 @@ export interface components {
                 /** Format: date-time */
                 createdAt: string | null;
                 description: string;
+                developerRevision: string;
+                /** Format: date-time */
+                developerUpdatedAt: string;
                 /** Format: date-time */
                 dueAt: string | null;
                 groupId: string | null;
@@ -4047,6 +4087,12 @@ export interface components {
         IfMatchFile: string;
         /** @description Exactly one strong ETag returned by the latest task planned-work GET. Wildcards, weak validators, and lists are rejected. */
         IfMatchPlannedWork: string;
+        /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+        IfMatchProject: string;
+        /** @description Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+        IfMatchProjectTemplate: string;
+        /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+        IfMatchTask: string;
         Limit: number;
         ResourceId: string;
         WebhookDeliveryId: string;
@@ -4082,6 +4128,12 @@ export interface components {
         CustomFieldValueETag: string;
         /** @description Strong schedule revision required verbatim in If-Match before replacement. */
         PlannedWorkETag: string;
+        /** @description Strong project revision returned by reads and synchronous mutations. */
+        ProjectETag: string;
+        /** @description Strong project-template revision returned by reads and mutations. */
+        ProjectTemplateETag: string;
+        /** @description Strong task revision returned by reads and mutations. */
+        TaskETag: string;
         /** @description Strong member-administration resource revision. */
         AdministrationETag: string;
         /** @description Strong automation-definition revision. */
@@ -6051,6 +6103,7 @@ export interface operations {
             200: {
                 headers: {
                     "Idempotency-Replayed"?: "true";
+                    ETag: components["headers"]["ProjectETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6064,6 +6117,7 @@ export interface operations {
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["ProjectETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6096,6 +6150,7 @@ export interface operations {
             /** @description The requested resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["ProjectETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6116,7 +6171,10 @@ export interface operations {
     updateProject: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -6131,6 +6189,7 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["ProjectETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6145,6 +6204,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6154,6 +6215,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
                 /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -6185,6 +6248,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6194,6 +6259,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
                 /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -6225,6 +6292,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6234,6 +6303,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
                 /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -6265,6 +6336,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6274,6 +6347,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
                 /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -6305,6 +6380,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6337,6 +6414,15 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            /** @description The operation predates resource revision tracking and can no longer be polled. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6409,6 +6495,7 @@ export interface operations {
             200: {
                 headers: {
                     "Idempotency-Replayed"?: "true";
+                    ETag: components["headers"]["ProjectTemplateETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6422,6 +6509,7 @@ export interface operations {
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["ProjectTemplateETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6454,6 +6542,7 @@ export interface operations {
             /** @description The requested resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["ProjectTemplateETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6475,7 +6564,10 @@ export interface operations {
     archiveProjectTemplate: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProjectTemplate"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -6486,6 +6578,7 @@ export interface operations {
             /** @description The project template was archived, or that state was already present. */
             204: {
                 headers: {
+                    ETag: components["headers"]["ProjectTemplateETag"];
                     [name: string]: unknown;
                 };
                 content?: never;
@@ -6495,6 +6588,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6503,7 +6598,10 @@ export interface operations {
     updateProjectTemplate: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProjectTemplate"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -6518,6 +6616,7 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["ProjectTemplateETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6532,6 +6631,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6540,7 +6641,10 @@ export interface operations {
     restoreProjectTemplate: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProjectTemplate"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -6551,6 +6655,7 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["ProjectTemplateETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6565,6 +6670,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6574,6 +6681,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProjectTemplate"];
                 /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -6609,6 +6718,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6641,6 +6752,15 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            /** @description The operation predates resource revision tracking and can no longer be polled. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7112,6 +7232,7 @@ export interface operations {
             200: {
                 headers: {
                     "Idempotency-Replayed"?: "true";
+                    ETag: components["headers"]["TaskETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7125,6 +7246,7 @@ export interface operations {
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["TaskETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7157,6 +7279,7 @@ export interface operations {
             /** @description The requested resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7177,7 +7300,10 @@ export interface operations {
     archiveTask: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -7188,6 +7314,7 @@ export interface operations {
             /** @description The resource was archived. */
             204: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
                     [name: string]: unknown;
                 };
                 content?: never;
@@ -7197,6 +7324,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7205,7 +7334,10 @@ export interface operations {
     updateTask: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -7220,6 +7352,7 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7234,6 +7367,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7242,7 +7377,10 @@ export interface operations {
     restoreTask: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -7253,6 +7391,7 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7267,6 +7406,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7275,7 +7416,10 @@ export interface operations {
     completeTask: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -7286,6 +7430,7 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7300,6 +7445,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7308,7 +7455,10 @@ export interface operations {
     reopenTask: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -7319,6 +7469,7 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7333,6 +7484,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

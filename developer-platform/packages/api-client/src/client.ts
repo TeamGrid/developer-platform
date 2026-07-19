@@ -49,6 +49,22 @@ import {
   workspaceEntitlementValidator,
   workspaceSettingsValidator,
 } from './newDomainValidation.js'
+import {
+  assertOperationSourceRevision,
+  assertProjectLifecycleOperationContinuity,
+  assertProjectTemplateInstantiationContinuity,
+  assertResourceRevisionEtag,
+  assertStrongResponseEtag,
+  canonicalProjectStrongETag,
+  canonicalProjectTemplateStrongETag,
+  canonicalTaskStrongETag,
+  projectLifecycleOperationValidator,
+  projectTemplateInstantiationValidator,
+  projectTemplateValidator,
+  projectValidator,
+  rawRevisionFromStrongETag,
+  taskValidator,
+} from './resourceConcurrency.js'
 import { buildRegionalApiBaseUrl, normalizeApiBaseUrl, parseCredentialLocation } from './routing.js'
 import type {
   AbsenceCreate,
@@ -142,21 +158,25 @@ import type {
   ProductGroupUpdate,
   ProductListOptions,
   ProductUpdate,
-  Project,
   ProjectCreate,
+  ProjectLifecycleMutationOptions,
   ProjectLifecycleOperation,
   ProjectLifecycleWaitOptions,
   ProjectListOptions,
+  ProjectMutationOptions,
   ProjectStatement,
   ProjectStatementCreate,
   ProjectStatementListOptions,
   ProjectStatementUpdate,
-  ProjectTemplate,
+  ProjectStrongETag,
   ProjectTemplateCreate,
   ProjectTemplateInstantiate,
+  ProjectTemplateInstantiateOptions,
   ProjectTemplateInstantiation,
   ProjectTemplateInstantiationWaitOptions,
   ProjectTemplateListOptions,
+  ProjectTemplateMutationOptions,
+  ProjectTemplateStrongETag,
   ProjectTemplateUpdate,
   ProjectUpdate,
   RequestOptions,
@@ -170,10 +190,11 @@ import type {
   Tag,
   TagCreate,
   TagUpdate,
-  Task,
   TaskCreate,
   TaskListOptions,
+  TaskMutationOptions,
   TaskPlannedWork,
+  TaskStrongETag,
   TaskUpdate,
   TimeEntry,
   TimeEntryCreate,
@@ -182,6 +203,8 @@ import type {
   TimerAction,
   TransportMetadata,
   User,
+  VersionedResourceEnvelope,
+  VersionedResourceTransport,
   WebhookCreate,
   WebhookDelivery,
   WebhookDeliveryListOptions,
@@ -197,6 +220,13 @@ type Fetch = typeof globalThis.fetch
 type Sleep = (milliseconds: number, signal?: AbortSignal) => Promise<void>
 type QueryValue = boolean | number | string | Date | null | undefined
 type Query = Record<string, QueryValue | readonly QueryValue[]>
+type VersionedResourceKind = 'project' | 'projectTemplate' | 'task'
+type StrongETagForKind<TKind extends VersionedResourceKind> = TKind extends 'project'
+  ? ProjectStrongETag
+  : TKind extends 'projectTemplate'
+    ? ProjectTemplateStrongETag
+    : TaskStrongETag
+type ResourceValidator<T> = (value: unknown) => value is T
 
 type InternalRequestOptions = RequestOptions & {
   body?: unknown
@@ -704,14 +734,17 @@ function transportMetadata({
   })
 }
 
-function attachTransport<T extends object>(value: T, transport: Readonly<TransportMetadata>) {
+function attachTransport<T extends object, TTransport extends Readonly<TransportMetadata>>(
+  value: T,
+  transport: TTransport,
+) {
   Object.defineProperty(value, 'transport', {
     configurable: false,
     enumerable: false,
     value: transport,
     writable: false,
   })
-  return value as T & { readonly transport: Readonly<TransportMetadata> }
+  return value as T & { readonly transport: TTransport }
 }
 
 export class TeamGridClient {
@@ -1709,44 +1742,81 @@ export class TeamGridClient {
         this.#waitForPlannedWorkOperation(id, options),
     }
     this.projects = {
-      archive: (id: string, options?: MutationOptions) =>
-        this.#create<ProjectLifecycleOperation>(
+      archive: (id: string, options: ProjectLifecycleMutationOptions) =>
+        this.#createRevisionOperation(
           `/projects/${encodeURIComponent(id)}/archive`,
           undefined,
           options,
+          projectLifecycleOperationValidator,
+          'project',
+          'project archive',
         ),
-      complete: (id: string, options?: MutationOptions) =>
-        this.#create<ProjectLifecycleOperation>(
+      complete: (id: string, options: ProjectLifecycleMutationOptions) =>
+        this.#createRevisionOperation(
           `/projects/${encodeURIComponent(id)}/complete`,
           undefined,
           options,
+          projectLifecycleOperationValidator,
+          'project',
+          'project completion',
         ),
       create: (data: ProjectCreate, options?: MutationOptions) =>
-        this.#create<Project>('/projects', data, options),
+        this.#createVersionedResource(
+          '/projects',
+          data,
+          options,
+          projectValidator,
+          'project',
+          'project creation',
+        ),
       get: (id: string, options?: RequestOptions) =>
-        this.#resource<Project>(`/projects/${encodeURIComponent(id)}`, options),
-      list: (options?: ProjectListOptions) => this.#page<Project>('/projects', options),
+        this.#versionedResource(
+          `/projects/${encodeURIComponent(id)}`,
+          options,
+          projectValidator,
+          'project',
+          'project',
+        ),
+      list: (options: ProjectListOptions = {}) =>
+        this.#strictPage('/projects', projectValidator, 'project list', options),
       pages: (options?: ProjectListOptions, pagination?: PaginationOptions) =>
-        this.#pages<Project>('/projects', options, pagination),
-      reopen: (id: string, options?: MutationOptions) =>
-        this.#create<ProjectLifecycleOperation>(
+        this.#strictPages('/projects', projectValidator, 'project list', options, pagination),
+      reopen: (id: string, options: ProjectLifecycleMutationOptions) =>
+        this.#createRevisionOperation(
           `/projects/${encodeURIComponent(id)}/reopen`,
           undefined,
           options,
+          projectLifecycleOperationValidator,
+          'project',
+          'project reopen',
         ),
-      restore: (id: string, options?: MutationOptions) =>
-        this.#create<ProjectLifecycleOperation>(
+      restore: (id: string, options: ProjectLifecycleMutationOptions) =>
+        this.#createRevisionOperation(
           `/projects/${encodeURIComponent(id)}/restore`,
           undefined,
           options,
+          projectLifecycleOperationValidator,
+          'project',
+          'project restore',
         ),
-      update: (id: string, data: ProjectUpdate, options?: RequestOptions) =>
-        this.#update<Project>(`/projects/${encodeURIComponent(id)}`, data, options),
+      update: (id: string, data: ProjectUpdate, options: ProjectMutationOptions) =>
+        this.#mutateVersionedResource(
+          `/projects/${encodeURIComponent(id)}`,
+          'PATCH',
+          data,
+          options,
+          projectValidator,
+          'project',
+          'project update',
+        ),
     }
     this.projectLifecycleOperations = {
       get: (id: string, options?: RequestOptions) =>
-        this.#resource<ProjectLifecycleOperation>(
+        this.#strictOperationResource(
           `/project-lifecycle-operations/${encodeURIComponent(id)}`,
+          id,
+          projectLifecycleOperationValidator,
+          'project lifecycle operation',
           options,
         ),
       wait: (id: string, options?: ProjectLifecycleWaitOptions) =>
@@ -1804,27 +1874,78 @@ export class TeamGridClient {
         ),
     }
     this.tasks = {
-      archive: (id: string, options?: RequestOptions) =>
-        this.#archive(`/tasks/${encodeURIComponent(id)}`, options),
-      complete: (id: string, options?: RequestOptions) =>
-        this.#action<Task>(`/tasks/${encodeURIComponent(id)}/complete`, undefined, options),
+      archive: (id: string, options: TaskMutationOptions) =>
+        this.#archiveVersionedResource(
+          `/tasks/${encodeURIComponent(id)}`,
+          options,
+          'task',
+          'task archive',
+        ),
+      complete: (id: string, options: TaskMutationOptions) =>
+        this.#mutateVersionedResource(
+          `/tasks/${encodeURIComponent(id)}/complete`,
+          'POST',
+          undefined,
+          options,
+          taskValidator,
+          'task',
+          'task completion',
+        ),
       create: (data: TaskCreate, options?: MutationOptions) =>
-        this.#create<Task>('/tasks', data, options),
+        this.#createVersionedResource(
+          '/tasks',
+          data,
+          options,
+          taskValidator,
+          'task',
+          'task creation',
+        ),
       get: (id: string, options?: RequestOptions) =>
-        this.#resource<Task>(`/tasks/${encodeURIComponent(id)}`, options),
-      list: (options?: TaskListOptions) => this.#page<Task>('/tasks', options),
+        this.#versionedResource(
+          `/tasks/${encodeURIComponent(id)}`,
+          options,
+          taskValidator,
+          'task',
+          'task',
+        ),
+      list: (options: TaskListOptions = {}) =>
+        this.#strictPage('/tasks', taskValidator, 'task list', options),
       pages: (options?: TaskListOptions, pagination?: PaginationOptions) =>
-        this.#pages<Task>('/tasks', options, pagination),
-      restore: (id: string, options?: RequestOptions) =>
-        this.#action<Task>(`/tasks/${encodeURIComponent(id)}/restore`, undefined, options),
-      reopen: (id: string, options?: RequestOptions) =>
-        this.#action<Task>(`/tasks/${encodeURIComponent(id)}/reopen`, undefined, options),
+        this.#strictPages('/tasks', taskValidator, 'task list', options, pagination),
+      restore: (id: string, options: TaskMutationOptions) =>
+        this.#mutateVersionedResource(
+          `/tasks/${encodeURIComponent(id)}/restore`,
+          'POST',
+          undefined,
+          options,
+          taskValidator,
+          'task',
+          'task restore',
+        ),
+      reopen: (id: string, options: TaskMutationOptions) =>
+        this.#mutateVersionedResource(
+          `/tasks/${encodeURIComponent(id)}/reopen`,
+          'POST',
+          undefined,
+          options,
+          taskValidator,
+          'task',
+          'task reopen',
+        ),
       startTimer: (id: string, data: TimerAction, options?: RequestOptions) =>
         this.#action<TimeEntry>(`/tasks/${encodeURIComponent(id)}/timer/start`, data, options),
       stopTimer: (id: string, data: TimerAction, options?: RequestOptions) =>
         this.#action<TimeEntry>(`/tasks/${encodeURIComponent(id)}/timer/stop`, data, options),
-      update: (id: string, data: TaskUpdate, options?: RequestOptions) =>
-        this.#update<Task>(`/tasks/${encodeURIComponent(id)}`, data, options),
+      update: (id: string, data: TaskUpdate, options: TaskMutationOptions) =>
+        this.#mutateVersionedResource(
+          `/tasks/${encodeURIComponent(id)}`,
+          'PATCH',
+          data,
+          options,
+          taskValidator,
+          'task',
+          'task update',
+        ),
     }
     this.timeEntries = {
       archive: (id: string, options?: RequestOptions) =>
@@ -1954,39 +2075,86 @@ export class TeamGridClient {
         ),
     }
     this.projectTemplates = {
-      archive: (id: string, options?: RequestOptions) =>
-        this.#archive(`/project-templates/${encodeURIComponent(id)}`, options),
+      archive: (id: string, options: ProjectTemplateMutationOptions) =>
+        this.#archiveVersionedResource(
+          `/project-templates/${encodeURIComponent(id)}`,
+          options,
+          'projectTemplate',
+          'project-template archive',
+        ),
       create: (data: ProjectTemplateCreate, options?: MutationOptions) =>
-        this.#create<ProjectTemplate>('/project-templates', data, options),
+        this.#createVersionedResource(
+          '/project-templates',
+          data,
+          options,
+          projectTemplateValidator,
+          'projectTemplate',
+          'project-template creation',
+        ),
       get: (id: string, options?: RequestOptions) =>
-        this.#resource<ProjectTemplate>(`/project-templates/${encodeURIComponent(id)}`, options),
-      instantiate: (id: string, data: ProjectTemplateInstantiate, options?: MutationOptions) =>
-        this.#create<ProjectTemplateInstantiation>(
+        this.#versionedResource(
+          `/project-templates/${encodeURIComponent(id)}`,
+          options,
+          projectTemplateValidator,
+          'projectTemplate',
+          'project template',
+        ),
+      instantiate: (
+        id: string,
+        data: ProjectTemplateInstantiate,
+        options: ProjectTemplateInstantiateOptions,
+      ) =>
+        this.#createRevisionOperation(
           `/project-templates/${encodeURIComponent(id)}/instantiate`,
           data,
           options,
+          projectTemplateInstantiationValidator,
+          'projectTemplate',
+          'project-template instantiation',
         ),
-      list: (options?: ProjectTemplateListOptions) =>
-        this.#page<ProjectTemplate>('/project-templates', options),
+      list: (options: ProjectTemplateListOptions = {}) =>
+        this.#strictPage(
+          '/project-templates',
+          projectTemplateValidator,
+          'project-template list',
+          options,
+        ),
       pages: (options?: ProjectTemplateListOptions, pagination?: PaginationOptions) =>
-        this.#pages<ProjectTemplate>('/project-templates', options, pagination),
-      restore: (id: string, options?: RequestOptions) =>
-        this.#action<ProjectTemplate>(
+        this.#strictPages(
+          '/project-templates',
+          projectTemplateValidator,
+          'project-template list',
+          options,
+          pagination,
+        ),
+      restore: (id: string, options: ProjectTemplateMutationOptions) =>
+        this.#mutateVersionedResource(
           `/project-templates/${encodeURIComponent(id)}/restore`,
+          'POST',
           undefined,
           options,
+          projectTemplateValidator,
+          'projectTemplate',
+          'project-template restore',
         ),
-      update: (id: string, data: ProjectTemplateUpdate, options?: RequestOptions) =>
-        this.#update<ProjectTemplate>(
+      update: (id: string, data: ProjectTemplateUpdate, options: ProjectTemplateMutationOptions) =>
+        this.#mutateVersionedResource(
           `/project-templates/${encodeURIComponent(id)}`,
+          'PATCH',
           data,
           options,
+          projectTemplateValidator,
+          'projectTemplate',
+          'project-template update',
         ),
     }
     this.projectTemplateInstantiations = {
       get: (id: string, options?: RequestOptions) =>
-        this.#resource<ProjectTemplateInstantiation>(
+        this.#strictOperationResource(
           `/project-template-instantiations/${encodeURIComponent(id)}`,
+          id,
+          projectTemplateInstantiationValidator,
+          'project-template instantiation',
           options,
         ),
       wait: (id: string, options?: ProjectTemplateInstantiationWaitOptions) =>
@@ -2252,6 +2420,23 @@ export class TeamGridClient {
       }
     }
     return attachTransport(envelope, response.transport)
+  }
+
+  async #strictOperationResource<T extends { id: string }>(
+    path: string,
+    expectedId: string,
+    validator: (value: unknown) => value is T,
+    label: string,
+    options: InternalRequestOptions = {},
+  ) {
+    const envelope = await this.#strictResource(path, validator, label, options)
+    if (envelope.data.id !== expectedId) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned an inconsistent ${label} id.`,
+      )
+    }
+    return envelope
   }
 
   async #strictResourceArray<T>(
@@ -2550,14 +2735,41 @@ export class TeamGridClient {
   }
 
   async #waitForProjectLifecycleOperation(id: string, options: ProjectLifecycleWaitOptions = {}) {
+    const {
+      acceptedOperation,
+      maxWaitMs: requestedMaxWaitMs,
+      pollIntervalMs: requestedPollIntervalMs,
+      ...requestOptions
+    } = options
+    if (
+      acceptedOperation !== undefined &&
+      (!projectLifecycleOperationValidator(acceptedOperation) || acceptedOperation.id !== id)
+    ) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'The accepted project lifecycle operation does not match the requested operation id.',
+      )
+    }
     const pollIntervalMs = Math.max(
       100,
-      Math.min(Math.trunc(options.pollIntervalMs ?? 1000), 30_000),
+      Math.min(Math.trunc(requestedPollIntervalMs ?? 1000), 30_000),
     )
-    const maxWaitMs = Math.max(100, Math.min(Math.trunc(options.maxWaitMs ?? 300_000), 86_400_000))
+    const maxWaitMs = Math.max(100, Math.min(Math.trunc(requestedMaxWaitMs ?? 300_000), 86_400_000))
     const startedAt = Date.now()
+    let expectedOperation = acceptedOperation
+      ? { ...acceptedOperation, attributes: { ...acceptedOperation.attributes } }
+      : undefined
     while (true) {
-      const operation = await this.projectLifecycleOperations.get(id, options)
+      const operation = await this.projectLifecycleOperations.get(id, requestOptions)
+      if (expectedOperation) {
+        assertProjectLifecycleOperationContinuity(
+          operation.data,
+          expectedOperation,
+          'project lifecycle operation',
+        )
+      } else {
+        expectedOperation = operation.data
+      }
       if (
         operation.data.attributes.state === 'succeeded' ||
         operation.data.attributes.state === 'failed'
@@ -2571,7 +2783,7 @@ export class TeamGridClient {
           `Project lifecycle operation ${id} did not finish within ${maxWaitMs} ms.`,
         )
       }
-      await this.#sleep(Math.min(pollIntervalMs, maxWaitMs - elapsed), options.signal)
+      await this.#sleep(Math.min(pollIntervalMs, maxWaitMs - elapsed), requestOptions.signal)
     }
   }
 
@@ -2579,14 +2791,41 @@ export class TeamGridClient {
     id: string,
     options: ProjectTemplateInstantiationWaitOptions = {},
   ) {
+    const {
+      acceptedOperation,
+      maxWaitMs: requestedMaxWaitMs,
+      pollIntervalMs: requestedPollIntervalMs,
+      ...requestOptions
+    } = options
+    if (
+      acceptedOperation !== undefined &&
+      (!projectTemplateInstantiationValidator(acceptedOperation) || acceptedOperation.id !== id)
+    ) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'The accepted project-template instantiation does not match the requested operation id.',
+      )
+    }
     const pollIntervalMs = Math.max(
       100,
-      Math.min(Math.trunc(options.pollIntervalMs ?? 1000), 30_000),
+      Math.min(Math.trunc(requestedPollIntervalMs ?? 1000), 30_000),
     )
-    const maxWaitMs = Math.max(100, Math.min(Math.trunc(options.maxWaitMs ?? 300_000), 86_400_000))
+    const maxWaitMs = Math.max(100, Math.min(Math.trunc(requestedMaxWaitMs ?? 300_000), 86_400_000))
     const startedAt = Date.now()
+    let expectedOperation = acceptedOperation
+      ? { ...acceptedOperation, attributes: { ...acceptedOperation.attributes } }
+      : undefined
     while (true) {
-      const operation = await this.projectTemplateInstantiations.get(id, options)
+      const operation = await this.projectTemplateInstantiations.get(id, requestOptions)
+      if (expectedOperation) {
+        assertProjectTemplateInstantiationContinuity(
+          operation.data,
+          expectedOperation,
+          'project-template instantiation',
+        )
+      } else {
+        expectedOperation = operation.data
+      }
       if (
         operation.data.attributes.state === 'succeeded' ||
         operation.data.attributes.state === 'failed'
@@ -2600,7 +2839,7 @@ export class TeamGridClient {
           `Project-template instantiation ${id} did not finish within ${maxWaitMs} ms.`,
         )
       }
-      await this.#sleep(Math.min(pollIntervalMs, maxWaitMs - elapsed), options.signal)
+      await this.#sleep(Math.min(pollIntervalMs, maxWaitMs - elapsed), requestOptions.signal)
     }
   }
 
@@ -2785,6 +3024,190 @@ export class TeamGridClient {
       'pagination_limit',
       `Pagination exceeded the configured ${maxPages}-page safety limit.`,
     )
+  }
+
+  #canonicalResourceEtag(kind: VersionedResourceKind, value: unknown) {
+    if (kind === 'project') return canonicalProjectStrongETag(value as string)
+    if (kind === 'projectTemplate') return canonicalProjectTemplateStrongETag(value as string)
+    return canonicalTaskStrongETag(value as string)
+  }
+
+  async #versionedResource<
+    T extends { attributes: { developerRevision: string } },
+    TKind extends VersionedResourceKind,
+  >(
+    path: string,
+    options: RequestOptions | undefined,
+    validator: ResourceValidator<T>,
+    kind: TKind,
+    label: string,
+  ): Promise<VersionedResourceEnvelope<T, StrongETagForKind<TKind>>> {
+    const response = await this.#request(path, options)
+    if (response.transport.status !== 200) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned an unexpected status for ${label}.`,
+      )
+    }
+    const envelope = assertStrictResource(response.payload, validator, label)
+    assertResourceRevisionEtag(
+      kind,
+      response.transport,
+      envelope.data.attributes.developerRevision,
+      label,
+    )
+    return attachTransport(
+      envelope,
+      response.transport as VersionedResourceTransport<StrongETagForKind<TKind>>,
+    )
+  }
+
+  async #createVersionedResource<
+    T extends { attributes: { developerRevision: string } },
+    TKind extends VersionedResourceKind,
+  >(
+    path: string,
+    data: unknown,
+    options: MutationOptions | undefined,
+    validator: ResourceValidator<T>,
+    kind: TKind,
+    label: string,
+  ): Promise<VersionedResourceEnvelope<T, StrongETagForKind<TKind>>> {
+    const mutationOptions = options || {}
+    const response = await this.#request(path, {
+      ...mutationOptions,
+      body: data,
+      idempotencyKey: canonicalIdempotencyKey(mutationOptions.idempotencyKey),
+      method: 'POST',
+    })
+    const replayed = response.transport.headers['idempotency-replayed']
+    if (
+      (response.transport.status !== 200 && response.transport.status !== 201) ||
+      replayed !== (response.transport.status === 200 ? 'true' : 'false')
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned invalid ${label} mutation metadata.`,
+      )
+    }
+    const envelope = assertStrictResource(response.payload, validator, label)
+    assertResourceRevisionEtag(
+      kind,
+      response.transport,
+      envelope.data.attributes.developerRevision,
+      label,
+    )
+    return attachTransport(
+      envelope,
+      response.transport as VersionedResourceTransport<StrongETagForKind<TKind>>,
+    )
+  }
+
+  async #mutateVersionedResource<
+    T extends { attributes: { developerRevision: string } },
+    TKind extends VersionedResourceKind,
+  >(
+    path: string,
+    method: 'PATCH' | 'POST',
+    data: unknown,
+    options: ProjectMutationOptions | ProjectTemplateMutationOptions | TaskMutationOptions,
+    validator: ResourceValidator<T>,
+    kind: TKind,
+    label: string,
+  ): Promise<VersionedResourceEnvelope<T, StrongETagForKind<TKind>>> {
+    const ifMatch = this.#canonicalResourceEtag(kind, options?.ifMatch)
+    const { ifMatch: _ifMatch, ...requestOptions } = options || {}
+    const response = await this.#request(path, {
+      ...requestOptions,
+      ...(data === undefined ? {} : { body: data }),
+      ifMatch,
+      method,
+    })
+    if (response.transport.status !== 200) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned an unexpected status for ${label}.`,
+      )
+    }
+    const envelope = assertStrictResource(response.payload, validator, label)
+    assertResourceRevisionEtag(
+      kind,
+      response.transport,
+      envelope.data.attributes.developerRevision,
+      label,
+    )
+    return attachTransport(
+      envelope,
+      response.transport as VersionedResourceTransport<StrongETagForKind<TKind>>,
+    )
+  }
+
+  async #archiveVersionedResource<TKind extends 'projectTemplate' | 'task'>(
+    path: string,
+    options: ProjectTemplateMutationOptions | TaskMutationOptions,
+    kind: TKind,
+    label: string,
+  ): Promise<
+    VersionedResourceTransport<TKind extends 'task' ? TaskStrongETag : ProjectTemplateStrongETag>
+  > {
+    const ifMatch = this.#canonicalResourceEtag(kind, options?.ifMatch)
+    const { ifMatch: _ifMatch, ...requestOptions } = options || {}
+    const response = await this.#request(path, { ...requestOptions, ifMatch, method: 'DELETE' })
+    if (response.transport.status !== 204 || response.payload !== undefined) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned an invalid empty ${label} response.`,
+      )
+    }
+    assertStrongResponseEtag(kind, response.transport, label)
+    return response.transport as VersionedResourceTransport<
+      TKind extends 'task' ? TaskStrongETag : ProjectTemplateStrongETag
+    >
+  }
+
+  async #createRevisionOperation<
+    T extends ProjectLifecycleOperation | ProjectTemplateInstantiation,
+  >(
+    path: string,
+    data: unknown,
+    options: ProjectLifecycleMutationOptions | ProjectTemplateInstantiateOptions,
+    validator: ResourceValidator<T>,
+    kind: 'project' | 'projectTemplate',
+    label: string,
+  ) {
+    const ifMatch = this.#canonicalResourceEtag(kind, options?.ifMatch)
+    const expectedRevision = rawRevisionFromStrongETag(kind, ifMatch)
+    const { idempotencyKey, ifMatch: _ifMatch, ...requestOptions } = options || {}
+    const response = await this.#request(path, {
+      ...requestOptions,
+      ...(data === undefined ? {} : { body: data }),
+      idempotencyKey: canonicalIdempotencyKey(idempotencyKey),
+      ifMatch,
+      method: 'POST',
+    })
+    const replayed = response.transport.headers['idempotency-replayed']
+    if (response.transport.status !== 202 || (replayed !== 'false' && replayed !== 'true')) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned invalid ${label} acceptance metadata.`,
+      )
+    }
+    const envelope = assertStrictResource(response.payload, validator, label)
+    assertOperationSourceRevision(envelope.data, expectedRevision, label)
+    const operationRoot =
+      kind === 'project'
+        ? '/v1/project-lifecycle-operations/'
+        : '/v1/project-template-instantiations/'
+    if (
+      response.transport.headers.location !==
+      `${operationRoot}${encodeURIComponent(envelope.data.id)}`
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned an invalid ${label} polling location.`,
+      )
+    }
+    return attachTransport(envelope, response.transport)
   }
 
   async #create<T>(path: string, data: unknown, options: MutationOptions = {}) {

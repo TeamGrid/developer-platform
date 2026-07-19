@@ -1,9 +1,34 @@
 import type { components } from './generated/schema.js'
 
+declare const developerRevisionBrand: unique symbol
+declare const strongEtagBrand: unique symbol
+
+/** A server-issued opaque revision. Never construct or modify this value yourself. */
+export type DeveloperResourceRevision<TResource extends 'project' | 'projectTemplate' | 'task'> =
+  string & { readonly [developerRevisionBrand]: TResource }
+
+/** A quoted, strong HTTP entity tag for one mutable TeamGrid resource type. */
+export type DeveloperResourceStrongETag<
+  TResource extends 'project' | 'projectTemplate' | 'task',
+  TPrefix extends 'prj1' | 'tpl1' | 'tsk1',
+> = `"${TPrefix}-${string}"` & { readonly [strongEtagBrand]: TResource }
+
+export type ProjectRevision = DeveloperResourceRevision<'project'>
+export type ProjectStrongETag = DeveloperResourceStrongETag<'project', 'prj1'>
+export type ProjectTemplateRevision = DeveloperResourceRevision<'projectTemplate'>
+export type ProjectTemplateStrongETag = DeveloperResourceStrongETag<'projectTemplate', 'tpl1'>
+export type TaskRevision = DeveloperResourceRevision<'task'>
+export type TaskStrongETag = DeveloperResourceStrongETag<'task', 'tsk1'>
+
 export type Workspace = components['schemas']['Workspace']
 export type ApiVersion = components['schemas']['ApiVersionEnvelope']['data']
 export type ApiVersionEnvelope = components['schemas']['ApiVersionEnvelope'] & TransportAware
-export type Project = components['schemas']['Project']
+type GeneratedProject = components['schemas']['Project']
+export type Project = Omit<GeneratedProject, 'attributes'> & {
+  attributes: Omit<GeneratedProject['attributes'], 'developerRevision'> & {
+    developerRevision: ProjectRevision
+  }
+}
 export type ProjectCreate = components['schemas']['ProjectCreate']
 export type ProjectUpdate = components['schemas']['ProjectUpdate']
 export type Product = components['schemas']['Product']
@@ -15,7 +40,12 @@ export type ProductGroupUpdate = components['schemas']['ProductGroupUpdate']
 export type ProjectStatement = components['schemas']['ProjectStatement']
 export type ProjectStatementCreate = components['schemas']['ProjectStatementCreate']
 export type ProjectStatementUpdate = components['schemas']['ProjectStatementUpdate']
-export type Task = components['schemas']['Task']
+type GeneratedTask = components['schemas']['Task']
+export type Task = Omit<GeneratedTask, 'attributes'> & {
+  attributes: Omit<GeneratedTask['attributes'], 'developerRevision'> & {
+    developerRevision: TaskRevision
+  }
+}
 export type TimeEntry = components['schemas']['TimeEntry']
 export type Contact = components['schemas']['Contact']
 export type ContactCreate = components['schemas']['ContactCreate']
@@ -33,11 +63,28 @@ export type CustomFieldValueMutation = components['schemas']['CustomFieldValueMu
 export type CustomFieldValueSet = components['schemas']['CustomFieldValueSet']
 export type CustomFieldValueTargetType = CustomFieldValue['attributes']['targetType']
 export type CustomFieldValueRevision = CustomFieldValue['attributes']['revision']
-export type ProjectTemplate = components['schemas']['ProjectTemplate']
+type GeneratedProjectTemplate = components['schemas']['ProjectTemplate']
+export type ProjectTemplate = Omit<GeneratedProjectTemplate, 'attributes'> & {
+  attributes: Omit<GeneratedProjectTemplate['attributes'], 'developerRevision'> & {
+    developerRevision: ProjectTemplateRevision
+  }
+}
 export type ProjectTemplateCreate = components['schemas']['ProjectTemplateCreate']
 export type ProjectTemplateUpdate = components['schemas']['ProjectTemplateUpdate']
 export type ProjectTemplateInstantiate = components['schemas']['ProjectTemplateInstantiate']
-export type ProjectTemplateInstantiation = components['schemas']['ProjectTemplateInstantiation']
+type GeneratedProjectTemplateInstantiation = components['schemas']['ProjectTemplateInstantiation']
+export type ProjectTemplateInstantiation = Omit<
+  GeneratedProjectTemplateInstantiation,
+  'attributes'
+> & {
+  attributes: Omit<
+    GeneratedProjectTemplateInstantiation['attributes'],
+    'resultRevision' | 'sourceRevision'
+  > & {
+    resultRevision: ProjectRevision | null
+    sourceRevision: ProjectTemplateRevision
+  }
+}
 export type PlannedWork = components['schemas']['PlannedWork']
 export type PlannedWorkReplacement = components['schemas']['PlannedWorkReplacement']
 export type PlannedWorkOperation = components['schemas']['PlannedWorkOperation']
@@ -78,7 +125,16 @@ export type TaskUpdate = components['schemas']['TaskUpdate']
 export type TimeEntryCreate = components['schemas']['TimeEntryCreate']
 export type TimeEntryUpdate = components['schemas']['TimeEntryUpdate']
 export type TimerAction = components['schemas']['TimerAction']
-export type ProjectLifecycleOperation = components['schemas']['ProjectLifecycleOperation']
+type GeneratedProjectLifecycleOperation = components['schemas']['ProjectLifecycleOperation']
+export type ProjectLifecycleOperation = Omit<GeneratedProjectLifecycleOperation, 'attributes'> & {
+  attributes: Omit<
+    GeneratedProjectLifecycleOperation['attributes'],
+    'resultRevision' | 'sourceRevision'
+  > & {
+    resultRevision: ProjectRevision | null
+    sourceRevision: ProjectRevision
+  }
+}
 export type ApiErrorDocument = components['schemas']['ApiError']
 export type Appointment = components['schemas']['Appointment']
 export type AppointmentCreate = components['schemas']['AppointmentCreate']
@@ -526,6 +582,20 @@ export type TransportAware = {
   readonly transport: Readonly<TransportMetadata>
 }
 
+export type VersionedResourceTransport<TStrongETag extends string> = Omit<
+  Readonly<TransportMetadata>,
+  'headers'
+> & {
+  readonly headers: Readonly<Record<string, string> & { etag: TStrongETag }>
+}
+
+export type VersionedResourceEnvelope<T, TStrongETag extends string> = Omit<
+  ResourceEnvelope<T>,
+  'transport'
+> & {
+  readonly transport: VersionedResourceTransport<TStrongETag>
+}
+
 export type PageMeta = RequestMeta & {
   page: {
     limit: number
@@ -811,6 +881,26 @@ export type MutationOptions = {
   signal?: AbortSignal
 }
 
+export type ProjectMutationOptions = RequestOptions & {
+  ifMatch: ProjectRevision | ProjectStrongETag
+}
+
+export type ProjectLifecycleMutationOptions = MutationOptions & {
+  ifMatch: ProjectRevision | ProjectStrongETag
+}
+
+export type ProjectTemplateMutationOptions = RequestOptions & {
+  ifMatch: ProjectTemplateRevision | ProjectTemplateStrongETag
+}
+
+export type ProjectTemplateInstantiateOptions = MutationOptions & {
+  ifMatch: ProjectTemplateRevision | ProjectTemplateStrongETag
+}
+
+export type TaskMutationOptions = RequestOptions & {
+  ifMatch: TaskRevision | TaskStrongETag
+}
+
 /**
  * A compare-and-set precondition obtained from the latest custom-field-value
  * response. Both the resource revision and its quoted strong ETag are accepted.
@@ -820,6 +910,12 @@ export type CustomFieldValueMutationOptions = RequestOptions & {
 }
 
 export type ProjectTemplateInstantiationWaitOptions = RequestOptions & {
+  /**
+   * The validated operation returned by projectTemplates.instantiate(). When
+   * supplied, every poll is bound to its immutable identity and source
+   * revision before a terminal result is accepted.
+   */
+  acceptedOperation?: ProjectTemplateInstantiation
   maxWaitMs?: number
   pollIntervalMs?: number
 }
@@ -834,6 +930,12 @@ export type PlannedWorkOperationWaitOptions = RequestOptions & {
 }
 
 export type ProjectLifecycleWaitOptions = RequestOptions & {
+  /**
+   * The validated operation returned by a project lifecycle mutation. When
+   * supplied, every poll is bound to its immutable identity, action, target,
+   * and source revision before a terminal result is accepted.
+   */
+  acceptedOperation?: ProjectLifecycleOperation
   maxWaitMs?: number
   pollIntervalMs?: number
 }

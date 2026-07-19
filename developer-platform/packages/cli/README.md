@@ -15,7 +15,8 @@ teamgrid changes list --cursor "$CHECKPOINT" --resource-type project,task --outp
 teamgrid custom-field-values set project project-id field-id \
   --data '{"value":"ACME-42"}' --if-match "$REVISION" --output json
 teamgrid project-templates instantiate template-id \
-  --data @project.json --idempotency-key rollout-1 --wait --output json
+  --data @project.json --if-match "$TEMPLATE_REVISION" \
+  --idempotency-key rollout-1 --wait --output json
 teamgrid planned-work replace task-id --data @schedule.json \
   --if-match "$REVISION" --idempotency-key schedule-1 --yes --wait --output json
 ```
@@ -42,6 +43,11 @@ only after applying the preceding events. Every checkpoint also carries `caughtU
 only when the API marks the fixed watermark as reached.
 
 Custom-field `set`/`clear` and planned-work `replace` require a revision from the latest GET.
+Task, project, and project-template updates and state changes also require `--if-match`. Read the
+latest resource as JSON, use its `attributes.developerRevision`, and do not reuse revisions across
+resource types. A stale revision returns exit code `6` with instructions to fetch and retry; the CLI
+does not silently overwrite or automatically replay the change. Task and project-template archive
+commands print the new strong `etag`, which can be passed directly to a later restore command.
 Planned-work replacement is a full schedule replacement, so non-interactive use additionally
 requires `--yes`; always provide a stable idempotency key. Template instantiation and planned-work
 replacement can be polled to a terminal state with `--wait`, bounded by `--max-wait`.

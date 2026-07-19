@@ -314,6 +314,13 @@ function lifecycleOptions(command: Command) {
     .option('--max-wait <milliseconds>', 'maximum wait time', positiveInteger, 300_000)
 }
 
+function resourceCasOptions(command: Command) {
+  return command.requiredOption(
+    '--if-match <revision|etag>',
+    'latest server-issued resource revision or exact strong ETag',
+  )
+}
+
 function overrideCommandExits(command: Command) {
   command.exitOverride()
   for (const child of command.commands) overrideCommandExits(child)
@@ -754,12 +761,19 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   projects
     .command('update <id>')
     .requiredOption('--data <json|@file|->', 'project patch JSON')
+    .requiredOption(
+      '--if-match <revision|etag>',
+      'latest server-issued project revision or exact strong ETag',
+    )
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       outputData(
         command,
-        (await client.projects.update(id, (await readJsonObject(options.data, input)) as never))
-          .data,
+        (
+          await client.projects.update(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
       )
     })
   async function runProjectLifecycle(
@@ -767,6 +781,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     id: string,
     options: {
       idempotencyKey?: string
+      ifMatch: string
       maxWait?: number
       pollInterval?: number
       wait?: boolean
@@ -776,44 +791,38 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const client = await loadClient(command)
     const started = await client.projects[action](id, {
       idempotencyKey: options.idempotencyKey,
+      ifMatch: options.ifMatch as never,
     })
     const result = options.wait
       ? await client.projectLifecycleOperations.wait(started.data.id, {
+          acceptedOperation: started.data,
           maxWaitMs: options.maxWait,
           pollIntervalMs: options.pollInterval,
         })
       : started
     outputData(command, result.data)
   }
-  lifecycleOptions(projects.command('complete <id>')).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await runProjectLifecycle('complete', id, options, command)
-  })
-  lifecycleOptions(projects.command('reopen <id>')).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await runProjectLifecycle('reopen', id, options, command)
-  })
-  lifecycleOptions(projects.command('restore <id>')).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await runProjectLifecycle('restore', id, options, command)
-  })
-  lifecycleOptions(archiveOptions(projects.command('archive <id>'))).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await confirmDestructive(command, 'Archive', 'project', id)
-    await runProjectLifecycle('archive', id, options, command)
-  })
+  resourceCasOptions(lifecycleOptions(projects.command('complete <id>'))).action(
+    async function action(id: string, options, command: Command) {
+      await runProjectLifecycle('complete', id, options, command)
+    },
+  )
+  resourceCasOptions(lifecycleOptions(projects.command('reopen <id>'))).action(
+    async function action(id: string, options, command: Command) {
+      await runProjectLifecycle('reopen', id, options, command)
+    },
+  )
+  resourceCasOptions(lifecycleOptions(projects.command('restore <id>'))).action(
+    async function action(id: string, options, command: Command) {
+      await runProjectLifecycle('restore', id, options, command)
+    },
+  )
+  resourceCasOptions(lifecycleOptions(archiveOptions(projects.command('archive <id>')))).action(
+    async function action(id: string, options, command: Command) {
+      await confirmDestructive(command, 'Archive', 'project', id)
+      await runProjectLifecycle('archive', id, options, command)
+    },
+  )
 
   const projectLifecycleOperations = program
     .command('project-lifecycle-operations')
@@ -969,46 +978,54 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   tasks
     .command('update <id>')
     .requiredOption('--data <json|@file|->', 'task patch JSON')
+    .requiredOption(
+      '--if-match <revision|etag>',
+      'latest server-issued task revision or exact strong ETag',
+    )
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       outputData(
         command,
-        (await client.tasks.update(id, (await readJsonObject(options.data, input)) as never)).data,
+        (
+          await client.tasks.update(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
       )
     })
-  archiveOptions(tasks.command('archive <id>')).action(async function action(
+  resourceCasOptions(archiveOptions(tasks.command('archive <id>'))).action(async function action(
     id: string,
-    _options,
+    options,
     command: Command,
   ) {
     await confirmDestructive(command, 'Archive', 'task', id)
     const client = await loadClient(command)
-    await client.tasks.archive(id)
-    outputData(command, { archived: true, id, type: 'task' })
+    const archived = await client.tasks.archive(id, { ifMatch: options.ifMatch })
+    outputData(command, { archived: true, etag: archived.headers.etag, id, type: 'task' })
   })
-  tasks.command('complete <id>').action(async function action(
+  resourceCasOptions(tasks.command('complete <id>')).action(async function action(
     id: string,
-    _options,
+    options,
     command: Command,
   ) {
     const client = await loadClient(command)
-    outputData(command, (await client.tasks.complete(id)).data)
+    outputData(command, (await client.tasks.complete(id, { ifMatch: options.ifMatch })).data)
   })
-  tasks.command('restore <id>').action(async function action(
+  resourceCasOptions(tasks.command('restore <id>')).action(async function action(
     id: string,
-    _options,
+    options,
     command: Command,
   ) {
     const client = await loadClient(command)
-    outputData(command, (await client.tasks.restore(id)).data)
+    outputData(command, (await client.tasks.restore(id, { ifMatch: options.ifMatch })).data)
   })
-  tasks.command('reopen <id>').action(async function action(
+  resourceCasOptions(tasks.command('reopen <id>')).action(async function action(
     id: string,
-    _options,
+    options,
     command: Command,
   ) {
     const client = await loadClient(command)
-    outputData(command, (await client.tasks.reopen(id)).data)
+    outputData(command, (await client.tasks.reopen(id, { ifMatch: options.ifMatch })).data)
   })
   const taskTimer = tasks.command('timer').description('start or stop task time tracking')
   taskTimer
@@ -1562,6 +1579,10 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   projectTemplates
     .command('update <id>')
     .requiredOption('--data <json|@file|->', 'project-template patch JSON')
+    .requiredOption(
+      '--if-match <revision|etag>',
+      'latest server-issued project-template revision or exact strong ETag',
+    )
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       outputData(
@@ -1570,39 +1591,47 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
           await client.projectTemplates.update(
             id,
             (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
           )
         ).data,
       )
     })
-  archiveOptions(projectTemplates.command('archive <id>')).action(async function action(
+  resourceCasOptions(archiveOptions(projectTemplates.command('archive <id>'))).action(
+    async function action(id: string, options, command: Command) {
+      await confirmDestructive(command, 'Archive', 'project template', id)
+      const client = await loadClient(command)
+      const archived = await client.projectTemplates.archive(id, { ifMatch: options.ifMatch })
+      outputData(command, {
+        archived: true,
+        etag: archived.headers.etag,
+        id,
+        type: 'projectTemplate',
+      })
+    },
+  )
+  resourceCasOptions(projectTemplates.command('restore <id>')).action(async function action(
     id: string,
-    _options,
+    options,
     command: Command,
   ) {
-    await confirmDestructive(command, 'Archive', 'project template', id)
     const client = await loadClient(command)
-    await client.projectTemplates.archive(id)
-    outputData(command, { archived: true, id, type: 'projectTemplate' })
+    outputData(
+      command,
+      (await client.projectTemplates.restore(id, { ifMatch: options.ifMatch })).data,
+    )
   })
-  projectTemplates.command('restore <id>').action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    const client = await loadClient(command)
-    outputData(command, (await client.projectTemplates.restore(id)).data)
-  })
-  lifecycleOptions(projectTemplates.command('instantiate <id>'))
+  resourceCasOptions(lifecycleOptions(projectTemplates.command('instantiate <id>')))
     .requiredOption('--data <json|@file|->', 'project-template instantiation JSON')
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       const accepted = await client.projectTemplates.instantiate(
         id,
         (await readJsonObject(options.data, input)) as never,
-        { idempotencyKey: options.idempotencyKey },
+        { idempotencyKey: options.idempotencyKey, ifMatch: options.ifMatch },
       )
       const result = options.wait
         ? await client.projectTemplateInstantiations.wait(accepted.data.id, {
+            acceptedOperation: accepted.data,
             maxWaitMs: options.maxWait,
             pollIntervalMs: options.pollInterval,
           })
@@ -2645,7 +2674,11 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
 
 export function exitCodeForError(error: unknown) {
   if (error instanceof TeamGridApiError) {
-    return ({ 401: 3, 403: 4, 404: 5, 409: 6, 429: 7 } as Record<number, number>)[error.status] || 1
+    return (
+      ({ 401: 3, 403: 4, 404: 5, 409: 6, 412: 6, 428: 2, 429: 7 } as Record<number, number>)[
+        error.status
+      ] || 1
+    )
   }
   if (error instanceof TeamGridClientError) {
     if (error.code === 'cancelled') return 0

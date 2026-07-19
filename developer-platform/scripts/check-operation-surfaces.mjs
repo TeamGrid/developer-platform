@@ -42,6 +42,15 @@ function commandPaths(command, prefix = []) {
   return result
 }
 
+function commandsByPath(command, prefix = [], result = new Map()) {
+  for (const child of command.commands) {
+    const current = [...prefix, child.name()]
+    result.set(current.join(' '), child)
+    commandsByPath(child, current, result)
+  }
+  return result
+}
+
 function hasFunction(root, dottedPath) {
   const parts = dottedPath.split('.')
   let current = root
@@ -49,9 +58,12 @@ function hasFunction(root, dottedPath) {
   return typeof current === 'function'
 }
 
-const [openapi, ledger] = await Promise.all([
+const [openapi, ledger, manifest] = await Promise.all([
   readFile(new URL('../../openapi/v1.json', import.meta.url), 'utf8').then(JSON.parse),
   readFile(new URL('../../openapi/developer-capabilities.json', import.meta.url), 'utf8').then(
+    JSON.parse,
+  ),
+  readFile(new URL('../../openapi/developer-platform-manifest.json', import.meta.url), 'utf8').then(
     JSON.parse,
   ),
 ])
@@ -67,6 +79,64 @@ const policyOperations = ledger.operationPolicy
   .sort((left, right) => left.operationId.localeCompare(right.operationId))
 if (JSON.stringify(expectedOperations) !== JSON.stringify(policyOperations)) {
   fail('OpenAPI and developer capability policy operation sets differ')
+}
+
+const expectedCasOperationIds = [
+  'archiveProject',
+  'archiveProjectTemplate',
+  'archiveTask',
+  'completeProject',
+  'completeTask',
+  'instantiateProjectTemplate',
+  'reopenProject',
+  'reopenTask',
+  'restoreProject',
+  'restoreProjectTemplate',
+  'restoreTask',
+  'updateProject',
+  'updateProjectTemplate',
+  'updateTask',
+]
+const casOperations = Object.values(openapi.paths)
+  .flatMap((pathItem) => Object.values(pathItem))
+  .filter((operation) => operation?.['x-teamgrid-resource-cas'] === 'resource-cas-v1')
+  .sort((left, right) => left.operationId.localeCompare(right.operationId))
+if (
+  casOperations.length !== 14 ||
+  JSON.stringify(casOperations.map((operation) => operation.operationId)) !==
+    JSON.stringify(expectedCasOperationIds) ||
+  manifest.summary?.resourceCasMutationOperations !== 14
+) {
+  fail('resource-cas-v1 must cover exactly the governed 14 mutation operations')
+}
+if (manifest.contractVersion !== openapi.info.version) {
+  fail('contract manifest and OpenAPI versions differ')
+}
+for (const operation of casOperations) {
+  const ifMatchParameters = (operation.parameters || []).filter((parameter) =>
+    /^#\/components\/parameters\/IfMatch(?:Project|ProjectTemplate|Task)$/.test(
+      parameter.$ref || '',
+    ),
+  )
+  if (
+    ifMatchParameters.length !== 1 ||
+    operation.responses?.['412'] === undefined ||
+    operation.responses?.['428'] === undefined
+  ) {
+    fail(`${operation.operationId} lacks its exact If-Match/412/428 contract`)
+  }
+}
+const casOperationReadIds = ['getProjectLifecycleOperation', 'getProjectTemplateInstantiation']
+const casOperationReads = Object.values(openapi.paths)
+  .flatMap((pathItem) => Object.values(pathItem))
+  .filter((operation) => casOperationReadIds.includes(operation?.operationId))
+  .sort((left, right) => left.operationId.localeCompare(right.operationId))
+if (
+  casOperationReads.length !== 2 ||
+  manifest.summary?.resourceCasOperationReads !== 2 ||
+  casOperationReads.some((operation) => operation.responses?.['410'] === undefined)
+) {
+  fail('resource CAS operation reads must be exactly two and define legacy-revision 410 responses')
 }
 
 const finalExpansionRoots = new Set([
@@ -111,8 +181,22 @@ for (const operation of ledger.operationPolicy) {
 }
 
 const cliCommands = new Set(commandPaths(createProgram()))
+const cliCommandMap = commandsByPath(createProgram())
 for (const operation of ledger.operationPolicy) {
   if (!cliCommands.has(operation.cli)) fail(`${operation.operationId} lacks CLI command ${operation.cli}`)
+}
+for (const operation of casOperations) {
+  const policy = ledger.operationPolicy.find((entry) => entry.operationId === operation.operationId)
+  const command = policy && cliCommandMap.get(policy.cli)
+  const ifMatchOptions = command?.options.filter((option) => option.long === '--if-match') || []
+  if (
+    !policy ||
+    policy.mcp.exposure !== 'forbidden' ||
+    ifMatchOptions.length !== 1 ||
+    ifMatchOptions[0].mandatory !== true
+  ) {
+    fail(`${operation.operationId} must have one required CLI --if-match and no MCP exposure`)
+  }
 }
 
 const method = async () => ({ data: [], meta: {} })

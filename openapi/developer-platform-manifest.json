@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.0.0",
+  "contractVersion": "1.0.0-beta.1",
   "artifacts": [
     {
       "bytes": 62150,
@@ -33,16 +33,18 @@
       "sha256": "46da62dba5b8a459362f4edd3c74fed1dac92300c414e606dfa9f433120da947"
     },
     {
-      "bytes": 715784,
+      "bytes": 731960,
       "id": "openapi-v1",
       "path": "openapi/v1.json",
-      "sha256": "39758e56965fb16061401a7f5ff889c66e77d8fb3a9ffc0a2450e834f9d3cf64"
+      "sha256": "74416af71ad0addd8b93592c075151dde83b36ecbaa70f594f75602f8291bbba"
     }
   ],
   "summary": {
     "classifiedProductCapabilities": 73,
     "canonicalScopes": 79,
     "governedV1Operations": 182,
+    "resourceCasMutationOperations": 14,
+    "resourceCasOperationReads": 2,
     "v0Operations": 87,
     "v0MigrationRoutes": 87,
     "v1Operations": 182
