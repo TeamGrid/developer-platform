@@ -10,7 +10,6 @@ describe('TeamGrid read-only MCP adapter', () => {
     const get = vi.fn(async (id) => ({ data: { id }, meta: {} }))
     const query = vi.fn(async (input) => ({ data: [], meta: { input } }))
     const handlers = createReadOnlyHandlers({
-      auditEvents: { list },
       callNotes: { get, list },
       contacts: { get, list },
       contactGroups: { get, list },
@@ -43,7 +42,6 @@ describe('TeamGrid read-only MCP adapter', () => {
 
   it('negotiates MCP and advertises only read-only tools', async () => {
     const apiClient = {
-      auditEvents: { list: vi.fn(async () => ({ data: [], meta: {} })) },
       callNotes: {
         get: vi.fn(async (id) => ({ data: { id }, meta: {} })),
         list: vi.fn(async () => ({ data: [], meta: {} })),
@@ -152,7 +150,6 @@ describe('TeamGrid read-only MCP adapter', () => {
         expect(advertisedNames.some((name) => forbiddenSurface.test(name))).toBe(false)
       }
       expect(tools.tools.map((tool) => tool.name).sort()).toEqual([
-        'teamgrid_audit_events_list',
         'teamgrid_call_note_get',
         'teamgrid_call_notes_list',
         'teamgrid_contact_get',
@@ -183,6 +180,7 @@ describe('TeamGrid read-only MCP adapter', () => {
         'teamgrid_webhooks_list',
         'teamgrid_workspace_get',
       ])
+      expect(advertisedNames).toHaveLength(29)
       expect(advertisedNames.join(' ')).not.toMatch(/create|update|remove|archive/i)
       const response = await client.callTool({
         arguments: {},
@@ -266,6 +264,7 @@ describe('TeamGrid read-only MCP adapter', () => {
         get: () => new Proxy({}, { get: () => method }),
       },
     )
+    const expectedToolCounts = { collaboration: 22, core: 15, governance: 21 } as const
     for (const toolProfile of ['collaboration', 'core', 'governance'] as const) {
       const server = createTeamGridMcpServer(apiClient as never, { toolProfile })
       const client = new Client({ name: `${toolProfile}-test-client`, version: '1.0.0' })
@@ -273,6 +272,7 @@ describe('TeamGrid read-only MCP adapter', () => {
       await Promise.all([server.connect(serverTransport), client.connect(clientTransport)])
       try {
         const names = (await client.listTools()).tools.map((tool) => tool.name)
+        expect(names).toHaveLength(expectedToolCounts[toolProfile])
         expect(names).not.toContain('teamgrid_search')
       } finally {
         await client.close()

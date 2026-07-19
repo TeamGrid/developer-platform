@@ -29,7 +29,6 @@ const collaborationTools = [
 ] as const
 const governanceTools = [
   ...coreTools,
-  'teamgrid_audit_events_list',
   'teamgrid_custom_field_definition_get',
   'teamgrid_custom_field_definitions_list',
   'teamgrid_service_get',

@@ -91,13 +91,6 @@ function withoutProductPurchasePrices<T>(value: T): T {
 
 export function createReadOnlyHandlers(client: TeamGridClient) {
   return Object.freeze({
-    auditEventsList: (input: {
-      credentialId?: string
-      cursor?: string
-      eventType?: string
-      limit?: number
-      outcome?: 'denied' | 'failure' | 'success'
-    }) => client.auditEvents.list(input),
     callNoteGet: (input: { id: string }) => client.callNotes.get(input.id),
     callNotesList: (input: { archived?: boolean; cursor?: string; limit?: number }) =>
       client.callNotes.list(input),
@@ -550,22 +543,6 @@ export function createTeamGridMcpServer(
       inputSchema: z.object({ id: z.string().min(1).max(128) }).strict(),
     },
     async (input) => toolResult(await handlers.webhookGet(input)),
-  )
-  registerTool(
-    'teamgrid_audit_events_list',
-    {
-      annotations: readOnlyAnnotations,
-      description: 'List sensitive Developer Platform audit events for security review.',
-      inputSchema: z
-        .object({
-          ...listInput,
-          credentialId: z.string().max(128).optional(),
-          eventType: z.string().max(128).optional(),
-          outcome: z.enum(['success', 'denied', 'failure']).optional(),
-        })
-        .strict(),
-    },
-    async (input) => toolResult(await handlers.auditEventsList(input)),
   )
   return server
 }

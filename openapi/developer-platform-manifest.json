@@ -3,10 +3,10 @@
   "contractVersion": "1.0.0",
   "artifacts": [
     {
-      "bytes": 62095,
+      "bytes": 62150,
       "id": "capability-ledger",
       "path": "contracts/developer-capabilities.json",
-      "sha256": "4a40798eafee4ac0d8927fa8b30e5ab2ed51070ac6101a88aa41a3ebb639f243"
+      "sha256": "a1f91460803bd862021224e8c87e239b6464aa1ee190ff7e0d2bbaa100fcd7a7"
     },
     {
       "bytes": 8729,
