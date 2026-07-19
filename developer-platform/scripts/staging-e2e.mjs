@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict'
+import { execFile } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
+import { promisify } from 'node:util'
+import { Client as McpClient } from '@modelcontextprotocol/sdk/client/index.js'
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { TeamGridApiError, TeamGridClient } from '../packages/api-client/dist/index.js'
 import {
   createSignedWebhookReceiver,
@@ -21,6 +26,9 @@ const webhookReceiverMode = String(
   process.env.TEAMGRID_E2E_WEBHOOK_RECEIVER || 'webhook-site',
 ).trim()
 const webhookReceiverAttempts = 3
+const execFileAsync = promisify(execFile)
+const cliBinary = fileURLToPath(new URL('../packages/cli/dist/bin.js', import.meta.url))
+const mcpBinary = fileURLToPath(new URL('../packages/mcp-server/dist/bin.js', import.meta.url))
 
 if (!token || !baseUrl) {
   throw new Error('TEAMGRID_API_TOKEN and TEAMGRID_API_BASE_URL are required.')
@@ -43,8 +51,49 @@ const client = new TeamGridClient({ baseUrl, retries: 2, timeoutMs: 30_000, toke
 let taskId
 let timeEntryId
 let webhookId
+let customFieldDefinitionId
+let projectTemplateId
+let sourceProjectId
+let instantiatedProjectId
 let webhookReceiver
 let webhookCaptureCleanupVerified = false
+
+async function runBinarySmokes(expectedWorkspaceId) {
+  const environment = {
+    ...process.env,
+    TEAMGRID_API_BASE_URL: baseUrl,
+    TEAMGRID_API_TOKEN: token,
+  }
+  const { stdout, stderr } = await execFileAsync(
+    process.execPath,
+    [cliBinary, '--base-url', baseUrl, '--output', 'json', 'workspace'],
+    { env: environment, maxBuffer: 1024 * 1024, timeout: 30_000 },
+  )
+  assert.equal(stderr, '')
+  const cliWorkspace = JSON.parse(stdout)
+  assert.equal(cliWorkspace.id, expectedWorkspaceId)
+  assert.equal(stdout.includes(token), false)
+
+  const transport = new StdioClientTransport({
+    args: [mcpBinary, '--tool-profile', 'core'],
+    command: process.execPath,
+    env: environment,
+    stderr: 'pipe',
+  })
+  const mcp = new McpClient({ name: 'teamgrid-staging-e2e', version: '1.0.0' })
+  await mcp.connect(transport)
+  try {
+    const tools = await mcp.listTools()
+    const names = tools.tools.map(tool => tool.name)
+    assert(names.includes('teamgrid_workspace_get'))
+    assert(names.every(name => !/(change|custom_field_value|planned_work|project_template)/i.test(name)))
+    const result = await mcp.callTool({ arguments: {}, name: 'teamgrid_workspace_get' })
+    assert.equal(result.structuredContent?.data?.id, expectedWorkspaceId)
+    assert.equal(JSON.stringify(result).includes(token), false)
+  } finally {
+    await mcp.close()
+  }
+}
 
 async function expectApiError(operation, expectedStatus) {
   try {
@@ -65,6 +114,16 @@ async function expectRawFailure(candidateToken, expectedStatus) {
   })
   assert.equal(response.status, expectedStatus)
   assert.match(response.headers.get('x-request-id') || '', /^[A-Za-z0-9._:-]+$/)
+}
+
+async function archiveProject(id) {
+  const accepted = await client.projects.archive(id, {
+    idempotencyKey: `staging-e2e-cleanup-project-${id}-${runId}`,
+  })
+  return client.projectLifecycleOperations.wait(accepted.data.id, {
+    maxWaitMs: 120_000,
+    pollIntervalMs: 500,
+  })
 }
 
 async function startSignedWebhookReceiver() {
@@ -91,6 +150,7 @@ try {
   const workspace = await client.workspace.get()
   assert.equal(workspace.data.attributes.region, 'de')
   assert.equal(workspace.data.attributes.cellId, 'de-nbg-001')
+  await runBinarySmokes(workspace.data.id)
 
   const [projects, users, contacts] = await Promise.all([
     client.projects.list({ limit: 2 }),
@@ -139,11 +199,26 @@ try {
   assert.equal(readWebhook.data.id, webhookId)
   assert.equal('signingSecret' in readWebhook.data.attributes, false)
 
+  const sourceProject = await client.projects.create({
+    name: `Developer Platform staging source ${runId}`,
+  }, { idempotencyKey: `staging-e2e-project-${runId}` })
+  sourceProjectId = sourceProject.data.id
+
+  const changeCheckpointPage = await client.changes.checkpoint({
+    limit: 50,
+    resourceTypes: ['task'],
+  })
+  assert.equal(changeCheckpointPage.data.length, 0)
+  assert.equal(changeCheckpointPage.meta.page.caughtUp, true)
+  let changeCheckpoint = changeCheckpointPage.meta.page.nextCursor
+
   const idempotencyKey = `staging-e2e-task-${runId}`
   const taskInput = {
+    assigneeId: users.data[0].id,
     description: `Developer Platform staging smoke ${runId}`,
     name: `Developer Platform staging smoke ${runId}`,
     plannedMinutes: 15,
+    projectId: sourceProjectId,
   }
   const createdTask = await client.tasks.create(taskInput, { idempotencyKey })
   taskId = createdTask.data.id
@@ -175,11 +250,108 @@ try {
   }
 
   const updatedTask = await client.tasks.update(taskId, {
-    completed: true,
+    completed: false,
     name: `${taskInput.name} updated`,
   })
-  assert.equal(updatedTask.data.attributes.completed, true)
+  assert.equal(updatedTask.data.attributes.completed, false)
   assert.equal((await client.tasks.get(taskId)).data.id, taskId)
+
+  const changeDeadline = Date.now() + 30_000
+  let taskChangeVerified = false
+  while (!taskChangeVerified && Date.now() < changeDeadline) {
+    for await (const page of client.changes.pages({
+      cursor: changeCheckpoint,
+      limit: 50,
+      resourceTypes: ['task'],
+    }, { maxPages: 100 })) {
+      changeCheckpoint = page.meta.page.nextCursor
+      taskChangeVerified = page.data.some(event => event.attributes.resourceId === taskId)
+      assert.equal(page.meta.page.caughtUp || page.data.length === page.meta.page.limit, true)
+    }
+    if (!taskChangeVerified) await new Promise(resolve => setTimeout(resolve, 1_000))
+  }
+  assert.equal(taskChangeVerified, true, 'Expected the disposable task in the v1 change feed')
+
+  const customFieldDefinition = await client.customFieldDefinitions.create({
+    configuration: { type: 'text' },
+    defaultEnabled: false,
+    fieldType: 'text',
+    targetType: 'task',
+    title: `Staging reference ${runId}`,
+  }, { idempotencyKey: `staging-e2e-field-${runId}` })
+  customFieldDefinitionId = customFieldDefinition.data.id
+  const emptyCustomValue = await client.customFieldValues.get(
+    'task',
+    taskId,
+    customFieldDefinitionId,
+  )
+  const setCustomValue = await client.customFieldValues.set(
+    'task',
+    taskId,
+    customFieldDefinitionId,
+    { value: `staging-${runId}` },
+    { ifMatch: emptyCustomValue.data.attributes.revision },
+  )
+  assert.equal(setCustomValue.data.attributes.value, `staging-${runId}`)
+  const clearedCustomValue = await client.customFieldValues.clear(
+    'task',
+    taskId,
+    customFieldDefinitionId,
+    { ifMatch: setCustomValue.data.attributes.revision },
+  )
+  assert.equal(clearedCustomValue.data.attributes.state, 'unset')
+
+  const currentPlannedWork = await client.plannedWork.getForTask(taskId)
+  const plannedStart = new Date()
+  plannedStart.setUTCHours(0, 0, 0, 0)
+  const plannedEnd = new Date(plannedStart)
+  plannedEnd.setUTCHours(23, 59, 59, 999)
+  const plannedOperation = await client.plannedWork.replaceForTask(
+    taskId,
+    {
+      dayLoads: [15],
+      plannedEnd: plannedEnd.toISOString(),
+      plannedStart: plannedStart.toISOString(),
+    },
+    {
+      idempotencyKey: `staging-e2e-planned-${runId}`,
+      ifMatch: currentPlannedWork.data.attributes.revision,
+    },
+  )
+  const completedPlannedOperation = await client.plannedWorkOperations.wait(
+    plannedOperation.data.id,
+    { maxWaitMs: 120_000, pollIntervalMs: 500 },
+  )
+  assert.equal(completedPlannedOperation.data.attributes.state, 'succeeded')
+  const replacedPlannedWork = await client.plannedWork.getForTask(taskId)
+  assert.equal(replacedPlannedWork.data.attributes.revision, plannedOperation.data.attributes.targetRevision)
+  const plannedWindow = await client.plannedWork.list({
+    end: plannedEnd,
+    start: plannedStart,
+    taskId,
+  })
+  assert(plannedWindow.data.some(item => item.attributes.taskId === taskId))
+
+  const projectTemplate = await client.projectTemplates.create({
+    color: '#1557ed',
+    description: `Developer Platform staging template ${runId}`,
+    projectId: sourceProjectId,
+    title: `Staging template ${runId}`,
+  }, { idempotencyKey: `staging-e2e-template-${runId}` })
+  projectTemplateId = projectTemplate.data.id
+  const listedTemplates = await client.projectTemplates.list({ originProjectId: sourceProjectId })
+  assert(listedTemplates.data.some(template => template.id === projectTemplateId))
+  const instantiation = await client.projectTemplates.instantiate(
+    projectTemplateId,
+    { name: `Staging instantiated project ${runId}` },
+    { idempotencyKey: `staging-e2e-instantiate-${runId}` },
+  )
+  const completedInstantiation = await client.projectTemplateInstantiations.wait(
+    instantiation.data.id,
+    { maxWaitMs: 120_000, pollIntervalMs: 500 },
+  )
+  assert.equal(completedInstantiation.data.attributes.state, 'succeeded')
+  instantiatedProjectId = completedInstantiation.data.attributes.projectId
 
   const endAt = new Date()
   const startAt = new Date(endAt.getTime() - 5 * 60 * 1000)
@@ -215,10 +387,16 @@ try {
     expiredCredentialVerified: Boolean(expiredToken),
     foreignTenantMissVerified: Boolean(foreignTaskId),
     idempotencyReplayVerified: true,
+    binaryCliVerified: true,
+    binaryMcpVerified: true,
+    changeFeedVerified: taskChangeVerified,
+    customFieldValuesVerified: true,
     negativeAuthVerified: true,
     originAuthVerified: Boolean(originUrl),
     readOnlyScopeVerified: Boolean(readOnlyToken),
     region: workspace.data.attributes.region,
+    plannedWorkVerified: true,
+    projectTemplatesVerified: true,
     signedWebhookDeliveryVerified: Boolean(signedDelivery),
     webhookCaptureCleanupVerified,
     wrongCellRoutingVerified: Boolean(wrongCellToken),
@@ -226,12 +404,22 @@ try {
       task: Boolean(taskId),
       timeEntry: Boolean(timeEntryId),
       webhook: Boolean(webhookId),
+      customFieldDefinition: Boolean(customFieldDefinitionId),
+      projectTemplate: Boolean(projectTemplateId),
+      sourceProject: Boolean(sourceProjectId),
+      instantiatedProject: Boolean(instantiatedProjectId),
     },
     runId,
   }))
 } finally {
   if (webhookId) await client.webhooks.remove(webhookId).catch(() => {})
   if (timeEntryId) await client.timeEntries.archive(timeEntryId).catch(() => {})
+  if (customFieldDefinitionId) {
+    await client.customFieldDefinitions.archive(customFieldDefinitionId).catch(() => {})
+  }
+  if (projectTemplateId) await client.projectTemplates.archive(projectTemplateId).catch(() => {})
   if (taskId) await client.tasks.archive(taskId).catch(() => {})
+  if (instantiatedProjectId) await archiveProject(instantiatedProjectId).catch(() => {})
+  if (sourceProjectId) await archiveProject(sourceProjectId).catch(() => {})
   if (webhookReceiver) await webhookReceiver.close().catch(() => {})
 }

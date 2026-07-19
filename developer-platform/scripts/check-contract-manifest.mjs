@@ -5,7 +5,9 @@ const manifestUrl = new URL('../../openapi/developer-platform-manifest.json', im
 const manifest = JSON.parse(await readFile(manifestUrl, 'utf8'))
 const localArtifacts = {
   'contracts/developer-capabilities.json': '../../openapi/developer-capabilities.json',
+  'contracts/developer-scopes.json': '../../openapi/developer-scopes.json',
   'contracts/v0-routes.json': '../../openapi/v0-routes.json',
+  'contracts/v0-to-v1-migration.json': '../../openapi/v0-to-v1-migration.json',
   'openapi/v0.json': '../../openapi/v0.json',
   'openapi/v1.json': '../../openapi/v1.json',
 }

@@ -27,3 +27,10 @@ reads; `governance` for audit, webhook, service, and custom-field-definition
 reads; or `all` for the explicit 29-tool union. Project statements and webhook
 delivery history remain forbidden in every MCP profile. The adapter does not
 expose write or secret-bearing operations.
+
+The high-volume change feed is forbidden in every MCP profile. It is a synchronization
+primitive for API, SDK, and CLI consumers, not a bounded interactive model tool. Per-resource
+custom-field values, project templates and instantiation status, and planned-work schedules and
+operation status are also forbidden in every profile because they contain sensitive workflow or
+workload data. Even `all` does not register or advertise any of these operations. Custom-field
+*definition* reads remain the narrow exception in `governance`; all writes remain forbidden.

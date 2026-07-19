@@ -1,0 +1,2132 @@
+{
+  "schemaVersion": 1,
+  "sourceApiVersion": "v0",
+  "targetApiVersion": "v1",
+  "classifications": {
+    "adaptation-required": "The capability has a v1 replacement with an intentional request, response, or semantic migration.",
+    "equivalent": "The same product capability is available through the governed v1 contract.",
+    "retained-v0": "No public v1 replacement exists yet; the route remains supported under the frozen v0 contract."
+  },
+  "routes": [
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get",
+        "path": "/"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getApiVersion",
+        "path": "/"
+      }
+    },
+    {
+      "classification": "retained-v0",
+      "migration": {
+        "requestChanges": [],
+        "responseChanges": [],
+        "semanticChanges": [
+          "Calendar token feeds remain on API v0 until the calendar domain is released in v1."
+        ]
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_calendar_token_ics",
+        "path": "/calendar/{token}.ics"
+      },
+      "v1": null
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "DELETE",
+        "operationId": "v0_delete_callnotes",
+        "path": "/callnotes"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveCallNote",
+        "path": "/call-notes/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_callnotes",
+        "path": "/callnotes"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listCallNotes",
+        "path": "/call-notes"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_callnotes",
+        "path": "/callnotes"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createCallNote",
+        "path": "/call-notes"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "DELETE",
+        "operationId": "v0_delete_callnotes_id",
+        "path": "/callnotes/{_id}"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveCallNote",
+        "path": "/call-notes/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_callnotes_id",
+        "path": "/callnotes/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getCallNote",
+        "path": "/call-notes/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion.",
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "DELETE",
+        "operationId": "v0_delete_contactgroups",
+        "path": "/contactgroups"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveContactGroup",
+        "path": "/contact-groups/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_contactgroups",
+        "path": "/contactgroups"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listContactGroups",
+        "path": "/contact-groups"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "POST",
+        "operationId": "v0_post_contactgroups",
+        "path": "/contactgroups"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createContactGroup",
+        "path": "/contact-groups"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "PUT",
+        "operationId": "v0_put_contactgroups",
+        "path": "/contactgroups"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateContactGroup",
+        "path": "/contact-groups/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion.",
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "DELETE",
+        "operationId": "v0_delete_contactgroups_id",
+        "path": "/contactgroups/{_id}"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveContactGroup",
+        "path": "/contact-groups/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_contactgroups_id",
+        "path": "/contactgroups/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getContactGroup",
+        "path": "/contact-groups/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "PUT",
+        "operationId": "v0_put_contactgroups_id",
+        "path": "/contactgroups/{_id}"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateContactGroup",
+        "path": "/contact-groups/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_contacts",
+        "path": "/contacts"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listContacts",
+        "path": "/contacts"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_contacts",
+        "path": "/contacts"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createContact",
+        "path": "/contacts"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "PUT",
+        "operationId": "v0_put_contacts",
+        "path": "/contacts"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateContact",
+        "path": "/contacts/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_contacts_id",
+        "path": "/contacts/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getContact",
+        "path": "/contacts/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "PUT",
+        "operationId": "v0_put_contacts_id",
+        "path": "/contacts/{_id}"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateContact",
+        "path": "/contacts/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Rename the resource from journal entry to project statement and request the required finance scope for financial fields."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion.",
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "DELETE",
+        "operationId": "v0_delete_journalEntries",
+        "path": "/journalEntries"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveProjectStatement",
+        "path": "/project-statements/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Rename the resource from journal entry to project statement and request the required finance scope for financial fields."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_journalEntries",
+        "path": "/journalEntries"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listProjectStatements",
+        "path": "/project-statements"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Rename the resource from journal entry to project statement and request the required finance scope for financial fields."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "POST",
+        "operationId": "v0_post_journalEntries",
+        "path": "/journalEntries"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createProjectStatement",
+        "path": "/project-statements"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract.",
+          "Rename the resource from journal entry to project statement and request the required finance scope for financial fields."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "PUT",
+        "operationId": "v0_put_journalEntries",
+        "path": "/journalEntries"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateProjectStatement",
+        "path": "/project-statements/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Rename the resource from journal entry to project statement and request the required finance scope for financial fields."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion.",
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "DELETE",
+        "operationId": "v0_delete_journalEntries_id",
+        "path": "/journalEntries/{_id}"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveProjectStatement",
+        "path": "/project-statements/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Rename the resource from journal entry to project statement and request the required finance scope for financial fields."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_journalEntries_id",
+        "path": "/journalEntries/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getProjectStatement",
+        "path": "/project-statements/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract.",
+          "Rename the resource from journal entry to project statement and request the required finance scope for financial fields."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "PUT",
+        "operationId": "v0_put_journalEntries_id",
+        "path": "/journalEntries/{_id}"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateProjectStatement",
+        "path": "/project-statements/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "DELETE",
+        "operationId": "v0_delete_lists",
+        "path": "/lists"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveList",
+        "path": "/lists/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_lists",
+        "path": "/lists"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listLists",
+        "path": "/lists"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_lists",
+        "path": "/lists"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createList",
+        "path": "/lists"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "PUT",
+        "operationId": "v0_put_lists",
+        "path": "/lists"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateList",
+        "path": "/lists/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "DELETE",
+        "operationId": "v0_delete_lists_id",
+        "path": "/lists/{_id}"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveList",
+        "path": "/lists/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_lists_id",
+        "path": "/lists/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getList",
+        "path": "/lists/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "PUT",
+        "operationId": "v0_put_lists_id",
+        "path": "/lists/{_id}"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateList",
+        "path": "/lists/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "DELETE",
+        "operationId": "v0_delete_productgroups",
+        "path": "/productgroups"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveProductGroup",
+        "path": "/product-groups/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_productgroups",
+        "path": "/productgroups"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listProductGroups",
+        "path": "/product-groups"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_productgroups",
+        "path": "/productgroups"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createProductGroup",
+        "path": "/product-groups"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "PUT",
+        "operationId": "v0_put_productgroups",
+        "path": "/productgroups"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateProductGroup",
+        "path": "/product-groups/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "DELETE",
+        "operationId": "v0_delete_productgroups_id",
+        "path": "/productgroups/{_id}"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveProductGroup",
+        "path": "/product-groups/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_productgroups_id",
+        "path": "/productgroups/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getProductGroup",
+        "path": "/product-groups/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "PUT",
+        "operationId": "v0_put_productgroups_id",
+        "path": "/productgroups/{_id}"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateProductGroup",
+        "path": "/product-groups/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "DELETE",
+        "operationId": "v0_delete_products",
+        "path": "/products"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveProduct",
+        "path": "/products/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_products",
+        "path": "/products"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listProducts",
+        "path": "/products"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_products",
+        "path": "/products"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createProduct",
+        "path": "/products"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "PUT",
+        "operationId": "v0_put_products",
+        "path": "/products"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateProduct",
+        "path": "/products/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "DELETE",
+        "operationId": "v0_delete_products_id",
+        "path": "/products/{_id}"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveProduct",
+        "path": "/products/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_products_id",
+        "path": "/products/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getProduct",
+        "path": "/products/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "PUT",
+        "operationId": "v0_put_products_id",
+        "path": "/products/{_id}"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateProduct",
+        "path": "/products/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_projects",
+        "path": "/projects"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listProjects",
+        "path": "/projects"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_projects",
+        "path": "/projects"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createProject",
+        "path": "/projects"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "PUT",
+        "operationId": "v0_put_projects",
+        "path": "/projects"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateProject",
+        "path": "/projects/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_projects_id",
+        "path": "/projects/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getProject",
+        "path": "/projects/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "PUT",
+        "operationId": "v0_put_projects_id",
+        "path": "/projects/{_id}"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateProject",
+        "path": "/projects/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion.",
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "DELETE",
+        "operationId": "v0_delete_projectTemplates",
+        "path": "/projectTemplates"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveProjectTemplate",
+        "path": "/project-templates/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_projectTemplates",
+        "path": "/projectTemplates"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listProjectTemplates",
+        "path": "/project-templates"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "POST",
+        "operationId": "v0_post_projectTemplates",
+        "path": "/projectTemplates"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createProjectTemplate",
+        "path": "/project-templates"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "PUT",
+        "operationId": "v0_put_projectTemplates",
+        "path": "/projectTemplates"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateProjectTemplate",
+        "path": "/project-templates/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion.",
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "DELETE",
+        "operationId": "v0_delete_projectTemplates_id",
+        "path": "/projectTemplates/{_id}"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveProjectTemplate",
+        "path": "/project-templates/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_projectTemplates_id",
+        "path": "/projectTemplates/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getProjectTemplate",
+        "path": "/project-templates/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The frozen v0 route is unavailable; v1 provides the governed replacement operation."
+        ]
+      },
+      "v0": {
+        "contractStatus": "unavailable",
+        "method": "PUT",
+        "operationId": "v0_put_projectTemplates_id",
+        "path": "/projectTemplates/{_id}"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateProjectTemplate",
+        "path": "/project-templates/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use the planned-work filters and bounded pagination instead of the legacy scheduled-work query shape."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_scheduledWork",
+        "path": "/scheduledWork"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listPlannedWork",
+        "path": "/planned-work"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_services",
+        "path": "/services"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listServices",
+        "path": "/services"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_services_id",
+        "path": "/services/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getService",
+        "path": "/services/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_tags",
+        "path": "/tags"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listTags",
+        "path": "/tags"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_tags_id",
+        "path": "/tags/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getTag",
+        "path": "/tags/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "DELETE",
+        "operationId": "v0_delete_tasks",
+        "path": "/tasks"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveTask",
+        "path": "/tasks/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_tasks",
+        "path": "/tasks"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listTasks",
+        "path": "/tasks"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_tasks",
+        "path": "/tasks"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createTask",
+        "path": "/tasks"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "PUT",
+        "operationId": "v0_put_tasks",
+        "path": "/tasks"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateTask",
+        "path": "/tasks/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "DELETE",
+        "operationId": "v0_delete_tasks_id",
+        "path": "/tasks/{_id}"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveTask",
+        "path": "/tasks/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_tasks_id",
+        "path": "/tasks/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getTask",
+        "path": "/tasks/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "PUT",
+        "operationId": "v0_put_tasks_id",
+        "path": "/tasks/{_id}"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateTask",
+        "path": "/tasks/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_tasks_id_startTracking",
+        "path": "/tasks/{_id}/startTracking"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "startTaskTimer",
+        "path": "/tasks/{id}/timer/start"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_tasks_id_stopTracking",
+        "path": "/tasks/{_id}/stopTracking"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "stopTaskTimer",
+        "path": "/tasks/{id}/timer/stop"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": [
+          "The authenticated tenant is exposed as one workspace resource rather than a team collection."
+        ]
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_teams",
+        "path": "/teams"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getWorkspace",
+        "path": "/workspace"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "DELETE",
+        "operationId": "v0_delete_times",
+        "path": "/times"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveTimeEntry",
+        "path": "/time-entries/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_times",
+        "path": "/times"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listTimeEntries",
+        "path": "/time-entries"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_times",
+        "path": "/times"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createTimeEntry",
+        "path": "/time-entries"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "PUT",
+        "operationId": "v0_put_times",
+        "path": "/times"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateTimeEntry",
+        "path": "/time-entries/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": [
+          "The v1 operation archives the resource; it does not promise physical deletion."
+        ]
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "DELETE",
+        "operationId": "v0_delete_times_id",
+        "path": "/times/{_id}"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "archiveTimeEntry",
+        "path": "/time-entries/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_times_id",
+        "path": "/times/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getTimeEntry",
+        "path": "/time-entries/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Use PATCH and send only declared mutable attributes; follow the target operation concurrency contract."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "PUT",
+        "operationId": "v0_put_times_id",
+        "path": "/times/{_id}"
+      },
+      "v1": {
+        "method": "PATCH",
+        "operationId": "updateTimeEntry",
+        "path": "/time-entries/{id}"
+      }
+    },
+    {
+      "classification": "equivalent",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_users",
+        "path": "/users"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listUsers",
+        "path": "/users"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Move the resource id from the legacy body alias into the v1 resource path."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Treat legacy unsigned v0 and signed v2 webhook subscriptions as separate resources during migration."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "deprecated-alias",
+        "method": "DELETE",
+        "operationId": "v0_delete_webhooks",
+        "path": "/webhooks"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "removeWebhook",
+        "path": "/webhooks/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Follow cursor pagination and persist the returned continuation cursor when present.",
+          "Treat legacy unsigned v0 and signed v2 webhook subscriptions as separate resources during migration."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_webhooks",
+        "path": "/webhooks"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "listWebhooks",
+        "path": "/webhooks"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint.",
+          "Create a signed webhook v2 subscription and persist the one-time signing secret."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Treat legacy unsigned v0 and signed v2 webhook subscriptions as separate resources during migration."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "POST",
+        "operationId": "v0_post_webhooks",
+        "path": "/webhooks"
+      },
+      "v1": {
+        "method": "POST",
+        "operationId": "createWebhook",
+        "path": "/webhooks"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Treat legacy unsigned v0 and signed v2 webhook subscriptions as separate resources during migration."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "DELETE",
+        "operationId": "v0_delete_webhooks_id",
+        "path": "/webhooks/{_id}"
+      },
+      "v1": {
+        "method": "DELETE",
+        "operationId": "removeWebhook",
+        "path": "/webhooks/{id}"
+      }
+    },
+    {
+      "classification": "adaptation-required",
+      "migration": {
+        "requestChanges": [
+          "Use a scoped API v1 bearer credential and the credential-derived regional endpoint."
+        ],
+        "responseChanges": [
+          "Consume the documented API v1 resource envelope and error model.",
+          "Treat legacy unsigned v0 and signed v2 webhook subscriptions as separate resources during migration."
+        ],
+        "semanticChanges": []
+      },
+      "v0": {
+        "contractStatus": "supported",
+        "method": "GET",
+        "operationId": "v0_get_webhooks_id",
+        "path": "/webhooks/{_id}"
+      },
+      "v1": {
+        "method": "GET",
+        "operationId": "getWebhook",
+        "path": "/webhooks/{id}"
+      }
+    }
+  ]
+}

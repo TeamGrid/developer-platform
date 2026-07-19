@@ -38,6 +38,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List cell-local resource changes */
+        get: operations["listChanges"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/products": {
         parameters: {
             query?: never;
@@ -226,6 +243,173 @@ export interface paths {
         /** Get a project lifecycle operation */
         get: operations["getProjectLifecycleOperation"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/project-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List project templates
+         * @description The cell-local App re-authenticates the credential and verifies the projects.templates plan capability before this service reads only the tenant-scoped, metadata-only projection. Captured snapshot data is never selected or exposed.
+         */
+        get: operations["listProjectTemplates"];
+        put?: never;
+        /**
+         * Capture a project as a template
+         * @description The cell-local App re-authenticates the credential, verifies tenant ownership and the projects.templates.add plan permission, snapshots the source project with bounded list/task limits, and applies credential-bound idempotency.
+         */
+        post: operations["createProjectTemplate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/project-templates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get project-template metadata
+         * @description The cell-local App re-authenticates the credential and verifies the projects.templates plan capability before a tenant-scoped metadata-only read. The captured snapshot is never selected or exposed.
+         */
+        get: operations["getProjectTemplate"];
+        put?: never;
+        post?: never;
+        /** Archive a project template */
+        delete: operations["archiveProjectTemplate"];
+        options?: never;
+        head?: never;
+        /** Update project-template metadata */
+        patch: operations["updateProjectTemplate"];
+        trace?: never;
+    };
+    "/project-templates/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore an archived project template */
+        post: operations["restoreProjectTemplate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/project-templates/{id}/instantiate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Instantiate a project template asynchronously
+         * @description The cell-local App re-authenticates the credential, verifies both required scopes, tenant ownership, projects.templates and projects.create plan permissions, validates every referenced resource, and starts a credential-owned asynchronous operation.
+         */
+        post: operations["instantiateProjectTemplate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/project-template-instantiations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a project-template instantiation operation
+         * @description Returns only an operation owned by the authenticated credential in its workspace. The cell-local App re-authenticates both project-templates:write and projects:write scopes before every poll.
+         */
+        get: operations["getProjectTemplateInstantiation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planned-work": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List planned work in a bounded window
+         * @description Returns a stable ascending keyset page from the credential cell. The cursor is bound to the workspace and complete filter set. Authorization filtering can produce an empty page with a non-null cursor.
+         */
+        get: operations["listPlannedWork"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planned-work-operations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a planned-work replacement operation
+         * @description Polls a credential-owned, workspace-owned asynchronous replacement operation. Tenant and cell routing internals are never projected.
+         */
+        get: operations["getPlannedWorkOperation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/planned-work": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a task planned-work schedule
+         * @description Returns the task schedule and a strong revision ETag. Reads fail closed while a replacement overlaps the task.
+         */
+        get: operations["getTaskPlannedWork"];
+        /**
+         * Replace task planned work asynchronously
+         * @description Atomically compares the strong task schedule revision and accepts a credential-owned asynchronous replacement. The same Idempotency-Key and payload replay the original operation; a different payload conflicts.
+         */
+        put: operations["replaceTaskPlannedWork"];
         post?: never;
         delete?: never;
         options?: never;
@@ -839,6 +1023,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/custom-field-values/{targetType}/{resourceId}/{fieldId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a custom-field value
+         * @description The cell-local App re-authenticates the credential and additionally requires a target-domain scope selected by targetType: contacts:read/write, projects:read/write, project-statements:read/write, or tasks:read/write. Reading a contact, project, tag, or user reference field, and validating a newly set reference, also requires the matching contacts:read, projects:read, tags:read, or users:read scope. Invalid legacy values are classified without exposing their payload.
+         */
+        get: operations["getCustomFieldValue"];
+        /**
+         * Set a custom-field value
+         * @description The cell-local App re-authenticates the credential and additionally requires a target-domain scope selected by targetType: contacts:read/write, projects:read/write, project-statements:read/write, or tasks:read/write. Reading a contact, project, tag, or user reference field, and validating a newly set reference, also requires the matching contacts:read, projects:read, tags:read, or users:read scope. Invalid legacy values are classified without exposing their payload.
+         */
+        put: operations["setCustomFieldValue"];
+        post?: never;
+        /**
+         * Clear a custom-field value
+         * @description The cell-local App re-authenticates the credential and additionally requires a target-domain scope selected by targetType: contacts:read/write, projects:read/write, project-statements:read/write, or tasks:read/write. Reading a contact, project, tag, or user reference field, and validating a newly set reference, also requires the matching contacts:read, projects:read, tags:read, or users:read scope. Invalid legacy values are classified without exposing their payload.
+         */
+        delete: operations["clearCustomFieldValue"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/audit-events": {
         parameters: {
             query?: never;
@@ -1001,6 +1213,57 @@ export interface components {
             id: string;
             /** @constant */
             type: "project";
+        };
+        /** @description Safe project-template metadata. The captured project, list, and task snapshot, tenant fields, actor fields, and other storage internals are never exposed. */
+        ProjectTemplate: {
+            attributes: {
+                archived: boolean;
+                color: string;
+                /** Format: date-time */
+                createdAt: string | null;
+                description: string;
+                originProjectId: string | null;
+                /** @enum {integer|null} */
+                snapshotVersion: 1 | null;
+                stats: {
+                    listCount: number;
+                    taskCount: number;
+                } | null;
+                title: string;
+                /** Format: date-time */
+                updatedAt: string | null;
+            };
+            id: string;
+            /** @constant */
+            type: "projectTemplate";
+        };
+        /** @description Credential-owned asynchronous instantiation status. Checkpoints, source snapshots, generated documents, tenant routing, runner state, and retry internals are never exposed. */
+        ProjectTemplateInstantiation: {
+            attributes: {
+                /** Format: date-time */
+                createdAt: string;
+                readonly error?: {
+                    code: string;
+                    message: string;
+                };
+                /** Format: date-time */
+                readonly finishedAt?: string;
+                progress: {
+                    listsCompleted: number;
+                    listsTotal: number;
+                    tasksCompleted: number;
+                    tasksTotal: number;
+                };
+                projectId: string;
+                /** @enum {string} */
+                state: "failed" | "pending" | "running" | "succeeded";
+                templateId: string;
+                /** Format: date-time */
+                updatedAt: string;
+            } & (unknown & unknown & unknown);
+            id: string;
+            /** @constant */
+            type: "projectTemplateInstantiation";
         };
         ProjectLifecycleOperation: {
             attributes: {
@@ -1414,6 +1677,112 @@ export interface components {
             required?: boolean;
             title?: string;
         };
+        /** @description Canonical value. The field definition selects the valid branch and applies tighter length, option, reference, and number constraints. Serialized input is limited to 256 KiB. */
+        CustomFieldValueValue: boolean | number | string | string[];
+        CustomFieldValue: {
+            attributes: {
+                fieldId: string;
+                /** @enum {string} */
+                fieldType: "contact" | "date" | "dropdown" | "number" | "project" | "switcher" | "tag" | "text" | "textarea" | "user";
+                resourceId: string;
+                revision: string;
+                /** @enum {string} */
+                state: "invalid" | "set" | "unset";
+                /** @enum {string} */
+                targetType: "contact" | "project" | "project-journal-entry" | "task";
+                value?: components["schemas"]["CustomFieldValueValue"];
+            } & unknown;
+            id: string;
+            /** @constant */
+            type: "customFieldValue";
+        };
+        CustomFieldValueMutation: {
+            attributes: {
+                fieldId: string;
+                /** @enum {string} */
+                fieldType: "contact" | "date" | "dropdown" | "number" | "project" | "switcher" | "tag" | "text" | "textarea" | "user";
+                /** @description Whether the mutation was an idempotent canonical no-op. */
+                readonly replayed: boolean;
+                resourceId: string;
+                revision: string;
+                /** @enum {string} */
+                state: "invalid" | "set" | "unset";
+                /** @enum {string} */
+                targetType: "contact" | "project" | "project-journal-entry" | "task";
+                value?: components["schemas"]["CustomFieldValueValue"];
+            } & unknown;
+            id: string;
+            /** @constant */
+            type: "customFieldValue";
+        };
+        CustomFieldValueSet: {
+            value: components["schemas"]["CustomFieldValueValue"];
+        };
+        PlannedWork: {
+            attributes: {
+                /** Format: date-time */
+                date: string;
+                minutes: number;
+                projectId: string;
+                taskId: string;
+                userId: string;
+            };
+            id: string;
+            /** @constant */
+            type: "plannedWork";
+        };
+        TaskPlannedWork: {
+            attributes: {
+                items: components["schemas"]["PlannedWork"][];
+                /** Format: date-time */
+                plannedEnd: string | null;
+                /** Format: date-time */
+                plannedStart: string | null;
+                projectId: string;
+                revision: string;
+                taskId: string;
+                userId: string;
+            };
+            id: string;
+            /** @constant */
+            type: "taskPlannedWork";
+        };
+        PlannedWorkOperation: {
+            attributes: {
+                attempts: number;
+                /** Format: date-time */
+                createdAt: string;
+                readonly error?: {
+                    code: string;
+                    message: string;
+                };
+                /** Format: date-time */
+                readonly finishedAt?: string;
+                /** Format: date-time */
+                plannedEnd: string;
+                /** Format: date-time */
+                plannedStart: string;
+                projectId: string;
+                sourceRevision: string;
+                /** @enum {string} */
+                state: "failed" | "pending" | "running" | "succeeded";
+                targetRevision: string;
+                taskId: string;
+                /** Format: date-time */
+                updatedAt: string;
+                userId: string;
+            } & (unknown & unknown & unknown & unknown);
+            id: string;
+            /** @constant */
+            type: "plannedWorkOperation";
+        };
+        PlannedWorkReplacement: {
+            dayLoads: number[];
+            /** Format: date-time */
+            plannedEnd: string;
+            /** Format: date-time */
+            plannedStart: string;
+        };
         ListCreate: {
             name: string;
             parentId?: string | null;
@@ -1466,6 +1835,23 @@ export interface components {
             id: string;
             /** @constant */
             type: "auditEvent";
+        };
+        ChangeEvent: {
+            attributes: {
+                /** @enum {string} */
+                operation: "created" | "deleted" | "updated";
+                /** Format: date-time */
+                occurredAt: string;
+                region: string;
+                resourceId: string;
+                /** @enum {string} */
+                resourceType: "callNote" | "contact" | "contactGroup" | "customFieldDefinition" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "service" | "tag" | "task" | "timeEntry";
+                sequence: number;
+                tombstone: boolean;
+            };
+            id: string;
+            /** @constant */
+            type: "changeEvent";
         };
         Webhook: {
             attributes: {
@@ -1553,6 +1939,35 @@ export interface components {
             listId?: string | null;
             managerId?: string | null;
             name?: string;
+            /** Format: date-time */
+            plannedEndAt?: string | null;
+            /** Format: date-time */
+            plannedStartAt?: string | null;
+            showInScheduling?: boolean | null;
+            subscriberIds?: string[] | null;
+        };
+        ProjectTemplateCreate: {
+            color: string;
+            description?: string;
+            projectId: string;
+            title: string;
+        };
+        ProjectTemplateUpdate: {
+            color?: string;
+            description?: string;
+            title?: string;
+        };
+        ProjectTemplateInstantiate: {
+            additionalContactIds?: string[] | null;
+            color?: string | null;
+            contactId?: string | null;
+            description?: string;
+            /** Format: date-time */
+            dueAt?: string | null;
+            individualId?: string | null;
+            listId?: string | null;
+            managerId?: string | null;
+            name: string;
             /** Format: date-time */
             plannedEndAt?: string | null;
             /** Format: date-time */
@@ -1812,6 +2227,24 @@ export interface components {
                 "application/json": components["schemas"]["ErrorEnvelope"];
             };
         };
+        /** @description The resource changed since the supplied revision. */
+        PreconditionFailed: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
+        /** @description A strong If-Match revision is required. */
+        PreconditionRequired: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ErrorEnvelope"];
+            };
+        };
         /** @description The credential or source exceeded its rate limit. */
         RateLimited: {
             headers: {
@@ -1853,14 +2286,26 @@ export interface components {
     parameters: {
         /** @description Opaque cursor returned in meta.page.nextCursor. */
         Cursor: string;
+        CustomFieldValueFieldId: string;
+        CustomFieldValueResourceId: string;
+        CustomFieldValueTargetType: "contact" | "project" | "project-journal-entry" | "task";
         /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
         IdempotencyKey: string;
+        /** @description Exactly one strong ETag returned by the latest GET or mutation response. Wildcards, weak validators, and lists are rejected. */
+        IfMatchCustomFieldValue: string;
+        /** @description Exactly one strong ETag returned by the latest task planned-work GET. Wildcards, weak validators, and lists are rejected. */
+        IfMatchPlannedWork: string;
         Limit: number;
         ResourceId: string;
         WebhookDeliveryId: string;
     };
     requestBodies: never;
-    headers: never;
+    headers: {
+        /** @description Strong revision tag required verbatim in If-Match before a mutation. */
+        CustomFieldValueETag: string;
+        /** @description Strong schedule revision required verbatim in If-Match before replacement. */
+        PlannedWorkETag: string;
+    };
     pathItems: never;
 }
 export type $defs = Record<string, never>;
@@ -1912,6 +2357,63 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listChanges: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+                /** @description Filter by one or more change operations. Repeat the query parameter for multiple values. */
+                operations?: ("created" | "deleted" | "updated")[];
+                /** @description Filter by one or more public resource types. Repeat the query parameter for multiple values. */
+                resourceTypes?: ("callNote" | "contact" | "contactGroup" | "customFieldDefinition" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "service" | "tag" | "task" | "timeEntry")[];
+                /** @description Create an empty checkpoint at the latest committed cell sequence. Cannot be combined with cursor. Use this before a full resource snapshot, then poll with the returned cursor. */
+                startAtLatest?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A fixed-watermark change page and the checkpoint for the next poll. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ChangeEvent"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                /** @description Credential-bound checkpoint for the next poll. It is present even when this page is empty. */
+                                nextCursor: string;
+                                /** @description True when this page reaches its fixed watermark. False pages are always full. */
+                                caughtUp: boolean;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description The cursor is outside retained history or cell continuity cannot be proven. A full resynchronization is required. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
         };
     };
@@ -2643,6 +3145,474 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listProjectTemplates: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+                /** @description Return archived resources instead of active resources. */
+                archived?: boolean;
+                /** @description Include templates created at or after this time. */
+                createdAtFrom?: string;
+                /** @description Include templates created at or before this time. */
+                createdAtTo?: string;
+                /** @description Filter templates by their source project id. */
+                originProjectId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectTemplate"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createProjectTemplate: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectTemplateCreate"];
+            };
+        };
+        responses: {
+            /** @description An idempotent replay of an existing resource. */
+            200: {
+                headers: {
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectTemplate"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectTemplate"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getProjectTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectTemplate"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    archiveProjectTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The project template was archived, or that state was already present. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateProjectTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectTemplateUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectTemplate"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    restoreProjectTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectTemplate"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    instantiateProjectTemplate: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectTemplateInstantiate"];
+            };
+        };
+        responses: {
+            /** @description The asynchronous template instantiation was accepted. */
+            202: {
+                headers: {
+                    /** @description Whether this response replays the operation created for this key. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    /** @description Relative credential-owned polling URL for this operation. */
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectTemplateInstantiation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getProjectTemplateInstantiation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectTemplateInstantiation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listPlannedWork: {
+        parameters: {
+            query: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+                /** @description Inclusive window start. Together with end, limited to 366 days and years 2000–2100. */
+                start: string;
+                /** @description Inclusive window end. Together with start, limited to 366 days and years 2000–2100. */
+                end: string;
+                /** @description Filter by task id. */
+                taskId?: string;
+                /** @description Filter by project id. */
+                projectId?: string;
+                /** @description Filter by user id. */
+                userId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PlannedWork"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getPlannedWorkOperation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PlannedWorkOperation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getTaskPlannedWork: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["PlannedWorkETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TaskPlannedWork"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    replaceTaskPlannedWork: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one strong ETag returned by the latest task planned-work GET. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchPlannedWork"];
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlannedWorkReplacement"];
+            };
+        };
+        responses: {
+            /** @description The asynchronous schedule replacement was accepted or replayed. */
+            202: {
+                headers: {
+                    /** @description Whether this response replays the operation created for this key. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    /** @description Relative credential-owned polling URL for this operation. */
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PlannedWorkOperation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -4965,6 +5935,128 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getCustomFieldValue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                targetType: components["parameters"]["CustomFieldValueTargetType"];
+                resourceId: components["parameters"]["CustomFieldValueResourceId"];
+                fieldId: components["parameters"]["CustomFieldValueFieldId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The current value state and its strong revision tag. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["CustomFieldValueETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CustomFieldValue"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    setCustomFieldValue: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one strong ETag returned by the latest GET or mutation response. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchCustomFieldValue"];
+            };
+            path: {
+                targetType: components["parameters"]["CustomFieldValueTargetType"];
+                resourceId: components["parameters"]["CustomFieldValueResourceId"];
+                fieldId: components["parameters"]["CustomFieldValueFieldId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomFieldValueSet"];
+            };
+        };
+        responses: {
+            /** @description The value was set or an identical canonical value was replayed. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["CustomFieldValueETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CustomFieldValueMutation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    clearCustomFieldValue: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one strong ETag returned by the latest GET or mutation response. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchCustomFieldValue"];
+            };
+            path: {
+                targetType: components["parameters"]["CustomFieldValueTargetType"];
+                resourceId: components["parameters"]["CustomFieldValueResourceId"];
+                fieldId: components["parameters"]["CustomFieldValueFieldId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The value was cleared or an already-unset state was replayed. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["CustomFieldValueETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CustomFieldValueMutation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

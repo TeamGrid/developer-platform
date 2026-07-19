@@ -30,6 +30,11 @@ type ListCommandOptions = {
   maxPages?: number
 }
 
+type ChangeCommandOptions = ListCommandOptions & {
+  operation?: string[]
+  resourceType?: string[]
+}
+
 type CliClient = TeamGridClient
 
 const localUsageErrorCodes = new Set([
@@ -90,6 +95,25 @@ function booleanValue(value: string) {
   if (value === 'true') return true
   if (value === 'false') return false
   throw new TeamGridClientError('invalid_boolean', 'Expected true or false.')
+}
+
+function commaSeparatedChoice(
+  allowed: ReadonlySet<string>,
+  description: string,
+): (value: string, previous: string[]) => string[] {
+  return (value, previous = []) => {
+    const values = value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+    if (!values.length || values.some((item) => !allowed.has(item))) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        `${description} must contain only: ${Array.from(allowed).join(', ')}.`,
+      )
+    }
+    return Array.from(new Set([...previous, ...values]))
+  }
 }
 
 function addListOptions(command: Command) {
@@ -240,6 +264,83 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       resources.push(...page.data)
     }
     outputData(command, resources)
+  }
+
+  const changeOperations = new Set(['created', 'deleted', 'updated'])
+  const changeResourceTypes = new Set([
+    'callNote',
+    'contact',
+    'contactGroup',
+    'customFieldDefinition',
+    'list',
+    'product',
+    'productGroup',
+    'project',
+    'projectStatement',
+    'service',
+    'tag',
+    'task',
+    'timeEntry',
+  ])
+
+  function addChangeFilterOptions(command: Command) {
+    return command
+      .option(
+        '--operation <operation>',
+        'filter operation; repeat or comma-separate',
+        commaSeparatedChoice(changeOperations, 'Operation'),
+        [],
+      )
+      .option(
+        '--resource-type <type>',
+        'filter resource type; repeat or comma-separate',
+        commaSeparatedChoice(changeResourceTypes, 'Resource type'),
+        [],
+      )
+  }
+
+  function changeFilters(options: ChangeCommandOptions) {
+    return {
+      ...(options.limit === undefined ? {} : { limit: options.limit }),
+      ...(options.operation?.length ? { operations: options.operation } : {}),
+      ...(options.resourceType?.length ? { resourceTypes: options.resourceType } : {}),
+    }
+  }
+
+  async function outputChangePage(
+    command: Command,
+    page: {
+      data: unknown[]
+      meta: { page: { caughtUp: boolean; nextCursor: string }; requestId: string }
+    },
+  ) {
+    const mode = globalOptions(command).output
+    if (mode === 'json') {
+      outputData(command, page)
+      return
+    }
+    if (mode === 'jsonl') {
+      await writeJsonLines(
+        output,
+        page.data.map((data) => ({ data, kind: 'change' })),
+      )
+      await writeJsonLines(output, [
+        {
+          caughtUp: page.meta.page.caughtUp,
+          cursor: page.meta.page.nextCursor,
+          kind: 'checkpoint',
+          requestId: page.meta.requestId,
+        },
+      ])
+      return
+    }
+    outputData(command, page.data)
+    outputData(command, {
+      caughtUp: page.meta.page.caughtUp,
+      cursor: page.meta.page.nextCursor,
+      requestId: page.meta.requestId,
+      type: 'changeCheckpoint',
+    })
   }
 
   async function confirmDestructive(
@@ -1098,6 +1199,283 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   ) {
     const client = await loadClient(command)
     outputData(command, (await client.customFieldDefinitions.restore(id)).data)
+  })
+
+  const customFieldValues = program
+    .command('custom-field-values')
+    .description('read and compare-and-set custom-field values')
+  customFieldValues
+    .command('get <target-type> <resource-id> <field-id>')
+    .action(async function action(
+      targetType: 'contact' | 'project' | 'project-journal-entry' | 'task',
+      resourceId: string,
+      fieldId: string,
+      _options,
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.customFieldValues.get(targetType, resourceId, fieldId)).data,
+      )
+    })
+  customFieldValues
+    .command('set <target-type> <resource-id> <field-id>')
+    .requiredOption('--data <json|@file|->', 'custom-field value JSON, for example {"value":"A"}')
+    .requiredOption(
+      '--if-match <revision|etag>',
+      'latest custom-field value revision or strong ETag',
+    )
+    .action(async function action(
+      targetType: 'contact' | 'project' | 'project-journal-entry' | 'task',
+      resourceId: string,
+      fieldId: string,
+      options,
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.customFieldValues.set(
+            targetType,
+            resourceId,
+            fieldId,
+            (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
+          )
+        ).data,
+      )
+    })
+  archiveOptions(
+    customFieldValues
+      .command('clear <target-type> <resource-id> <field-id>')
+      .requiredOption(
+        '--if-match <revision|etag>',
+        'latest custom-field value revision or strong ETag',
+      ),
+  ).action(async function action(
+    targetType: 'contact' | 'project' | 'project-journal-entry' | 'task',
+    resourceId: string,
+    fieldId: string,
+    options,
+    command: Command,
+  ) {
+    await confirmDestructive(
+      command,
+      'Clear',
+      'custom-field value',
+      `${targetType}/${resourceId}/${fieldId}`,
+    )
+    const client = await loadClient(command)
+    outputData(
+      command,
+      (
+        await client.customFieldValues.clear(targetType, resourceId, fieldId, {
+          ifMatch: options.ifMatch,
+        })
+      ).data,
+    )
+  })
+
+  const projectTemplates = program
+    .command('project-templates')
+    .description('read and manage reusable project templates')
+  addListOptions(projectTemplates.command('list'))
+    .option('--archived <boolean>', 'return archived templates', booleanValue)
+    .option('--created-at-from <date>', 'filter by earliest creation timestamp')
+    .option('--created-at-to <date>', 'filter by latest creation timestamp')
+    .option('--origin-project-id <id>', 'filter by source project')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.projectTemplates as never)
+    })
+  projectTemplates.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.projectTemplates.get(id)).data)
+  })
+  projectTemplates
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'project-template create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.projectTemplates.create(
+            (await readJsonObject(options.data, input)) as never,
+            { idempotencyKey: options.idempotencyKey },
+          )
+        ).data,
+      )
+    })
+  projectTemplates
+    .command('update <id>')
+    .requiredOption('--data <json|@file|->', 'project-template patch JSON')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.projectTemplates.update(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+          )
+        ).data,
+      )
+    })
+  archiveOptions(projectTemplates.command('archive <id>')).action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Archive', 'project template', id)
+    const client = await loadClient(command)
+    await client.projectTemplates.archive(id)
+    outputData(command, { archived: true, id, type: 'projectTemplate' })
+  })
+  projectTemplates.command('restore <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.projectTemplates.restore(id)).data)
+  })
+  lifecycleOptions(projectTemplates.command('instantiate <id>'))
+    .requiredOption('--data <json|@file|->', 'project-template instantiation JSON')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      const accepted = await client.projectTemplates.instantiate(
+        id,
+        (await readJsonObject(options.data, input)) as never,
+        { idempotencyKey: options.idempotencyKey },
+      )
+      const result = options.wait
+        ? await client.projectTemplateInstantiations.wait(accepted.data.id, {
+            maxWaitMs: options.maxWait,
+            pollIntervalMs: options.pollInterval,
+          })
+        : accepted
+      outputData(command, result.data)
+    })
+
+  const projectTemplateInstantiations = program
+    .command('project-template-instantiations')
+    .description('inspect credential-owned project-template instantiations')
+  projectTemplateInstantiations.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.projectTemplateInstantiations.get(id)).data)
+  })
+
+  const plannedWork = program
+    .command('planned-work')
+    .description('read and atomically replace task planned work')
+  addListOptions(plannedWork.command('list'))
+    .requiredOption('--start <date>', 'inclusive planned-work window start')
+    .requiredOption('--end <date>', 'inclusive planned-work window end')
+    .option('--project-id <id>', 'filter by project')
+    .option('--task-id <id>', 'filter by task')
+    .option('--user-id <id>', 'filter by user')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.plannedWork as never)
+    })
+  plannedWork.command('get <task-id>').action(async function action(
+    taskId: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.plannedWork.getForTask(taskId)).data)
+  })
+  archiveOptions(lifecycleOptions(plannedWork.command('replace <task-id>')))
+    .requiredOption('--data <json|@file|->', 'complete planned-work replacement JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest planned-work revision or strong ETag')
+    .action(async function action(taskId: string, options, command: Command) {
+      await confirmDestructive(command, 'Replace', 'planned work for task', taskId)
+      const client = await loadClient(command)
+      const accepted = await client.plannedWork.replaceForTask(
+        taskId,
+        (await readJsonObject(options.data, input)) as never,
+        { idempotencyKey: options.idempotencyKey, ifMatch: options.ifMatch },
+      )
+      const result = options.wait
+        ? await client.plannedWorkOperations.wait(accepted.data.id, {
+            maxWaitMs: options.maxWait,
+            pollIntervalMs: options.pollInterval,
+          })
+        : accepted
+      outputData(command, result.data)
+    })
+
+  const plannedWorkOperations = program
+    .command('planned-work-operations')
+    .description('inspect credential-owned planned-work replacements')
+  plannedWorkOperations.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.plannedWorkOperations.get(id)).data)
+  })
+
+  const changes = program
+    .command('changes')
+    .description('create checkpoints and read the cell-local change feed')
+  addChangeFilterOptions(
+    changes.command('checkpoint').description('create an empty checkpoint at the latest sequence'),
+  ).action(async function action(options: ChangeCommandOptions, command: Command) {
+    const client = await loadClient(command)
+    const page = await client.changes.checkpoint(changeFilters(options) as never)
+    outputData(command, {
+      caughtUp: page.meta.page.caughtUp,
+      cursor: page.meta.page.nextCursor,
+      requestId: page.meta.requestId,
+    })
+  })
+  addChangeFilterOptions(
+    addListOptions(changes.command('list').description('read one change page')),
+  ).action(async function action(options: ChangeCommandOptions, command: Command) {
+    const client = await loadClient(command)
+    const { all, cursor, maxPages } = options
+    const filters = changeFilters(options)
+    if (!all) {
+      await outputChangePage(
+        command,
+        await client.changes.list({ ...filters, ...(cursor ? { cursor } : {}) } as never),
+      )
+      return
+    }
+
+    const mode = globalOptions(command).output
+    const data: unknown[] = []
+    let lastPage:
+      | {
+          data: unknown[]
+          meta: { page: { caughtUp: boolean; nextCursor: string }; requestId: string }
+        }
+      | undefined
+    for await (const page of client.changes.pages(
+      { ...filters, ...(cursor ? { cursor } : {}) } as never,
+      { maxPages },
+    )) {
+      lastPage = page
+      if (mode === 'jsonl') await outputChangePage(command, page)
+      else data.push(...page.data)
+    }
+    if (!lastPage || mode === 'jsonl') return
+    await outputChangePage(command, { data, meta: lastPage.meta })
   })
 
   addListOptions(

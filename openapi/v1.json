@@ -1,5 +1,23 @@
 {
   "components": {
+    "headers": {
+      "CustomFieldValueETag": {
+        "description": "Strong revision tag required verbatim in If-Match before a mutation.",
+        "required": true,
+        "schema": {
+          "pattern": "^\"cfv1-[a-f0-9]{64}\"$",
+          "type": "string"
+        }
+      },
+      "PlannedWorkETag": {
+        "description": "Strong schedule revision required verbatim in If-Match before replacement.",
+        "required": true,
+        "schema": {
+          "pattern": "^\"pw1-[a-f0-9]{64}\"$",
+          "type": "string"
+        }
+      }
+    },
     "parameters": {
       "Cursor": {
         "description": "Opaque cursor returned in meta.page.nextCursor.",
@@ -7,6 +25,42 @@
         "name": "cursor",
         "schema": {
           "maxLength": 1024,
+          "type": "string"
+        }
+      },
+      "CustomFieldValueFieldId": {
+        "in": "path",
+        "name": "fieldId",
+        "required": true,
+        "schema": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9]+$",
+          "type": "string"
+        }
+      },
+      "CustomFieldValueResourceId": {
+        "in": "path",
+        "name": "resourceId",
+        "required": true,
+        "schema": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "type": "string"
+        }
+      },
+      "CustomFieldValueTargetType": {
+        "in": "path",
+        "name": "targetType",
+        "required": true,
+        "schema": {
+          "enum": [
+            "contact",
+            "project",
+            "project-journal-entry",
+            "task"
+          ],
           "type": "string"
         }
       },
@@ -18,6 +72,26 @@
         "schema": {
           "maxLength": 128,
           "minLength": 1,
+          "type": "string"
+        }
+      },
+      "IfMatchCustomFieldValue": {
+        "description": "Exactly one strong ETag returned by the latest GET or mutation response. Wildcards, weak validators, and lists are rejected.",
+        "in": "header",
+        "name": "If-Match",
+        "required": true,
+        "schema": {
+          "pattern": "^\"cfv1-[a-f0-9]{64}\"$",
+          "type": "string"
+        }
+      },
+      "IfMatchPlannedWork": {
+        "description": "Exactly one strong ETag returned by the latest task planned-work GET. Wildcards, weak validators, and lists are rejected.",
+        "in": "header",
+        "name": "If-Match",
+        "required": true,
+        "schema": {
+          "pattern": "^\"pw1-[a-f0-9]{64}\"$",
           "type": "string"
         }
       },
@@ -103,6 +177,26 @@
           }
         },
         "description": "The tenant-scoped resource does not exist."
+      },
+      "PreconditionFailed": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        },
+        "description": "The resource changed since the supplied revision."
+      },
+      "PreconditionRequired": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorEnvelope"
+            }
+          }
+        },
+        "description": "A strong If-Match revision is required."
       },
       "RateLimited": {
         "content": {
@@ -447,6 +541,327 @@
           "type",
           "id",
           "attributes"
+        ],
+        "type": "object"
+      },
+      "ProjectTemplate": {
+        "additionalProperties": false,
+        "description": "Safe project-template metadata. The captured project, list, and task snapshot, tenant fields, actor fields, and other storage internals are never exposed.",
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "archived": {
+                "type": "boolean"
+              },
+              "color": {
+                "pattern": "^#[0-9a-f]{6}$",
+                "type": "string"
+              },
+              "createdAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "description": {
+                "maxLength": 50000,
+                "type": "string"
+              },
+              "originProjectId": {
+                "maxLength": 128,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "snapshotVersion": {
+                "enum": [
+                  1,
+                  null
+                ],
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "stats": {
+                "additionalProperties": false,
+                "properties": {
+                  "listCount": {
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "taskCount": {
+                    "maximum": 5000,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "listCount",
+                  "taskCount"
+                ],
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "title": {
+                "maxLength": 500,
+                "minLength": 1,
+                "type": "string"
+              },
+              "updatedAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "archived",
+              "color",
+              "createdAt",
+              "description",
+              "originProjectId",
+              "snapshotVersion",
+              "stats",
+              "title",
+              "updatedAt"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          "type": {
+            "const": "projectTemplate",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attributes",
+          "id",
+          "type"
+        ],
+        "type": "object"
+      },
+      "ProjectTemplateInstantiation": {
+        "additionalProperties": false,
+        "description": "Credential-owned asynchronous instantiation status. Checkpoints, source snapshots, generated documents, tenant routing, runner state, and retry internals are never exposed.",
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "state": {
+                      "const": "failed"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "error": true,
+                    "finishedAt": true
+                  },
+                  "required": [
+                    "error",
+                    "finishedAt"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "state": {
+                      "const": "succeeded"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "not": {
+                    "properties": {
+                      "error": true
+                    },
+                    "required": [
+                      "error"
+                    ]
+                  },
+                  "properties": {
+                    "finishedAt": true
+                  },
+                  "required": [
+                    "finishedAt"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "state": {
+                      "enum": [
+                        "pending",
+                        "running"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "error": true
+                        },
+                        "required": [
+                          "error"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "finishedAt": true
+                        },
+                        "required": [
+                          "finishedAt"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "createdAt": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "error": {
+                "additionalProperties": false,
+                "properties": {
+                  "code": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "message": {
+                    "maxLength": 500,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "readOnly": true,
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "type": "object"
+              },
+              "finishedAt": {
+                "format": "date-time",
+                "readOnly": true,
+                "type": "string"
+              },
+              "progress": {
+                "additionalProperties": false,
+                "properties": {
+                  "listsCompleted": {
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "listsTotal": {
+                    "maximum": 100,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "tasksCompleted": {
+                    "maximum": 5000,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "tasksTotal": {
+                    "maximum": 5000,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "listsCompleted",
+                  "listsTotal",
+                  "tasksCompleted",
+                  "tasksTotal"
+                ],
+                "type": "object"
+              },
+              "projectId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "failed",
+                  "pending",
+                  "running",
+                  "succeeded"
+                ],
+                "type": "string"
+              },
+              "templateId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "updatedAt": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "createdAt",
+              "progress",
+              "projectId",
+              "state",
+              "templateId",
+              "updatedAt"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          "type": {
+            "const": "projectTemplateInstantiation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attributes",
+          "id",
+          "type"
         ],
         "type": "object"
       },
@@ -2319,6 +2734,677 @@
         },
         "type": "object"
       },
+      "CustomFieldValueValue": {
+        "description": "Canonical value. The field definition selects the valid branch and applies tighter length, option, reference, and number constraints. Serialized input is limited to 256 KiB.",
+        "oneOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "minimum": 0,
+            "type": "number"
+          },
+          {
+            "maxLength": 100000,
+            "type": "string"
+          },
+          {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          }
+        ]
+      },
+      "CustomFieldValue": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "else": {
+                  "not": {
+                    "properties": {
+                      "value": {}
+                    },
+                    "required": [
+                      "value"
+                    ]
+                  }
+                },
+                "if": {
+                  "properties": {
+                    "state": {
+                      "const": "set"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "value": {}
+                  },
+                  "required": [
+                    "value"
+                  ]
+                }
+              }
+            ],
+            "properties": {
+              "fieldId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9]+$",
+                "type": "string"
+              },
+              "fieldType": {
+                "enum": [
+                  "contact",
+                  "date",
+                  "dropdown",
+                  "number",
+                  "project",
+                  "switcher",
+                  "tag",
+                  "text",
+                  "textarea",
+                  "user"
+                ],
+                "type": "string"
+              },
+              "resourceId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "revision": {
+                "pattern": "^cfv1-[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "invalid",
+                  "set",
+                  "unset"
+                ],
+                "type": "string"
+              },
+              "targetType": {
+                "enum": [
+                  "contact",
+                  "project",
+                  "project-journal-entry",
+                  "task"
+                ],
+                "type": "string"
+              },
+              "value": {
+                "$ref": "#/components/schemas/CustomFieldValueValue"
+              }
+            },
+            "required": [
+              "fieldId",
+              "fieldType",
+              "resourceId",
+              "revision",
+              "state",
+              "targetType"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "pattern": "^cfv_[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "type": {
+            "const": "customFieldValue",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attributes",
+          "id",
+          "type"
+        ],
+        "type": "object"
+      },
+      "CustomFieldValueMutation": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "else": {
+                  "not": {
+                    "properties": {
+                      "value": {}
+                    },
+                    "required": [
+                      "value"
+                    ]
+                  }
+                },
+                "if": {
+                  "properties": {
+                    "state": {
+                      "const": "set"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "value": {}
+                  },
+                  "required": [
+                    "value"
+                  ]
+                }
+              }
+            ],
+            "properties": {
+              "fieldId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9]+$",
+                "type": "string"
+              },
+              "fieldType": {
+                "enum": [
+                  "contact",
+                  "date",
+                  "dropdown",
+                  "number",
+                  "project",
+                  "switcher",
+                  "tag",
+                  "text",
+                  "textarea",
+                  "user"
+                ],
+                "type": "string"
+              },
+              "replayed": {
+                "description": "Whether the mutation was an idempotent canonical no-op.",
+                "readOnly": true,
+                "type": "boolean"
+              },
+              "resourceId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "revision": {
+                "pattern": "^cfv1-[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "invalid",
+                  "set",
+                  "unset"
+                ],
+                "type": "string"
+              },
+              "targetType": {
+                "enum": [
+                  "contact",
+                  "project",
+                  "project-journal-entry",
+                  "task"
+                ],
+                "type": "string"
+              },
+              "value": {
+                "$ref": "#/components/schemas/CustomFieldValueValue"
+              }
+            },
+            "required": [
+              "fieldId",
+              "fieldType",
+              "replayed",
+              "resourceId",
+              "revision",
+              "state",
+              "targetType"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "pattern": "^cfv_[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "type": {
+            "const": "customFieldValue",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attributes",
+          "id",
+          "type"
+        ],
+        "type": "object"
+      },
+      "CustomFieldValueSet": {
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/CustomFieldValueValue"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "type": "object"
+      },
+      "PlannedWork": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "date": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "minutes": {
+                "maximum": 1440,
+                "minimum": 0,
+                "type": "number"
+              },
+              "projectId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "taskId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "userId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "date",
+              "minutes",
+              "projectId",
+              "taskId",
+              "userId"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "plannedWork"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "TaskPlannedWork": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "items": {
+                "items": {
+                  "$ref": "#/components/schemas/PlannedWork"
+                },
+                "maxItems": 366,
+                "type": "array"
+              },
+              "plannedEnd": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "plannedStart": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "projectId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "revision": {
+                "pattern": "^pw1-[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "taskId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "userId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "items",
+              "plannedEnd",
+              "plannedStart",
+              "projectId",
+              "revision",
+              "taskId",
+              "userId"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          "type": {
+            "const": "taskPlannedWork",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attributes",
+          "id",
+          "type"
+        ],
+        "type": "object"
+      },
+      "PlannedWorkOperation": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "state": {
+                      "const": "failed"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "error": true,
+                    "finishedAt": true
+                  },
+                  "required": [
+                    "error",
+                    "finishedAt"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "state": {
+                      "const": "succeeded"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "not": {
+                    "properties": {
+                      "error": true
+                    },
+                    "required": [
+                      "error"
+                    ]
+                  },
+                  "properties": {
+                    "finishedAt": true
+                  },
+                  "required": [
+                    "finishedAt"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "state": {
+                      "const": "pending"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "properties": {
+                          "error": true
+                        },
+                        "required": [
+                          "error"
+                        ]
+                      },
+                      {
+                        "properties": {
+                          "finishedAt": true
+                        },
+                        "required": [
+                          "finishedAt"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "state": {
+                      "const": "running"
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "not": {
+                    "properties": {
+                      "finishedAt": true
+                    },
+                    "required": [
+                      "finishedAt"
+                    ]
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "attempts": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "createdAt": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "error": {
+                "additionalProperties": false,
+                "properties": {
+                  "code": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z0-9_.-]+$",
+                    "type": "string"
+                  },
+                  "message": {
+                    "maxLength": 500,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "readOnly": true,
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "type": "object"
+              },
+              "finishedAt": {
+                "format": "date-time",
+                "readOnly": true,
+                "type": "string"
+              },
+              "plannedEnd": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "plannedStart": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "projectId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "sourceRevision": {
+                "pattern": "^pw1-[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "failed",
+                  "pending",
+                  "running",
+                  "succeeded"
+                ],
+                "type": "string"
+              },
+              "targetRevision": {
+                "pattern": "^pw1-[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "taskId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "updatedAt": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "userId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "attempts",
+              "createdAt",
+              "plannedEnd",
+              "plannedStart",
+              "projectId",
+              "sourceRevision",
+              "state",
+              "targetRevision",
+              "taskId",
+              "updatedAt",
+              "userId"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          "type": {
+            "const": "plannedWorkOperation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attributes",
+          "id",
+          "type"
+        ],
+        "type": "object"
+      },
+      "PlannedWorkReplacement": {
+        "additionalProperties": false,
+        "properties": {
+          "dayLoads": {
+            "items": {
+              "maximum": 1440,
+              "minimum": 0,
+              "type": "number"
+            },
+            "maxItems": 366,
+            "type": "array"
+          },
+          "plannedEnd": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "plannedStart": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dayLoads",
+          "plannedEnd",
+          "plannedStart"
+        ],
+        "type": "object"
+      },
       "ListCreate": {
         "additionalProperties": false,
         "properties": {
@@ -2552,6 +3638,85 @@
           },
           "type": {
             "const": "auditEvent"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "ChangeEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "enum": [
+                  "created",
+                  "deleted",
+                  "updated"
+                ],
+                "type": "string"
+              },
+              "occurredAt": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "region": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "resourceId": {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              "resourceType": {
+                "enum": [
+                  "callNote",
+                  "contact",
+                  "contactGroup",
+                  "customFieldDefinition",
+                  "list",
+                  "product",
+                  "productGroup",
+                  "project",
+                  "projectStatement",
+                  "service",
+                  "tag",
+                  "task",
+                  "timeEntry"
+                ],
+                "type": "string"
+              },
+              "sequence": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "tombstone": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "operation",
+              "occurredAt",
+              "region",
+              "resourceId",
+              "resourceType",
+              "sequence",
+              "tombstone"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "changeEvent"
           }
         },
         "required": [
@@ -3040,6 +4205,164 @@
             ]
           }
         },
+        "type": "object"
+      },
+      "ProjectTemplateCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "color": {
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 50000,
+            "type": "string"
+          },
+          "projectId": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "color",
+          "projectId",
+          "title"
+        ],
+        "type": "object"
+      },
+      "ProjectTemplateUpdate": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "color": {
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 50000,
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProjectTemplateInstantiate": {
+        "additionalProperties": false,
+        "properties": {
+          "additionalContactIds": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 500,
+            "type": [
+              "array",
+              "null"
+            ],
+            "uniqueItems": true
+          },
+          "color": {
+            "maxLength": 64,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contactId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1
+          },
+          "description": {
+            "maxLength": 50000,
+            "type": "string"
+          },
+          "dueAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "individualId": {
+            "maxLength": 500,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "listId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1
+          },
+          "managerId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1
+          },
+          "name": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "plannedEndAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "plannedStartAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "showInScheduling": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "subscriberIds": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 500,
+            "type": [
+              "array",
+              "null"
+            ],
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "ContactCreate": {
@@ -4399,6 +5722,175 @@
         ],
         "x-teamgrid-required-scopes": [
           "workspace:read"
+        ]
+      }
+    },
+    "/changes": {
+      "get": {
+        "operationId": "listChanges",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "description": "Filter by one or more change operations. Repeat the query parameter for multiple values.",
+            "in": "query",
+            "name": "operations",
+            "schema": {
+              "items": {
+                "enum": [
+                  "created",
+                  "deleted",
+                  "updated"
+                ],
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "Filter by one or more public resource types. Repeat the query parameter for multiple values.",
+            "in": "query",
+            "name": "resourceTypes",
+            "schema": {
+              "items": {
+                "enum": [
+                  "callNote",
+                  "contact",
+                  "contactGroup",
+                  "customFieldDefinition",
+                  "list",
+                  "product",
+                  "productGroup",
+                  "project",
+                  "projectStatement",
+                  "service",
+                  "tag",
+                  "task",
+                  "timeEntry"
+                ],
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            }
+          },
+          {
+            "description": "Create an empty checkpoint at the latest committed cell sequence. Cannot be combined with cursor. Use this before a full resource snapshot, then poll with the returned cursor.",
+            "in": "query",
+            "name": "startAtLatest",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/ChangeEvent"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "page": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "limit": {
+                              "maximum": 200,
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "nextCursor": {
+                              "description": "Credential-bound checkpoint for the next poll. It is present even when this page is empty.",
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "caughtUp": {
+                              "description": "True when this page reaches its fixed watermark. False pages are always full.",
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "limit",
+                            "nextCursor",
+                            "caughtUp"
+                          ],
+                          "type": "object"
+                        },
+                        "requestId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "requestId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A fixed-watermark change page and the checkpoint for the next poll."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "The cursor is outside retained history or cell continuity cannot be proven. A full resynchronization is required."
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List cell-local resource changes",
+        "tags": [
+          "Changes"
+        ],
+        "x-teamgrid-required-scopes": [
+          "changes:read"
         ]
       }
     },
@@ -6097,6 +7589,1125 @@
         ],
         "x-teamgrid-required-scopes": [
           "projects:lifecycle"
+        ]
+      }
+    },
+    "/project-templates": {
+      "get": {
+        "operationId": "listProjectTemplates",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "description": "Return archived resources instead of active resources.",
+            "in": "query",
+            "name": "archived",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Include templates created at or after this time.",
+            "in": "query",
+            "name": "createdAtFrom",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Include templates created at or before this time.",
+            "in": "query",
+            "name": "createdAtTo",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter templates by their source project id.",
+            "in": "query",
+            "name": "originProjectId",
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/ProjectTemplate"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "page": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "limit": {
+                              "maximum": 200,
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "nextCursor": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "limit",
+                            "nextCursor"
+                          ],
+                          "type": "object"
+                        },
+                        "requestId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "requestId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A stable cursor page."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List project templates",
+        "tags": [
+          "Project Templates"
+        ],
+        "x-teamgrid-required-scopes": [
+          "project-templates:read"
+        ],
+        "description": "The cell-local App re-authenticates the credential and verifies the projects.templates plan capability before this service reads only the tenant-scoped, metadata-only projection. Captured snapshot data is never selected or exposed."
+      },
+      "post": {
+        "operationId": "createProjectTemplate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectTemplateCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProjectTemplate"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "An idempotent replay of an existing resource.",
+            "headers": {
+              "Idempotency-Replayed": {
+                "schema": {
+                  "enum": [
+                    "true"
+                  ],
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProjectTemplate"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A newly created resource.",
+            "headers": {
+              "Idempotency-Replayed": {
+                "schema": {
+                  "enum": [
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Capture a project as a template",
+        "tags": [
+          "Project Templates"
+        ],
+        "x-teamgrid-required-scopes": [
+          "project-templates:write"
+        ],
+        "description": "The cell-local App re-authenticates the credential, verifies tenant ownership and the projects.templates.add plan permission, snapshots the source project with bounded list/task limits, and applies credential-bound idempotency."
+      }
+    },
+    "/project-templates/{id}": {
+      "delete": {
+        "operationId": "archiveProjectTemplate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The project template was archived, or that state was already present."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Archive a project template",
+        "tags": [
+          "Project Templates"
+        ],
+        "x-teamgrid-required-scopes": [
+          "project-templates:write"
+        ]
+      },
+      "get": {
+        "operationId": "getProjectTemplate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProjectTemplate"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The requested resource."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get project-template metadata",
+        "tags": [
+          "Project Templates"
+        ],
+        "x-teamgrid-required-scopes": [
+          "project-templates:read"
+        ],
+        "description": "The cell-local App re-authenticates the credential and verifies the projects.templates plan capability before a tenant-scoped metadata-only read. The captured snapshot is never selected or exposed."
+      },
+      "patch": {
+        "operationId": "updateProjectTemplate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectTemplateUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProjectTemplate"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The updated resource."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update project-template metadata",
+        "tags": [
+          "Project Templates"
+        ],
+        "x-teamgrid-required-scopes": [
+          "project-templates:write"
+        ]
+      }
+    },
+    "/project-templates/{id}/restore": {
+      "post": {
+        "operationId": "restoreProjectTemplate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProjectTemplate"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The updated resource."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Restore an archived project template",
+        "tags": [
+          "Project Templates"
+        ],
+        "x-teamgrid-required-scopes": [
+          "project-templates:write"
+        ]
+      }
+    },
+    "/project-templates/{id}/instantiate": {
+      "post": {
+        "description": "The cell-local App re-authenticates the credential, verifies both required scopes, tenant ownership, projects.templates and projects.create plan permissions, validates every referenced resource, and starts a credential-owned asynchronous operation.",
+        "operationId": "instantiateProjectTemplate",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectTemplateInstantiate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProjectTemplateInstantiation"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The asynchronous template instantiation was accepted.",
+            "headers": {
+              "Idempotency-Replayed": {
+                "description": "Whether this response replays the operation created for this key.",
+                "schema": {
+                  "enum": [
+                    "false",
+                    "true"
+                  ],
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "Relative credential-owned polling URL for this operation.",
+                "schema": {
+                  "format": "uri-reference",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Instantiate a project template asynchronously",
+        "tags": [
+          "Project Templates"
+        ],
+        "x-teamgrid-required-scopes": [
+          "project-templates:write",
+          "projects:write"
+        ]
+      }
+    },
+    "/project-template-instantiations/{id}": {
+      "get": {
+        "operationId": "getProjectTemplateInstantiation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProjectTemplateInstantiation"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The requested resource."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get a project-template instantiation operation",
+        "tags": [
+          "Project Templates"
+        ],
+        "x-teamgrid-required-scopes": [
+          "project-templates:write",
+          "projects:write"
+        ],
+        "description": "Returns only an operation owned by the authenticated credential in its workspace. The cell-local App re-authenticates both project-templates:write and projects:write scopes before every poll."
+      }
+    },
+    "/planned-work": {
+      "get": {
+        "operationId": "listPlannedWork",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "description": "Inclusive window start. Together with end, limited to 366 days and years 2000–2100.",
+            "in": "query",
+            "name": "start",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "description": "Inclusive window end. Together with start, limited to 366 days and years 2000–2100.",
+            "in": "query",
+            "name": "end",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "description": "Filter by task id.",
+            "in": "query",
+            "name": "taskId",
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by project id.",
+            "in": "query",
+            "name": "projectId",
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by user id.",
+            "in": "query",
+            "name": "userId",
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/PlannedWork"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "page": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "limit": {
+                              "maximum": 200,
+                              "minimum": 1,
+                              "type": "integer"
+                            },
+                            "nextCursor": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "limit",
+                            "nextCursor"
+                          ],
+                          "type": "object"
+                        },
+                        "requestId": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "requestId"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A stable cursor page."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List planned work in a bounded window",
+        "tags": [
+          "Planned Work"
+        ],
+        "x-teamgrid-required-scopes": [
+          "planned-work:read"
+        ],
+        "description": "Returns a stable ascending keyset page from the credential cell. The cursor is bound to the workspace and complete filter set. Authorization filtering can produce an empty page with a non-null cursor."
+      }
+    },
+    "/planned-work-operations/{id}": {
+      "get": {
+        "operationId": "getPlannedWorkOperation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PlannedWorkOperation"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The requested resource."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get a planned-work replacement operation",
+        "tags": [
+          "Planned Work"
+        ],
+        "x-teamgrid-required-scopes": [
+          "planned-work:write"
+        ],
+        "description": "Polls a credential-owned, workspace-owned asynchronous replacement operation. Tenant and cell routing internals are never projected."
+      }
+    },
+    "/tasks/{id}/planned-work": {
+      "get": {
+        "operationId": "getTaskPlannedWork",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TaskPlannedWork"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The requested resource.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/PlannedWorkETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get a task planned-work schedule",
+        "tags": [
+          "Planned Work"
+        ],
+        "x-teamgrid-required-scopes": [
+          "planned-work:read"
+        ],
+        "description": "Returns the task schedule and a strong revision ETag. Reads fail closed while a replacement overlaps the task."
+      },
+      "put": {
+        "description": "Atomically compares the strong task schedule revision and accepts a credential-owned asynchronous replacement. The same Idempotency-Key and payload replay the original operation; a different payload conflicts.",
+        "operationId": "replaceTaskPlannedWork",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchPlannedWork"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlannedWorkReplacement"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PlannedWorkOperation"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The asynchronous schedule replacement was accepted or replayed.",
+            "headers": {
+              "Idempotency-Replayed": {
+                "description": "Whether this response replays the operation created for this key.",
+                "schema": {
+                  "enum": [
+                    "false",
+                    "true"
+                  ],
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "Relative credential-owned polling URL for this operation.",
+                "schema": {
+                  "format": "uri-reference",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Replace task planned work asynchronously",
+        "tags": [
+          "Planned Work"
+        ],
+        "x-teamgrid-required-scopes": [
+          "planned-work:write"
         ]
       }
     },
@@ -11446,6 +14057,315 @@
         ]
       }
     },
+    "/custom-field-values/{targetType}/{resourceId}/{fieldId}": {
+      "delete": {
+        "description": "The cell-local App re-authenticates the credential and additionally requires a target-domain scope selected by targetType: contacts:read/write, projects:read/write, project-statements:read/write, or tasks:read/write. Reading a contact, project, tag, or user reference field, and validating a newly set reference, also requires the matching contacts:read, projects:read, tags:read, or users:read scope. Invalid legacy values are classified without exposing their payload.",
+        "operationId": "clearCustomFieldValue",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomFieldValueTargetType"
+          },
+          {
+            "$ref": "#/components/parameters/CustomFieldValueResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/CustomFieldValueFieldId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchCustomFieldValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CustomFieldValueMutation"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The value was cleared or an already-unset state was replayed.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/CustomFieldValueETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Clear a custom-field value",
+        "tags": [
+          "Custom Field Values"
+        ],
+        "x-teamgrid-dynamic-scopes": {
+          "target": [
+            "contacts:write",
+            "projects:write",
+            "project-statements:write",
+            "tasks:write"
+          ]
+        },
+        "x-teamgrid-required-scopes": [
+          "custom-field-values:write"
+        ]
+      },
+      "get": {
+        "description": "The cell-local App re-authenticates the credential and additionally requires a target-domain scope selected by targetType: contacts:read/write, projects:read/write, project-statements:read/write, or tasks:read/write. Reading a contact, project, tag, or user reference field, and validating a newly set reference, also requires the matching contacts:read, projects:read, tags:read, or users:read scope. Invalid legacy values are classified without exposing their payload.",
+        "operationId": "getCustomFieldValue",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomFieldValueTargetType"
+          },
+          {
+            "$ref": "#/components/parameters/CustomFieldValueResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/CustomFieldValueFieldId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CustomFieldValue"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The current value state and its strong revision tag.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/CustomFieldValueETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get a custom-field value",
+        "tags": [
+          "Custom Field Values"
+        ],
+        "x-teamgrid-dynamic-scopes": {
+          "referenceRead": [
+            "contacts:read",
+            "projects:read",
+            "tags:read",
+            "users:read"
+          ],
+          "target": [
+            "contacts:read",
+            "projects:read",
+            "project-statements:read",
+            "tasks:read"
+          ]
+        },
+        "x-teamgrid-required-scopes": [
+          "custom-field-values:read"
+        ]
+      },
+      "put": {
+        "description": "The cell-local App re-authenticates the credential and additionally requires a target-domain scope selected by targetType: contacts:read/write, projects:read/write, project-statements:read/write, or tasks:read/write. Reading a contact, project, tag, or user reference field, and validating a newly set reference, also requires the matching contacts:read, projects:read, tags:read, or users:read scope. Invalid legacy values are classified without exposing their payload.",
+        "operationId": "setCustomFieldValue",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomFieldValueTargetType"
+          },
+          {
+            "$ref": "#/components/parameters/CustomFieldValueResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/CustomFieldValueFieldId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchCustomFieldValue"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomFieldValueSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CustomFieldValueMutation"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The value was set or an identical canonical value was replayed.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/CustomFieldValueETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set a custom-field value",
+        "tags": [
+          "Custom Field Values"
+        ],
+        "x-teamgrid-dynamic-scopes": {
+          "referenceRead": [
+            "contacts:read",
+            "projects:read",
+            "tags:read",
+            "users:read"
+          ],
+          "target": [
+            "contacts:write",
+            "projects:write",
+            "project-statements:write",
+            "tasks:write"
+          ]
+        },
+        "x-teamgrid-required-scopes": [
+          "custom-field-values:write"
+        ]
+      }
+    },
     "/audit-events": {
       "get": {
         "operationId": "listAuditEvents",
@@ -12132,6 +15052,10 @@
   ],
   "tags": [
     {
+      "description": "Ordered, resumable cell-local resource metadata changes.",
+      "name": "Changes"
+    },
+    {
       "name": "System"
     },
     {
@@ -12139,6 +15063,10 @@
     },
     {
       "name": "Projects"
+    },
+    {
+      "description": "Metadata-only template lifecycle and credential-owned asynchronous instantiation. Source snapshots and runner internals stay private; every operation is forbidden in every MCP profile.",
+      "name": "Project Templates"
     },
     {
       "description": "Catalog products. Archive is available; restore is intentionally absent because the current App domain has no public restore command.",
@@ -12175,6 +15103,14 @@
     },
     {
       "name": "Custom Fields"
+    },
+    {
+      "description": "Per-resource custom-field values with strong compare-and-set revisions. These operations are forbidden in every MCP profile.",
+      "name": "Custom Field Values"
+    },
+    {
+      "description": "Bounded cell-local workload reads and compare-and-set asynchronous schedule replacement. Every operation is conservatively forbidden in MCP profiles.",
+      "name": "Planned Work"
     },
     {
       "name": "Audit"

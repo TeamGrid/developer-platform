@@ -65,6 +65,12 @@ teamgrid webhooks create \
   --data '{"url":"https://hooks.example.com/teamgrid","actions":["task_created"]}' \
   --idempotency-key webhook-1 \
   --output json
+teamgrid changes checkpoint --resource-type project,task --output json
+teamgrid changes list --cursor "$CHECKPOINT" --resource-type project,task --output json
+teamgrid custom-field-values get project project-id field-id --output json
+teamgrid project-templates list --origin-project-id project-id --output json
+teamgrid planned-work list --start 2026-07-20T00:00:00Z --end 2026-07-27T00:00:00Z \
+  --user-id user-id --output json
 ```
 
 Use `--data @payload.json` or `--data -` for files/stdin. Destructive commands
@@ -88,8 +94,15 @@ for await (const page of client.tasks.pages({ projectId: 'project-id' })) {
 }
 ```
 
-GET requests and POST requests with an idempotency key are retried for bounded
-transient failures. PATCH and DELETE are not automatically retried. Errors do
+For race-free mirrors, call `client.changes.snapshotThenCatchUp()`: it takes a cell-local checkpoint
+before running the supplied full-snapshot callback and returns a bounded change-page iterator from
+that checkpoint. Change events contain resource identity and operation metadata, not document
+payloads. Persist every returned checkpoint only after applying the page. Continue until
+`page.meta.page.caughtUp` is true; an empty page alone is not the completion contract.
+
+GET requests, POST requests with an idempotency key, and compare-and-set planned-work PUTs with an
+idempotency key are retried for bounded transient failures. Other PUT, PATCH, and DELETE requests
+are not automatically retried. Errors do
 not retain or print the bearer credential.
 
 ## Webhook v2 signatures
@@ -134,8 +147,9 @@ union of the collaboration and governance profiles.
 }
 ```
 
-No remote MCP endpoint, MCP-specific credential, session affinity, or write
-tool is introduced.
+No remote MCP endpoint, MCP-specific credential, session affinity, write tool, or change-feed tool
+is introduced. Custom-field values, project templates, planned work, and their operation-status
+resources remain explicitly forbidden from every MCP profile.
 
 ## Development gates
 
@@ -156,12 +170,28 @@ publish tokens are disabled for all three packages. Published prereleases use
 the `next` dist-tag; future stable releases use `latest`.
 
 To release, update all three package versions, commit and tag the exact source
-as `v<version>`, then dispatch `Stage npm release` from that tag with the
-matching version and dist-tag. Inspect the staged artifacts with `npm stage
-list`, `npm stage view`, and `npm stage download`, then approve each package
-with npm's 2FA-backed staged-release flow. Reject any stage whose contents or
-provenance do not match the tag. The workflow accepts prereleases only with
-`next` and stable versions only with `latest`.
+as `v<version>`. The same immutable developer-platform commit and contract
+manifest must first pass staging and be promoted by a successful
+`Deploy multi-cell production` run in `TeamGrid/teamgrid`. Dispatch `Stage npm
+release` from the tag with the matching version, dist-tag, and that production
+run URL. The workflow downloads the production release evidence and refuses to
+stage packages unless both the source SHA and contract-manifest SHA-256 match.
+It needs the `TEAMGRID_REPOSITORY_TOKEN` secret in the protected `npm`
+environment solely to read that private workflow run and its artifacts.
+
+Inspect the staged artifacts with `npm stage list`, `npm stage view`, and `npm
+stage download`, then approve each package with npm's 2FA-backed staged-release
+flow. Reject any stage whose contents or provenance do not match the tag. The
+workflow accepts prereleases only with `next` and stable versions only with
+`latest`; a stable release additionally requires the explicit `confirm_ga`
+input after the separately governed GA decision.
+
+After npm approval, dispatch `Verify published npm release` with the exact
+version and dist-tag. It waits for all three registry entries to converge,
+performs a clean installation, verifies registry signatures, imports each
+package, and invokes both public binaries. Treat that workflow as the registry
+publication gate rather than assuming that npm approval alone proves a usable
+release.
 
 The destructive-safe staging proof is available as `npm run e2e:staging`. It
 refuses mutation outside a staging/loopback base URL unless explicitly
@@ -171,3 +201,9 @@ disposable Webhook.site token, captures synthetic staging data, verifies the
 exact raw-body HMAC locally, and deletes the token in cleanup. Set
 `TEAMGRID_E2E_WEBHOOK_RECEIVER=quick-tunnel` only for local experiments where a
 Cloudflare Quick Tunnel is known to be reachable.
+
+The staging proof also spawns the built CLI for a live workspace request and negotiates with the
+built MCP stdio binary before making changes. It then verifies the fixed-watermark change feed,
+custom-field compare-and-set values, project-template capture/instantiation, and planned-work
+replacement against disposable staging resources. All created resources are best-effort cleaned up;
+the script never permits these mutation smokes against an unmarked production hostname.

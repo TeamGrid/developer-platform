@@ -28,6 +28,21 @@ export type ContactGroupUpdate = components['schemas']['ContactGroupUpdate']
 export type CustomFieldDefinition = components['schemas']['CustomFieldDefinition']
 export type CustomFieldDefinitionCreate = components['schemas']['CustomFieldDefinitionCreate']
 export type CustomFieldDefinitionUpdate = components['schemas']['CustomFieldDefinitionUpdate']
+export type CustomFieldValue = components['schemas']['CustomFieldValue']
+export type CustomFieldValueMutation = components['schemas']['CustomFieldValueMutation']
+export type CustomFieldValueSet = components['schemas']['CustomFieldValueSet']
+export type CustomFieldValueTargetType = CustomFieldValue['attributes']['targetType']
+export type CustomFieldValueRevision = CustomFieldValue['attributes']['revision']
+export type ProjectTemplate = components['schemas']['ProjectTemplate']
+export type ProjectTemplateCreate = components['schemas']['ProjectTemplateCreate']
+export type ProjectTemplateUpdate = components['schemas']['ProjectTemplateUpdate']
+export type ProjectTemplateInstantiate = components['schemas']['ProjectTemplateInstantiate']
+export type ProjectTemplateInstantiation = components['schemas']['ProjectTemplateInstantiation']
+export type PlannedWork = components['schemas']['PlannedWork']
+export type PlannedWorkReplacement = components['schemas']['PlannedWorkReplacement']
+export type PlannedWorkOperation = components['schemas']['PlannedWorkOperation']
+export type TaskPlannedWork = components['schemas']['TaskPlannedWork']
+export type PlannedWorkRevision = TaskPlannedWork['attributes']['revision']
 export type User = components['schemas']['User']
 export type List = components['schemas']['List']
 export type ListCreate = components['schemas']['ListCreate']
@@ -40,6 +55,15 @@ export type TagCreate = components['schemas']['TagCreate']
 export type TagUpdate = components['schemas']['TagUpdate']
 export type Lookup = List | Service | Tag
 export type AuditEvent = components['schemas']['AuditEvent']
+export type ChangeEvent = components['schemas']['ChangeEvent']
+export type ChangeOperation = ChangeEvent['attributes']['operation']
+export type ChangeResourceType = ChangeEvent['attributes']['resourceType']
+/**
+ * An opaque, credential- and cell-bound change-feed checkpoint. Persist the
+ * value verbatim and return it only to the same regional endpoint with the
+ * same credential and filters.
+ */
+export type ChangeCheckpoint = string
 export type Webhook = components['schemas']['Webhook']
 export type WebhookCreate = components['schemas']['WebhookCreate']
 export type WebhookDelivery = components['schemas']['WebhookDelivery']
@@ -90,6 +114,17 @@ export type ResourceEnvelope<T> = TransportAware & {
 export type ListEnvelope<T> = TransportAware & {
   data: T[]
   meta: PageMeta
+}
+
+export type ChangePageEnvelope = TransportAware & {
+  data: ChangeEvent[]
+  meta: RequestMeta & {
+    page: {
+      caughtUp: boolean
+      limit: number
+      nextCursor: ChangeCheckpoint
+    }
+  }
 }
 
 export type ListOptions = {
@@ -172,10 +207,48 @@ export type CustomFieldDefinitionListOptions = ListOptions &
     targetType?: 'contact' | 'project' | 'projectJournalEntry' | 'task'
   }
 
+export type ProjectTemplateListOptions = ListOptions &
+  ArchiveFilter & {
+    createdAtFrom?: string | Date
+    createdAtTo?: string | Date
+    originProjectId?: string
+  }
+
+export type PlannedWorkListOptions = ListOptions & {
+  end: string | Date
+  projectId?: string
+  start: string | Date
+  taskId?: string
+  userId?: string
+}
+
 export type AuditEventListOptions = ListOptions & {
   credentialId?: string
   eventType?: string
   outcome?: 'success' | 'denied' | 'failure'
+}
+
+export type ChangeFilterOptions = RequestOptions & {
+  limit?: number
+  operations?: readonly ChangeOperation[]
+  resourceTypes?: readonly ChangeResourceType[]
+}
+
+export type ChangeListOptions = ChangeFilterOptions & {
+  cursor?: ChangeCheckpoint
+  startAtLatest?: boolean
+}
+
+export type ChangeCatchUpOptions = ChangeFilterOptions & {
+  cursor?: ChangeCheckpoint
+}
+
+export type ChangeFeedBootstrap<T> = {
+  /** The checkpoint taken immediately before the snapshot started. */
+  checkpoint: ChangeCheckpoint
+  /** A bounded catch-up traversal after the snapshot checkpoint. */
+  pages: AsyncIterable<ChangePageEnvelope>
+  snapshot: T
 }
 
 export type LookupListOptions = ListOptions & ArchiveFilter
@@ -197,6 +270,28 @@ export type MutationOptions = {
   idempotencyKey?: string
   requestId?: string
   signal?: AbortSignal
+}
+
+/**
+ * A compare-and-set precondition obtained from the latest custom-field-value
+ * response. Both the resource revision and its quoted strong ETag are accepted.
+ */
+export type CustomFieldValueMutationOptions = RequestOptions & {
+  ifMatch: CustomFieldValueRevision | `"${string}"`
+}
+
+export type ProjectTemplateInstantiationWaitOptions = RequestOptions & {
+  maxWaitMs?: number
+  pollIntervalMs?: number
+}
+
+export type PlannedWorkReplaceOptions = MutationOptions & {
+  ifMatch: PlannedWorkRevision | `"${string}"`
+}
+
+export type PlannedWorkOperationWaitOptions = RequestOptions & {
+  maxWaitMs?: number
+  pollIntervalMs?: number
 }
 
 export type ProjectLifecycleWaitOptions = RequestOptions & {

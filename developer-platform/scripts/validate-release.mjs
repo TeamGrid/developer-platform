@@ -13,6 +13,9 @@ function fail(message) {
 if (mode !== 'stage') fail('mode must be stage')
 if (!expectedVersion) fail('RELEASE_VERSION is required')
 if (!['next', 'latest'].includes(distTag)) fail('RELEASE_DIST_TAG must be next or latest')
+if (distTag === 'latest' && process.env.RELEASE_CONFIRM_GA !== 'true') {
+  fail('latest requires the separately approved confirm_ga gate')
+}
 
 const manifests = await Promise.all(
   packageDirectories.map(async (directory) => {

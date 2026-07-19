@@ -7,6 +7,12 @@ import type {
   CallNote,
   CallNoteCreate,
   CallNoteListOptions,
+  ChangeCatchUpOptions,
+  ChangeCheckpoint,
+  ChangeFeedBootstrap,
+  ChangeFilterOptions,
+  ChangeListOptions,
+  ChangePageEnvelope,
   Contact,
   ContactCreate,
   ContactGroup,
@@ -19,6 +25,11 @@ import type {
   CustomFieldDefinitionCreate,
   CustomFieldDefinitionListOptions,
   CustomFieldDefinitionUpdate,
+  CustomFieldValue,
+  CustomFieldValueMutation,
+  CustomFieldValueMutationOptions,
+  CustomFieldValueSet,
+  CustomFieldValueTargetType,
   List,
   ListCreate,
   ListEnvelope,
@@ -28,6 +39,12 @@ import type {
   LookupListOptions,
   MutationOptions,
   PaginationOptions,
+  PlannedWork,
+  PlannedWorkListOptions,
+  PlannedWorkOperation,
+  PlannedWorkOperationWaitOptions,
+  PlannedWorkReplacement,
+  PlannedWorkReplaceOptions,
   Product,
   ProductCreate,
   ProductGroup,
@@ -45,6 +62,13 @@ import type {
   ProjectStatementCreate,
   ProjectStatementListOptions,
   ProjectStatementUpdate,
+  ProjectTemplate,
+  ProjectTemplateCreate,
+  ProjectTemplateInstantiate,
+  ProjectTemplateInstantiation,
+  ProjectTemplateInstantiationWaitOptions,
+  ProjectTemplateListOptions,
+  ProjectTemplateUpdate,
   ProjectUpdate,
   RequestOptions,
   ResourceEnvelope,
@@ -57,6 +81,7 @@ import type {
   Task,
   TaskCreate,
   TaskListOptions,
+  TaskPlannedWork,
   TaskUpdate,
   TimeEntry,
   TimeEntryCreate,
@@ -82,7 +107,8 @@ type Query = Record<string, QueryValue | QueryValue[]>
 type InternalRequestOptions = RequestOptions & {
   body?: unknown
   idempotencyKey?: string
-  method?: 'DELETE' | 'GET' | 'PATCH' | 'POST'
+  ifMatch?: string
+  method?: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT'
   query?: Query
 }
 
@@ -252,11 +278,50 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 function isRetryableMethod(method: string, idempotencyKey?: string) {
-  return method === 'GET' || (method === 'POST' && Boolean(idempotencyKey))
+  return method === 'GET' || ((method === 'POST' || method === 'PUT') && Boolean(idempotencyKey))
+}
+
+function strongCustomFieldValueEtag(value: string) {
+  const revision = value.startsWith('"') && value.endsWith('"') ? value.slice(1, -1) : value
+  if (!/^cfv1-[a-f0-9]{64}$/.test(revision)) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Custom-field-value ifMatch must be a canonical revision or one strong ETag.',
+    )
+  }
+  return `"${revision}"`
+}
+
+function strongPlannedWorkEtag(value: string) {
+  const revision = value.startsWith('"') && value.endsWith('"') ? value.slice(1, -1) : value
+  if (!/^pw1-[a-f0-9]{64}$/.test(revision)) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Planned-work ifMatch must be a canonical revision or one strong ETag.',
+    )
+  }
+  return `"${revision}"`
+}
+
+function customFieldValuePath(
+  targetType: CustomFieldValueTargetType,
+  resourceId: string,
+  fieldId: string,
+) {
+  return [
+    '/custom-field-values',
+    encodeURIComponent(targetType),
+    encodeURIComponent(resourceId),
+    encodeURIComponent(fieldId),
+  ].join('/')
 }
 
 function expectedResourceTypes(path: string) {
   if (/^\/tasks\/[^/]+\/timer\/(?:start|stop)$/.test(path)) return ['timeEntry']
+  if (/^\/tasks\/[^/]+\/planned-work$/.test(path)) return ['taskPlannedWork']
+  if (/^\/project-templates\/[^/]+\/instantiate$/.test(path)) {
+    return ['projectTemplateInstantiation']
+  }
   if (/^\/projects\/[^/]+\/(?:complete|reopen|archive|restore)$/.test(path)) {
     return ['projectLifecycleOperation']
   }
@@ -264,15 +329,21 @@ function expectedResourceTypes(path: string) {
   const mapping: Record<string, string[]> = {
     'audit-events': ['auditEvent'],
     'call-notes': ['callNote'],
+    changes: ['changeEvent'],
     contacts: ['contact'],
     'contact-groups': ['contactGroup'],
     'custom-field-definitions': ['customFieldDefinition'],
+    'custom-field-values': ['customFieldValue'],
     lists: ['list'],
     'product-groups': ['productGroup'],
     products: ['product'],
+    'planned-work': ['plannedWork'],
+    'planned-work-operations': ['plannedWorkOperation'],
     projects: ['project'],
     'project-lifecycle-operations': ['projectLifecycleOperation'],
     'project-statements': ['projectStatement'],
+    'project-template-instantiations': ['projectTemplateInstantiation'],
+    'project-templates': ['projectTemplate'],
     services: ['service'],
     tags: ['tag'],
     tasks: ['task'],
@@ -317,6 +388,27 @@ function assertPage<T>(value: unknown, expectedTypes: string[]): ListEnvelope<T>
     assertResourceValue(resource, expectedTypes)
   })
   return value as ListEnvelope<T>
+}
+
+function assertChangePage(value: unknown): ChangePageEnvelope {
+  const page = assertPage(value, ['changeEvent'])
+  if (
+    typeof page.meta.page.nextCursor !== 'string' ||
+    !page.meta.page.nextCursor ||
+    typeof (page.meta.page as unknown as { caughtUp?: unknown }).caughtUp !== 'boolean' ||
+    !Number.isInteger(page.meta.page.limit) ||
+    page.meta.page.limit < 1 ||
+    page.meta.page.limit > 200 ||
+    page.data.length > page.meta.page.limit ||
+    (!(page.meta.page as unknown as { caughtUp: boolean }).caughtUp &&
+      page.data.length !== page.meta.page.limit)
+  ) {
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'Expected a TeamGrid change-feed checkpoint.',
+    )
+  }
+  return page as ChangePageEnvelope
 }
 
 function assertResource<T>(value: unknown, expectedTypes: string[]): ResourceEnvelope<T> {
@@ -397,16 +489,22 @@ function attachTransport<T extends object>(value: T, transport: Readonly<Transpo
 export class TeamGridClient {
   readonly auditEvents
   readonly callNotes
+  readonly changes
   readonly contacts
   readonly contactGroups
   readonly customFieldDefinitions
+  readonly customFieldValues
   readonly lists
   readonly location
+  readonly plannedWork
+  readonly plannedWorkOperations
   readonly productGroups
   readonly products
   readonly projects
   readonly projectLifecycleOperations
   readonly projectStatements
+  readonly projectTemplateInstantiations
+  readonly projectTemplates
   readonly services
   readonly system
   readonly tags
@@ -453,6 +551,39 @@ export class TeamGridClient {
         const response = await this.#request('/', options)
         return attachTransport(assertApiVersion(response.payload), response.transport)
       },
+    }
+    this.changes = {
+      checkpoint: (options?: ChangeFilterOptions) =>
+        this.#changePage({ ...options, startAtLatest: true }),
+      list: (options?: ChangeListOptions) => this.#changePage(options),
+      pages: (options?: ChangeCatchUpOptions, pagination?: PaginationOptions) =>
+        this.#changePages(options, pagination),
+      snapshotThenCatchUp: <T>(
+        snapshot: (checkpoint: ChangeCheckpoint) => Promise<T>,
+        options?: ChangeFilterOptions,
+        pagination?: PaginationOptions,
+      ) => this.#snapshotThenCatchUp(snapshot, options, pagination),
+    }
+    this.plannedWork = {
+      getForTask: (id: string, options?: RequestOptions) =>
+        this.#resource<TaskPlannedWork>(`/tasks/${encodeURIComponent(id)}/planned-work`, options),
+      list: (options: PlannedWorkListOptions) => this.#page<PlannedWork>('/planned-work', options),
+      pages: (options: PlannedWorkListOptions, pagination?: PaginationOptions) =>
+        this.#pages<PlannedWork>('/planned-work', options, pagination),
+      replaceForTask: (
+        id: string,
+        data: PlannedWorkReplacement,
+        options: PlannedWorkReplaceOptions,
+      ) => this.#replaceTaskPlannedWork(id, data, options),
+    }
+    this.plannedWorkOperations = {
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<PlannedWorkOperation>(
+          `/planned-work-operations/${encodeURIComponent(id)}`,
+          options,
+        ),
+      wait: (id: string, options?: PlannedWorkOperationWaitOptions) =>
+        this.#waitForPlannedWorkOperation(id, options),
     }
     this.projects = {
       archive: (id: string, options?: MutationOptions) =>
@@ -662,6 +793,82 @@ export class TeamGridClient {
           options,
         ),
     }
+    this.customFieldValues = {
+      clear: (
+        targetType: CustomFieldValueTargetType,
+        resourceId: string,
+        fieldId: string,
+        options: CustomFieldValueMutationOptions,
+      ) =>
+        this.#customFieldValueMutation(
+          customFieldValuePath(targetType, resourceId, fieldId),
+          'DELETE',
+          undefined,
+          options,
+        ),
+      get: (
+        targetType: CustomFieldValueTargetType,
+        resourceId: string,
+        fieldId: string,
+        options?: RequestOptions,
+      ) =>
+        this.#resource<CustomFieldValue>(
+          customFieldValuePath(targetType, resourceId, fieldId),
+          options,
+        ),
+      set: (
+        targetType: CustomFieldValueTargetType,
+        resourceId: string,
+        fieldId: string,
+        data: CustomFieldValueSet,
+        options: CustomFieldValueMutationOptions,
+      ) =>
+        this.#customFieldValueMutation(
+          customFieldValuePath(targetType, resourceId, fieldId),
+          'PUT',
+          data,
+          options,
+        ),
+    }
+    this.projectTemplates = {
+      archive: (id: string, options?: RequestOptions) =>
+        this.#archive(`/project-templates/${encodeURIComponent(id)}`, options),
+      create: (data: ProjectTemplateCreate, options?: MutationOptions) =>
+        this.#create<ProjectTemplate>('/project-templates', data, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<ProjectTemplate>(`/project-templates/${encodeURIComponent(id)}`, options),
+      instantiate: (id: string, data: ProjectTemplateInstantiate, options?: MutationOptions) =>
+        this.#create<ProjectTemplateInstantiation>(
+          `/project-templates/${encodeURIComponent(id)}/instantiate`,
+          data,
+          options,
+        ),
+      list: (options?: ProjectTemplateListOptions) =>
+        this.#page<ProjectTemplate>('/project-templates', options),
+      pages: (options?: ProjectTemplateListOptions, pagination?: PaginationOptions) =>
+        this.#pages<ProjectTemplate>('/project-templates', options, pagination),
+      restore: (id: string, options?: RequestOptions) =>
+        this.#action<ProjectTemplate>(
+          `/project-templates/${encodeURIComponent(id)}/restore`,
+          undefined,
+          options,
+        ),
+      update: (id: string, data: ProjectTemplateUpdate, options?: RequestOptions) =>
+        this.#update<ProjectTemplate>(
+          `/project-templates/${encodeURIComponent(id)}`,
+          data,
+          options,
+        ),
+    }
+    this.projectTemplateInstantiations = {
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<ProjectTemplateInstantiation>(
+          `/project-template-instantiations/${encodeURIComponent(id)}`,
+          options,
+        ),
+      wait: (id: string, options?: ProjectTemplateInstantiationWaitOptions) =>
+        this.#waitForProjectTemplateInstantiation(id, options),
+    }
     this.users = {
       list: (options?: ListOptions) => this.#page<User>('/users', options),
       pages: (options?: ListOptions, pagination?: PaginationOptions) =>
@@ -752,6 +959,7 @@ export class TeamGridClient {
     })
     if (options.body !== undefined) headers.set('content-type', 'application/json')
     if (options.idempotencyKey) headers.set('idempotency-key', options.idempotencyKey)
+    if (options.ifMatch) headers.set('if-match', options.ifMatch)
 
     for (let attempt = 0; attempt <= this.#retries; attempt += 1) {
       const combined = buildCombinedSignal(options.signal, this.#timeoutMs)
@@ -848,6 +1056,61 @@ export class TeamGridClient {
     }
   }
 
+  async #waitForProjectTemplateInstantiation(
+    id: string,
+    options: ProjectTemplateInstantiationWaitOptions = {},
+  ) {
+    const pollIntervalMs = Math.max(
+      100,
+      Math.min(Math.trunc(options.pollIntervalMs ?? 1000), 30_000),
+    )
+    const maxWaitMs = Math.max(100, Math.min(Math.trunc(options.maxWaitMs ?? 300_000), 86_400_000))
+    const startedAt = Date.now()
+    while (true) {
+      const operation = await this.projectTemplateInstantiations.get(id, options)
+      if (
+        operation.data.attributes.state === 'succeeded' ||
+        operation.data.attributes.state === 'failed'
+      ) {
+        return operation
+      }
+      const elapsed = Date.now() - startedAt
+      if (elapsed >= maxWaitMs) {
+        throw new TeamGridClientError(
+          'project_template_instantiation_wait_timeout',
+          `Project-template instantiation ${id} did not finish within ${maxWaitMs} ms.`,
+        )
+      }
+      await this.#sleep(Math.min(pollIntervalMs, maxWaitMs - elapsed), options.signal)
+    }
+  }
+
+  async #waitForPlannedWorkOperation(id: string, options: PlannedWorkOperationWaitOptions = {}) {
+    const pollIntervalMs = Math.max(
+      100,
+      Math.min(Math.trunc(options.pollIntervalMs ?? 1000), 30_000),
+    )
+    const maxWaitMs = Math.max(100, Math.min(Math.trunc(options.maxWaitMs ?? 300_000), 86_400_000))
+    const startedAt = Date.now()
+    while (true) {
+      const operation = await this.plannedWorkOperations.get(id, options)
+      if (
+        operation.data.attributes.state === 'succeeded' ||
+        operation.data.attributes.state === 'failed'
+      ) {
+        return operation
+      }
+      const elapsed = Date.now() - startedAt
+      if (elapsed >= maxWaitMs) {
+        throw new TeamGridClientError(
+          'planned_work_operation_wait_timeout',
+          `Planned-work operation ${id} did not finish within ${maxWaitMs} ms.`,
+        )
+      }
+      await this.#sleep(Math.min(pollIntervalMs, maxWaitMs - elapsed), options.signal)
+    }
+  }
+
   #retryDelay(attempt: number) {
     return Math.min(250 * 2 ** attempt + Math.floor(this.#random() * 100), maxRetryDelayMs)
   }
@@ -871,6 +1134,106 @@ export class TeamGridClient {
       assertPage<T>(response.payload, expectedResourceTypes(path)),
       response.transport,
     )
+  }
+
+  async #changePage(options: ChangeListOptions = {}) {
+    const { requestId, signal, ...query } = options
+    const response = await this.#request('/changes', {
+      query: query as Query,
+      requestId,
+      signal,
+    })
+    return attachTransport(assertChangePage(response.payload), response.transport)
+  }
+
+  async #customFieldValueMutation(
+    path: string,
+    method: 'DELETE' | 'PUT',
+    data: unknown,
+    options: CustomFieldValueMutationOptions,
+  ) {
+    const { ifMatch, ...requestOptions } = options
+    const response = await this.#request(path, {
+      ...requestOptions,
+      ...(data === undefined ? {} : { body: data }),
+      ifMatch: strongCustomFieldValueEtag(ifMatch),
+      method,
+    })
+    return attachTransport(
+      assertResource<CustomFieldValueMutation>(response.payload, expectedResourceTypes(path)),
+      response.transport,
+    )
+  }
+
+  async #replaceTaskPlannedWork(
+    id: string,
+    data: PlannedWorkReplacement,
+    options: PlannedWorkReplaceOptions,
+  ) {
+    const { ifMatch, ...requestOptions } = options
+    const response = await this.#request(`/tasks/${encodeURIComponent(id)}/planned-work`, {
+      ...requestOptions,
+      body: data,
+      idempotencyKey: requestOptions.idempotencyKey || newRequestId(),
+      ifMatch: strongPlannedWorkEtag(ifMatch),
+      method: 'PUT',
+    })
+    return attachTransport(
+      assertResource<PlannedWorkOperation>(response.payload, ['plannedWorkOperation']),
+      response.transport,
+    )
+  }
+
+  async *#changePages(
+    options: ChangeCatchUpOptions = {},
+    pagination: PaginationOptions = {},
+  ): AsyncIterable<ChangePageEnvelope> {
+    let cursor = options.cursor
+    const seen = new Set<string>(cursor ? [cursor] : [])
+    const maxPages = Math.max(1, Math.min(Math.trunc(pagination.maxPages ?? 10_000), 10_000))
+    for (let pageIndex = 0; pageIndex < maxPages; pageIndex += 1) {
+      const page = await this.#changePage({
+        ...options,
+        cursor,
+        signal: pagination.signal || options.signal,
+      })
+      yield page
+      if (page.meta.page.caughtUp) return
+      const nextCursor = page.meta.page.nextCursor
+      if (seen.has(nextCursor)) {
+        throw new TeamGridClientError(
+          'pagination_cycle',
+          'The TeamGrid API returned a repeated change-feed cursor.',
+        )
+      }
+      seen.add(nextCursor)
+      cursor = nextCursor
+    }
+    throw new TeamGridClientError(
+      'pagination_limit',
+      `Change-feed catch-up exceeded the configured ${maxPages}-page safety limit.`,
+    )
+  }
+
+  async #snapshotThenCatchUp<T>(
+    snapshot: (checkpoint: ChangeCheckpoint) => Promise<T>,
+    options: ChangeFilterOptions = {},
+    pagination: PaginationOptions = {},
+  ): Promise<ChangeFeedBootstrap<T>> {
+    const checkpointPage = await this.#changePage({ ...options, startAtLatest: true })
+    if (checkpointPage.data.length !== 0 || !checkpointPage.meta.page.caughtUp) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'Expected an empty TeamGrid change-feed checkpoint page.',
+      )
+    }
+    const checkpoint = checkpointPage.meta.page.nextCursor
+    const snapshotValue = await snapshot(checkpoint)
+    return {
+      checkpoint,
+      pages: this.#changePages({ ...options, cursor: checkpoint }, pagination),
+      snapshot: snapshotValue,
+    }
   }
 
   async *#pages<T>(

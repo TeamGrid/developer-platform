@@ -579,6 +579,183 @@ describe('TeamGrid CLI', () => {
     expect(list).toHaveBeenCalledWith(expected)
   })
 
+  it('creates a script-safe change checkpoint with repeatable and CSV filters', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const output = capture()
+    const checkpoint = vi.fn(async () => ({
+      data: [],
+      meta: {
+        page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-1' },
+        requestId: 'request-checkpoint',
+      },
+    }))
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          '--output',
+          'json',
+          'changes',
+          'checkpoint',
+          '--operation',
+          'created,updated',
+          '--operation',
+          'deleted',
+          '--resource-type',
+          'project,task',
+        ],
+        {
+          clientFactory: () => ({ changes: { checkpoint } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          output: output.stream,
+        },
+      ),
+    ).toBe(0)
+    expect(checkpoint).toHaveBeenCalledWith({
+      operations: ['created', 'updated', 'deleted'],
+      resourceTypes: ['project', 'task'],
+    })
+    expect(JSON.parse(output.value())).toEqual({
+      caughtUp: true,
+      cursor: 'checkpoint-1',
+      requestId: 'request-checkpoint',
+    })
+  })
+
+  it('reads one change page by default and emits an explicit JSONL checkpoint', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const output = capture()
+    const list = vi.fn(async () => ({
+      data: [
+        {
+          attributes: { operation: 'updated', resourceId: 'task-1', resourceType: 'task' },
+          id: 'change-1',
+          type: 'changeEvent',
+        },
+      ],
+      meta: {
+        page: { caughtUp: true, limit: 10, nextCursor: 'checkpoint-2' },
+        requestId: 'request-changes',
+      },
+    }))
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          '--output',
+          'jsonl',
+          'changes',
+          'list',
+          '--cursor',
+          'checkpoint-1',
+          '--limit',
+          '10',
+          '--resource-type',
+          'task',
+        ],
+        {
+          clientFactory: () => ({ changes: { list } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          output: output.stream,
+        },
+      ),
+    ).toBe(0)
+    expect(list).toHaveBeenCalledWith({
+      cursor: 'checkpoint-1',
+      limit: 10,
+      resourceTypes: ['task'],
+    })
+    expect(
+      output
+        .value()
+        .trim()
+        .split('\n')
+        .map((line) => JSON.parse(line)),
+    ).toEqual([
+      {
+        data: {
+          attributes: { operation: 'updated', resourceId: 'task-1', resourceType: 'task' },
+          id: 'change-1',
+          type: 'changeEvent',
+        },
+        kind: 'change',
+      },
+      {
+        caughtUp: true,
+        cursor: 'checkpoint-2',
+        kind: 'checkpoint',
+        requestId: 'request-changes',
+      },
+    ])
+  })
+
+  it('bounds explicit change catch-up and never enters an implicit polling loop', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const output = capture()
+    const pages = vi.fn((_options, pagination) => {
+      expect(pagination).toEqual({ maxPages: 3 })
+      return (async function* changes() {
+        yield {
+          data: [{ attributes: {}, id: 'change-1', type: 'changeEvent' }],
+          meta: {
+            page: { caughtUp: false, limit: 50, nextCursor: 'checkpoint-2' },
+            requestId: 'request-1',
+          },
+        }
+        yield {
+          data: [],
+          meta: {
+            page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-3' },
+            requestId: 'request-2',
+          },
+        }
+      })()
+    })
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          '--output',
+          'json',
+          'changes',
+          'list',
+          '--cursor',
+          'checkpoint-1',
+          '--all',
+          '--max-pages',
+          '3',
+        ],
+        {
+          clientFactory: () => ({ changes: { pages } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          output: output.stream,
+        },
+      ),
+    ).toBe(0)
+    expect(pages).toHaveBeenCalledWith({ cursor: 'checkpoint-1' }, { maxPages: 3 })
+    expect(JSON.parse(output.value())).toMatchObject({
+      data: [{ id: 'change-1' }],
+      meta: { page: { nextCursor: 'checkpoint-3' } },
+    })
+  })
+
+  it('rejects unknown change filters locally', async () => {
+    const errorOutput = capture()
+    expect(
+      await runCli(['node', 'teamgrid', 'changes', 'list', '--operation', 'renamed'], {
+        errorOutput: errorOutput.stream,
+        output: capture().stream,
+      }),
+    ).toBe(2)
+    expect(errorOutput.value()).toContain('created, deleted, updated')
+  })
+
   it.each([
     ['lists', 'list', { archived: false, parentId: 'project-1', type: 'tasks' }],
     ['services', undefined, { archived: false }],
@@ -725,6 +902,218 @@ describe('TeamGrid CLI', () => {
       },
       { idempotencyKey: 'field-create-1' },
     )
+  })
+
+  it('routes custom-field compare-and-set writes and confirms clears', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const revision = `cfv1-${'1'.repeat(64)}`
+    const set = vi.fn(async () => ({
+      data: { attributes: { revision }, id: `cfv_${'a'.repeat(64)}`, type: 'customFieldValue' },
+    }))
+    const clear = vi.fn(async () => ({
+      data: { attributes: { revision }, id: `cfv_${'a'.repeat(64)}`, type: 'customFieldValue' },
+    }))
+    const dependencies = {
+      clientFactory: () => ({ customFieldValues: { clear, set } }) as never,
+      configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+      environment: { TEAMGRID_API_TOKEN: token },
+      output: capture().stream,
+    }
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          'custom-field-values',
+          'set',
+          'project',
+          'project-1',
+          'field1',
+          '--data',
+          '{"value":"ACME-42"}',
+          '--if-match',
+          revision,
+        ],
+        dependencies,
+      ),
+    ).toBe(0)
+    expect(set).toHaveBeenCalledWith(
+      'project',
+      'project-1',
+      'field1',
+      { value: 'ACME-42' },
+      { ifMatch: revision },
+    )
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          'custom-field-values',
+          'clear',
+          'project',
+          'project-1',
+          'field1',
+          '--if-match',
+          revision,
+          '--yes',
+        ],
+        dependencies,
+      ),
+    ).toBe(0)
+    expect(clear).toHaveBeenCalledWith('project', 'project-1', 'field1', {
+      ifMatch: revision,
+    })
+  })
+
+  it('filters templates and can wait for a credential-owned instantiation', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const list = vi.fn(async () => ({
+      data: [],
+      meta: { page: { limit: 50, nextCursor: null }, requestId: 'template-list' },
+    }))
+    const instantiate = vi.fn(async () => ({
+      data: { attributes: { state: 'pending' }, id: 'instantiation-1' },
+    }))
+    const wait = vi.fn(async () => ({
+      data: { attributes: { state: 'succeeded' }, id: 'instantiation-1' },
+    }))
+    const dependencies = {
+      clientFactory: () =>
+        ({
+          projectTemplateInstantiations: { wait },
+          projectTemplates: { instantiate, list },
+        }) as never,
+      configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+      environment: { TEAMGRID_API_TOKEN: token },
+      output: capture().stream,
+    }
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          'project-templates',
+          'list',
+          '--archived',
+          'false',
+          '--origin-project-id',
+          'project-1',
+        ],
+        dependencies,
+      ),
+    ).toBe(0)
+    expect(list).toHaveBeenCalledWith({ archived: false, originProjectId: 'project-1' })
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          'project-templates',
+          'instantiate',
+          'template-1',
+          '--data',
+          '{"name":"Customer rollout"}',
+          '--idempotency-key',
+          'instantiate-1',
+          '--wait',
+          '--poll-interval',
+          '250',
+          '--max-wait',
+          '5000',
+        ],
+        dependencies,
+      ),
+    ).toBe(0)
+    expect(instantiate).toHaveBeenCalledWith(
+      'template-1',
+      { name: 'Customer rollout' },
+      { idempotencyKey: 'instantiate-1' },
+    )
+    expect(wait).toHaveBeenCalledWith('instantiation-1', {
+      maxWaitMs: 5000,
+      pollIntervalMs: 250,
+    })
+  })
+
+  it('lists planned work and makes full replacement explicit and waitable', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const revision = `pw1-${'1'.repeat(64)}`
+    const list = vi.fn(async () => ({
+      data: [],
+      meta: { page: { limit: 50, nextCursor: null }, requestId: 'planned-list' },
+    }))
+    const replaceForTask = vi.fn(async () => ({
+      data: { attributes: { state: 'pending' }, id: 'planned-operation-1' },
+    }))
+    const wait = vi.fn(async () => ({
+      data: { attributes: { state: 'succeeded' }, id: 'planned-operation-1' },
+    }))
+    const dependencies = {
+      clientFactory: () =>
+        ({
+          plannedWork: { list, replaceForTask },
+          plannedWorkOperations: { wait },
+        }) as never,
+      configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+      environment: { TEAMGRID_API_TOKEN: token },
+      output: capture().stream,
+    }
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          'planned-work',
+          'list',
+          '--start',
+          '2026-07-19T00:00:00.000Z',
+          '--end',
+          '2026-07-20T00:00:00.000Z',
+          '--user-id',
+          'user-1',
+        ],
+        dependencies,
+      ),
+    ).toBe(0)
+    expect(list).toHaveBeenCalledWith({
+      end: '2026-07-20T00:00:00.000Z',
+      start: '2026-07-19T00:00:00.000Z',
+      userId: 'user-1',
+    })
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          'planned-work',
+          'replace',
+          'task-1',
+          '--data',
+          '{"dayLoads":[60],"plannedEnd":"2026-07-19T23:59:59.999Z","plannedStart":"2026-07-19T00:00:00.000Z"}',
+          '--if-match',
+          revision,
+          '--idempotency-key',
+          'planned-replace-1',
+          '--yes',
+          '--wait',
+        ],
+        dependencies,
+      ),
+    ).toBe(0)
+    expect(replaceForTask).toHaveBeenCalledWith(
+      'task-1',
+      {
+        dayLoads: [60],
+        plannedEnd: '2026-07-19T23:59:59.999Z',
+        plannedStart: '2026-07-19T00:00:00.000Z',
+      },
+      { idempotencyKey: 'planned-replace-1', ifMatch: revision },
+    )
+    expect(wait).toHaveBeenCalledWith('planned-operation-1', {
+      maxWaitMs: 300_000,
+      pollIntervalMs: 1000,
+    })
   })
 
   it('routes collaboration resources and confirms call-note archives', async () => {

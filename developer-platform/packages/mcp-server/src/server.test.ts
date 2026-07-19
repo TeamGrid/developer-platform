@@ -118,6 +118,15 @@ describe('TeamGrid read-only MCP adapter', () => {
         version: packageManifest.version,
       })
       const tools = await client.listTools()
+      const advertisedNames = tools.tools.map((tool) => tool.name)
+      for (const forbiddenSurface of [
+        /change/i,
+        /custom_field_value/i,
+        /planned_work/i,
+        /project_template/i,
+      ]) {
+        expect(advertisedNames.some((name) => forbiddenSurface.test(name))).toBe(false)
+      }
       expect(tools.tools.map((tool) => tool.name).sort()).toEqual([
         'teamgrid_audit_events_list',
         'teamgrid_call_note_get',
@@ -149,9 +158,7 @@ describe('TeamGrid read-only MCP adapter', () => {
         'teamgrid_webhooks_list',
         'teamgrid_workspace_get',
       ])
-      expect(tools.tools.map((tool) => tool.name).join(' ')).not.toMatch(
-        /create|update|remove|archive/i,
-      )
+      expect(advertisedNames.join(' ')).not.toMatch(/create|update|remove|archive/i)
       const response = await client.callTool({
         arguments: {},
         name: 'teamgrid_workspace_get',

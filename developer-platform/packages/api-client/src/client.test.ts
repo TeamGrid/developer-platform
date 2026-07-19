@@ -283,6 +283,177 @@ describe('TeamGrid API client', () => {
     ).resolves.toMatchObject({ data: [{ id: 'delivery-1' }] })
   })
 
+  it('lists typed change metadata with repeated filters and opaque checkpoints', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input))
+      expect(url.pathname).toBe('/v1/changes')
+      expect(url.searchParams.getAll('operations')).toEqual(['created', 'updated'])
+      expect(url.searchParams.getAll('resourceTypes')).toEqual(['project', 'task'])
+      expect(url.searchParams.get('cursor')).toBe('checkpoint-1')
+      return json({
+        data: [
+          {
+            attributes: {
+              operation: 'updated',
+              occurredAt: '2026-07-19T12:00:00.000Z',
+              region: 'us',
+              resourceId: 'task-1',
+              resourceType: 'task',
+              sequence: 42,
+              tombstone: false,
+            },
+            id: 'change-42',
+            type: 'changeEvent',
+          },
+        ],
+        meta: {
+          page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-2' },
+          requestId: 'request-changes',
+        },
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(
+      client.changes.list({
+        cursor: 'checkpoint-1',
+        operations: ['created', 'updated'],
+        resourceTypes: ['project', 'task'],
+      }),
+    ).resolves.toMatchObject({
+      data: [{ attributes: { resourceId: 'task-1', sequence: 42 }, type: 'changeEvent' }],
+      meta: { page: { nextCursor: 'checkpoint-2' } },
+    })
+  })
+
+  it('takes a checkpoint before a snapshot and catches up only to an empty page', async () => {
+    const order: string[] = []
+    const fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input))
+      const cursor = url.searchParams.get('cursor')
+      if (url.searchParams.get('startAtLatest') === 'true') {
+        order.push('checkpoint')
+        return json({
+          data: [],
+          meta: {
+            page: { caughtUp: true, limit: 1, nextCursor: 'checkpoint-start' },
+            requestId: 'checkpoint',
+          },
+        })
+      }
+      order.push(`changes:${cursor}`)
+      if (cursor === 'checkpoint-start') {
+        return json({
+          data: [
+            {
+              attributes: {
+                operation: 'created',
+                occurredAt: '2026-07-19T12:00:00.000Z',
+                region: 'us',
+                resourceId: 'project-1',
+                resourceType: 'project',
+                sequence: 43,
+                tombstone: false,
+              },
+              id: 'change-43',
+              type: 'changeEvent',
+            },
+          ],
+          meta: {
+            page: { caughtUp: false, limit: 1, nextCursor: 'checkpoint-43' },
+            requestId: 'changes-1',
+          },
+        })
+      }
+      return json({
+        data: [],
+        meta: {
+          page: { caughtUp: true, limit: 1, nextCursor: 'checkpoint-latest' },
+          requestId: 'changes-2',
+        },
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    const bootstrap = await client.changes.snapshotThenCatchUp(
+      async (checkpoint) => {
+        order.push(`snapshot:${checkpoint}`)
+        return ['project-1']
+      },
+      { limit: 1, operations: ['created'], resourceTypes: ['project'] },
+    )
+    const pages = []
+    for await (const page of bootstrap.pages) pages.push(page)
+
+    expect(bootstrap.checkpoint).toBe('checkpoint-start')
+    expect(bootstrap.snapshot).toEqual(['project-1'])
+    expect(pages.map((page) => page.data.length)).toEqual([1, 0])
+    expect(pages.at(-1)?.meta.page.nextCursor).toBe('checkpoint-latest')
+    expect(order).toEqual([
+      'checkpoint',
+      'snapshot:checkpoint-start',
+      'changes:checkpoint-start',
+      'changes:checkpoint-43',
+    ])
+  })
+
+  it.each([410, 503])('keeps change-feed HTTP %i responses as typed API errors', async (status) => {
+    const client = new TeamGridClient({
+      fetch: vi.fn(async () =>
+        json(
+          {
+            errors: [
+              {
+                code: status === 410 ? 'change_feed_reset_required' : 'change_feed_unavailable',
+                detail: 'Change feed unavailable.',
+                status: String(status),
+                title: status === 410 ? 'Gone' : 'Service Unavailable',
+              },
+            ],
+            meta: { requestId: `request-${status}` },
+          },
+          status,
+        ),
+      ),
+      retries: 0,
+      token,
+    })
+    await expect(client.changes.list({ cursor: 'checkpoint' })).rejects.toMatchObject({ status })
+  })
+
+  it('rejects a repeated change checkpoint before requesting or yielding a duplicate page', async () => {
+    const fetch = vi.fn(async () =>
+      json({
+        data: [
+          {
+            attributes: {
+              operation: 'updated',
+              occurredAt: '2026-07-19T12:00:00.000Z',
+              region: 'us',
+              resourceId: 'task-1',
+              resourceType: 'task',
+              sequence: 42,
+              tombstone: false,
+            },
+            id: 'change-42',
+            type: 'changeEvent',
+          },
+        ],
+        meta: {
+          page: { caughtUp: false, limit: 1, nextCursor: 'same' },
+          requestId: 'request-cycle',
+        },
+      }),
+    )
+    const client = new TeamGridClient({ fetch, token })
+    const yielded: unknown[] = []
+    await expect(async () => {
+      for await (const page of client.changes.pages({ cursor: 'same', limit: 1 })) {
+        yielded.push(page)
+      }
+    }).rejects.toMatchObject({ code: 'pagination_cycle' })
+    expect(yielded).toHaveLength(1)
+    expect(fetch).toHaveBeenCalledOnce()
+  })
+
   it.each([
     {
       create: (client: TeamGridClient) =>
@@ -593,6 +764,196 @@ describe('TeamGrid API client', () => {
     ).resolves.toMatchObject({ data: [resource] })
     await expect(client.customFieldDefinitions.restore('field-1')).resolves.toMatchObject({
       data: resource,
+    })
+  })
+
+  it('uses strong compare-and-set preconditions for custom-field values', async () => {
+    const revision = `cfv1-${'1'.repeat(64)}`
+    const nextRevision = `cfv1-${'2'.repeat(64)}`
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input))
+      expect(url.pathname).toBe('/v1/custom-field-values/project/project-1/field1')
+      if (init?.method === 'GET') {
+        return json(
+          {
+            data: {
+              attributes: {
+                fieldId: 'field1',
+                fieldType: 'text',
+                resourceId: 'project-1',
+                revision,
+                state: 'unset',
+                targetType: 'project',
+              },
+              id: `cfv_${'a'.repeat(64)}`,
+              type: 'customFieldValue',
+            },
+            meta: { requestId: 'custom-value-get' },
+          },
+          200,
+          { etag: `"${revision}"` },
+        )
+      }
+      expect(init?.method).toBe('PUT')
+      expect(new Headers(init?.headers).get('if-match')).toBe(`"${revision}"`)
+      expect(JSON.parse(String(init?.body))).toEqual({ value: 'ACME-42' })
+      return json(
+        {
+          data: {
+            attributes: {
+              fieldId: 'field1',
+              fieldType: 'text',
+              replayed: false,
+              resourceId: 'project-1',
+              revision: nextRevision,
+              state: 'set',
+              targetType: 'project',
+              value: 'ACME-42',
+            },
+            id: `cfv_${'a'.repeat(64)}`,
+            type: 'customFieldValue',
+          },
+          meta: { requestId: 'custom-value-set' },
+        },
+        200,
+        { etag: `"${nextRevision}"` },
+      )
+    })
+    const client = new TeamGridClient({ fetch, token })
+    const current = await client.customFieldValues.get('project', 'project-1', 'field1')
+    expect(current.transport.headers.etag).toBe(`"${revision}"`)
+    await expect(
+      client.customFieldValues.set(
+        'project',
+        'project-1',
+        'field1',
+        { value: 'ACME-42' },
+        { ifMatch: current.data.attributes.revision },
+      ),
+    ).resolves.toMatchObject({ data: { attributes: { revision: nextRevision } } })
+    expect(() =>
+      client.customFieldValues.clear('project', 'project-1', 'field1', { ifMatch: '*' }),
+    ).rejects.toMatchObject({ code: 'invalid_arguments' })
+  })
+
+  it('supports project-template lifecycle and credential-owned instantiation polling', async () => {
+    const template = {
+      attributes: { archived: false, title: 'Delivery' },
+      id: 'template-1',
+      type: 'projectTemplate',
+    }
+    const pending = {
+      attributes: { state: 'pending' },
+      id: 'instantiation-1',
+      type: 'projectTemplateInstantiation',
+    }
+    const succeeded = {
+      ...pending,
+      attributes: { state: 'succeeded' },
+    }
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input))
+      if (url.pathname === '/v1/project-templates') {
+        expect(url.searchParams.get('originProjectId')).toBe('project-source')
+        return json({
+          data: [template],
+          meta: { page: { limit: 50, nextCursor: null }, requestId: 'templates-list' },
+        })
+      }
+      if (url.pathname.endsWith('/instantiate')) {
+        expect(init?.method).toBe('POST')
+        expect(new Headers(init?.headers).get('idempotency-key')).toBe('instantiate-1')
+        return json({ data: pending, meta: { requestId: 'instantiate' } }, 202, {
+          location: '/v1/project-template-instantiations/instantiation-1',
+        })
+      }
+      expect(url.pathname).toBe('/v1/project-template-instantiations/instantiation-1')
+      return json({ data: succeeded, meta: { requestId: 'instantiation-status' } })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(
+      client.projectTemplates.list({ originProjectId: 'project-source' }),
+    ).resolves.toMatchObject({ data: [template] })
+    const accepted = await client.projectTemplates.instantiate(
+      'template-1',
+      { name: 'Customer rollout' },
+      { idempotencyKey: 'instantiate-1' },
+    )
+    expect(accepted.transport.headers.location).toContain('instantiation-1')
+    await expect(
+      client.projectTemplateInstantiations.wait(accepted.data.id),
+    ).resolves.toMatchObject({ data: { attributes: { state: 'succeeded' } } })
+  })
+
+  it('lists and atomically replaces planned work with bounded operation polling', async () => {
+    const revision = `pw1-${'1'.repeat(64)}`
+    const targetRevision = `pw1-${'2'.repeat(64)}`
+    const taskSchedule = {
+      attributes: {
+        items: [],
+        plannedEnd: null,
+        plannedStart: null,
+        projectId: 'project-1',
+        revision,
+        taskId: 'task-1',
+        userId: 'user-1',
+      },
+      id: 'task-1',
+      type: 'taskPlannedWork',
+    }
+    const pending = {
+      attributes: { state: 'pending', targetRevision },
+      id: 'planned-operation-1',
+      type: 'plannedWorkOperation',
+    }
+    const succeeded = { ...pending, attributes: { ...pending.attributes, state: 'succeeded' } }
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input))
+      if (url.pathname === '/v1/planned-work') {
+        expect(Object.fromEntries(url.searchParams)).toMatchObject({
+          end: '2026-07-20T00:00:00.000Z',
+          start: '2026-07-19T00:00:00.000Z',
+        })
+        return json({
+          data: [],
+          meta: { page: { limit: 50, nextCursor: null }, requestId: 'planned-list' },
+        })
+      }
+      if (url.pathname === '/v1/tasks/task-1/planned-work' && init?.method === 'PUT') {
+        const headers = new Headers(init.headers)
+        expect(headers.get('if-match')).toBe(`"${revision}"`)
+        expect(headers.get('idempotency-key')).toBe('replace-planned-1')
+        return json({ data: pending, meta: { requestId: 'planned-replace' } }, 202, {
+          location: '/v1/planned-work-operations/planned-operation-1',
+        })
+      }
+      if (url.pathname === '/v1/tasks/task-1/planned-work') {
+        return json({ data: taskSchedule, meta: { requestId: 'planned-get' } }, 200, {
+          etag: `"${revision}"`,
+        })
+      }
+      expect(url.pathname).toBe('/v1/planned-work-operations/planned-operation-1')
+      return json({ data: succeeded, meta: { requestId: 'planned-status' } })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(
+      client.plannedWork.list({
+        end: new Date('2026-07-20T00:00:00.000Z'),
+        start: new Date('2026-07-19T00:00:00.000Z'),
+      }),
+    ).resolves.toMatchObject({ data: [] })
+    const schedule = await client.plannedWork.getForTask('task-1')
+    const accepted = await client.plannedWork.replaceForTask(
+      'task-1',
+      {
+        dayLoads: [60],
+        plannedEnd: '2026-07-19T23:59:59.999Z',
+        plannedStart: '2026-07-19T00:00:00.000Z',
+      },
+      { idempotencyKey: 'replace-planned-1', ifMatch: schedule.data.attributes.revision },
+    )
+    await expect(client.plannedWorkOperations.wait(accepted.data.id)).resolves.toMatchObject({
+      data: { attributes: { state: 'succeeded' } },
     })
   })
 
