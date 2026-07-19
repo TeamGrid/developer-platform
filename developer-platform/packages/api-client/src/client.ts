@@ -1,21 +1,59 @@
 import { TeamGridApiError, TeamGridClientError } from './errors.js'
 import { buildRegionalApiBaseUrl, normalizeApiBaseUrl, parseCredentialLocation } from './routing.js'
 import type {
+  ApiVersionEnvelope,
   AuditEvent,
   AuditEventListOptions,
+  CallNote,
+  CallNoteCreate,
+  CallNoteListOptions,
   Contact,
+  ContactCreate,
+  ContactGroup,
+  ContactGroupCreate,
+  ContactGroupListOptions,
+  ContactGroupUpdate,
   ContactListOptions,
+  ContactUpdate,
+  CustomFieldDefinition,
+  CustomFieldDefinitionCreate,
+  CustomFieldDefinitionListOptions,
+  CustomFieldDefinitionUpdate,
+  List,
+  ListCreate,
   ListEnvelope,
   ListLookupListOptions,
   ListOptions,
-  Lookup,
+  ListUpdate,
   LookupListOptions,
   MutationOptions,
   PaginationOptions,
+  Product,
+  ProductCreate,
+  ProductGroup,
+  ProductGroupCreate,
+  ProductGroupListOptions,
+  ProductGroupUpdate,
+  ProductListOptions,
+  ProductUpdate,
   Project,
+  ProjectCreate,
+  ProjectLifecycleOperation,
+  ProjectLifecycleWaitOptions,
   ProjectListOptions,
+  ProjectStatement,
+  ProjectStatementCreate,
+  ProjectStatementListOptions,
+  ProjectStatementUpdate,
+  ProjectUpdate,
   RequestOptions,
   ResourceEnvelope,
+  Service,
+  ServiceCreate,
+  ServiceUpdate,
+  Tag,
+  TagCreate,
+  TagUpdate,
   Task,
   TaskCreate,
   TaskListOptions,
@@ -24,12 +62,17 @@ import type {
   TimeEntryCreate,
   TimeEntryListOptions,
   TimeEntryUpdate,
+  TimerAction,
+  TransportMetadata,
   User,
   Webhook,
   WebhookCreate,
+  WebhookDelivery,
+  WebhookDeliveryListOptions,
   WebhookListOptions,
   Workspace,
 } from './types.js'
+import { apiClientVersion } from './version.js'
 
 type Fetch = typeof globalThis.fetch
 type Sleep = (milliseconds: number, signal?: AbortSignal) => Promise<void>
@@ -41,6 +84,11 @@ type InternalRequestOptions = RequestOptions & {
   idempotencyKey?: string
   method?: 'DELETE' | 'GET' | 'PATCH' | 'POST'
   query?: Query
+}
+
+type InternalResponse = {
+  payload: unknown
+  transport: Readonly<TransportMetadata>
 }
 
 export type TeamGridClientOptions = {
@@ -208,17 +256,29 @@ function isRetryableMethod(method: string, idempotencyKey?: string) {
 }
 
 function expectedResourceTypes(path: string) {
+  if (/^\/tasks\/[^/]+\/timer\/(?:start|stop)$/.test(path)) return ['timeEntry']
+  if (/^\/projects\/[^/]+\/(?:complete|reopen|archive|restore)$/.test(path)) {
+    return ['projectLifecycleOperation']
+  }
   const root = path.split('/').filter(Boolean)[0]
   const mapping: Record<string, string[]> = {
     'audit-events': ['auditEvent'],
+    'call-notes': ['callNote'],
     contacts: ['contact'],
+    'contact-groups': ['contactGroup'],
+    'custom-field-definitions': ['customFieldDefinition'],
     lists: ['list'],
+    'product-groups': ['productGroup'],
+    products: ['product'],
     projects: ['project'],
+    'project-lifecycle-operations': ['projectLifecycleOperation'],
+    'project-statements': ['projectStatement'],
     services: ['service'],
     tags: ['tag'],
     tasks: ['task'],
     'time-entries': ['timeEntry'],
     users: ['user'],
+    'webhook-deliveries': ['webhookDelivery'],
     webhooks: ['webhook'],
     workspace: ['workspace'],
   }
@@ -272,17 +332,88 @@ function assertResource<T>(value: unknown, expectedTypes: string[]): ResourceEnv
   return value as ResourceEnvelope<T>
 }
 
+function assertApiVersion(value: unknown): ApiVersionEnvelope {
+  if (
+    !isObject(value) ||
+    !isObject(value.data) ||
+    value.data.version !== '1' ||
+    typeof value.data.documentation !== 'string' ||
+    !isObject(value.meta) ||
+    typeof value.meta.requestId !== 'string'
+  ) {
+    throw new TeamGridClientError('invalid_api_response', 'Expected TeamGrid API discovery data.')
+  }
+  return value as ApiVersionEnvelope
+}
+
+function numericHeader(headers: Headers, name: string) {
+  const value = headers.get(name)
+  if (value === null) return undefined
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
+function transportMetadata({
+  attempts,
+  fallbackRequestId,
+  response,
+  retryAfterMs,
+}: {
+  attempts: number
+  fallbackRequestId: string
+  response: Response
+  retryAfterMs?: number
+}): Readonly<TransportMetadata> {
+  const headers: Record<string, string> = {}
+  response.headers.forEach((value, key) => {
+    headers[key] = value
+  })
+  const replayed = response.headers.get('idempotency-replayed')
+  return Object.freeze({
+    attempts,
+    headers: Object.freeze(headers),
+    ...(replayed === null ? {} : { idempotencyReplayed: replayed === 'true' }),
+    rateLimit: Object.freeze({
+      limit: numericHeader(response.headers, 'x-ratelimit-limit'),
+      remaining: numericHeader(response.headers, 'x-ratelimit-remaining'),
+      reset: numericHeader(response.headers, 'x-ratelimit-reset'),
+    }),
+    requestId: response.headers.get('x-request-id') || fallbackRequestId,
+    ...(retryAfterMs === undefined ? {} : { retryAfterMs }),
+    status: response.status,
+  })
+}
+
+function attachTransport<T extends object>(value: T, transport: Readonly<TransportMetadata>) {
+  Object.defineProperty(value, 'transport', {
+    configurable: false,
+    enumerable: false,
+    value: transport,
+    writable: false,
+  })
+  return value as T & { readonly transport: Readonly<TransportMetadata> }
+}
+
 export class TeamGridClient {
   readonly auditEvents
+  readonly callNotes
   readonly contacts
+  readonly contactGroups
+  readonly customFieldDefinitions
   readonly lists
   readonly location
+  readonly productGroups
+  readonly products
   readonly projects
+  readonly projectLifecycleOperations
+  readonly projectStatements
   readonly services
+  readonly system
   readonly tags
   readonly tasks
   readonly timeEntries
   readonly users
+  readonly webhookDeliveries
   readonly webhooks
   readonly workspace
 
@@ -317,16 +448,112 @@ export class TeamGridClient {
     this.workspace = {
       get: (options?: RequestOptions) => this.#resource<Workspace>('/workspace', options),
     }
+    this.system = {
+      getApiVersion: async (options?: RequestOptions) => {
+        const response = await this.#request('/', options)
+        return attachTransport(assertApiVersion(response.payload), response.transport)
+      },
+    }
     this.projects = {
+      archive: (id: string, options?: MutationOptions) =>
+        this.#create<ProjectLifecycleOperation>(
+          `/projects/${encodeURIComponent(id)}/archive`,
+          undefined,
+          options,
+        ),
+      complete: (id: string, options?: MutationOptions) =>
+        this.#create<ProjectLifecycleOperation>(
+          `/projects/${encodeURIComponent(id)}/complete`,
+          undefined,
+          options,
+        ),
+      create: (data: ProjectCreate, options?: MutationOptions) =>
+        this.#create<Project>('/projects', data, options),
       get: (id: string, options?: RequestOptions) =>
         this.#resource<Project>(`/projects/${encodeURIComponent(id)}`, options),
       list: (options?: ProjectListOptions) => this.#page<Project>('/projects', options),
       pages: (options?: ProjectListOptions, pagination?: PaginationOptions) =>
         this.#pages<Project>('/projects', options, pagination),
+      reopen: (id: string, options?: MutationOptions) =>
+        this.#create<ProjectLifecycleOperation>(
+          `/projects/${encodeURIComponent(id)}/reopen`,
+          undefined,
+          options,
+        ),
+      restore: (id: string, options?: MutationOptions) =>
+        this.#create<ProjectLifecycleOperation>(
+          `/projects/${encodeURIComponent(id)}/restore`,
+          undefined,
+          options,
+        ),
+      update: (id: string, data: ProjectUpdate, options?: RequestOptions) =>
+        this.#update<Project>(`/projects/${encodeURIComponent(id)}`, data, options),
+    }
+    this.projectLifecycleOperations = {
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<ProjectLifecycleOperation>(
+          `/project-lifecycle-operations/${encodeURIComponent(id)}`,
+          options,
+        ),
+      wait: (id: string, options?: ProjectLifecycleWaitOptions) =>
+        this.#waitForProjectLifecycleOperation(id, options),
+    }
+    this.products = {
+      archive: (id: string, options?: RequestOptions) =>
+        this.#archive(`/products/${encodeURIComponent(id)}`, options),
+      create: (data: ProductCreate, options?: MutationOptions) =>
+        this.#create<Product>('/products', data, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<Product>(`/products/${encodeURIComponent(id)}`, options),
+      list: (options?: ProductListOptions) => this.#page<Product>('/products', options),
+      pages: (options?: ProductListOptions, pagination?: PaginationOptions) =>
+        this.#pages<Product>('/products', options, pagination),
+      update: (id: string, data: ProductUpdate, options?: RequestOptions) =>
+        this.#update<Product>(`/products/${encodeURIComponent(id)}`, data, options),
+    }
+    this.productGroups = {
+      archive: (id: string, options?: RequestOptions) =>
+        this.#archive(`/product-groups/${encodeURIComponent(id)}`, options),
+      create: (data: ProductGroupCreate, options?: MutationOptions) =>
+        this.#create<ProductGroup>('/product-groups', data, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<ProductGroup>(`/product-groups/${encodeURIComponent(id)}`, options),
+      list: (options?: ProductGroupListOptions) =>
+        this.#page<ProductGroup>('/product-groups', options),
+      pages: (options?: ProductGroupListOptions, pagination?: PaginationOptions) =>
+        this.#pages<ProductGroup>('/product-groups', options, pagination),
+      update: (id: string, data: ProductGroupUpdate, options?: RequestOptions) =>
+        this.#update<ProductGroup>(`/product-groups/${encodeURIComponent(id)}`, data, options),
+    }
+    this.projectStatements = {
+      archive: (id: string, options?: RequestOptions) =>
+        this.#archive(`/project-statements/${encodeURIComponent(id)}`, options),
+      create: (data: ProjectStatementCreate, options?: MutationOptions) =>
+        this.#create<ProjectStatement>('/project-statements', data, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<ProjectStatement>(`/project-statements/${encodeURIComponent(id)}`, options),
+      list: (options?: ProjectStatementListOptions) =>
+        this.#page<ProjectStatement>('/project-statements', options),
+      pages: (options?: ProjectStatementListOptions, pagination?: PaginationOptions) =>
+        this.#pages<ProjectStatement>('/project-statements', options, pagination),
+      restore: (id: string, options?: RequestOptions) =>
+        this.#action<ProjectStatement>(
+          `/project-statements/${encodeURIComponent(id)}/restore`,
+          undefined,
+          options,
+        ),
+      update: (id: string, data: ProjectStatementUpdate, options?: RequestOptions) =>
+        this.#update<ProjectStatement>(
+          `/project-statements/${encodeURIComponent(id)}`,
+          data,
+          options,
+        ),
     }
     this.tasks = {
       archive: (id: string, options?: RequestOptions) =>
         this.#archive(`/tasks/${encodeURIComponent(id)}`, options),
+      complete: (id: string, options?: RequestOptions) =>
+        this.#action<Task>(`/tasks/${encodeURIComponent(id)}/complete`, undefined, options),
       create: (data: TaskCreate, options?: MutationOptions) =>
         this.#create<Task>('/tasks', data, options),
       get: (id: string, options?: RequestOptions) =>
@@ -334,6 +561,14 @@ export class TeamGridClient {
       list: (options?: TaskListOptions) => this.#page<Task>('/tasks', options),
       pages: (options?: TaskListOptions, pagination?: PaginationOptions) =>
         this.#pages<Task>('/tasks', options, pagination),
+      restore: (id: string, options?: RequestOptions) =>
+        this.#action<Task>(`/tasks/${encodeURIComponent(id)}/restore`, undefined, options),
+      reopen: (id: string, options?: RequestOptions) =>
+        this.#action<Task>(`/tasks/${encodeURIComponent(id)}/reopen`, undefined, options),
+      startTimer: (id: string, data: TimerAction, options?: RequestOptions) =>
+        this.#action<TimeEntry>(`/tasks/${encodeURIComponent(id)}/timer/start`, data, options),
+      stopTimer: (id: string, data: TimerAction, options?: RequestOptions) =>
+        this.#action<TimeEntry>(`/tasks/${encodeURIComponent(id)}/timer/stop`, data, options),
       update: (id: string, data: TaskUpdate, options?: RequestOptions) =>
         this.#update<Task>(`/tasks/${encodeURIComponent(id)}`, data, options),
     }
@@ -347,15 +582,85 @@ export class TeamGridClient {
       list: (options?: TimeEntryListOptions) => this.#page<TimeEntry>('/time-entries', options),
       pages: (options?: TimeEntryListOptions, pagination?: PaginationOptions) =>
         this.#pages<TimeEntry>('/time-entries', options, pagination),
+      restore: (id: string, options?: RequestOptions) =>
+        this.#action<TimeEntry>(
+          `/time-entries/${encodeURIComponent(id)}/restore`,
+          undefined,
+          options,
+        ),
       update: (id: string, data: TimeEntryUpdate, options?: RequestOptions) =>
         this.#update<TimeEntry>(`/time-entries/${encodeURIComponent(id)}`, data, options),
     }
+    this.callNotes = {
+      archive: (id: string, options?: RequestOptions) =>
+        this.#archive(`/call-notes/${encodeURIComponent(id)}`, options),
+      create: (data: CallNoteCreate, options?: MutationOptions) =>
+        this.#create<CallNote>('/call-notes', data, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<CallNote>(`/call-notes/${encodeURIComponent(id)}`, options),
+      list: (options?: CallNoteListOptions) => this.#page<CallNote>('/call-notes', options),
+      pages: (options?: CallNoteListOptions, pagination?: PaginationOptions) =>
+        this.#pages<CallNote>('/call-notes', options, pagination),
+      restore: (id: string, options?: RequestOptions) =>
+        this.#action<CallNote>(`/call-notes/${encodeURIComponent(id)}/restore`, undefined, options),
+    }
     this.contacts = {
+      create: (data: ContactCreate, options?: MutationOptions) =>
+        this.#create<Contact>('/contacts', data, options),
       get: (id: string, options?: RequestOptions) =>
         this.#resource<Contact>(`/contacts/${encodeURIComponent(id)}`, options),
       list: (options?: ContactListOptions) => this.#page<Contact>('/contacts', options),
       pages: (options?: ContactListOptions, pagination?: PaginationOptions) =>
         this.#pages<Contact>('/contacts', options, pagination),
+      update: (id: string, data: ContactUpdate, options?: RequestOptions) =>
+        this.#update<Contact>(`/contacts/${encodeURIComponent(id)}`, data, options),
+    }
+    this.contactGroups = {
+      archive: (id: string, options?: RequestOptions) =>
+        this.#archive(`/contact-groups/${encodeURIComponent(id)}`, options),
+      create: (data: ContactGroupCreate, options?: MutationOptions) =>
+        this.#create<ContactGroup>('/contact-groups', data, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<ContactGroup>(`/contact-groups/${encodeURIComponent(id)}`, options),
+      list: (options?: ContactGroupListOptions) =>
+        this.#page<ContactGroup>('/contact-groups', options),
+      pages: (options?: ContactGroupListOptions, pagination?: PaginationOptions) =>
+        this.#pages<ContactGroup>('/contact-groups', options, pagination),
+      restore: (id: string, options?: RequestOptions) =>
+        this.#action<ContactGroup>(
+          `/contact-groups/${encodeURIComponent(id)}/restore`,
+          undefined,
+          options,
+        ),
+      update: (id: string, data: ContactGroupUpdate, options?: RequestOptions) =>
+        this.#update<ContactGroup>(`/contact-groups/${encodeURIComponent(id)}`, data, options),
+    }
+    this.customFieldDefinitions = {
+      archive: (id: string, options?: RequestOptions) =>
+        this.#archive(`/custom-field-definitions/${encodeURIComponent(id)}`, options),
+      create: (data: CustomFieldDefinitionCreate, options?: MutationOptions) =>
+        this.#create<CustomFieldDefinition>('/custom-field-definitions', data, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<CustomFieldDefinition>(
+          `/custom-field-definitions/${encodeURIComponent(id)}`,
+          options,
+        ),
+      list: (options?: CustomFieldDefinitionListOptions) =>
+        this.#page<CustomFieldDefinition>('/custom-field-definitions', options),
+      pages: (options?: CustomFieldDefinitionListOptions, pagination?: PaginationOptions) =>
+        this.#pages<CustomFieldDefinition>('/custom-field-definitions', options, pagination),
+      restore: (id: string, options?: RequestOptions) =>
+        this.#action<CustomFieldDefinition>(
+          `/custom-field-definitions/${encodeURIComponent(id)}/restore`,
+          undefined,
+          options,
+        ),
+      update: (id: string, data: CustomFieldDefinitionUpdate, options?: RequestOptions) =>
+        this.#update<CustomFieldDefinition>(
+          `/custom-field-definitions/${encodeURIComponent(id)}`,
+          data,
+          options,
+        ),
     }
     this.users = {
       list: (options?: ListOptions) => this.#page<User>('/users', options),
@@ -363,16 +668,62 @@ export class TeamGridClient {
         this.#pages<User>('/users', options, pagination),
     }
     this.lists = {
-      list: (options?: ListLookupListOptions) => this.#page<Lookup>('/lists', options),
+      archive: (id: string, options?: RequestOptions) =>
+        this.#archive(`/lists/${encodeURIComponent(id)}`, options),
+      create: (data: ListCreate, options?: MutationOptions) =>
+        this.#create<List>('/lists', data, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<List>(`/lists/${encodeURIComponent(id)}`, options),
+      list: (options?: ListLookupListOptions) => this.#page<List>('/lists', options),
       pages: (options?: ListLookupListOptions, pagination?: PaginationOptions) =>
-        this.#pages<Lookup>('/lists', options, pagination),
+        this.#pages<List>('/lists', options, pagination),
+      restore: (id: string, options?: RequestOptions) =>
+        this.#action<List>(`/lists/${encodeURIComponent(id)}/restore`, undefined, options),
+      update: (id: string, data: ListUpdate, options?: RequestOptions) =>
+        this.#update<List>(`/lists/${encodeURIComponent(id)}`, data, options),
     }
-    this.services = this.#lookupClient('/services')
-    this.tags = this.#lookupClient('/tags')
+    this.services = {
+      archive: (id: string, options?: RequestOptions) =>
+        this.#archive(`/services/${encodeURIComponent(id)}`, options),
+      create: (data: ServiceCreate, options?: MutationOptions) =>
+        this.#create<Service>('/services', data, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<Service>(`/services/${encodeURIComponent(id)}`, options),
+      list: (options?: LookupListOptions) => this.#page<Service>('/services', options),
+      pages: (options?: LookupListOptions, pagination?: PaginationOptions) =>
+        this.#pages<Service>('/services', options, pagination),
+      restore: (id: string, options?: RequestOptions) =>
+        this.#action<Service>(`/services/${encodeURIComponent(id)}/restore`, undefined, options),
+      update: (id: string, data: ServiceUpdate, options?: RequestOptions) =>
+        this.#update<Service>(`/services/${encodeURIComponent(id)}`, data, options),
+    }
+    this.tags = {
+      archive: (id: string, options?: RequestOptions) =>
+        this.#archive(`/tags/${encodeURIComponent(id)}`, options),
+      create: (data: TagCreate, options?: MutationOptions) =>
+        this.#create<Tag>('/tags', data, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<Tag>(`/tags/${encodeURIComponent(id)}`, options),
+      list: (options?: LookupListOptions) => this.#page<Tag>('/tags', options),
+      pages: (options?: LookupListOptions, pagination?: PaginationOptions) =>
+        this.#pages<Tag>('/tags', options, pagination),
+      restore: (id: string, options?: RequestOptions) =>
+        this.#action<Tag>(`/tags/${encodeURIComponent(id)}/restore`, undefined, options),
+      update: (id: string, data: TagUpdate, options?: RequestOptions) =>
+        this.#update<Tag>(`/tags/${encodeURIComponent(id)}`, data, options),
+    }
     this.auditEvents = {
       list: (options?: AuditEventListOptions) => this.#page<AuditEvent>('/audit-events', options),
       pages: (options?: AuditEventListOptions, pagination?: PaginationOptions) =>
         this.#pages<AuditEvent>('/audit-events', options, pagination),
+    }
+    this.webhookDeliveries = {
+      get: (id: string, options?: RequestOptions) =>
+        this.#resource<WebhookDelivery>(`/webhook-deliveries/${encodeURIComponent(id)}`, options),
+      list: (options?: WebhookDeliveryListOptions) =>
+        this.#page<WebhookDelivery>('/webhook-deliveries', options),
+      pages: (options?: WebhookDeliveryListOptions, pagination?: PaginationOptions) =>
+        this.#pages<WebhookDelivery>('/webhook-deliveries', options, pagination),
     }
     this.webhooks = {
       create: (data: WebhookCreate, options?: MutationOptions) =>
@@ -387,15 +738,7 @@ export class TeamGridClient {
     }
   }
 
-  #lookupClient(path: string) {
-    return {
-      list: (options?: LookupListOptions) => this.#page<Lookup>(path, options),
-      pages: (options?: LookupListOptions, pagination?: PaginationOptions) =>
-        this.#pages<Lookup>(path, options, pagination),
-    }
-  }
-
-  async #request(path: string, options: InternalRequestOptions = {}) {
+  async #request(path: string, options: InternalRequestOptions = {}): Promise<InternalResponse> {
     const method = options.method || 'GET'
     const url = new URL(`${this.#baseUrl}${path}`)
     addQuery(url, options.query)
@@ -403,6 +746,8 @@ export class TeamGridClient {
     const headers = new Headers({
       accept: 'application/json',
       authorization: `Bearer ${this.#token}`,
+      'x-teamgrid-client': '@teamgrid/api-client',
+      'x-teamgrid-client-version': apiClientVersion,
       'x-request-id': requestId,
     })
     if (options.body !== undefined) headers.set('content-type', 'application/json')
@@ -452,21 +797,55 @@ export class TeamGridClient {
         continue
       }
       const payload = await parseJsonResponse(response, this.#maxResponseBytes)
+      const envelope = isObject(payload) ? payload : {}
+      const responseRequestId =
+        isObject(envelope.meta) && typeof envelope.meta.requestId === 'string'
+          ? envelope.meta.requestId
+          : response.headers.get('x-request-id') || requestId
+      const transport = transportMetadata({
+        attempts: attempt + 1,
+        fallbackRequestId: responseRequestId,
+        response,
+        retryAfterMs,
+      })
       if (!response.ok) {
-        const envelope = isObject(payload) ? payload : {}
         throw new TeamGridApiError({
           errors: Array.isArray(envelope.errors) ? envelope.errors : undefined,
-          requestId:
-            isObject(envelope.meta) && typeof envelope.meta.requestId === 'string'
-              ? envelope.meta.requestId
-              : response.headers.get('x-request-id') || requestId,
+          requestId: responseRequestId,
           retryAfterMs,
           status: response.status,
+          transport,
         })
       }
-      return payload
+      return { payload, transport }
     }
     throw new TeamGridClientError('retry_exhausted', 'The TeamGrid API retry budget was exhausted.')
+  }
+
+  async #waitForProjectLifecycleOperation(id: string, options: ProjectLifecycleWaitOptions = {}) {
+    const pollIntervalMs = Math.max(
+      100,
+      Math.min(Math.trunc(options.pollIntervalMs ?? 1000), 30_000),
+    )
+    const maxWaitMs = Math.max(100, Math.min(Math.trunc(options.maxWaitMs ?? 300_000), 86_400_000))
+    const startedAt = Date.now()
+    while (true) {
+      const operation = await this.projectLifecycleOperations.get(id, options)
+      if (
+        operation.data.attributes.state === 'succeeded' ||
+        operation.data.attributes.state === 'failed'
+      ) {
+        return operation
+      }
+      const elapsed = Date.now() - startedAt
+      if (elapsed >= maxWaitMs) {
+        throw new TeamGridClientError(
+          'lifecycle_wait_timeout',
+          `Project lifecycle operation ${id} did not finish within ${maxWaitMs} ms.`,
+        )
+      }
+      await this.#sleep(Math.min(pollIntervalMs, maxWaitMs - elapsed), options.signal)
+    }
   }
 
   #retryDelay(attempt: number) {
@@ -474,18 +853,23 @@ export class TeamGridClient {
   }
 
   async #resource<T>(path: string, options?: RequestOptions) {
-    return assertResource<T>(await this.#request(path, options), expectedResourceTypes(path))
+    const response = await this.#request(path, options)
+    return attachTransport(
+      assertResource<T>(response.payload, expectedResourceTypes(path)),
+      response.transport,
+    )
   }
 
   async #page<T>(path: string, options: ListOptions & Record<string, unknown> = {}) {
     const { requestId, signal, ...query } = options
-    return assertPage<T>(
-      await this.#request(path, {
-        query: query as Query,
-        requestId,
-        signal,
-      }),
-      expectedResourceTypes(path),
+    const response = await this.#request(path, {
+      query: query as Query,
+      requestId,
+      signal,
+    })
+    return attachTransport(
+      assertPage<T>(response.payload, expectedResourceTypes(path)),
+      response.transport,
     )
   }
 
@@ -522,29 +906,43 @@ export class TeamGridClient {
   }
 
   async #create<T>(path: string, data: unknown, options: MutationOptions = {}) {
-    return assertResource<T>(
-      await this.#request(path, {
-        ...options,
-        body: data,
-        idempotencyKey: options.idempotencyKey || newRequestId(),
-        method: 'POST',
-      }),
-      expectedResourceTypes(path),
+    const response = await this.#request(path, {
+      ...options,
+      body: data,
+      idempotencyKey: options.idempotencyKey || newRequestId(),
+      method: 'POST',
+    })
+    return attachTransport(
+      assertResource<T>(response.payload, expectedResourceTypes(path)),
+      response.transport,
     )
   }
 
   async #update<T>(path: string, data: unknown, options: RequestOptions = {}) {
-    return assertResource<T>(
-      await this.#request(path, {
-        ...options,
-        body: data,
-        method: 'PATCH',
-      }),
-      expectedResourceTypes(path),
+    const response = await this.#request(path, {
+      ...options,
+      body: data,
+      method: 'PATCH',
+    })
+    return attachTransport(
+      assertResource<T>(response.payload, expectedResourceTypes(path)),
+      response.transport,
+    )
+  }
+
+  async #action<T>(path: string, data?: unknown, options: RequestOptions = {}) {
+    const response = await this.#request(path, {
+      ...options,
+      ...(data === undefined ? {} : { body: data }),
+      method: 'POST',
+    })
+    return attachTransport(
+      assertResource<T>(response.payload, expectedResourceTypes(path)),
+      response.transport,
     )
   }
 
   async #archive(path: string, options: RequestOptions = {}) {
-    await this.#request(path, { ...options, method: 'DELETE' })
+    return (await this.#request(path, { ...options, method: 'DELETE' })).transport
   }
 }

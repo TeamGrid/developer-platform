@@ -123,6 +123,14 @@ function archiveOptions(command: Command) {
   return command.option('-y, --yes', 'skip the archive confirmation')
 }
 
+function lifecycleOptions(command: Command) {
+  return command
+    .option('--idempotency-key <key>', 'stable retry key')
+    .option('--wait', 'wait until the asynchronous operation finishes')
+    .option('--poll-interval <milliseconds>', 'poll interval while waiting', positiveInteger, 1000)
+    .option('--max-wait <milliseconds>', 'maximum wait time', positiveInteger, 300_000)
+}
+
 export function createProgram(dependencies: ProgramDependencies = {}) {
   const environment = dependencies.environment || process.env
   const input = dependencies.input || process.stdin
@@ -351,6 +359,14 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     })
 
   program
+    .command('api-version')
+    .description('discover the TeamGrid API version')
+    .action(async function action(_options: unknown, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.system.getApiVersion()).data)
+    })
+
+  program
     .command('workspace')
     .description('get the authenticated workspace')
     .action(async function action(_options: unknown, command: Command) {
@@ -358,7 +374,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       outputData(command, (await client.workspace.get()).data)
     })
 
-  const projects = program.command('projects').description('read projects')
+  const projects = program.command('projects').description('read and mutate projects')
   addListOptions(projects.command('list'))
     .option('--archived <boolean>', 'return archived projects', booleanValue)
     .option('--completed <boolean>', 'filter completion', booleanValue)
@@ -374,6 +390,205 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const client = await loadClient(command)
     outputData(command, (await client.projects.get(id)).data)
   })
+  projects
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'project create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.projects.create((await readJsonObject(options.data, input)) as never, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      )
+    })
+  projects
+    .command('update <id>')
+    .requiredOption('--data <json|@file|->', 'project patch JSON')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.projects.update(id, (await readJsonObject(options.data, input)) as never))
+          .data,
+      )
+    })
+  async function runProjectLifecycle(
+    action: 'archive' | 'complete' | 'reopen' | 'restore',
+    id: string,
+    options: {
+      idempotencyKey?: string
+      maxWait?: number
+      pollInterval?: number
+      wait?: boolean
+    },
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    const started = await client.projects[action](id, {
+      idempotencyKey: options.idempotencyKey,
+    })
+    const result = options.wait
+      ? await client.projectLifecycleOperations.wait(started.data.id, {
+          maxWaitMs: options.maxWait,
+          pollIntervalMs: options.pollInterval,
+        })
+      : started
+    outputData(command, result.data)
+  }
+  lifecycleOptions(projects.command('complete <id>')).action(async function action(
+    id: string,
+    options,
+    command: Command,
+  ) {
+    await runProjectLifecycle('complete', id, options, command)
+  })
+  lifecycleOptions(projects.command('reopen <id>')).action(async function action(
+    id: string,
+    options,
+    command: Command,
+  ) {
+    await runProjectLifecycle('reopen', id, options, command)
+  })
+  lifecycleOptions(projects.command('restore <id>')).action(async function action(
+    id: string,
+    options,
+    command: Command,
+  ) {
+    await runProjectLifecycle('restore', id, options, command)
+  })
+  lifecycleOptions(archiveOptions(projects.command('archive <id>'))).action(async function action(
+    id: string,
+    options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Archive', 'project', id)
+    await runProjectLifecycle('archive', id, options, command)
+  })
+
+  const projectLifecycleOperations = program
+    .command('project-lifecycle-operations')
+    .description('inspect asynchronous project lifecycle operations')
+  projectLifecycleOperations.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.projectLifecycleOperations.get(id)).data)
+  })
+
+  function registerCommerceCommands(
+    resource: 'product-groups' | 'products' | 'project-statements',
+    singular: 'product group' | 'product' | 'project statement',
+    clientResource: 'productGroups' | 'products' | 'projectStatements',
+  ) {
+    const root = program.command(resource).description(`read and manage ${resource}`)
+    const list = addListOptions(root.command('list')).option(
+      '--archived <boolean>',
+      `return archived ${resource}`,
+      booleanValue,
+    )
+    if (resource === 'products') {
+      list
+        .option('--disabled <boolean>', 'filter disabled products', booleanValue)
+        .option('--product-group-id <id>', 'filter by product group')
+    } else if (resource === 'product-groups') {
+      list.option('--parent-id <id>', 'filter by parent product group')
+    } else {
+      list
+        .option('--created-at-from <date>', 'filter by earliest creation timestamp')
+        .option('--created-at-to <date>', 'filter by latest creation timestamp')
+        .option('--created-by <id>', 'filter by creator')
+        .option('--date-from <date>', 'filter by earliest statement date')
+        .option('--date-to <date>', 'filter by latest statement date')
+        .option('--product-id <id>', 'filter by product')
+        .option('--project-id <id>', 'filter by project')
+        .addOption(
+          new Option('--type <type>', 'filter statement type').choices([
+            'budget',
+            'bundle',
+            'manual',
+            'product',
+          ]),
+        )
+    }
+    list.action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client[clientResource] as never)
+    })
+    root.command('get <id>').action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client[clientResource].get(id)).data)
+    })
+    root
+      .command('create')
+      .requiredOption('--data <json|@file|->', `${singular} create JSON`)
+      .option('--idempotency-key <key>', 'stable retry key')
+      .action(async function action(options, command: Command) {
+        const client = await loadClient(command)
+        outputData(
+          command,
+          (
+            await client[clientResource].create(
+              (await readJsonObject(options.data, input)) as never,
+              { idempotencyKey: options.idempotencyKey },
+            )
+          ).data,
+        )
+      })
+    root
+      .command('update <id>')
+      .requiredOption('--data <json|@file|->', `${singular} patch JSON`)
+      .action(async function action(id: string, options, command: Command) {
+        const client = await loadClient(command)
+        outputData(
+          command,
+          (
+            await client[clientResource].update(
+              id,
+              (await readJsonObject(options.data, input)) as never,
+            )
+          ).data,
+        )
+      })
+    archiveOptions(root.command('archive <id>')).action(async function action(
+      id: string,
+      _options,
+      command: Command,
+    ) {
+      await confirmDestructive(command, 'Archive', singular, id)
+      const client = await loadClient(command)
+      await client[clientResource].archive(id)
+      outputData(command, {
+        archived: true,
+        id,
+        type:
+          clientResource === 'productGroups'
+            ? 'productGroup'
+            : clientResource === 'projectStatements'
+              ? 'projectStatement'
+              : 'product',
+      })
+    })
+    if (clientResource === 'projectStatements') {
+      root.command('restore <id>').action(async function action(
+        id: string,
+        _options,
+        command: Command,
+      ) {
+        const client = await loadClient(command)
+        outputData(command, (await client.projectStatements.restore(id)).data)
+      })
+    }
+  }
+
+  registerCommerceCommands('products', 'product', 'products')
+  registerCommerceCommands('product-groups', 'product group', 'productGroups')
+  registerCommerceCommands('project-statements', 'project statement', 'projectStatements')
 
   const tasks = program.command('tasks').description('read and mutate tasks')
   addListOptions(tasks.command('list'))
@@ -425,6 +640,63 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     await client.tasks.archive(id)
     outputData(command, { archived: true, id, type: 'task' })
   })
+  tasks.command('complete <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.tasks.complete(id)).data)
+  })
+  tasks.command('restore <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.tasks.restore(id)).data)
+  })
+  tasks.command('reopen <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.tasks.reopen(id)).data)
+  })
+  const taskTimer = tasks.command('timer').description('start or stop task time tracking')
+  taskTimer
+    .command('start <id>')
+    .requiredOption('--user-id <id>', 'workspace user whose timer should start')
+    .option('--at <date>', 'start timestamp; defaults to the API receive time')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.tasks.startTimer(id, {
+            ...(options.at ? { at: options.at } : {}),
+            userId: options.userId,
+          })
+        ).data,
+      )
+    })
+  taskTimer
+    .command('stop <id>')
+    .requiredOption('--user-id <id>', 'workspace user whose timer should stop')
+    .option('--at <date>', 'stop timestamp; defaults to the API receive time')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.tasks.stopTimer(id, {
+            ...(options.at ? { at: options.at } : {}),
+            userId: options.userId,
+          })
+        ).data,
+      )
+    })
 
   const times = program
     .command('time-entries')
@@ -480,8 +752,65 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     await client.timeEntries.archive(id)
     outputData(command, { archived: true, id, type: 'timeEntry' })
   })
+  times.command('restore <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.timeEntries.restore(id)).data)
+  })
 
-  const contacts = program.command('contacts').description('read contacts')
+  const callNotes = program.command('call-notes').description('read and manage call notes')
+  addListOptions(callNotes.command('list'))
+    .option('--archived <boolean>', 'return archived call notes', booleanValue)
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.callNotes as never)
+    })
+  callNotes.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.callNotes.get(id)).data)
+  })
+  callNotes
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'call-note create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.callNotes.create((await readJsonObject(options.data, input)) as never, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      )
+    })
+  archiveOptions(callNotes.command('archive <id>')).action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Archive', 'call note', id)
+    const client = await loadClient(command)
+    await client.callNotes.archive(id)
+    outputData(command, { archived: true, id, type: 'callNote' })
+  })
+  callNotes.command('restore <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.callNotes.restore(id)).data)
+  })
+
+  const contacts = program.command('contacts').description('read and mutate contacts')
   addListOptions(contacts.command('list'))
     .option('--archived <boolean>', 'return archived contacts', booleanValue)
     .addOption(new Option('--type <type>', 'contact type').choices(['person', 'company']))
@@ -497,17 +826,279 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const client = await loadClient(command)
     outputData(command, (await client.contacts.get(id)).data)
   })
+  contacts
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'contact create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.contacts.create((await readJsonObject(options.data, input)) as never, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      )
+    })
+  contacts
+    .command('update <id>')
+    .requiredOption('--data <json|@file|->', 'contact patch JSON')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.contacts.update(id, (await readJsonObject(options.data, input)) as never))
+          .data,
+      )
+    })
 
-  for (const resource of ['users', 'lists', 'services', 'tags'] as const) {
-    const command = addListOptions(program.command(resource).description(`list ${resource}`))
-    if (resource !== 'users')
-      command.option('--archived <boolean>', 'return archived values', booleanValue)
-    if (resource === 'lists') command.option('--type <type>', 'filter task-list type')
-    command.action(async function action(options, currentCommand: Command) {
-      const client = await loadClient(currentCommand)
-      await listResources(currentCommand, options, client[resource] as never)
+  const contactGroups = program
+    .command('contact-groups')
+    .description('read and manage contact groups')
+  addListOptions(contactGroups.command('list'))
+    .option('--archived <boolean>', 'return archived contact groups', booleanValue)
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.contactGroups as never)
+    })
+  contactGroups.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.contactGroups.get(id)).data)
+  })
+  contactGroups
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'contact-group create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.contactGroups.create((await readJsonObject(options.data, input)) as never, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      )
+    })
+  contactGroups
+    .command('update <id>')
+    .requiredOption('--data <json|@file|->', 'contact-group patch JSON')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.contactGroups.update(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+          )
+        ).data,
+      )
+    })
+  archiveOptions(contactGroups.command('archive <id>')).action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Archive', 'contact group', id)
+    const client = await loadClient(command)
+    await client.contactGroups.archive(id)
+    outputData(command, { archived: true, id, type: 'contactGroup' })
+  })
+  contactGroups.command('restore <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.contactGroups.restore(id)).data)
+  })
+
+  addListOptions(program.command('users').description('list workspace users')).action(
+    async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.users as never)
+    },
+  )
+
+  function registerMetadataCommands(
+    resource: 'lists' | 'services' | 'tags',
+    singular: 'list' | 'service' | 'tag',
+  ) {
+    function addMetadataListOptions(command: Command) {
+      addListOptions(command).option('--archived <boolean>', 'return archived values', booleanValue)
+      if (resource === 'lists') {
+        command
+          .option('--parent-id <id>', 'filter by parent project or user')
+          .addOption(
+            new Option('--type <type>', 'list type').choices(['tasks', 'projects', 'personal']),
+          )
+      }
+      return command
+    }
+
+    async function runList(
+      options: ListCommandOptions & Record<string, unknown>,
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      const parentOptions = command.parent?.name() === resource ? command.parent.opts() : {}
+      await listResources(command, { ...parentOptions, ...options }, client[resource] as never)
+    }
+
+    const root = addMetadataListOptions(
+      program.command(resource).description(`read and manage ${resource}`),
+    )
+    root.action(runList)
+    addMetadataListOptions(root.command('list')).action(runList)
+    root.command('get <id>').action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client[resource].get(id)).data)
+    })
+    root
+      .command('create')
+      .requiredOption('--data <json|@file|->', `${singular} create JSON`)
+      .option('--idempotency-key <key>', 'stable retry key')
+      .action(async function action(options, command: Command) {
+        const client = await loadClient(command)
+        outputData(
+          command,
+          (
+            await client[resource].create((await readJsonObject(options.data, input)) as never, {
+              idempotencyKey: options.idempotencyKey,
+            })
+          ).data,
+        )
+      })
+    root
+      .command('update <id>')
+      .requiredOption('--data <json|@file|->', `${singular} patch JSON`)
+      .action(async function action(id: string, options, command: Command) {
+        const client = await loadClient(command)
+        outputData(
+          command,
+          (await client[resource].update(id, (await readJsonObject(options.data, input)) as never))
+            .data,
+        )
+      })
+    archiveOptions(root.command('archive <id>')).action(async function action(
+      id: string,
+      _options,
+      command: Command,
+    ) {
+      await confirmDestructive(command, 'Archive', singular, id)
+      const client = await loadClient(command)
+      await client[resource].archive(id)
+      outputData(command, { archived: true, id, type: singular })
+    })
+    root.command('restore <id>').action(async function action(
+      id: string,
+      _options,
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      outputData(command, (await client[resource].restore(id)).data)
     })
   }
+
+  registerMetadataCommands('lists', 'list')
+  registerMetadataCommands('services', 'service')
+  registerMetadataCommands('tags', 'tag')
+
+  const customFieldDefinitions = program
+    .command('custom-field-definitions')
+    .description('read and manage custom-field definitions')
+  addListOptions(customFieldDefinitions.command('list'))
+    .option('--archived <boolean>', 'return archived definitions', booleanValue)
+    .option('--default-enabled <boolean>', 'filter default-enabled definitions', booleanValue)
+    .addOption(
+      new Option('--field-type <type>', 'filter canonical field type').choices([
+        'contact',
+        'date',
+        'dropdown',
+        'number',
+        'project',
+        'switcher',
+        'tag',
+        'text',
+        'textarea',
+        'user',
+      ]),
+    )
+    .addOption(
+      new Option('--target-type <type>', 'filter target resource').choices([
+        'contact',
+        'project',
+        'projectJournalEntry',
+        'task',
+      ]),
+    )
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.customFieldDefinitions as never)
+    })
+  customFieldDefinitions.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.customFieldDefinitions.get(id)).data)
+  })
+  customFieldDefinitions
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'custom-field definition create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.customFieldDefinitions.create(
+            (await readJsonObject(options.data, input)) as never,
+            { idempotencyKey: options.idempotencyKey },
+          )
+        ).data,
+      )
+    })
+  customFieldDefinitions
+    .command('update <id>')
+    .requiredOption('--data <json|@file|->', 'custom-field definition patch JSON')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.customFieldDefinitions.update(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+          )
+        ).data,
+      )
+    })
+  archiveOptions(customFieldDefinitions.command('archive <id>')).action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Archive', 'custom-field definition', id)
+    const client = await loadClient(command)
+    await client.customFieldDefinitions.archive(id)
+    outputData(command, { archived: true, id, type: 'customFieldDefinition' })
+  })
+  customFieldDefinitions.command('restore <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.customFieldDefinitions.restore(id)).data)
+  })
 
   addListOptions(
     program.command('audit-events').description('list Developer Platform audit events'),
@@ -521,6 +1112,34 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       const client = await loadClient(command)
       await listResources(command, options, client.auditEvents as never)
     })
+
+  const webhookDeliveries = program
+    .command('webhook-deliveries')
+    .description('inspect credential-owned webhook delivery history')
+  addListOptions(webhookDeliveries.command('list'))
+    .option('--webhook-id <id>', 'filter by an owned webhook')
+    .option('--event <event>', 'filter by event name')
+    .addOption(
+      new Option('--state <state>', 'filter delivery state').choices([
+        'delivering',
+        'failed',
+        'retrying',
+        'skipped',
+        'succeeded',
+      ]),
+    )
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.webhookDeliveries as never)
+    })
+  webhookDeliveries.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.webhookDeliveries.get(id)).data)
+  })
 
   const webhooks = program.command('webhooks').description('read and manage webhooks')
   addListOptions(webhooks.command('list')).action(async function action(options, command: Command) {

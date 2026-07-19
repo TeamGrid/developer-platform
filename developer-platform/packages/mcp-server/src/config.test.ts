@@ -1,11 +1,21 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createMcpApiClient } from './config.js'
+import { createMcpApiClient, parseMcpArguments } from './config.js'
 
 const token = // gitleaks:allow -- synthetic fixed-format test credential
   'tg_sk_v1_us_us-mnz-001_0123456789abcdef01234567_' +
   '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
 
 describe('TeamGrid MCP configuration', () => {
+  it('parses authentication and least-privilege tool profiles independently', () => {
+    expect(parseMcpArguments(['--tool-profile', 'governance', '--profile', 'automation'])).toEqual({
+      profile: 'automation',
+      toolProfile: 'governance',
+    })
+    expect(() => parseMcpArguments(['--tool-profile', 'unknown'])).toThrow(
+      "MCP tool profile must be 'core', 'collaboration', 'governance', or 'all'.",
+    )
+  })
+
   it('uses an explicit profile without exposing its keychain credential', async () => {
     const get = vi.fn(async () => token)
     const client = await createMcpApiClient(['--profile', 'automation'], {

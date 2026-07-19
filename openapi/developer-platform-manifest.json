@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": "1.0.0",
+  "artifacts": [
+    {
+      "bytes": 34310,
+      "id": "capability-ledger",
+      "path": "contracts/developer-capabilities.json",
+      "sha256": "f4f0f12d2254497331945a54a17545aa8bdc0078c70d5314793c30bc2f225fa2"
+    },
+    {
+      "bytes": 15389,
+      "id": "v0-route-inventory",
+      "path": "contracts/v0-routes.json",
+      "sha256": "95a559e8cc46e6c6aaeab4239ea5e1fd4841438fc220cbfa8ef7ca7068b0dd9d"
+    },
+    {
+      "bytes": 210370,
+      "id": "openapi-v0",
+      "path": "openapi/v0.json",
+      "sha256": "46da62dba5b8a459362f4edd3c74fed1dac92300c414e606dfa9f433120da947"
+    },
+    {
+      "bytes": 326064,
+      "id": "openapi-v1",
+      "path": "openapi/v1.json",
+      "sha256": "590b58f1e9c08fff17975222e83989c39727b6ad31d7ec7ca3b31c5cd272640d"
+    }
+  ],
+  "summary": {
+    "classifiedProductCapabilities": 73,
+    "governedV1Operations": 90,
+    "v0Operations": 87,
+    "v1Operations": 90
+  }
+}

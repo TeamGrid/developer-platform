@@ -8,8 +8,9 @@ none imports Meteor runtime code.
 
 - `@teamgrid/api-client`: typed, cell-aware TypeScript client with timeouts,
   safe retries, idempotent creates, cursor iterators, and stable errors.
-- `@teamgrid/cli`: `teamgrid` command for profiles, reads, task/time-entry
-  writes, signed webhook management, JSON/JSONL, and automation-safe exits.
+- `@teamgrid/cli`: `teamgrid` command for profiles, typed project, contact,
+  task, time-entry, list, service, and tag workflows, signed webhook
+  management, JSON/JSONL, and automation-safe exits.
 - `@teamgrid/mcp-server`: optional local stdio MCP adapter. It exposes only
   bounded read tools and delegates every request to the same API client.
 
@@ -54,6 +55,12 @@ teamgrid tasks create \
   --idempotency-key launch-task-1 \
   --output json
 teamgrid time-entries list --from 2026-07-01 --to 2026-07-31 --output jsonl
+teamgrid lists create \
+  --data '{"name":"Delivery","type":"tasks","parentId":"project-id"}' \
+  --idempotency-key delivery-list-1 \
+  --output json
+teamgrid services update service-id --data '{"billingRate":175}' --output json
+teamgrid tags archive tag-id --yes --output json
 teamgrid webhooks create \
   --data '{"url":"https://hooks.example.com/teamgrid","actions":["task_created"]}' \
   --idempotency-key webhook-1 \
@@ -109,15 +116,19 @@ only once.
 ## Optional MCP adapter
 
 MCP is intentionally downstream of API v1 and is not required for automation.
-It reads the same CLI keychain profile and offers only workspace/project/task/
-time/contact/user/webhook/audit reads.
+It reads the same CLI keychain profile and offers only bounded read tools.
+The default `core` tool profile includes workspace, projects, tasks, time
+entries, lists, and tags. `collaboration` additionally exposes contacts and
+users; `governance` adds audit, webhooks, and services. Service reads are kept
+out of `core` because they include billing-rate data. `all` is the explicit
+union of the collaboration and governance profiles.
 
 ```json
 {
   "mcpServers": {
     "teamgrid": {
       "command": "teamgrid-mcp",
-      "args": ["--profile", "default"]
+      "args": ["--profile", "default", "--tool-profile", "core"]
     }
   }
 }

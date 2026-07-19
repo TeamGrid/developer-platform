@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "build": "npm run generate:types && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server",
-    "check": "npm run generate:types && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run typecheck -w @teamgrid/api-client && npm run typecheck -w @teamgrid/cli && npm run typecheck -w @teamgrid/mcp-server && biome check packages scripts/validate-release.mjs",
+    "check": "node scripts/check-contract-manifest.mjs && npm run generate:types && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server && npm run typecheck -w @teamgrid/api-client && npm run typecheck -w @teamgrid/cli && npm run typecheck -w @teamgrid/mcp-server && npm run contract:surfaces && node scripts/check-client-version.mjs && biome check packages scripts",
+    "contract:surfaces": "node scripts/check-operation-surfaces.mjs",
     "e2e:staging": "node scripts/staging-e2e.mjs",
     "generate:types": "openapi-typescript ../openapi/v1.json -o packages/api-client/src/generated/schema.ts",
     "test": "npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && vitest run",

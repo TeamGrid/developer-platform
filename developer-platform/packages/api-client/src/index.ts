@@ -7,3 +7,13 @@ export {
   parseCredentialLocation,
 } from './routing.js'
 export type * from './types.js'
+export type {
+  TeamGridWebhookDeduplicationStore,
+  TeamGridWebhookHeaders,
+  VerifiedTeamGridWebhook,
+  VerifyTeamGridWebhookOptions,
+} from './webhooks.js'
+export {
+  TeamGridWebhookVerificationError,
+  verifyTeamGridWebhook,
+} from './webhooks.js'
