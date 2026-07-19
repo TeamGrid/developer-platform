@@ -37,7 +37,7 @@ const governanceTools = [
   'teamgrid_webhook_get',
   'teamgrid_webhooks_list',
 ] as const
-const allTools = Array.from(new Set([...collaborationTools, ...governanceTools]))
+const allTools = Array.from(new Set([...collaborationTools, ...governanceTools, 'teamgrid_search']))
 
 export const toolsByProfile: Readonly<Record<McpToolProfile, readonly string[]>> = Object.freeze({
   all: allTools,

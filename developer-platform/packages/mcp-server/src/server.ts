@@ -18,6 +18,32 @@ const listInput = {
   cursor: z.string().max(512).optional(),
   limit: z.number().int().min(1).max(100).optional(),
 }
+const searchResourceTypes = ['contacts', 'projects', 'tasks'] as const
+const searchInput = z
+  .object({
+    limit: z.number().int().min(1).max(50).default(25),
+    term: z
+      .string()
+      .trim()
+      .min(2)
+      .max(160)
+      .refine(
+        (term) =>
+          Array.from(term).every((character) => {
+            const codePoint = character.codePointAt(0)
+            return codePoint !== undefined && codePoint > 31 && (codePoint < 127 || codePoint > 159)
+          }),
+        { message: 'Search terms cannot contain control characters.' },
+      ),
+    types: z
+      .array(z.enum(searchResourceTypes))
+      .min(1)
+      .max(searchResourceTypes.length)
+      .refine((types) => new Set(types).size === types.length, {
+        message: 'Search resource types must be unique.',
+      }),
+  })
+  .strict()
 
 function toolResult(value: unknown) {
   const text = JSON.stringify(value)
@@ -129,6 +155,11 @@ export function createReadOnlyHandlers(client: TeamGridClient) {
       limit?: number
       productGroupId?: string
     }) => withoutProductPurchasePrices(await client.products.list(input)),
+    searchQuery: (input: {
+      limit?: number
+      term: string
+      types: readonly (typeof searchResourceTypes)[number][]
+    }) => client.search.query(input),
     projectGet: (input: { id: string }) => client.projects.get(input.id),
     projectsList: (input: {
       archived?: boolean
@@ -195,6 +226,16 @@ export function createTeamGridMcpServer(
       inputSchema: z.object({}).strict(),
     },
     async () => toolResult(await handlers.workspaceGet()),
+  )
+  registerTool(
+    'teamgrid_search',
+    {
+      annotations: readOnlyAnnotations,
+      description:
+        'Search authorized TeamGrid contacts, projects, and tasks. Returns at most 50 curated metadata-only results; contact matches can contain personal data.',
+      inputSchema: searchInput,
+    },
+    async (input) => toolResult(await handlers.searchQuery(input)),
   )
   registerTool(
     'teamgrid_projects_list',

@@ -69,6 +69,42 @@ if (JSON.stringify(expectedOperations) !== JSON.stringify(policyOperations)) {
   fail('OpenAPI and developer capability policy operation sets differ')
 }
 
+const finalExpansionRoots = new Set([
+  'automation-actions',
+  'automation-definitions',
+  'automation-runs',
+  'exports',
+  'groups',
+  'integration-installations',
+  'invitations',
+  'members',
+  'roles',
+  'search',
+])
+const finalExpansionPolicy = ledger.operationPolicy.filter((operation) =>
+  finalExpansionRoots.has(operation.path.split('/').filter(Boolean)[0]),
+)
+const finalExpansionReads = finalExpansionPolicy.filter(
+  (operation) => operation.mcp.exposure === 'read',
+)
+const finalExpansionForbidden = finalExpansionPolicy.filter(
+  (operation) => operation.mcp.exposure === 'forbidden',
+)
+const finalExpansionRead = finalExpansionReads[0]
+if (
+  finalExpansionPolicy.length !== 36 ||
+  finalExpansionForbidden.length !== 35 ||
+  finalExpansionReads.length !== 1 ||
+  finalExpansionRead.operationId !== 'searchResources' ||
+  finalExpansionRead.mcp.exposure !== 'read' ||
+  finalExpansionRead.mcp.tool !== 'teamgrid_search' ||
+  finalExpansionRead.mcp.curated !== true ||
+  finalExpansionRead.mcp.sensitive !== true ||
+  Object.keys(finalExpansionRead.mcp).length !== 4
+) {
+  fail('final MCP expansion must expose only the sensitive curated teamgrid_search read')
+}
+
 const sdk = new TeamGridClient({ fetch: async () => new Response(null, { status: 500 }), token: syntheticToken })
 for (const operation of ledger.operationPolicy) {
   if (!hasFunction(sdk, operation.sdk)) fail(`${operation.operationId} lacks SDK method ${operation.sdk}`)

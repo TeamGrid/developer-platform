@@ -3,16 +3,16 @@
   "contractVersion": "1.0.0",
   "artifacts": [
     {
-      "bytes": 39837,
+      "bytes": 60186,
       "id": "capability-ledger",
       "path": "contracts/developer-capabilities.json",
-      "sha256": "7f6e274e99e40ad3cd059cdffe252540e827a2c6ce81e515aca4a292dfeaf2fb"
+      "sha256": "d19bb0f7834e4caf6b64c762a549c6c8352344549010ddcfe19cad606ee4ea51"
     },
     {
-      "bytes": 3870,
+      "bytes": 8508,
       "id": "scope-contract",
       "path": "contracts/developer-scopes.json",
-      "sha256": "48645b719432ed10fa367ef3a56e0e350b7d1f5edecd2510c9736e9539f9ae9f"
+      "sha256": "8156cfc99a113f377dc2241b02dd249a0ada7897e6d3ed39bf511a3bb39adc2f"
     },
     {
       "bytes": 15389,
@@ -33,18 +33,18 @@
       "sha256": "46da62dba5b8a459362f4edd3c74fed1dac92300c414e606dfa9f433120da947"
     },
     {
-      "bytes": 412454,
+      "bytes": 688133,
       "id": "openapi-v1",
       "path": "openapi/v1.json",
-      "sha256": "cabff7cce36ebe3dee6afb8366393e2c268a6cf62755931311525fa4960df779"
+      "sha256": "7822ded35718dda3409493851da6cb8050f3a7460853dfd0437405501dfaa22b"
     }
   ],
   "summary": {
     "classifiedProductCapabilities": 73,
-    "canonicalScopes": 43,
-    "governedV1Operations": 106,
+    "canonicalScopes": 76,
+    "governedV1Operations": 176,
     "v0Operations": 87,
     "v0MigrationRoutes": 87,
-    "v1Operations": 106
+    "v1Operations": 176
   }
 }

@@ -12,6 +12,11 @@ import {
 import { Command, Option } from 'commander'
 import { type CliConfig, ConfigStore, normalizeProfileName } from './config.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
+import {
+  type CliExportDownload,
+  maximumCliExportBytes,
+  writeExportDownload,
+} from './exportDownload.js'
 import { readJsonObject, readStdin } from './input.js'
 import { type OutputMode, sanitizeTerminalText, writeJsonLines, writeOutput } from './output.js'
 
@@ -116,11 +121,46 @@ function commaSeparatedChoice(
   }
 }
 
-function addListOptions(command: Command) {
+function commaSeparatedValues(
+  maximum: number,
+  description: string,
+): (value: string, previous: string[]) => string[] {
+  return (value, previous = []) => {
+    const values = value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+    const combined = Array.from(new Set([...previous, ...values]))
+    if (
+      values.length === 0 ||
+      combined.length > maximum ||
+      combined.some(
+        (item) =>
+          item.length > 128 ||
+          Array.from(item).some((character) => {
+            const code = character.charCodeAt(0)
+            return code <= 31 || code === 127
+          }),
+      )
+    ) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        `${description} must contain 1 to ${maximum} bounded identifiers.`,
+      )
+    }
+    return combined
+  }
+}
+
+function addListOptions(command: Command, maximum = 200) {
   return command
     .option('--all', 'read every page')
     .option('--cursor <cursor>', 'resume from an opaque cursor')
-    .option('--limit <number>', 'resources per page (1–200)', integerInRange(1, 200, 'Limit'))
+    .option(
+      '--limit <number>',
+      `resources per page (1–${maximum})`,
+      integerInRange(1, maximum, 'Limit'),
+    )
     .option(
       '--max-pages <number>',
       'safety limit for --all (1–10000)',
@@ -144,7 +184,7 @@ function publicProfile(name: string, profile: CliConfig['profiles'][string]) {
 }
 
 function archiveOptions(command: Command) {
-  return command.option('-y, --yes', 'skip the archive confirmation')
+  return command.option('-y, --yes', 'skip the destructive-operation confirmation')
 }
 
 function lifecycleOptions(command: Command) {
@@ -153,6 +193,11 @@ function lifecycleOptions(command: Command) {
     .option('--wait', 'wait until the asynchronous operation finishes')
     .option('--poll-interval <milliseconds>', 'poll interval while waiting', positiveInteger, 1000)
     .option('--max-wait <milliseconds>', 'maximum wait time', positiveInteger, 300_000)
+}
+
+function overrideCommandExits(command: Command) {
+  command.exitOverride()
+  for (const child of command.commands) overrideCommandExits(child)
 }
 
 export function createProgram(dependencies: ProgramDependencies = {}) {
@@ -261,6 +306,38 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     }
     const resources: unknown[] = []
     for await (const page of clientMethods.pages(filters, { maxPages })) {
+      resources.push(...page.data)
+    }
+    outputData(command, resources)
+  }
+
+  async function listNestedResources(
+    command: Command,
+    id: string,
+    options: ListCommandOptions & Record<string, unknown>,
+    clientMethods: {
+      list(id: string, value: Record<string, unknown>): Promise<{ data: unknown[]; meta: unknown }>
+      pages(
+        id: string,
+        value: Record<string, unknown>,
+        pagination: { maxPages?: number },
+      ): AsyncIterable<{ data: unknown[] }>
+    },
+  ) {
+    const { all, maxPages, ...filters } = options
+    if (!all) {
+      const page = await clientMethods.list(id, filters)
+      outputData(command, globalOptions(command).output === 'table' ? page.data : page)
+      return
+    }
+    if (globalOptions(command).output === 'jsonl') {
+      for await (const page of clientMethods.pages(id, filters, { maxPages })) {
+        await writeJsonLines(output, page.data)
+      }
+      return
+    }
+    const resources: unknown[] = []
+    for await (const page of clientMethods.pages(id, filters, { maxPages })) {
       resources.push(...page.data)
     }
     outputData(command, resources)
@@ -1519,6 +1596,792 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     outputData(command, (await client.webhookDeliveries.get(id)).data)
   })
 
+  function calendarListOptions(command: Command) {
+    return addListOptions(command, 100)
+      .requiredOption('--start <date-time>', 'inclusive interval start')
+      .requiredOption('--end <date-time>', 'exclusive interval end')
+      .option('--archived <boolean>', 'return archived calendar entries', booleanValue)
+      .option(
+        '--user-id <id,...>',
+        'filter up to 50 user IDs (repeat or comma-separate)',
+        commaSeparatedValues(50, 'User IDs'),
+      )
+  }
+
+  function registerCalendarCommands(resource: 'absences' | 'appointments', singular: string) {
+    const root = program.command(resource).description(`read and manage ${resource}`)
+    calendarListOptions(root.command('list')).action(async function action(
+      options,
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      await listResources(command, options, client[resource] as never)
+    })
+    root
+      .command('create')
+      .requiredOption('--data <json|@file|->', `${singular} create JSON`)
+      .option('--idempotency-key <key>', 'stable retry key')
+      .action(async function action(options, command: Command) {
+        const client = await loadClient(command)
+        outputData(
+          command,
+          (
+            await client[resource].create((await readJsonObject(options.data, input)) as never, {
+              idempotencyKey: options.idempotencyKey,
+            })
+          ).data,
+        )
+      })
+    root.command('get <id>').action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client[resource].get(id)).data)
+    })
+    root
+      .command('update <id>')
+      .requiredOption('--data <json|@file|->', `${singular} update JSON`)
+      .requiredOption('--if-match <etag>', `latest strong ${singular} ETag`)
+      .action(async function action(id: string, options, command: Command) {
+        const client = await loadClient(command)
+        outputData(
+          command,
+          (
+            await client[resource].update(
+              id,
+              (await readJsonObject(options.data, input)) as never,
+              { ifMatch: options.ifMatch as never },
+            )
+          ).data,
+        )
+      })
+    archiveOptions(
+      root
+        .command('archive <id>')
+        .requiredOption('--if-match <etag>', `latest strong ${singular} ETag`),
+    ).action(async function action(id: string, _options, command: Command) {
+      await confirmDestructive(command, 'Archive', singular, id)
+      const client = await loadClient(command)
+      const options = command.opts() as { ifMatch: string }
+      outputData(
+        command,
+        (await client[resource].archive(id, { ifMatch: options.ifMatch as never })).data,
+      )
+    })
+    root
+      .command('restore <id>')
+      .requiredOption('--if-match <etag>', `latest strong ${singular} ETag`)
+      .action(async function action(id: string, options, command: Command) {
+        const client = await loadClient(command)
+        outputData(
+          command,
+          (await client[resource].restore(id, { ifMatch: options.ifMatch as never })).data,
+        )
+      })
+  }
+
+  registerCalendarCommands('appointments', 'appointment')
+  registerCalendarCommands('absences', 'absence')
+
+  const availability = program.command('availability').description('inspect derived availability')
+  availability
+    .command('list')
+    .requiredOption('--start <date-time>', 'inclusive availability interval start')
+    .requiredOption('--end <date-time>', 'exclusive availability interval end')
+    .requiredOption('--time-zone <iana-zone>', 'IANA time zone for returned intervals')
+    .option(
+      '--user-id <id,...>',
+      'select up to 50 user IDs (repeat or comma-separate)',
+      commaSeparatedValues(50, 'User IDs'),
+    )
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.availability.list(options)).data)
+    })
+
+  const activity = program.command('activity').description('inspect target-owned activity')
+  addListOptions(activity.command('list'), 100)
+    .addOption(
+      new Option('--target-type <type>', 'target resource type')
+        .choices(['contact', 'project', 'task'])
+        .makeOptionMandatory(),
+    )
+    .requiredOption('--target-id <id>', 'target resource ID')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.activity as never)
+    })
+
+  const comments = program.command('comments').description('read and manage target comments')
+  addListOptions(comments.command('list'), 100)
+    .option('--archived <boolean>', 'return archived comments', booleanValue)
+    .addOption(
+      new Option('--target-type <type>', 'target resource type')
+        .choices(['contact', 'project', 'task'])
+        .makeOptionMandatory(),
+    )
+    .requiredOption('--target-id <id>', 'target resource ID')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.comments as never)
+    })
+  comments
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'comment create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.comments.create((await readJsonObject(options.data, input)) as never, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      )
+    })
+  comments.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.comments.get(id)).data)
+  })
+  archiveOptions(
+    comments
+      .command('archive <id>')
+      .requiredOption('--if-match <etag>', 'latest strong comment ETag'),
+  ).action(async function action(id: string, _options, command: Command) {
+    await confirmDestructive(command, 'Archive', 'comment', id)
+    const client = await loadClient(command)
+    const options = command.opts() as { ifMatch: string }
+    outputData(
+      command,
+      (await client.comments.archive(id, { ifMatch: options.ifMatch as never })).data,
+    )
+  })
+  comments
+    .command('restore <id>')
+    .requiredOption('--if-match <etag>', 'latest strong comment ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.comments.restore(id, { ifMatch: options.ifMatch as never })).data,
+      )
+    })
+
+  const documents = program.command('documents').description('read and manage documents')
+  addListOptions(documents.command('list'), 100)
+    .option('--archived <boolean>', 'return archived documents', booleanValue)
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.documents as never)
+    })
+  documents
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'document create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.documents.create((await readJsonObject(options.data, input)) as never, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      )
+    })
+  documents.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.documents.get(id)).data)
+  })
+  documents
+    .command('update <id>')
+    .requiredOption('--data <json|@file|->', 'document update JSON')
+    .requiredOption('--if-match <etag>', 'latest strong document ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.documents.update(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch as never,
+          })
+        ).data,
+      )
+    })
+  archiveOptions(
+    documents
+      .command('archive <id>')
+      .requiredOption('--if-match <etag>', 'latest strong document ETag'),
+  ).action(async function action(id: string, _options, command: Command) {
+    await confirmDestructive(command, 'Archive', 'document', id)
+    const client = await loadClient(command)
+    const options = command.opts() as { ifMatch: string }
+    outputData(
+      command,
+      (await client.documents.archive(id, { ifMatch: options.ifMatch as never })).data,
+    )
+  })
+  documents
+    .command('restore <id>')
+    .requiredOption('--if-match <etag>', 'latest strong document ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.documents.restore(id, { ifMatch: options.ifMatch as never })).data,
+      )
+    })
+
+  const files = program.command('files').description('read and manage file metadata')
+  addListOptions(files.command('list'), 100)
+    .option('--archived <boolean>', 'return archived files', booleanValue)
+    .addOption(
+      new Option('--entity-type <type>', 'filter by owning entity type').choices([
+        'comment',
+        'contact',
+        'customField',
+        'outcome',
+        'project',
+        'streamItem',
+        'task',
+        'team',
+      ]),
+    )
+    .option('--entity-id <id>', 'filter by owning entity ID')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.files as never)
+    })
+  files
+    .command('get <id>')
+    .option('--archived <boolean>', 'allow an archived file', booleanValue)
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.files.get(id, options)).data)
+    })
+  files
+    .command('rename <id>')
+    .requiredOption('--data <json|@file|->', 'file rename JSON')
+    .requiredOption('--if-match <etag>', 'latest strong file ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.files.rename(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch as never,
+          })
+        ).data,
+      )
+    })
+  archiveOptions(
+    files.command('archive <id>').requiredOption('--if-match <etag>', 'latest strong file ETag'),
+  ).action(async function action(id: string, _options, command: Command) {
+    await confirmDestructive(command, 'Archive', 'file', id)
+    const client = await loadClient(command)
+    const options = command.opts() as { ifMatch: string }
+    outputData(
+      command,
+      (await client.files.archive(id, { ifMatch: options.ifMatch as never })).data,
+    )
+  })
+  files
+    .command('restore <id>')
+    .requiredOption('--if-match <etag>', 'latest strong file ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.files.restore(id, { ifMatch: options.ifMatch as never })).data,
+      )
+    })
+  files.command('download-intent <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.files.createDownloadIntent(id)).data)
+  })
+
+  const fileUploadIntents = program
+    .command('file-upload-intents')
+    .description('create and complete direct file uploads')
+  fileUploadIntents
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'file upload intent JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.fileUploadIntents.create(
+            (await readJsonObject(options.data, input)) as never,
+            { idempotencyKey: options.idempotencyKey },
+          )
+        ).data,
+      )
+    })
+  fileUploadIntents.command('finalize <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.fileUploadIntents.finalize(id)).data)
+  })
+  archiveOptions(fileUploadIntents.command('cancel <id>')).action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Cancel', 'file upload intent', id)
+    const client = await loadClient(command)
+    outputData(command, (await client.fileUploadIntents.cancel(id)).data)
+  })
+
+  const members = program.command('members').description('read and administer workspace members')
+  addListOptions(members.command('list'), 100)
+    .option('--include-pii', 'include explicitly scoped member profile fields')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.members as never)
+    })
+  members
+    .command('get <id>')
+    .option('--include-pii', 'include explicitly scoped member profile fields')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.members.get(id, options)).data)
+    })
+  members
+    .command('update-role <id>')
+    .requiredOption('--data <json|@file|->', 'member role update JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest member revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.members.updateRole(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+            {
+              ifMatch: options.ifMatch as never,
+            },
+          )
+        ).data,
+      )
+    })
+  archiveOptions(
+    members
+      .command('remove <id>')
+      .requiredOption('--if-match <revision|etag>', 'latest member revision or strong ETag'),
+  ).action(async function action(id: string, _options, command: Command) {
+    await confirmDestructive(command, 'Remove', 'workspace member', id)
+    const client = await loadClient(command)
+    const options = command.opts() as { ifMatch: string }
+    await client.members.remove(id, { ifMatch: options.ifMatch as never })
+    outputData(command, { id, removed: true, type: 'member' })
+  })
+
+  const invitations = program
+    .command('invitations')
+    .description('read and administer workspace invitations')
+  addListOptions(invitations.command('list'), 100)
+    .option('--include-pii', 'include the invited email when explicitly scoped')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.invitations as never)
+    })
+  invitations
+    .command('get <id>')
+    .option('--include-pii', 'include the invited email when explicitly scoped')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.invitations.get(id, options)).data)
+    })
+  invitations
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'invitation create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.invitations.create((await readJsonObject(options.data, input)) as never, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      )
+    })
+  invitations
+    .command('resend <id>')
+    .requiredOption('--if-match <revision|etag>', 'latest invitation revision or strong ETag')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      await client.invitations.resend(id, {
+        idempotencyKey: options.idempotencyKey,
+        ifMatch: options.ifMatch as never,
+      })
+      outputData(command, { id, resent: true, type: 'invitation' })
+    })
+  archiveOptions(
+    invitations
+      .command('cancel <id>')
+      .requiredOption('--if-match <revision|etag>', 'latest invitation revision or strong ETag'),
+  ).action(async function action(id: string, _options, command: Command) {
+    await confirmDestructive(command, 'Cancel', 'workspace invitation', id)
+    const client = await loadClient(command)
+    const options = command.opts() as { ifMatch: string }
+    await client.invitations.cancel(id, { ifMatch: options.ifMatch as never })
+    outputData(command, { cancelled: true, id, type: 'invitation' })
+  })
+
+  function registerAdministrationCollection(
+    resourceName: 'groups' | 'roles',
+    singular: 'group' | 'role',
+  ) {
+    const root = program
+      .command(resourceName)
+      .description(`read and administer workspace ${resourceName}`)
+    addListOptions(root.command('list'), 100).action(async function action(
+      options,
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      await listResources(command, options, client[resourceName] as never)
+    })
+    root.command('get <id>').action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client[resourceName].get(id)).data)
+    })
+    root
+      .command('create')
+      .requiredOption('--data <json|@file|->', `${singular} create JSON`)
+      .option('--idempotency-key <key>', 'stable retry key')
+      .action(async function action(options, command: Command) {
+        const client = await loadClient(command)
+        outputData(
+          command,
+          (
+            await client[resourceName].create(
+              (await readJsonObject(options.data, input)) as never,
+              {
+                idempotencyKey: options.idempotencyKey,
+              },
+            )
+          ).data,
+        )
+      })
+    root
+      .command('update <id>')
+      .requiredOption('--data <json|@file|->', `${singular} update JSON`)
+      .requiredOption('--if-match <revision|etag>', `latest ${singular} revision or strong ETag`)
+      .action(async function action(id: string, options, command: Command) {
+        const client = await loadClient(command)
+        outputData(
+          command,
+          (
+            await client[resourceName].update(
+              id,
+              (await readJsonObject(options.data, input)) as never,
+              {
+                ifMatch: options.ifMatch as never,
+              },
+            )
+          ).data,
+        )
+      })
+    archiveOptions(
+      root
+        .command('remove <id>')
+        .requiredOption('--if-match <revision|etag>', `latest ${singular} revision or strong ETag`),
+    ).action(async function action(id: string, _options, command: Command) {
+      await confirmDestructive(command, 'Remove', `workspace ${singular}`, id)
+      const client = await loadClient(command)
+      const options = command.opts() as { ifMatch: string }
+      await client[resourceName].remove(id, { ifMatch: options.ifMatch as never })
+      outputData(command, { id, removed: true, type: singular })
+    })
+  }
+
+  registerAdministrationCollection('roles', 'role')
+  registerAdministrationCollection('groups', 'group')
+
+  const search = program.command('search').description('search permitted TeamGrid resources')
+  search
+    .command('query')
+    .requiredOption('--data <json|@file|->', 'search request JSON')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.search.query((await readJsonObject(options.data, input)) as never)).data,
+      )
+    })
+
+  const exportsCommand = program
+    .command('exports')
+    .description('create and download bounded exports')
+  exportsCommand
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'export specification JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.exports.create((await readJsonObject(options.data, input)) as never, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      )
+    })
+  exportsCommand.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.exports.get(id)).data)
+  })
+  exportsCommand.command('download-intent <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.exports.createDownloadIntent(id)).data)
+  })
+  exportsCommand
+    .command('download <id>')
+    .option('--file <path>', 'create a new output file without overwriting')
+    .option('--stdout', 'write raw export bytes to standard output')
+    .option('--intent-token-stdin', 'read a short-lived download intent token from stdin')
+    .option(
+      '--max-bytes <number>',
+      `download safety limit (1–${maximumCliExportBytes})`,
+      integerInRange(1, maximumCliExportBytes, 'Maximum export bytes'),
+      maximumCliExportBytes,
+    )
+    .action(async function action(id: string, options, command: Command) {
+      if (Boolean(options.file) === Boolean(options.stdout)) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          'Choose exactly one export destination: --file or --stdout.',
+        )
+      }
+      const client = await loadClient(command)
+      let intentToken: string
+      if (options.intentTokenStdin) {
+        intentToken = (await readStdin(input)).trim()
+        if (!/^ex1\.\d{10}\.[a-f0-9]{32}\.[a-f0-9]{64}$/.test(intentToken)) {
+          throw new TeamGridClientError(
+            'invalid_arguments',
+            'Standard input did not contain a valid export download intent token.',
+          )
+        }
+      } else {
+        const intent = (await client.exports.createDownloadIntent(id)).data as {
+          attributes?: { token?: unknown }
+        }
+        if (typeof intent.attributes?.token !== 'string') {
+          throw new TeamGridClientError(
+            'invalid_api_response',
+            'The export download intent response did not contain a token.',
+          )
+        }
+        intentToken = intent.attributes.token
+      }
+      const download = (await client.exports.download(id, {
+        intentToken,
+        maxBytes: options.maxBytes,
+      })) as unknown as CliExportDownload
+      const written = await writeExportDownload({
+        download,
+        file: options.file,
+        maximumBytes: options.maxBytes,
+        output: output as Writable & { isTTY?: boolean },
+        stdout: options.stdout,
+      })
+      if (!options.stdout) outputData(command, written)
+    })
+
+  const automationActions = program
+    .command('automation-actions')
+    .description('inspect the public automation action catalog')
+  automationActions.command('list').action(async function action(_options, command: Command) {
+    const client = await loadClient(command)
+    outputData(command, (await client.automationActions.list()).data)
+  })
+
+  const automationDefinitions = program
+    .command('automation-definitions')
+    .description('read and administer automation definitions')
+  addListOptions(automationDefinitions.command('list'), 100)
+    .option('--archived <boolean>', 'return archived definitions', booleanValue)
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.automationDefinitions as never)
+    })
+  automationDefinitions.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.automationDefinitions.get(id)).data)
+  })
+  automationDefinitions
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'automation definition JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.automationDefinitions.create(
+            (await readJsonObject(options.data, input)) as never,
+            {
+              idempotencyKey: options.idempotencyKey,
+            },
+          )
+        ).data,
+      )
+    })
+  automationDefinitions
+    .command('update <id>')
+    .requiredOption('--data <json|@file|->', 'automation definition update JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest automation revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.automationDefinitions.update(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch as never },
+          )
+        ).data,
+      )
+    })
+  archiveOptions(
+    automationDefinitions
+      .command('archive <id>')
+      .requiredOption('--if-match <revision|etag>', 'latest automation revision or strong ETag'),
+  ).action(async function action(id: string, _options, command: Command) {
+    await confirmDestructive(command, 'Archive', 'automation definition', id)
+    const client = await loadClient(command)
+    const options = command.opts() as { ifMatch: string }
+    outputData(
+      command,
+      (await client.automationDefinitions.archive(id, { ifMatch: options.ifMatch as never })).data,
+    )
+  })
+  automationDefinitions
+    .command('restore <id>')
+    .requiredOption('--if-match <revision|etag>', 'latest automation revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.automationDefinitions.restore(id, { ifMatch: options.ifMatch as never }))
+          .data,
+      )
+    })
+
+  const automationDefinitionVersions = program
+    .command('automation-definition-versions')
+    .description('inspect immutable automation definition versions')
+  addListOptions(automationDefinitionVersions.command('list <definition-id>'), 100).action(
+    async function action(definitionId: string, options, command: Command) {
+      const client = await loadClient(command)
+      await listNestedResources(
+        command,
+        definitionId,
+        options,
+        client.automationDefinitionVersions as never,
+      )
+    },
+  )
+
+  const automationRuns = program
+    .command('automation-runs')
+    .description('inspect and control automation runs')
+  addListOptions(automationRuns.command('list'), 100)
+    .option('--definition-id <id>', 'filter by automation definition')
+    .option('--reference-id <id>', 'filter by target resource')
+    .addOption(
+      new Option('--reference-type <type>', 'filter target resource type').choices([
+        'contact',
+        'project',
+        'task',
+        'user',
+        'workspace',
+      ]),
+    )
+    .addOption(
+      new Option('--state <state>', 'filter run state').choices([
+        'aborted',
+        'failed',
+        'running',
+        'succeeded',
+      ]),
+    )
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.automationRuns as never)
+    })
+  automationRuns.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.automationRuns.get(id)).data)
+  })
+  archiveOptions(
+    automationRuns
+      .command('abort <id>')
+      .requiredOption(
+        '--if-match <revision|etag>',
+        'latest automation run revision or strong ETag',
+      ),
+  ).action(async function action(id: string, _options, command: Command) {
+    await confirmDestructive(command, 'Abort', 'automation run', id)
+    const client = await loadClient(command)
+    const options = command.opts() as { ifMatch: string }
+    outputData(
+      command,
+      (await client.automationRuns.abort(id, { ifMatch: options.ifMatch as never })).data,
+    )
+  })
+
+  const integrationInstallations = program
+    .command('integration-installations')
+    .description('inspect redacted integration installation metadata')
+  integrationInstallations.command('list').action(async function action(
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.integrationInstallations.list()).data)
+  })
+
   const webhooks = program.command('webhooks').description('read and manage webhooks')
   addListOptions(webhooks.command('list')).action(async function action(options, command: Command) {
     const client = await loadClient(command)
@@ -1558,6 +2421,10 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     outputData(command, { id, removed: true, type: 'webhook' })
   })
 
+  // Commander does not propagate exitOverride() from the root to nested commands.
+  // Throwing from every command keeps usage failures catchable and gives scripts
+  // the documented exit code instead of terminating the process directly.
+  overrideCommandExits(program)
   return program
 }
 

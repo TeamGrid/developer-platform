@@ -8,6 +8,7 @@ describe('TeamGrid read-only MCP adapter', () => {
   it('exposes only bounded reads from the shared API client', async () => {
     const list = vi.fn(async (input) => ({ data: [], meta: { input } }))
     const get = vi.fn(async (id) => ({ data: { id }, meta: {} }))
+    const query = vi.fn(async (input) => ({ data: [], meta: { input } }))
     const handlers = createReadOnlyHandlers({
       auditEvents: { list },
       callNotes: { get, list },
@@ -16,6 +17,7 @@ describe('TeamGrid read-only MCP adapter', () => {
       customFieldDefinitions: { get, list },
       lists: { get, list },
       projects: { get, list },
+      search: { query },
       services: { get, list },
       tags: { get, list },
       tasks: { get, list },
@@ -27,9 +29,15 @@ describe('TeamGrid read-only MCP adapter', () => {
 
     await handlers.tasksList({ limit: 25, projectId: 'project-1' })
     await handlers.taskGet({ id: 'task-1' })
+    await handlers.searchQuery({ limit: 50, term: 'proposal', types: ['projects', 'tasks'] })
     expect(list).toHaveBeenCalledWith({ limit: 25, projectId: 'project-1' })
     expect(get).toHaveBeenCalledWith('task-1')
-    expect(Object.keys(handlers).every((name) => /(?:Get|List)$/.test(name))).toBe(true)
+    expect(query).toHaveBeenCalledWith({
+      limit: 50,
+      term: 'proposal',
+      types: ['projects', 'tasks'],
+    })
+    expect(Object.keys(handlers).every((name) => /(?:Get|List|Query)$/.test(name))).toBe(true)
     expect(JSON.stringify(Object.keys(handlers))).not.toMatch(/create|update|remove|archive/i)
   })
 
@@ -59,6 +67,22 @@ describe('TeamGrid read-only MCP adapter', () => {
       projects: {
         get: vi.fn(async (id) => ({ data: { id }, meta: {} })),
         list: vi.fn(async () => ({ data: [], meta: {} })),
+      },
+      search: {
+        query: vi.fn(async (input) => ({
+          data: [
+            {
+              attributes: {
+                archived: false,
+                completed: false,
+                title: `Match for ${input.term}`,
+              },
+              id: 'task-1',
+              type: 'task',
+            },
+          ],
+          meta: { requestId: 'request-search-1' },
+        })),
       },
       products: {
         get: vi.fn(async (id) => ({
@@ -145,6 +169,7 @@ describe('TeamGrid read-only MCP adapter', () => {
         'teamgrid_products_list',
         'teamgrid_project_get',
         'teamgrid_projects_list',
+        'teamgrid_search',
         'teamgrid_service_get',
         'teamgrid_services_list',
         'teamgrid_tag_get',
@@ -171,6 +196,43 @@ describe('TeamGrid read-only MCP adapter', () => {
       })
       expect(JSON.stringify(productResponse)).not.toContain('purchasePrice')
       expect(JSON.stringify(productResponse)).toContain('retailPrice')
+      const searchResponse = await client.callTool({
+        arguments: { limit: 50, term: '  proposal  ', types: ['projects', 'tasks'] },
+        name: 'teamgrid_search',
+      })
+      expect(searchResponse.isError).not.toBe(true)
+      expect(searchResponse.structuredContent).toMatchObject({
+        data: [
+          {
+            attributes: { title: 'Match for proposal' },
+            id: 'task-1',
+            type: 'task',
+          },
+        ],
+      })
+      expect(apiClient.search.query).toHaveBeenCalledWith({
+        limit: 50,
+        term: 'proposal',
+        types: ['projects', 'tasks'],
+      })
+      for (const arguments_ of [
+        { limit: 51, term: 'proposal', types: ['tasks'] },
+        { term: 'x', types: ['tasks'] },
+        { term: 'proposal\nsecret', types: ['tasks'] },
+        { term: `proposal${String.fromCodePoint(133)}secret`, types: ['tasks'] },
+        { term: 'proposal', types: [] },
+        { term: 'proposal', types: ['tasks', 'tasks'] },
+        { term: 'proposal', types: ['documents'] },
+        { extra: true, term: 'proposal', types: ['tasks'] },
+      ]) {
+        const callsBefore = apiClient.search.query.mock.calls.length
+        const invalidResponse = await client.callTool({
+          arguments: arguments_ as never,
+          name: 'teamgrid_search',
+        })
+        expect(invalidResponse.isError).toBe(true)
+        expect(apiClient.search.query).toHaveBeenCalledTimes(callsBefore)
+      }
       expect(tools.tools.every((tool) => tool.annotations?.readOnlyHint === true)).toBe(true)
     } finally {
       await client.close()
@@ -189,9 +251,33 @@ describe('TeamGrid read-only MCP adapter', () => {
       expect(names).toHaveLength(15)
       expect(names.join(' ')).not.toMatch(/audit|contact|users|webhook/)
       expect(names.join(' ')).not.toMatch(/service/)
+      expect(names).not.toContain('teamgrid_search')
     } finally {
       await coreClient.close()
       await coreServer.close()
+    }
+  })
+
+  it('keeps sensitive curated search behind the explicit all profile', async () => {
+    const method = vi.fn(async () => ({ data: [], meta: {} }))
+    const apiClient = new Proxy(
+      {},
+      {
+        get: () => new Proxy({}, { get: () => method }),
+      },
+    )
+    for (const toolProfile of ['collaboration', 'core', 'governance'] as const) {
+      const server = createTeamGridMcpServer(apiClient as never, { toolProfile })
+      const client = new Client({ name: `${toolProfile}-test-client`, version: '1.0.0' })
+      const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
+      await Promise.all([server.connect(serverTransport), client.connect(clientTransport)])
+      try {
+        const names = (await client.listTools()).tools.map((tool) => tool.name)
+        expect(names).not.toContain('teamgrid_search')
+      } finally {
+        await client.close()
+        await server.close()
+      }
     }
   })
 })

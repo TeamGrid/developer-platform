@@ -55,6 +55,463 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/appointments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List appointments in a bounded interval
+         * @description Lists native and provider-managed appointment metadata. Private foreign appointments are redacted; provider identifiers, participants, recurrence payloads, and tokens are never returned.
+         */
+        get: operations["listAppointments"];
+        put?: never;
+        /**
+         * Create a TeamGrid-managed appointment
+         * @description The cell-local App re-authenticates the credential, derives the acting user from the credential principal, and applies tenant, sharing, plan, idempotency, and provider-management policy.
+         */
+        post: operations["createAppointment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/appointments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an appointment */
+        get: operations["getAppointment"];
+        put?: never;
+        post?: never;
+        /**
+         * Archive a TeamGrid-managed appointment
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        delete: operations["archiveAppointment"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a TeamGrid-managed appointment
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        patch: operations["updateAppointment"];
+        trace?: never;
+    };
+    "/appointments/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore a TeamGrid-managed appointment
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        post: operations["restoreAppointment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/absences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List absences in a bounded interval
+         * @description Lists tenant-scoped absence metadata through product plan and membership policy. Foreign-user reads require delegated access.
+         */
+        get: operations["listAbsences"];
+        put?: never;
+        /**
+         * Create an absence
+         * @description The cell-local App re-authenticates the credential, derives the acting user from the credential principal, and applies tenant, sharing, plan, idempotency, and provider-management policy.
+         */
+        post: operations["createAbsence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/absences/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an absence */
+        get: operations["getAbsence"];
+        put?: never;
+        post?: never;
+        /**
+         * Archive an absence
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        delete: operations["archiveAbsence"];
+        options?: never;
+        head?: never;
+        /**
+         * Update an absence
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        patch: operations["updateAbsence"];
+        trace?: never;
+    };
+    "/absences/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore an absence
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        post: operations["restoreAbsence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List user availability
+         * @description Returns bounded free intervals derived in the credential cell. Source appointments, absence reasons, provider payloads, working-hour configuration, and personal calendar details are never exposed.
+         */
+        get: operations["listAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List target activity
+         * @description Returns a bounded, target-owned activity stream filtered by product permissions and every domain scope implied by each event. Comments, internal content, and unscoped system events are excluded.
+         */
+        get: operations["listActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List target comments
+         * @description Returns strict comment DTOs for one tenant-owned task, project, or contact after target-domain scope and plan authorization.
+         */
+        get: operations["listComments"];
+        put?: never;
+        /**
+         * Create a target comment
+         * @description Creates plain-text product comments with canonical active-member mentions. Attachments and rich internal payloads are not accepted.
+         */
+        post: operations["createComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/comments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a comment */
+        get: operations["getComment"];
+        put?: never;
+        post?: never;
+        /**
+         * Archive a comment
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        delete: operations["archiveComment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/comments/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore a comment
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        post: operations["restoreComment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List document metadata
+         * @description Lists document metadata only. Content, edit locks, subscriptions, and storage internals are not selected.
+         */
+        get: operations["listDocuments"];
+        put?: never;
+        /**
+         * Create a document
+         * @description Creates a bounded plain document through the product document model with credential-bound idempotency.
+         */
+        post: operations["createDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/documents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a document */
+        get: operations["getDocument"];
+        put?: never;
+        post?: never;
+        /**
+         * Archive a document
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        delete: operations["archiveDocument"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a document
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        patch: operations["updateDocument"];
+        trace?: never;
+    };
+    "/documents/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore a document
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        post: operations["restoreDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List public-space file metadata
+         * @description Lists metadata for files in TeamGrid task, project, contact, and workspace spaces. Object keys, buckets, providers, private spaces, user links, and signed URLs are never returned.
+         */
+        get: operations["listFiles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get file metadata */
+        get: operations["getFile"];
+        put?: never;
+        post?: never;
+        /**
+         * Archive a file
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        delete: operations["archiveFile"];
+        options?: never;
+        head?: never;
+        /**
+         * Rename a file
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        patch: operations["renameFile"];
+        trace?: never;
+    };
+    "/files/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore a file
+         * @description Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.
+         */
+        post: operations["restoreFile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/{id}/download-intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a file download intent
+         * @description Creates a short-lived credential-authorized HTTPS download target after checking file visibility, malware state, and private storage configuration. Provider coordinates remain encapsulated by the intent.
+         */
+        post: operations["createFileDownloadIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/file-upload-intents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reserve and create a private file upload intent
+         * @description Reserves workspace storage and returns a short-lived private HTTPS PUT target bound to the exact content length, MIME type, destination, credential, and idempotency key.
+         */
+        post: operations["createFileUploadIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/file-upload-intents/{id}/finalize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finalize a file upload intent
+         * @description Verifies the uploaded object size and MIME type, consumes the storage reservation, creates canonical file records, and returns only the public file projection.
+         */
+        post: operations["finalizeFileUploadIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/file-upload-intents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Cancel a file upload intent
+         * @description Cancels a credential-owned unfinalized upload reservation. Repeated cancellation is safe; finalized intents cannot be canceled.
+         */
+        delete: operations["cancelFileUploadIntent"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/products": {
         parameters: {
             query?: never;
@@ -1144,6 +1601,447 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List workspace members */
+        get: operations["listMembers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/members/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a workspace member */
+        get: operations["getMember"];
+        put?: never;
+        post?: never;
+        /** Remove a workspace member */
+        delete: operations["removeMember"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/members/{id}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change a member role */
+        patch: operations["updateMemberRole"];
+        trace?: never;
+    };
+    "/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List pending invitations */
+        get: operations["listInvitations"];
+        put?: never;
+        /** Invite a workspace member */
+        post: operations["createInvitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invitations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a pending invitation */
+        get: operations["getInvitation"];
+        put?: never;
+        post?: never;
+        /** Cancel a pending invitation */
+        delete: operations["cancelInvitation"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invitations/{id}/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resend a pending invitation */
+        post: operations["resendInvitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List workspace roles */
+        get: operations["listRoles"];
+        put?: never;
+        /** Create a workspace role */
+        post: operations["createRole"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/roles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a workspace role */
+        get: operations["getRole"];
+        put?: never;
+        post?: never;
+        /** Delete a workspace role */
+        delete: operations["deleteRole"];
+        options?: never;
+        head?: never;
+        /** Update a workspace role */
+        patch: operations["updateRole"];
+        trace?: never;
+    };
+    "/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List workspace groups */
+        get: operations["listGroups"];
+        put?: never;
+        /** Create a workspace group */
+        post: operations["createGroup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/groups/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a workspace group */
+        get: operations["getGroup"];
+        put?: never;
+        post?: never;
+        /** Delete a workspace group */
+        delete: operations["deleteGroup"];
+        options?: never;
+        head?: never;
+        /** Update a workspace group */
+        patch: operations["updateGroup"];
+        trace?: never;
+    };
+    "/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Search authorized TeamGrid resources
+         * @description Searches only the requested, scope-authorized product domains in the owning cell. Results are bounded, metadata-only, tenant-filtered and sharing-filtered.
+         */
+        post: operations["searchResources"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create an asynchronous export
+         * @description Creates a credential-owned asynchronous CSV export in the owning cell. Resource permissions, sharing filters and a 10,000-row bound are applied again by the export worker.
+         */
+        post: operations["createExport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get export job status
+         * @description Returns only credential-owned job status; storage coordinates and signed URLs remain private.
+         */
+        get: operations["getExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exports/{id}/download-intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create an export download intent
+         * @description Creates a short-lived single-export capability only after the job succeeded and credential ownership, workspace and resource-domain permissions are revalidated.
+         */
+        post: operations["createExportDownloadIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/exports/{id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download a completed export through TeamGrid
+         * @description Consumes the header-only opaque intent, resolves a private cell-local storage target internally, rejects redirects and streams at most 50 MiB. The storage URL never appears in the public response.
+         */
+        get: operations["downloadExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/automation-actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List public automation actions
+         * @description Returns the bounded public action catalog with secret-safe parameter metadata and the domain scopes required by each action.
+         */
+        get: operations["listAutomationActions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/automation-definitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List automation definitions */
+        get: operations["listAutomationDefinitions"];
+        put?: never;
+        /** Create an automation definition */
+        post: operations["createAutomationDefinition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/automation-definitions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an automation definition */
+        get: operations["getAutomationDefinition"];
+        put?: never;
+        post?: never;
+        /** Archive an automation definition */
+        delete: operations["archiveAutomationDefinition"];
+        options?: never;
+        head?: never;
+        /** Update an automation definition */
+        patch: operations["updateAutomationDefinition"];
+        trace?: never;
+    };
+    "/automation-definitions/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore an automation definition */
+        post: operations["restoreAutomationDefinition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/automation-definitions/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List immutable automation definition versions */
+        get: operations["listAutomationDefinitionVersions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/automation-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List automation runs */
+        get: operations["listAutomationRuns"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/automation-runs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an automation run */
+        get: operations["getAutomationRun"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/automation-runs/{id}/abort": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Abort a running automation */
+        post: operations["abortAutomationRun"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integration-installations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List integration installation status
+         * @description Returns only secret-free configured installation metadata. Tokens, webhook secrets, provider account identifiers and connection diagnostics remain private.
+         */
+        get: operations["listIntegrationInstallations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1184,6 +2082,292 @@ export interface components {
             id: string;
             /** @constant */
             type: "workspace";
+        };
+        Appointment: {
+            attributes: {
+                allDay: boolean;
+                archived: boolean;
+                busy: boolean;
+                /** Format: date-time */
+                createdAt: string | null;
+                description: string | null;
+                end: {
+                    /** Format: date-time */
+                    at: string;
+                    timeZone: string | null;
+                };
+                location: string | null;
+                /** @enum {string} */
+                managedBy: "provider" | "teamgrid";
+                redacted: boolean;
+                revision: string;
+                start: {
+                    /** Format: date-time */
+                    at: string;
+                    timeZone: string | null;
+                };
+                title: string | null;
+                /** Format: date-time */
+                updatedAt: string | null;
+                userId: string;
+                /** @enum {string} */
+                visibility: "default" | "private" | "public";
+            };
+            id: string;
+            /** @constant */
+            type: "appointment";
+        };
+        AppointmentCreate: {
+            allDay?: boolean;
+            busy?: boolean;
+            description?: string;
+            end: {
+                /** Format: date-time */
+                at: string;
+                timeZone?: string;
+            };
+            location?: string;
+            start: {
+                /** Format: date-time */
+                at: string;
+                timeZone?: string;
+            };
+            title?: string;
+            /** @enum {string} */
+            visibility?: "default" | "private" | "public";
+            userId?: string;
+        };
+        AppointmentUpdate: {
+            allDay?: boolean;
+            busy?: boolean;
+            description?: string;
+            end?: {
+                /** Format: date-time */
+                at: string;
+                timeZone?: string;
+            };
+            location?: string;
+            start?: {
+                /** Format: date-time */
+                at: string;
+                timeZone?: string;
+            };
+            title?: string;
+            /** @enum {string} */
+            visibility?: "default" | "private" | "public";
+        };
+        Absence: {
+            attributes: {
+                archived: boolean;
+                /** Format: date-time */
+                archivedAt: string | null;
+                /** Format: date-time */
+                createdAt: string | null;
+                /** Format: date-time */
+                end: string;
+                reason: string | null;
+                revision: string;
+                /** Format: date-time */
+                start: string;
+                userId: string;
+            };
+            id: string;
+            /** @constant */
+            type: "absence";
+        };
+        AbsenceCreate: {
+            /** Format: date-time */
+            end: string;
+            reason?: string | null;
+            /** Format: date-time */
+            start: string;
+            userId?: string;
+        };
+        AbsenceUpdate: {
+            /** Format: date-time */
+            end?: string;
+            reason?: string | null;
+            /** Format: date-time */
+            start?: string;
+        };
+        Availability: {
+            attributes: {
+                /** Format: date-time */
+                end: string;
+                /** Format: date-time */
+                start: string;
+                timeZone: string;
+                users: {
+                    intervals: {
+                        /** Format: date-time */
+                        end: string;
+                        /** Format: date-time */
+                        start: string;
+                    }[];
+                    userId: string;
+                }[];
+            };
+            id: string;
+            /** @constant */
+            type: "availability";
+        };
+        ActivityEvent: {
+            attributes: {
+                actorId: string | null;
+                eventType: string;
+                /** Format: date-time */
+                occurredAt: string;
+                target: {
+                    id: string;
+                    /** @enum {string} */
+                    type: "contact" | "project" | "task";
+                };
+            };
+            id: string;
+            /** @constant */
+            type: "activityEvent";
+        };
+        Comment: {
+            attributes: {
+                archived: boolean;
+                authorId: string | null;
+                /** Format: date-time */
+                createdAt: string;
+                revision: string;
+                target: {
+                    id: string;
+                    /** @enum {string} */
+                    type: "contact" | "project" | "task";
+                };
+                text: string;
+                /** Format: date-time */
+                updatedAt: string;
+            };
+            id: string;
+            /** @constant */
+            type: "comment";
+        };
+        CommentCreate: {
+            targetId: string;
+            /** @enum {string} */
+            targetType: "contact" | "project" | "task";
+            text: string;
+        };
+        File: {
+            attributes: {
+                archived: boolean;
+                blocked: boolean;
+                contentRevision: number | null;
+                /** Format: date-time */
+                createdAt: string | null;
+                createdBy: string | null;
+                downloadAvailable: boolean;
+                links: {
+                    entityId: string;
+                    /** @enum {string} */
+                    entityType: "comment" | "contact" | "customField" | "outcome" | "project" | "streamItem" | "task" | "team";
+                    /** @enum {string} */
+                    linkType: "attachment" | "folder" | "generated" | "manual" | "primary" | "system";
+                }[];
+                metadataRevision: number | null;
+                mimeType: string;
+                name: string;
+                previewStatus: string;
+                size: number;
+                /** @enum {string} */
+                space: "contacts" | "projects" | "tasks" | "team";
+                syncRevision: number | null;
+                /** Format: date-time */
+                updatedAt: string | null;
+                updatedBy: string | null;
+            };
+            id: string;
+            /** @constant */
+            type: "file";
+        };
+        Document: {
+            attributes: {
+                archived: boolean;
+                readonly content?: string;
+                /** Format: date-time */
+                createdAt: string | null;
+                createdBy: string | null;
+                name: string;
+                /** Format: date-time */
+                updatedAt: string | null;
+                updatedBy: string | null;
+            };
+            id: string;
+            /** @constant */
+            type: "document";
+        };
+        DocumentCreate: {
+            content: string;
+            name: string;
+        };
+        DocumentUpdate: {
+            content?: string;
+            name?: string;
+        };
+        FileRename: {
+            name: string;
+        };
+        FileTransfer: {
+            /** Format: date-time */
+            expiresAt: string;
+            headers: {
+                "content-length"?: string;
+                "content-type"?: string;
+                /** @constant */
+                "x-amz-acl"?: "private";
+            };
+            id: string;
+            maxSize: number | null;
+            /** @enum {string} */
+            method: "GET" | "PUT";
+            /** Format: uri */
+            url: string;
+        };
+        FileTransferMetadata: {
+            fileName: string;
+            mimeType: string;
+            size: number;
+        };
+        FileDownloadIntent: {
+            attributes: {
+                file: components["schemas"]["FileTransferMetadata"];
+                transfer: components["schemas"]["FileTransfer"];
+            };
+            id: string;
+            /** @constant */
+            type: "fileDownloadIntent";
+        };
+        FileUploadIntent: {
+            attributes: {
+                file: components["schemas"]["FileTransferMetadata"];
+                transfer: components["schemas"]["FileTransfer"];
+            };
+            id: string;
+            /** @constant */
+            type: "fileUploadIntent";
+        };
+        FileUploadCancellation: {
+            attributes: {
+                replayed: boolean;
+                /** @constant */
+                state: "canceled";
+            };
+            id: string;
+            /** @constant */
+            type: "fileUploadIntent";
+        };
+        FileUploadIntentCreate: {
+            destination: {
+                id: string;
+                /** @enum {string} */
+                type: "contact" | "folder" | "project" | "task" | "team";
+            };
+            file: components["schemas"]["FileTransferMetadata"];
         };
         Project: {
             attributes: {
@@ -2180,6 +3364,389 @@ export interface components {
             at?: string;
             userId: string;
         };
+        Member: {
+            attributes: {
+                readonly contactId?: string | null;
+                currentGroupId: string | null;
+                disabled: boolean;
+                readonly displayName?: string | null;
+                /** Format: email */
+                readonly email?: string | null;
+                readonly firstname?: string | null;
+                groupIds: string[];
+                readonly lastname?: string | null;
+                owner: boolean;
+                readonly position?: string | null;
+                revision: string;
+                roleId: string;
+                /** @enum {string} */
+                status: "active" | "pending";
+            };
+            id: string;
+            /** @constant */
+            type: "member";
+        };
+        Invitation: {
+            attributes: {
+                /** Format: date-time */
+                createdAt: string | null;
+                /** Format: email */
+                readonly email?: string | null;
+                revision: string;
+                roleId: string;
+                /** @constant */
+                status: "pending";
+                workspaceOwner: boolean;
+            };
+            id: string;
+            /** @constant */
+            type: "invitation";
+        };
+        Role: {
+            attributes: {
+                default: boolean;
+                description: string;
+                memberCount: number;
+                name: string;
+                permissions: string[];
+                revision: string;
+                system: boolean;
+            };
+            id: string;
+            /** @constant */
+            type: "role";
+        };
+        Group: {
+            attributes: {
+                /** Format: date-time */
+                createdAt: string | null;
+                memberIds: string[];
+                name: string;
+                revision: string;
+                /** @enum {string} */
+                visibility: "all" | "members" | "private";
+            };
+            id: string;
+            /** @constant */
+            type: "group";
+        };
+        MemberRoleUpdate: {
+            roleId: string;
+        };
+        InvitationCreate: {
+            /** Format: email */
+            email: string;
+            firstname: string;
+            lastname: string;
+            position?: string;
+            roleId?: string;
+        };
+        RoleCreate: {
+            description?: string;
+            name: string;
+            permissions?: string[];
+        };
+        RoleUpdate: {
+            description?: string;
+            name?: string;
+            permissions?: string[];
+        };
+        GroupCreate: {
+            memberIds?: string[];
+            name: string;
+            /** @enum {string} */
+            visibility?: "all" | "members" | "private";
+        };
+        GroupUpdate: {
+            memberIds?: string[];
+            name?: string;
+            /** @enum {string} */
+            visibility?: "all" | "members" | "private";
+        };
+        SearchResult: {
+            attributes: {
+                archived: boolean;
+                readonly completed?: boolean;
+                readonly number?: string;
+                readonly subtitle?: string;
+                title: string;
+                /** Format: date-time */
+                readonly updatedAt?: string;
+            };
+            id: string;
+            /** @enum {string} */
+            type: "contact" | "project" | "task";
+        };
+        SearchRequest: {
+            limit?: number;
+            term: string;
+            types: ("contacts" | "projects" | "tasks")[];
+        };
+        Export: {
+            attributes: {
+                /** Format: date-time */
+                createdAt: string;
+                readonly failure?: {
+                    /** @constant */
+                    code: "developer-export-failed";
+                    /** @constant */
+                    retryable: false;
+                };
+                fields: string[];
+                fileName: string;
+                /** Format: date-time */
+                readonly finishedAt?: string;
+                /** @constant */
+                format: "csv";
+                /** @enum {string} */
+                resourceType: "contacts" | "projects" | "tasks" | "timeEntries";
+                readonly rowCount?: number;
+                /** Format: date-time */
+                readonly startedAt?: string;
+                /** @enum {string} */
+                state: "failed" | "queued" | "retrying" | "running" | "succeeded";
+                readonly truncated?: boolean;
+            };
+            id: string;
+            /** @constant */
+            type: "export";
+        };
+        ExportCreation: {
+            attributes: {
+                replayed: boolean;
+            };
+            id: string;
+            /** @constant */
+            type: "export";
+        };
+        ExportDownloadIntent: {
+            attributes: {
+                /** Format: date-time */
+                expiresAt: string;
+                fileName: string;
+                token: string;
+            };
+            id: string;
+            /** @constant */
+            type: "exportDownloadIntent";
+        };
+        ExportCreate: {
+            fields?: string[];
+            fileName?: string;
+            /** @constant */
+            format?: "csv";
+            includeArchived?: boolean;
+            maxRows?: number;
+            /** @enum {string} */
+            resourceType: "contacts" | "projects" | "tasks" | "timeEntries";
+            /** Format: date-time */
+            updatedFrom?: string;
+            /** Format: date-time */
+            updatedUntil?: string;
+        };
+        AutomationInputBranch: {
+            flow: components["schemas"]["AutomationInputStep"][];
+            key: string;
+        };
+        AutomationInputStep: {
+            /** @enum {string} */
+            actionId: "automationTask" | "condition" | "createDate" | "forEach" | "formatDate" | "listCreate" | "listEdit" | "loop" | "loopBreak" | "loopContinue" | "projectCreate" | "projectEdit" | "projectStatementCreate" | "projectStatementEdit" | "serviceCreate" | "serviceEdit" | "setAutomationStatus" | "setVariable" | "stopCurrentAutomation" | "taskCreate" | "taskEdit" | "timeentryCreate" | "timeentryEdit" | "waitFor" | "waitForCustomFieldChange" | "waitForProjectChange" | "waitForTaskChange" | "waitForTaskCompletion" | "waitUntil";
+            branches?: components["schemas"]["AutomationInputBranch"][];
+            config?: {
+                key: string;
+                value: string;
+            }[];
+            input?: {
+                key: string;
+                value: string;
+            }[];
+            output?: {
+                key: string;
+                value: string;
+            }[];
+        };
+        AutomationBranch: {
+            flow: components["schemas"]["AutomationStep"][];
+            key: string;
+        };
+        AutomationStep: {
+            actionId: string;
+            branches?: components["schemas"]["AutomationBranch"][];
+            config?: {
+                key: string;
+                /** @constant */
+                redacted?: true;
+                value?: string;
+            }[];
+            input?: {
+                key: string;
+                /** @constant */
+                redacted?: true;
+                value?: string;
+            }[];
+            output?: {
+                key: string;
+                /** @constant */
+                redacted?: true;
+                value?: string;
+            }[];
+            /** @constant */
+            restricted?: true;
+        };
+        AutomationAction: {
+            attributes: {
+                branches: {
+                    displayName?: Record<string, never> | string | null;
+                    key: string;
+                }[];
+                config: Record<string, never>[];
+                description: Record<string, never> | string | null;
+                input: Record<string, never>[];
+                name: Record<string, never> | string | null;
+                output: Record<string, never>[];
+                requiredScopes: string[];
+            };
+            id: string;
+            /** @constant */
+            type: "automationAction";
+        };
+        AutomationDefinition: {
+            attributes: {
+                archived: boolean;
+                /** Format: date-time */
+                readonly createdAt?: string;
+                description: string;
+                editable: boolean;
+                flow: components["schemas"]["AutomationStep"][];
+                name: string;
+                readonly replayed?: boolean;
+                revision: string;
+                trigger: {
+                    data?: {
+                        /** @enum {string} */
+                        type: "projects" | "tasks";
+                    };
+                    /** @enum {string} */
+                    event?: "change" | "create";
+                    /** @constant */
+                    restricted?: true;
+                };
+                /** Format: date-time */
+                readonly updatedAt?: string;
+            };
+            id: string;
+            /** @constant */
+            type: "automationDefinition";
+        };
+        AutomationDefinitionVersion: {
+            attributes: {
+                archived: boolean;
+                /** Format: date-time */
+                readonly createdAt?: string;
+                description: string;
+                editable: boolean;
+                flow: components["schemas"]["AutomationStep"][];
+                name: string;
+                readonly replayed?: boolean;
+                revision: string;
+                trigger: {
+                    data?: {
+                        /** @enum {string} */
+                        type: "projects" | "tasks";
+                    };
+                    /** @enum {string} */
+                    event?: "change" | "create";
+                    /** @constant */
+                    restricted?: true;
+                };
+                /** Format: date-time */
+                readonly updatedAt?: string;
+                definitionId: string;
+                /** Format: date-time */
+                versionedAt: string;
+            };
+            id: string;
+            /** @constant */
+            type: "automationDefinitionVersion";
+        };
+        AutomationRun: {
+            attributes: {
+                /** Format: date-time */
+                readonly abortedAt?: string;
+                /** Format: date-time */
+                readonly createdAt?: string;
+                definition: {
+                    id: string;
+                    name: string;
+                };
+                /** Format: date-time */
+                readonly failedAt?: string;
+                /** Format: date-time */
+                readonly finishedAt?: string;
+                readonly reference?: {
+                    id: string;
+                    /** @enum {string} */
+                    type: "contact" | "project" | "task" | "user" | "workspace";
+                };
+                readonly replayed?: boolean;
+                revision: string;
+                /** @enum {string} */
+                state: "aborted" | "failed" | "running" | "succeeded";
+                /** Format: date-time */
+                readonly updatedAt?: string;
+            };
+            id: string;
+            /** @constant */
+            type: "automationRun";
+        };
+        IntegrationInstallation: {
+            attributes: {
+                /** Format: date-time */
+                readonly createdAt?: string;
+                /** @enum {string} */
+                provider: "googleCalendar" | "sipgate" | "slack";
+                /** @constant */
+                state: "configured";
+                target: {
+                    id: string;
+                    /** @enum {string} */
+                    type: "contact" | "project" | "task" | "user" | "workspace";
+                };
+                /** Format: date-time */
+                readonly updatedAt?: string;
+                /** @constant */
+                verification: "not_checked";
+            };
+            id: string;
+            /** @constant */
+            type: "integrationInstallation";
+        };
+        AutomationDefinitionCreate: {
+            description?: string;
+            flow: components["schemas"]["AutomationInputStep"][];
+            name: string;
+            trigger: {
+                data: {
+                    /** @enum {string} */
+                    type: "projects" | "tasks";
+                };
+                /** @enum {string} */
+                event: "change" | "create";
+            };
+        };
+        AutomationDefinitionUpdate: {
+            description?: string;
+            flow?: components["schemas"]["AutomationInputStep"][];
+            name?: string;
+            trigger?: {
+                data: {
+                    /** @enum {string} */
+                    type: "projects" | "tasks";
+                };
+                /** @enum {string} */
+                event: "change" | "create";
+            };
+        };
     };
     responses: {
         /** @description The cell-local application returned an invalid response. */
@@ -2293,18 +3860,54 @@ export interface components {
         IdempotencyKey: string;
         /** @description Exactly one strong ETag returned by the latest GET or mutation response. Wildcards, weak validators, and lists are rejected. */
         IfMatchCustomFieldValue: string;
+        /** @description Exactly one latest strong absence ETag. Wildcards, weak validators, and lists are rejected. */
+        IfMatchAbsence: string;
+        /** @description Exactly one latest strong appointment ETag. Wildcards, weak validators, and lists are rejected. */
+        IfMatchAppointment: string;
+        /** @description Exactly one latest strong comment ETag. Wildcards, weak validators, and lists are rejected. */
+        IfMatchComment: string;
+        /** @description Exactly one latest strong document ETag. Wildcards, weak validators, and lists are rejected. */
+        IfMatchDocument: string;
+        /** @description Exactly one latest strong file ETag. Wildcards, weak validators, and lists are rejected. */
+        IfMatchFile: string;
         /** @description Exactly one strong ETag returned by the latest task planned-work GET. Wildcards, weak validators, and lists are rejected. */
         IfMatchPlannedWork: string;
         Limit: number;
         ResourceId: string;
         WebhookDeliveryId: string;
+        /** @description Include PII only when the credential also has members:pii:read. */
+        IncludeMemberPii: boolean;
+        /** @description Exactly one latest strong administration ETag. */
+        IfMatchAdministration: string;
+        /** @description Exactly one latest strong automation-definition ETag. */
+        IfMatchAutomationDefinition: string;
+        /** @description Exactly one latest strong automation-run ETag. */
+        IfMatchAutomationRun: string;
+        /** @description Short-lived opaque export capability returned by the download-intent endpoint. It is carried only in a header so it cannot enter URL or proxy logs. */
+        ExportDownloadIntent: string;
     };
     requestBodies: never;
     headers: {
+        /** @description Strong absence revision returned by reads and mutations. */
+        AbsenceETag: string;
+        /** @description Strong appointment revision returned by reads and mutations. */
+        AppointmentETag: string;
+        /** @description Strong comment revision returned by reads and lifecycle mutations. */
+        CommentETag: string;
+        /** @description Strong document update timestamp encoded as an opaque revision. */
+        DocumentETag: string;
+        /** @description Strong canonical file synchronization revision. */
+        FileETag: string;
         /** @description Strong revision tag required verbatim in If-Match before a mutation. */
         CustomFieldValueETag: string;
         /** @description Strong schedule revision required verbatim in If-Match before replacement. */
         PlannedWorkETag: string;
+        /** @description Strong member-administration resource revision. */
+        AdministrationETag: string;
+        /** @description Strong automation-definition revision. */
+        AutomationDefinitionETag: string;
+        /** @description Strong automation-run revision. */
+        AutomationRunETag: string;
     };
     pathItems: never;
 }
@@ -2412,6 +4015,1411 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listAppointments: {
+        parameters: {
+            query: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+                /** @description Return archived resources instead of active resources. */
+                archived?: boolean;
+                /** @description Inclusive beginning of the bounded calendar interval. */
+                start: string;
+                /** @description Exclusive end of the bounded calendar interval. */
+                end: string;
+                /** @description One or more user ids. Foreign users additionally require a delegated scope and product sharing permission. */
+                userId?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Appointment"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createAppointment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointmentCreate"];
+            };
+        };
+        responses: {
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["AppointmentETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Appointment"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getAppointment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AppointmentETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Appointment"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    archiveAppointment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong appointment ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchAppointment"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AppointmentETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Appointment"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateAppointment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong appointment ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchAppointment"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointmentUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AppointmentETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Appointment"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    restoreAppointment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong appointment ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchAppointment"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AppointmentETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Appointment"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listAbsences: {
+        parameters: {
+            query: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+                /** @description Return archived resources instead of active resources. */
+                archived?: boolean;
+                /** @description Inclusive beginning of the bounded calendar interval. */
+                start: string;
+                /** @description Exclusive end of the bounded calendar interval. */
+                end: string;
+                /** @description One or more user ids. Foreign users additionally require a delegated scope and product sharing permission. */
+                userId?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Absence"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createAbsence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AbsenceCreate"];
+            };
+        };
+        responses: {
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["AbsenceETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Absence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getAbsence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AbsenceETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Absence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    archiveAbsence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong absence ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchAbsence"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AbsenceETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Absence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateAbsence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong absence ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchAbsence"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AbsenceUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AbsenceETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Absence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    restoreAbsence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong absence ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchAbsence"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AbsenceETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Absence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listAvailability: {
+        parameters: {
+            query: {
+                /** @description Inclusive beginning of the bounded calendar interval. */
+                start: string;
+                /** @description Exclusive end of the bounded calendar interval. */
+                end: string;
+                /** @description IANA time-zone name used to evaluate working hours. */
+                timeZone: string;
+                /** @description One or more user ids. Foreign users additionally require a delegated scope and product sharing permission. */
+                userId?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Availability intervals for the requested users and window. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Availability"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description The requested availability window contains too many source records. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listActivity: {
+        parameters: {
+            query: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+                /** @description Target resource type. The matching target-domain read scope is also required. */
+                targetType: "contact" | "project" | "task";
+                /** @description Target resource identifier. */
+                targetId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ActivityEvent"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listComments: {
+        parameters: {
+            query: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+                /** @description Return archived resources instead of active resources. */
+                archived?: boolean;
+                /** @description Target resource type. The matching target-domain read scope is also required. */
+                targetType: "contact" | "project" | "task";
+                /** @description Target resource identifier. */
+                targetId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Comment"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommentCreate"];
+            };
+        };
+        responses: {
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["CommentETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Comment"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["CommentETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Comment"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    archiveComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong comment ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchComment"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["CommentETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Comment"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    restoreComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong comment ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchComment"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["CommentETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Comment"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listDocuments: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+                /** @description Return archived resources instead of active resources. */
+                archived?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Document"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createDocument: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentCreate"];
+            };
+        };
+        responses: {
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["DocumentETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Document"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["DocumentETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Document"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The document exceeds the supported one MiB content boundary. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    archiveDocument: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong document ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchDocument"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["DocumentETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Document"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateDocument: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong document ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchDocument"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["DocumentETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Document"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    restoreDocument: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong document ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchDocument"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["DocumentETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Document"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listFiles: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+                /** @description Return archived resources instead of active resources. */
+                archived?: boolean;
+                /** @description Optional linked entity type; requires entityId. */
+                entityType?: "comment" | "contact" | "customField" | "outcome" | "project" | "streamItem" | "task" | "team";
+                /** @description Optional linked entity id; requires entityType. */
+                entityId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["File"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getFile: {
+        parameters: {
+            query?: {
+                /** @description Return archived resources instead of active resources. */
+                archived?: boolean;
+            };
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["FileETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["File"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    archiveFile: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong file ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchFile"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["FileETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["File"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    renameFile: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong file ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchFile"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FileRename"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["FileETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["File"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    restoreFile: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong file ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchFile"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["FileETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["File"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createFileDownloadIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A short-lived private download intent. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileDownloadIntent"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            /** @description The file is blocked by malware policy. */
+            451: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createFileUploadIntent: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FileUploadIntentCreate"];
+            };
+        };
+        responses: {
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileUploadIntent"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            /** @description The upload reservation expired. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description The active or executable upload type is blocked. */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    finalizeFileUploadIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The finalized canonical file. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["FileETag"];
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["File"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            /** @description The upload reservation expired. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    cancelFileUploadIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The canceled upload intent state. */
+            200: {
+                headers: {
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileUploadCancellation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6326,6 +9334,1352 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listMembers: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+                /** @description Include PII only when the credential also has members:pii:read. */
+                includePii?: components["parameters"]["IncludeMemberPii"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Member"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getMember: {
+        parameters: {
+            query?: {
+                /** @description Include PII only when the credential also has members:pii:read. */
+                includePii?: components["parameters"]["IncludeMemberPii"];
+            };
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AdministrationETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Member"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    removeMember: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong administration ETag. */
+                "If-Match": components["parameters"]["IfMatchAdministration"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The administration resource was removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateMemberRole: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong administration ETag. */
+                "If-Match": components["parameters"]["IfMatchAdministration"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberRoleUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AdministrationETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Member"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listInvitations: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+                /** @description Include PII only when the credential also has members:pii:read. */
+                includePii?: components["parameters"]["IncludeMemberPii"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Invitation"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createInvitation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InvitationCreate"];
+            };
+        };
+        responses: {
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["AdministrationETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Invitation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getInvitation: {
+        parameters: {
+            query?: {
+                /** @description Include PII only when the credential also has members:pii:read. */
+                includePii?: components["parameters"]["IncludeMemberPii"];
+            };
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AdministrationETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Invitation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    cancelInvitation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong administration ETag. */
+                "If-Match": components["parameters"]["IfMatchAdministration"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The administration resource was removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    resendInvitation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong administration ETag. */
+                "If-Match": components["parameters"]["IfMatchAdministration"];
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The invitation was resent or the idempotent result was replayed. */
+            204: {
+                headers: {
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listRoles: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Role"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createRole: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleCreate"];
+            };
+        };
+        responses: {
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["AdministrationETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Role"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AdministrationETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Role"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    deleteRole: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong administration ETag. */
+                "If-Match": components["parameters"]["IfMatchAdministration"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The administration resource was removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateRole: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong administration ETag. */
+                "If-Match": components["parameters"]["IfMatchAdministration"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AdministrationETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Role"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listGroups: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Group"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createGroup: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GroupCreate"];
+            };
+        };
+        responses: {
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["AdministrationETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Group"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AdministrationETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Group"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    deleteGroup: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong administration ETag. */
+                "If-Match": components["parameters"]["IfMatchAdministration"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The administration resource was removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateGroup: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong administration ETag. */
+                "If-Match": components["parameters"]["IfMatchAdministration"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GroupUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AdministrationETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Group"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    searchResources: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SearchRequest"];
+            };
+        };
+        responses: {
+            /** @description At most 50 authorized search results. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SearchResult"][];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createExport: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportCreate"];
+            };
+        };
+        responses: {
+            /** @description The credential-owned export job was created or replayed. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExportCreation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Export"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createExportDownloadIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A short-lived opaque download intent, never a storage URL. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExportDownloadIntent"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    downloadExport: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Short-lived opaque export capability returned by the download-intent endpoint. It is carried only in a header so it cannot enter URL or proxy logs. */
+                "X-TeamGrid-Export-Download-Intent": components["parameters"]["ExportDownloadIntent"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The bounded CSV export body. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Content-Disposition": string;
+                    "Content-Length"?: number;
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listAutomationActions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The public automation action catalog. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationAction"][];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listAutomationDefinitions: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+                /** @description Return archived resources instead of active resources. */
+                archived?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationDefinition"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createAutomationDefinition: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutomationDefinitionCreate"];
+            };
+        };
+        responses: {
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["AutomationDefinitionETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationDefinition"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getAutomationDefinition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AutomationDefinitionETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationDefinition"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    archiveAutomationDefinition: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong automation-definition ETag. */
+                "If-Match": components["parameters"]["IfMatchAutomationDefinition"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AutomationDefinitionETag"];
+                    /** @description Whether the requested canonical state was already present. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationDefinition"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateAutomationDefinition: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong automation-definition ETag. */
+                "If-Match": components["parameters"]["IfMatchAutomationDefinition"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutomationDefinitionUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AutomationDefinitionETag"];
+                    /** @description Whether the requested canonical state was already present. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationDefinition"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    restoreAutomationDefinition: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong automation-definition ETag. */
+                "If-Match": components["parameters"]["IfMatchAutomationDefinition"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AutomationDefinitionETag"];
+                    /** @description Whether the requested canonical state was already present. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationDefinition"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listAutomationDefinitionVersions: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationDefinitionVersion"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listAutomationRuns: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: number;
+                /** @description Filter by automation definition. */
+                definitionId?: string;
+                /** @description Filter by target id; requires referenceType. */
+                referenceId?: string;
+                /** @description Filter by public target type; requires referenceId. */
+                referenceType?: "task" | "contact" | "project" | "workspace" | "user";
+                /** @description Filter by canonical run state. */
+                state?: "aborted" | "failed" | "running" | "succeeded";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationRun"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getAutomationRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AutomationRunETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationRun"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    abortAutomationRun: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong automation-run ETag. */
+                "If-Match": components["parameters"]["IfMatchAutomationRun"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The aborted or already-aborted run. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["AutomationRunETag"];
+                    "Idempotency-Replayed"?: "false" | "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AutomationRun"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listIntegrationInstallations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The bounded secret-free integration installation list. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["IntegrationInstallation"][];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

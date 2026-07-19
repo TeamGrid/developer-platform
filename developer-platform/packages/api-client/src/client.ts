@@ -1,9 +1,63 @@
 import { TeamGridApiError, TeamGridClientError } from './errors.js'
+import {
+  absenceValidator,
+  activityEventValidator,
+  appointmentValidator,
+  assertRevisionEtag,
+  assertStrictPage,
+  assertStrictResource,
+  assertStrictResourceArray,
+  automationActionValidator,
+  automationDefinitionValidator,
+  automationDefinitionVersionValidator,
+  automationRunValidator,
+  availabilityValidator,
+  canonicalAdministrationEtag,
+  canonicalAutomationDefinitionEtag,
+  canonicalAutomationRunEtag,
+  commentValidator,
+  documentEtag,
+  documentValidator,
+  exportCreationValidator,
+  exportDownloadIntentValidator,
+  exportJobValidator,
+  fileDownloadIntentValidator,
+  fileEtag,
+  fileUploadCancellationValidator,
+  fileUploadIntentValidator,
+  fileValidator,
+  groupValidator,
+  integrationInstallationValidator,
+  invitationCreateValidator,
+  invitationValidator,
+  isDownloadIntentToken,
+  isSafeExportFileName,
+  memberValidator,
+  roleValidator,
+  searchResultValidator,
+} from './newDomainValidation.js'
 import { buildRegionalApiBaseUrl, normalizeApiBaseUrl, parseCredentialLocation } from './routing.js'
 import type {
+  AbsenceCreate,
+  AbsenceMutationOptions,
+  AbsenceUpdate,
+  ActivityListOptions,
+  AdministrationMutationOptions,
+  AdministrationPiiOptions,
   ApiVersionEnvelope,
+  AppointmentCreate,
+  AppointmentMutationOptions,
+  AppointmentUpdate,
   AuditEvent,
   AuditEventListOptions,
+  AutomationDefinitionCreate,
+  AutomationDefinitionListOptions,
+  AutomationDefinitionMutationOptions,
+  AutomationDefinitionUpdate,
+  AutomationRunListOptions,
+  AutomationRunMutationOptions,
+  AvailabilityListOptions,
+  CalendarListOptions,
   CallNote,
   CallNoteCreate,
   CallNoteListOptions,
@@ -13,6 +67,9 @@ import type {
   ChangeFilterOptions,
   ChangeListOptions,
   ChangePageEnvelope,
+  CommentCreate,
+  CommentListOptions,
+  CommentMutationOptions,
   Contact,
   ContactCreate,
   ContactGroup,
@@ -30,6 +87,23 @@ import type {
   CustomFieldValueMutationOptions,
   CustomFieldValueSet,
   CustomFieldValueTargetType,
+  DocumentCreate,
+  DocumentListOptions,
+  DocumentMutationOptions,
+  DocumentUpdate,
+  ExportCreate,
+  ExportDownload,
+  ExportDownloadOptions,
+  FileGetOptions,
+  FileListOptions,
+  FileMutationOptions,
+  FileRename,
+  FileUploadIntentCreate,
+  GroupCreate,
+  GroupUpdate,
+  InvitationCreate,
+  InvitationListOptions,
+  InvitationResendOptions,
   List,
   ListCreate,
   ListEnvelope,
@@ -37,6 +111,8 @@ import type {
   ListOptions,
   ListUpdate,
   LookupListOptions,
+  MemberListOptions,
+  MemberRoleUpdate,
   MutationOptions,
   PaginationOptions,
   PlannedWork,
@@ -72,6 +148,9 @@ import type {
   ProjectUpdate,
   RequestOptions,
   ResourceEnvelope,
+  RoleCreate,
+  RoleUpdate,
+  SearchQuery,
   Service,
   ServiceCreate,
   ServiceUpdate,
@@ -102,7 +181,7 @@ import { apiClientVersion } from './version.js'
 type Fetch = typeof globalThis.fetch
 type Sleep = (milliseconds: number, signal?: AbortSignal) => Promise<void>
 type QueryValue = boolean | number | string | Date | null | undefined
-type Query = Record<string, QueryValue | QueryValue[]>
+type Query = Record<string, QueryValue | readonly QueryValue[]>
 
 type InternalRequestOptions = RequestOptions & {
   body?: unknown
@@ -132,6 +211,8 @@ export type TeamGridClientOptions = {
 const retryStatuses = new Set([429, 502, 503, 504])
 const maxRetryDelayMs = 30_000
 const defaultMaxResponseBytes = 8 * 1024 * 1024
+const maximumExportDownloadBytes = 50 * 1024 * 1024
+const exportContentType = 'text/csv; charset=utf-8' as const
 
 function isoQueryValue(value: QueryValue) {
   return value instanceof Date ? value.toISOString() : String(value)
@@ -259,6 +340,75 @@ async function readBoundedResponseText(response: Response, maxResponseBytes: num
   return new TextDecoder().decode(bytes)
 }
 
+async function readBoundedResponseBytes(response: Response, maximumBytes: number) {
+  const rawLength = response.headers.get('content-length')
+  let expectedLength: number | undefined
+  if (rawLength !== null) {
+    if (!/^\d+$/.test(rawLength)) {
+      await response.body?.cancel()
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid export download returned an invalid Content-Length.',
+      )
+    }
+    expectedLength = Number(rawLength)
+    if (!Number.isSafeInteger(expectedLength) || expectedLength > maximumBytes) {
+      await response.body?.cancel()
+      throw new TeamGridClientError(
+        'export_download_too_large',
+        `The TeamGrid export download exceeded ${maximumBytes} bytes.`,
+      )
+    }
+  }
+  if (!response.body) {
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'The TeamGrid export download did not include a response body.',
+    )
+  }
+  const reader = response.body.getReader()
+  const chunks: Uint8Array[] = []
+  let received = 0
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    received += value.byteLength
+    if (received > maximumBytes) {
+      await reader.cancel()
+      throw new TeamGridClientError(
+        'export_download_too_large',
+        `The TeamGrid export download exceeded ${maximumBytes} bytes.`,
+      )
+    }
+    chunks.push(value)
+  }
+  if (expectedLength !== undefined && received !== expectedLength) {
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'The TeamGrid export download did not match its Content-Length.',
+    )
+  }
+  const bytes = new Uint8Array(received)
+  let offset = 0
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset)
+    offset += chunk.byteLength
+  }
+  return bytes
+}
+
+function exportDownloadFileName(value: string | null) {
+  if (!value || !/^attachment\s*;/i.test(value)) return null
+  const utf8 = value.match(/(?:^|;)\s*filename\*=UTF-8''([^;]+)(?:;|$)/i)?.[1]
+  if (!utf8) return null
+  try {
+    const fileName = decodeURIComponent(utf8)
+    return isSafeExportFileName(fileName) ? fileName : null
+  } catch {
+    return null
+  }
+}
+
 async function parseJsonResponse(response: Response, maxResponseBytes: number) {
   const text = await readBoundedResponseText(response, maxResponseBytes)
   if (!text) return undefined
@@ -303,6 +453,48 @@ function strongPlannedWorkEtag(value: string) {
   return `"${revision}"`
 }
 
+function strongResourceEtag(value: string, pattern: RegExp, label: string) {
+  const revision = value.startsWith('"') && value.endsWith('"') ? value.slice(1, -1) : value
+  if (!pattern.test(revision)) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      `${label} ifMatch must be a canonical revision or one strong ETag.`,
+    )
+  }
+  return `"${revision}"`
+}
+
+const strongAppointmentEtag = (value: string) =>
+  strongResourceEtag(value, /^ap1-[a-f0-9]{64}$/, 'Appointment')
+const strongAbsenceEtag = (value: string) =>
+  strongResourceEtag(value, /^ab1-[a-f0-9]{64}$/, 'Absence')
+const strongCommentEtag = (value: string) =>
+  strongResourceEtag(value, /^cmt1-[a-f0-9]{64}$/, 'Comment')
+const strongDocumentEtag = (value: string) => {
+  const etag = strongResourceEtag(value, /^doc1-[A-Za-z0-9_-]+$/, 'Document')
+  const encoded = etag.slice('"doc1-'.length, -1)
+  try {
+    const padded = encoded
+      .replace(/-/g, '+')
+      .replace(/_/g, '/')
+      .padEnd(Math.ceil(encoded.length / 4) * 4, '=')
+    const binary = globalThis.atob(padded)
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0))
+    const updatedAt = new TextDecoder().decode(bytes)
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(updatedAt)) throw new Error()
+    const date = new Date(updatedAt)
+    if (!Number.isFinite(date.getTime()) || date.toISOString() !== updatedAt) throw new Error()
+    if (documentEtag(updatedAt) !== etag) throw new Error()
+    return etag
+  } catch {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Document ifMatch must contain one canonical document ETag.',
+    )
+  }
+}
+const strongFileEtag = (value: string) => strongResourceEtag(value, /^file-[1-9][0-9]*$/, 'File')
+
 function customFieldValuePath(
   targetType: CustomFieldValueTargetType,
   resourceId: string,
@@ -317,6 +509,8 @@ function customFieldValuePath(
 }
 
 function expectedResourceTypes(path: string) {
+  if (/^\/file-upload-intents\/[^/]+\/finalize$/.test(path)) return ['file']
+  if (/^\/file-upload-intents\/[^/]+$/.test(path)) return ['fileUploadIntent']
   if (/^\/tasks\/[^/]+\/timer\/(?:start|stop)$/.test(path)) return ['timeEntry']
   if (/^\/tasks\/[^/]+\/planned-work$/.test(path)) return ['taskPlannedWork']
   if (/^\/project-templates\/[^/]+\/instantiate$/.test(path)) {
@@ -327,13 +521,20 @@ function expectedResourceTypes(path: string) {
   }
   const root = path.split('/').filter(Boolean)[0]
   const mapping: Record<string, string[]> = {
+    absences: ['absence'],
+    activity: ['activityEvent'],
+    appointments: ['appointment'],
     'audit-events': ['auditEvent'],
     'call-notes': ['callNote'],
     changes: ['changeEvent'],
+    comments: ['comment'],
     contacts: ['contact'],
     'contact-groups': ['contactGroup'],
     'custom-field-definitions': ['customFieldDefinition'],
     'custom-field-values': ['customFieldValue'],
+    documents: ['document'],
+    files: ['file', 'fileDownloadIntent'],
+    'file-upload-intents': ['fileUploadIntent'],
     lists: ['list'],
     'product-groups': ['productGroup'],
     products: ['product'],
@@ -349,6 +550,7 @@ function expectedResourceTypes(path: string) {
     tasks: ['task'],
     'time-entries': ['timeEntry'],
     users: ['user'],
+    availability: ['availability'],
     'webhook-deliveries': ['webhookDelivery'],
     webhooks: ['webhook'],
     workspace: ['workspace'],
@@ -487,15 +689,32 @@ function attachTransport<T extends object>(value: T, transport: Readonly<Transpo
 }
 
 export class TeamGridClient {
+  readonly absences
+  readonly activity
+  readonly appointments
+  readonly automationActions
+  readonly automationDefinitions
+  readonly automationDefinitionVersions
+  readonly automationRuns
+  readonly availability
   readonly auditEvents
   readonly callNotes
   readonly changes
+  readonly comments
   readonly contacts
   readonly contactGroups
   readonly customFieldDefinitions
   readonly customFieldValues
+  readonly documents
+  readonly exports
+  readonly files
+  readonly fileUploadIntents
+  readonly groups
+  readonly integrationInstallations
+  readonly invitations
   readonly lists
   readonly location
+  readonly members
   readonly plannedWork
   readonly plannedWorkOperations
   readonly productGroups
@@ -505,6 +724,8 @@ export class TeamGridClient {
   readonly projectStatements
   readonly projectTemplateInstantiations
   readonly projectTemplates
+  readonly roles
+  readonly search
   readonly services
   readonly system
   readonly tags
@@ -551,6 +772,838 @@ export class TeamGridClient {
         const response = await this.#request('/', options)
         return attachTransport(assertApiVersion(response.payload), response.transport)
       },
+    }
+    this.appointments = {
+      archive: (id: string, options: AppointmentMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/appointments/${encodeURIComponent(id)}`,
+          appointmentValidator,
+          'appointment archive',
+          {
+            ...requestOptions,
+            ifMatch: strongAppointmentEtag(ifMatch),
+            method: 'DELETE',
+          },
+          200,
+          (item) => item.attributes.revision,
+        )
+      },
+      create: (data: AppointmentCreate, options: MutationOptions = {}) =>
+        this.#strictResource(
+          '/appointments',
+          appointmentValidator,
+          'appointment creation',
+          {
+            ...options,
+            body: data,
+            idempotencyKey: options.idempotencyKey || newRequestId(),
+            method: 'POST',
+          },
+          201,
+          (item) => item.attributes.revision,
+        ),
+      get: (id: string, options?: RequestOptions) =>
+        this.#strictResource(
+          `/appointments/${encodeURIComponent(id)}`,
+          appointmentValidator,
+          'appointment',
+          options,
+          200,
+          (item) => item.attributes.revision,
+        ),
+      list: (options: CalendarListOptions) =>
+        this.#strictPage('/appointments', appointmentValidator, 'appointment list', options),
+      pages: (options: CalendarListOptions, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          '/appointments',
+          appointmentValidator,
+          'appointment list',
+          options,
+          pagination,
+        ),
+      restore: (id: string, options: AppointmentMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/appointments/${encodeURIComponent(id)}/restore`,
+          appointmentValidator,
+          'appointment restore',
+          {
+            ...requestOptions,
+            ifMatch: strongAppointmentEtag(ifMatch),
+            method: 'POST',
+          },
+          200,
+          (item) => item.attributes.revision,
+        )
+      },
+      update: (id: string, data: AppointmentUpdate, options: AppointmentMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/appointments/${encodeURIComponent(id)}`,
+          appointmentValidator,
+          'appointment update',
+          {
+            ...requestOptions,
+            body: data,
+            ifMatch: strongAppointmentEtag(ifMatch),
+            method: 'PATCH',
+          },
+          200,
+          (item) => item.attributes.revision,
+        )
+      },
+    }
+    this.absences = {
+      archive: (id: string, options: AbsenceMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/absences/${encodeURIComponent(id)}`,
+          absenceValidator,
+          'absence archive',
+          { ...requestOptions, ifMatch: strongAbsenceEtag(ifMatch), method: 'DELETE' },
+          200,
+          (item) => item.attributes.revision,
+        )
+      },
+      create: (data: AbsenceCreate, options: MutationOptions = {}) =>
+        this.#strictResource(
+          '/absences',
+          absenceValidator,
+          'absence creation',
+          {
+            ...options,
+            body: data,
+            idempotencyKey: options.idempotencyKey || newRequestId(),
+            method: 'POST',
+          },
+          201,
+          (item) => item.attributes.revision,
+        ),
+      get: (id: string, options?: RequestOptions) =>
+        this.#strictResource(
+          `/absences/${encodeURIComponent(id)}`,
+          absenceValidator,
+          'absence',
+          options,
+          200,
+          (item) => item.attributes.revision,
+        ),
+      list: (options: CalendarListOptions) =>
+        this.#strictPage('/absences', absenceValidator, 'absence list', options),
+      pages: (options: CalendarListOptions, pagination?: PaginationOptions) =>
+        this.#strictPages('/absences', absenceValidator, 'absence list', options, pagination),
+      restore: (id: string, options: AbsenceMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/absences/${encodeURIComponent(id)}/restore`,
+          absenceValidator,
+          'absence restore',
+          { ...requestOptions, ifMatch: strongAbsenceEtag(ifMatch), method: 'POST' },
+          200,
+          (item) => item.attributes.revision,
+        )
+      },
+      update: (id: string, data: AbsenceUpdate, options: AbsenceMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/absences/${encodeURIComponent(id)}`,
+          absenceValidator,
+          'absence update',
+          {
+            ...requestOptions,
+            body: data,
+            ifMatch: strongAbsenceEtag(ifMatch),
+            method: 'PATCH',
+          },
+          200,
+          (item) => item.attributes.revision,
+        )
+      },
+    }
+    this.availability = {
+      list: async (options: AvailabilityListOptions) => {
+        const { requestId, signal, ...query } = options
+        return this.#strictResource('/availability', availabilityValidator, 'availability', {
+          query: query as Query,
+          requestId,
+          signal,
+        })
+      },
+    }
+    this.activity = {
+      list: (options: ActivityListOptions) =>
+        this.#strictPage('/activity', activityEventValidator, 'activity list', options),
+      pages: (options: ActivityListOptions, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          '/activity',
+          activityEventValidator,
+          'activity list',
+          options,
+          pagination,
+        ),
+    }
+    this.comments = {
+      archive: (id: string, options: CommentMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/comments/${encodeURIComponent(id)}`,
+          commentValidator,
+          'comment archive',
+          { ...requestOptions, ifMatch: strongCommentEtag(ifMatch), method: 'DELETE' },
+          200,
+          (item) => item.attributes.revision,
+        )
+      },
+      create: (data: CommentCreate, options: MutationOptions = {}) =>
+        this.#strictResource(
+          '/comments',
+          commentValidator,
+          'comment creation',
+          {
+            ...options,
+            body: data,
+            idempotencyKey: options.idempotencyKey || newRequestId(),
+            method: 'POST',
+          },
+          201,
+          (item) => item.attributes.revision,
+        ),
+      get: (id: string, options?: RequestOptions) =>
+        this.#strictResource(
+          `/comments/${encodeURIComponent(id)}`,
+          commentValidator,
+          'comment',
+          options,
+          200,
+          (item) => item.attributes.revision,
+        ),
+      list: (options: CommentListOptions) =>
+        this.#strictPage('/comments', commentValidator, 'comment list', options),
+      pages: (options: CommentListOptions, pagination?: PaginationOptions) =>
+        this.#strictPages('/comments', commentValidator, 'comment list', options, pagination),
+      restore: (id: string, options: CommentMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/comments/${encodeURIComponent(id)}/restore`,
+          commentValidator,
+          'comment restore',
+          { ...requestOptions, ifMatch: strongCommentEtag(ifMatch), method: 'POST' },
+          200,
+          (item) => item.attributes.revision,
+        )
+      },
+    }
+    this.documents = {
+      archive: (id: string, options: DocumentMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/documents/${encodeURIComponent(id)}`,
+          documentValidator('optional'),
+          'document archive',
+          { ...requestOptions, ifMatch: strongDocumentEtag(ifMatch), method: 'DELETE' },
+          200,
+          undefined,
+          (item) => documentEtag(item.attributes.updatedAt),
+        )
+      },
+      create: (data: DocumentCreate, options: MutationOptions = {}) =>
+        this.#strictResource(
+          '/documents',
+          documentValidator('required'),
+          'document creation',
+          {
+            ...options,
+            body: data,
+            idempotencyKey: options.idempotencyKey || newRequestId(),
+            method: 'POST',
+          },
+          201,
+          undefined,
+          (item) => documentEtag(item.attributes.updatedAt),
+        ),
+      get: (id: string, options?: RequestOptions) =>
+        this.#strictResource(
+          `/documents/${encodeURIComponent(id)}`,
+          documentValidator('required'),
+          'document',
+          options,
+          200,
+          undefined,
+          (item) => documentEtag(item.attributes.updatedAt),
+        ),
+      list: (options: DocumentListOptions = {}) =>
+        this.#strictPage('/documents', documentValidator('absent'), 'document list', options),
+      pages: (options: DocumentListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          '/documents',
+          documentValidator('absent'),
+          'document list',
+          options,
+          pagination,
+        ),
+      restore: (id: string, options: DocumentMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/documents/${encodeURIComponent(id)}/restore`,
+          documentValidator('optional'),
+          'document restore',
+          { ...requestOptions, ifMatch: strongDocumentEtag(ifMatch), method: 'POST' },
+          200,
+          undefined,
+          (item) => documentEtag(item.attributes.updatedAt),
+        )
+      },
+      update: (id: string, data: DocumentUpdate, options: DocumentMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/documents/${encodeURIComponent(id)}`,
+          documentValidator('required'),
+          'document update',
+          {
+            ...requestOptions,
+            body: data,
+            ifMatch: strongDocumentEtag(ifMatch),
+            method: 'PATCH',
+          },
+          200,
+          undefined,
+          (item) => documentEtag(item.attributes.updatedAt),
+        )
+      },
+    }
+    this.files = {
+      archive: (id: string, options: FileMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/files/${encodeURIComponent(id)}`,
+          fileValidator,
+          'file archive',
+          { ...requestOptions, ifMatch: strongFileEtag(ifMatch), method: 'DELETE' },
+          200,
+          undefined,
+          (item) => fileEtag(item.attributes.syncRevision),
+        )
+      },
+      createDownloadIntent: (id: string, options: RequestOptions = {}) =>
+        this.#strictResource(
+          `/files/${encodeURIComponent(id)}/download-intent`,
+          fileDownloadIntentValidator,
+          'file download intent',
+          { ...options, method: 'POST' },
+          201,
+        ),
+      get: async (id: string, options: FileGetOptions = {}) => {
+        const { archived, ...requestOptions } = options
+        return this.#strictResource(
+          `/files/${encodeURIComponent(id)}`,
+          fileValidator,
+          'file',
+          { ...requestOptions, ...(archived === undefined ? {} : { query: { archived } }) },
+          200,
+          undefined,
+          (item) => fileEtag(item.attributes.syncRevision),
+        )
+      },
+      list: (options: FileListOptions = {}) =>
+        this.#strictPage('/files', fileValidator, 'file list', options),
+      pages: (options: FileListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages('/files', fileValidator, 'file list', options, pagination),
+      rename: (id: string, data: FileRename, options: FileMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/files/${encodeURIComponent(id)}`,
+          fileValidator,
+          'file rename',
+          {
+            ...requestOptions,
+            body: data,
+            ifMatch: strongFileEtag(ifMatch),
+            method: 'PATCH',
+          },
+          200,
+          undefined,
+          (item) => fileEtag(item.attributes.syncRevision),
+        )
+      },
+      restore: (id: string, options: FileMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/files/${encodeURIComponent(id)}/restore`,
+          fileValidator,
+          'file restore',
+          { ...requestOptions, ifMatch: strongFileEtag(ifMatch), method: 'POST' },
+          200,
+          undefined,
+          (item) => fileEtag(item.attributes.syncRevision),
+        )
+      },
+    }
+    this.fileUploadIntents = {
+      cancel: (id: string, options: RequestOptions = {}) =>
+        this.#strictResource(
+          `/file-upload-intents/${encodeURIComponent(id)}`,
+          fileUploadCancellationValidator,
+          'file upload cancellation',
+          { ...options, method: 'DELETE' },
+        ),
+      create: (data: FileUploadIntentCreate, options: MutationOptions = {}) =>
+        this.#strictResource(
+          '/file-upload-intents',
+          fileUploadIntentValidator,
+          'file upload intent',
+          {
+            ...options,
+            body: data,
+            idempotencyKey: options.idempotencyKey || newRequestId(),
+            method: 'POST',
+          },
+          201,
+        ),
+      finalize: (id: string, options: RequestOptions = {}) =>
+        this.#strictResource(
+          `/file-upload-intents/${encodeURIComponent(id)}/finalize`,
+          fileValidator,
+          'file upload finalization',
+          { ...options, method: 'POST' },
+          200,
+          undefined,
+          (item) => fileEtag(item.attributes.syncRevision),
+        ),
+    }
+    this.members = {
+      get: (id: string, options: AdministrationPiiOptions = {}) => {
+        const { includePii, ...requestOptions } = options
+        return this.#strictResource(
+          `/members/${encodeURIComponent(id)}`,
+          memberValidator(includePii === true),
+          'member',
+          {
+            ...requestOptions,
+            ...(includePii === undefined ? {} : { query: { includePii } }),
+          },
+          200,
+          (resource) => resource.attributes.revision,
+        )
+      },
+      list: (options: MemberListOptions = {}) =>
+        this.#strictPage(
+          '/members',
+          memberValidator(options.includePii === true),
+          'member list',
+          options,
+        ),
+      pages: (options: MemberListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          '/members',
+          memberValidator(options.includePii === true),
+          'member list',
+          options,
+          pagination,
+        ),
+      remove: (id: string, options: AdministrationMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictNoContent(`/members/${encodeURIComponent(id)}`, {
+          ...requestOptions,
+          ifMatch: canonicalAdministrationEtag(ifMatch),
+          method: 'DELETE',
+        })
+      },
+      updateRole: (id: string, data: MemberRoleUpdate, options: AdministrationMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/members/${encodeURIComponent(id)}/role`,
+          memberValidator(false),
+          'member role update',
+          {
+            ...requestOptions,
+            body: data,
+            ifMatch: canonicalAdministrationEtag(ifMatch),
+            method: 'PATCH',
+          },
+          200,
+          (resource) => resource.attributes.revision,
+        )
+      },
+    }
+    this.invitations = {
+      cancel: (id: string, options: AdministrationMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictNoContent(`/invitations/${encodeURIComponent(id)}`, {
+          ...requestOptions,
+          ifMatch: canonicalAdministrationEtag(ifMatch),
+          method: 'DELETE',
+        })
+      },
+      create: (data: InvitationCreate, options: MutationOptions = {}) =>
+        this.#strictResource(
+          '/invitations',
+          invitationCreateValidator,
+          'invitation creation',
+          {
+            ...options,
+            body: data,
+            idempotencyKey: options.idempotencyKey || newRequestId(),
+            method: 'POST',
+          },
+          201,
+          (resource) => resource.attributes.revision,
+        ),
+      get: (id: string, options: AdministrationPiiOptions = {}) => {
+        const { includePii, ...requestOptions } = options
+        return this.#strictResource(
+          `/invitations/${encodeURIComponent(id)}`,
+          invitationValidator(includePii === true),
+          'invitation',
+          {
+            ...requestOptions,
+            ...(includePii === undefined ? {} : { query: { includePii } }),
+          },
+          200,
+          (resource) => resource.attributes.revision,
+        )
+      },
+      list: (options: InvitationListOptions = {}) =>
+        this.#strictPage(
+          '/invitations',
+          invitationValidator(options.includePii === true),
+          'invitation list',
+          options,
+        ),
+      pages: (options: InvitationListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          '/invitations',
+          invitationValidator(options.includePii === true),
+          'invitation list',
+          options,
+          pagination,
+        ),
+      resend: (id: string, options: InvitationResendOptions) => {
+        const { idempotencyKey, ifMatch, ...requestOptions } = options
+        return this.#strictNoContent(
+          `/invitations/${encodeURIComponent(id)}/resend`,
+          {
+            ...requestOptions,
+            idempotencyKey: idempotencyKey || newRequestId(),
+            ifMatch: canonicalAdministrationEtag(ifMatch),
+            method: 'POST',
+          },
+          true,
+        )
+      },
+    }
+    this.roles = {
+      create: (data: RoleCreate, options: MutationOptions = {}) =>
+        this.#strictResource(
+          '/roles',
+          roleValidator,
+          'role creation',
+          {
+            ...options,
+            body: data,
+            idempotencyKey: options.idempotencyKey || newRequestId(),
+            method: 'POST',
+          },
+          201,
+          (resource) => resource.attributes.revision,
+        ),
+      remove: (id: string, options: AdministrationMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictNoContent(`/roles/${encodeURIComponent(id)}`, {
+          ...requestOptions,
+          ifMatch: canonicalAdministrationEtag(ifMatch),
+          method: 'DELETE',
+        })
+      },
+      get: (id: string, options?: RequestOptions) =>
+        this.#strictResource(
+          `/roles/${encodeURIComponent(id)}`,
+          roleValidator,
+          'role',
+          options,
+          200,
+          (resource) => resource.attributes.revision,
+        ),
+      list: (options: ListOptions = {}) =>
+        this.#strictPage('/roles', roleValidator, 'role list', options),
+      pages: (options: ListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages('/roles', roleValidator, 'role list', options, pagination),
+      update: (id: string, data: RoleUpdate, options: AdministrationMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/roles/${encodeURIComponent(id)}`,
+          roleValidator,
+          'role update',
+          {
+            ...requestOptions,
+            body: data,
+            ifMatch: canonicalAdministrationEtag(ifMatch),
+            method: 'PATCH',
+          },
+          200,
+          (resource) => resource.attributes.revision,
+        )
+      },
+    }
+    this.groups = {
+      create: (data: GroupCreate, options: MutationOptions = {}) =>
+        this.#strictResource(
+          '/groups',
+          groupValidator,
+          'group creation',
+          {
+            ...options,
+            body: data,
+            idempotencyKey: options.idempotencyKey || newRequestId(),
+            method: 'POST',
+          },
+          201,
+          (resource) => resource.attributes.revision,
+        ),
+      remove: (id: string, options: AdministrationMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictNoContent(`/groups/${encodeURIComponent(id)}`, {
+          ...requestOptions,
+          ifMatch: canonicalAdministrationEtag(ifMatch),
+          method: 'DELETE',
+        })
+      },
+      get: (id: string, options?: RequestOptions) =>
+        this.#strictResource(
+          `/groups/${encodeURIComponent(id)}`,
+          groupValidator,
+          'group',
+          options,
+          200,
+          (resource) => resource.attributes.revision,
+        ),
+      list: (options: ListOptions = {}) =>
+        this.#strictPage('/groups', groupValidator, 'group list', options),
+      pages: (options: ListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages('/groups', groupValidator, 'group list', options, pagination),
+      update: (id: string, data: GroupUpdate, options: AdministrationMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/groups/${encodeURIComponent(id)}`,
+          groupValidator,
+          'group update',
+          {
+            ...requestOptions,
+            body: data,
+            ifMatch: canonicalAdministrationEtag(ifMatch),
+            method: 'PATCH',
+          },
+          200,
+          (resource) => resource.attributes.revision,
+        )
+      },
+    }
+    this.search = {
+      query: (data: SearchQuery, options: RequestOptions = {}) =>
+        this.#strictResourceArray('/search', searchResultValidator, 'search', 50, {
+          ...options,
+          body: data,
+          method: 'POST',
+        }),
+    }
+    this.exports = {
+      create: (data: ExportCreate, options: MutationOptions = {}) =>
+        this.#strictResource(
+          '/exports',
+          exportCreationValidator,
+          'export creation',
+          {
+            ...options,
+            body: data,
+            idempotencyKey: options.idempotencyKey || newRequestId(),
+            method: 'POST',
+          },
+          201,
+        ),
+      createDownloadIntent: (id: string, options: RequestOptions = {}) =>
+        this.#strictResource(
+          `/exports/${encodeURIComponent(id)}/download-intent`,
+          exportDownloadIntentValidator,
+          'export download intent',
+          { ...options, method: 'POST' },
+          201,
+        ),
+      download: (id: string, options: ExportDownloadOptions) => this.#downloadExport(id, options),
+      get: (id: string, options?: RequestOptions) =>
+        this.#strictResource(
+          `/exports/${encodeURIComponent(id)}`,
+          exportJobValidator,
+          'export job',
+          options,
+        ),
+    }
+    this.automationActions = {
+      list: (options: RequestOptions = {}) =>
+        this.#strictResourceArray(
+          '/automation-actions',
+          automationActionValidator,
+          'automation action list',
+          29,
+          options,
+        ),
+    }
+    this.automationDefinitions = {
+      archive: (id: string, options: AutomationDefinitionMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/automation-definitions/${encodeURIComponent(id)}`,
+          automationDefinitionValidator('required'),
+          'automation definition archive',
+          {
+            ...requestOptions,
+            ifMatch: canonicalAutomationDefinitionEtag(ifMatch),
+            method: 'DELETE',
+          },
+          200,
+          (resource) => resource.attributes.revision,
+        )
+      },
+      create: (data: AutomationDefinitionCreate, options: MutationOptions = {}) =>
+        this.#strictResource(
+          '/automation-definitions',
+          automationDefinitionValidator('required'),
+          'automation definition creation',
+          {
+            ...options,
+            body: data,
+            idempotencyKey: options.idempotencyKey || newRequestId(),
+            method: 'POST',
+          },
+          201,
+          (resource) => resource.attributes.revision,
+        ),
+      get: (id: string, options?: RequestOptions) =>
+        this.#strictResource(
+          `/automation-definitions/${encodeURIComponent(id)}`,
+          automationDefinitionValidator('absent'),
+          'automation definition',
+          options,
+          200,
+          (resource) => resource.attributes.revision,
+        ),
+      list: (options: AutomationDefinitionListOptions = {}) =>
+        this.#strictPage(
+          '/automation-definitions',
+          automationDefinitionValidator('absent'),
+          'automation definition list',
+          options,
+        ),
+      pages: (options: AutomationDefinitionListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          '/automation-definitions',
+          automationDefinitionValidator('absent'),
+          'automation definition list',
+          options,
+          pagination,
+        ),
+      restore: (id: string, options: AutomationDefinitionMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/automation-definitions/${encodeURIComponent(id)}/restore`,
+          automationDefinitionValidator('required'),
+          'automation definition restore',
+          {
+            ...requestOptions,
+            ifMatch: canonicalAutomationDefinitionEtag(ifMatch),
+            method: 'POST',
+          },
+          200,
+          (resource) => resource.attributes.revision,
+        )
+      },
+      update: (
+        id: string,
+        data: AutomationDefinitionUpdate,
+        options: AutomationDefinitionMutationOptions,
+      ) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/automation-definitions/${encodeURIComponent(id)}`,
+          automationDefinitionValidator('required'),
+          'automation definition update',
+          {
+            ...requestOptions,
+            body: data,
+            ifMatch: canonicalAutomationDefinitionEtag(ifMatch),
+            method: 'PATCH',
+          },
+          200,
+          (resource) => resource.attributes.revision,
+        )
+      },
+    }
+    this.automationDefinitionVersions = {
+      list: (id: string, options: ListOptions = {}) =>
+        this.#strictPage(
+          `/automation-definitions/${encodeURIComponent(id)}/versions`,
+          automationDefinitionVersionValidator,
+          'automation definition version list',
+          options,
+        ),
+      pages: (id: string, options: ListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          `/automation-definitions/${encodeURIComponent(id)}/versions`,
+          automationDefinitionVersionValidator,
+          'automation definition version list',
+          options,
+          pagination,
+        ),
+    }
+    this.automationRuns = {
+      abort: (id: string, options: AutomationRunMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/automation-runs/${encodeURIComponent(id)}/abort`,
+          automationRunValidator('required'),
+          'automation run abort',
+          {
+            ...requestOptions,
+            ifMatch: canonicalAutomationRunEtag(ifMatch),
+            method: 'POST',
+          },
+          200,
+          (resource) => resource.attributes.revision,
+        )
+      },
+      get: (id: string, options?: RequestOptions) =>
+        this.#strictResource(
+          `/automation-runs/${encodeURIComponent(id)}`,
+          automationRunValidator('absent'),
+          'automation run',
+          options,
+          200,
+          (resource) => resource.attributes.revision,
+        ),
+      list: (options: AutomationRunListOptions = {}) =>
+        this.#strictPage(
+          '/automation-runs',
+          automationRunValidator('absent'),
+          'automation run list',
+          options,
+        ),
+      pages: (options: AutomationRunListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          '/automation-runs',
+          automationRunValidator('absent'),
+          'automation run list',
+          options,
+          pagination,
+        ),
+    }
+    this.integrationInstallations = {
+      list: (options: RequestOptions = {}) =>
+        this.#strictResourceArray(
+          '/integration-installations',
+          integrationInstallationValidator,
+          'integration installation list',
+          100,
+          options,
+        ),
     }
     this.changes = {
       checkpoint: (options?: ChangeFilterOptions) =>
@@ -942,6 +1995,235 @@ export class TeamGridClient {
         this.#pages<Webhook>('/webhooks', options, pagination),
       remove: (id: string, options?: RequestOptions) =>
         this.#archive(`/webhooks/${encodeURIComponent(id)}`, options),
+    }
+  }
+
+  async #strictResource<T>(
+    path: string,
+    validator: (value: unknown) => value is T,
+    label: string,
+    options: InternalRequestOptions = {},
+    expectedStatus = 200,
+    revision?: (resource: T) => string,
+    expectedEtag?: (resource: T) => string | null,
+  ) {
+    const response = await this.#request(path, options)
+    if (response.transport.status !== expectedStatus) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned an unexpected status for ${label}.`,
+      )
+    }
+    const envelope = assertStrictResource(response.payload, validator, label)
+    if (revision) assertRevisionEtag(response.transport, revision(envelope.data), label)
+    if (expectedEtag) {
+      const expected = expectedEtag(envelope.data)
+      if (!expected || response.transport.headers.etag !== expected) {
+        throw new TeamGridClientError(
+          'invalid_api_response',
+          `The TeamGrid API returned an invalid ${label} ETag.`,
+        )
+      }
+    }
+    return attachTransport(envelope, response.transport)
+  }
+
+  async #strictResourceArray<T>(
+    path: string,
+    validator: (value: unknown) => value is T,
+    label: string,
+    maximum: number,
+    options: InternalRequestOptions = {},
+  ) {
+    const response = await this.#request(path, options)
+    if (response.transport.status !== 200) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned an unexpected status for ${label}.`,
+      )
+    }
+    return attachTransport(
+      assertStrictResourceArray(response.payload, validator, label, maximum),
+      response.transport,
+    )
+  }
+
+  async #strictPage<T>(
+    path: string,
+    validator: (value: unknown) => value is T,
+    label: string,
+    options: ListOptions & Record<string, unknown> = {},
+  ) {
+    const { requestId, signal, ...query } = options
+    const response = await this.#request(path, {
+      query: query as Query,
+      requestId,
+      signal,
+    })
+    if (response.transport.status !== 200) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned an unexpected status for ${label}.`,
+      )
+    }
+    return attachTransport(assertStrictPage(response.payload, validator, label), response.transport)
+  }
+
+  async *#strictPages<T>(
+    path: string,
+    validator: (value: unknown) => value is T,
+    label: string,
+    options: ListOptions & Record<string, unknown> = {},
+    pagination: PaginationOptions = {},
+  ) {
+    let cursor = options.cursor
+    const seen = new Set<string>()
+    const maxPages = Math.max(1, Math.min(Math.trunc(pagination.maxPages ?? 10_000), 10_000))
+    for (let pageIndex = 0; pageIndex < maxPages; pageIndex += 1) {
+      const page = await this.#strictPage(path, validator, label, {
+        ...options,
+        cursor,
+        signal: pagination.signal || options.signal,
+      })
+      yield page
+      const nextCursor = page.meta.page.nextCursor
+      if (!nextCursor) return
+      if (seen.has(nextCursor)) {
+        throw new TeamGridClientError(
+          'pagination_cycle',
+          'The TeamGrid API returned a repeated pagination cursor.',
+        )
+      }
+      seen.add(nextCursor)
+      cursor = nextCursor
+    }
+    throw new TeamGridClientError(
+      'pagination_limit',
+      `Pagination exceeded the configured ${maxPages}-page safety limit.`,
+    )
+  }
+
+  async #strictNoContent(
+    path: string,
+    options: InternalRequestOptions,
+    requireIdempotencyReplay = false,
+  ) {
+    const response = await this.#request(path, options)
+    if (
+      response.transport.status !== 204 ||
+      response.payload !== undefined ||
+      (requireIdempotencyReplay && response.transport.idempotencyReplayed === undefined)
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned an invalid empty mutation response.',
+      )
+    }
+    return response.transport
+  }
+
+  async #downloadExport(id: string, options: ExportDownloadOptions): Promise<ExportDownload> {
+    const { intentToken, maxBytes = maximumExportDownloadBytes, requestId, signal } = options
+    if (!isDownloadIntentToken(intentToken)) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'The export download intent token is invalid.',
+      )
+    }
+    if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > maximumExportDownloadBytes) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'Export maxBytes must be an integer between 1 and 52428800.',
+      )
+    }
+    const resolvedRequestId = requestId || newRequestId()
+    const url = new URL(`${this.#baseUrl}/exports/${encodeURIComponent(id)}/download`)
+    const headers = new Headers({
+      accept: 'text/csv',
+      authorization: `Bearer ${this.#token}`,
+      'x-teamgrid-client': '@teamgrid/api-client',
+      'x-teamgrid-client-version': apiClientVersion,
+      'x-teamgrid-export-download-intent': intentToken,
+      'x-request-id': resolvedRequestId,
+    })
+    const combined = buildCombinedSignal(signal, this.#timeoutMs)
+    try {
+      let response: Response
+      try {
+        response = await this.#fetch(url, {
+          headers,
+          method: 'GET',
+          redirect: 'manual',
+          signal: combined.signal,
+        })
+      } catch (error) {
+        if (error instanceof TeamGridClientError) throw error
+        throw new TeamGridClientError(
+          combined.signal.aborted ? 'request_aborted' : 'network_error',
+          combined.signal.aborted
+            ? 'The TeamGrid export download was aborted.'
+            : 'The TeamGrid export download could not reach the service.',
+          { cause: error },
+        )
+      }
+      const retryAfterMs = parseRetryAfter(response.headers.get('retry-after'))
+      const transport = transportMetadata({
+        attempts: 1,
+        fallbackRequestId: response.headers.get('x-request-id') || resolvedRequestId,
+        response,
+        retryAfterMs,
+      })
+      if (response.status >= 300 && response.status < 400) {
+        await response.body?.cancel()
+        throw new TeamGridClientError(
+          'unexpected_redirect',
+          'The TeamGrid export download refused an HTTP redirect.',
+        )
+      }
+      if (response.status !== 200) {
+        const text = await readBoundedResponseText(response, this.#maxResponseBytes)
+        let payload: unknown
+        try {
+          payload = text ? (JSON.parse(text) as unknown) : undefined
+        } catch {
+          payload = undefined
+        }
+        const envelope = isObject(payload) ? payload : {}
+        const responseRequestId =
+          isObject(envelope.meta) && typeof envelope.meta.requestId === 'string'
+            ? envelope.meta.requestId
+            : transport.requestId
+        throw new TeamGridApiError({
+          errors: Array.isArray(envelope.errors) ? envelope.errors : undefined,
+          requestId: responseRequestId,
+          retryAfterMs,
+          status: response.status,
+          transport,
+        })
+      }
+      if (
+        response.headers.get('content-type')?.toLowerCase() !== exportContentType ||
+        response.headers.get('cache-control')?.toLowerCase() !== 'private, no-store' ||
+        response.headers.get('x-content-type-options')?.toLowerCase() !== 'nosniff'
+      ) {
+        await response.body?.cancel()
+        throw new TeamGridClientError(
+          'invalid_api_response',
+          'The TeamGrid export download returned unsafe response headers.',
+        )
+      }
+      const fileName = exportDownloadFileName(response.headers.get('content-disposition'))
+      if (!fileName) {
+        await response.body?.cancel()
+        throw new TeamGridClientError(
+          'invalid_api_response',
+          'The TeamGrid export download returned an invalid file name.',
+        )
+      }
+      const data = await readBoundedResponseBytes(response, maxBytes)
+      return attachTransport({ contentType: exportContentType, data, fileName }, transport)
+    } finally {
+      combined.cleanup()
     }
   }
 
