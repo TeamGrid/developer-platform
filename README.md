@@ -10,7 +10,7 @@ The packages live in [`developer-platform/`](developer-platform/):
 - [`@teamgrid/mcp-server`](developer-platform/packages/mcp-server)
 
 The checked API contract is available at [`openapi/v1.json`](openapi/v1.json). The same directory
-also mirrors the capability ledger, canonical 43-scope policy, complete 87-route v0 migration map,
+also mirrors the capability ledger, canonical 79-scope policy, complete 87-route v0 migration map,
 and SHA-256 contract manifest used by CI.
 See the [workspace documentation](developer-platform/README.md) for usage,
 credential handling, regional routing, and development instructions.

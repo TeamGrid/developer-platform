@@ -167,6 +167,13 @@ npm run verify
 tests (including an in-memory MCP negotiation), and builds all publishable
 packages.
 
+Canonical contract updates use `npm run sync:contracts --
+/path/to/teamgrid-api <full-api-commit-sha>`. The command reads every artifact
+from that immutable Git object, verifies the API-owned manifest, and records
+the exact repository, commit, manifest size, and manifest digest in
+`../openapi/source.json`. Never copy contract files from an uncommitted API
+working tree.
+
 Before publishing, also run `npm audit --omit=dev` and `npm pack --dry-run` in
 each package directory, then inspect the file lists. Releases are submitted by
 the public repository's stage-only trusted publisher and require an explicit
