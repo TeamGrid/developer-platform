@@ -1690,9 +1690,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.callNotes.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/callNotes/get",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "getCallNote",
@@ -1746,9 +1746,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.contacts.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/contacts/get",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "getContact",
@@ -1771,9 +1771,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.contactGroups.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/contactGroups/get",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "getContactGroup",
@@ -2014,9 +2014,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.lists.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/lists/get",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "getList",
@@ -2157,9 +2157,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.projects.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/projects/get",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "getProject",
@@ -2322,9 +2322,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.services.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/services/get",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "getService",
@@ -2372,9 +2372,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.tags.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/tags/get",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "getTag",
@@ -2397,9 +2397,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.tasks.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/tasks/get",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "getTask",
@@ -2447,9 +2447,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.timeEntries.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/timeEntries/get",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "getTimeEntry",
@@ -2522,9 +2522,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.workspaces.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/workspace/get",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "getWorkspace",
@@ -2866,9 +2866,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.callNotes.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/callNotes/list",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "listCallNotes",
@@ -2947,9 +2947,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.contactGroups.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/contactGroups/list",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "listContactGroups",
@@ -2972,9 +2972,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.contacts.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/contacts/list",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "listContacts",
@@ -3156,9 +3156,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.lists.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/lists/list",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "listLists",
@@ -3299,9 +3299,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.projects.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/projects/list",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "listProjects",
@@ -3413,9 +3413,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.services.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/services/list",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "listServices",
@@ -3438,9 +3438,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.tags.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/tags/list",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "listTags",
@@ -3463,9 +3463,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.tasks.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/tasks/list",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "listTasks",
@@ -3488,9 +3488,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.timeEntries.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/timeEntries/list",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "listTimeEntries",
@@ -3513,9 +3513,9 @@
           "role": "transport"
         },
         {
-          "id": "api.mongo.users.read",
-          "kind": "cellRead",
-          "role": "data"
+          "id": "teamgrid/internal/v1/users/list",
+          "kind": "appMethod",
+          "role": "authorization"
         }
       ],
       "handlerId": "listUsers",
@@ -5029,36 +5029,16 @@
       "createTag",
       "createTask",
       "createTimeEntry",
-      "getCallNote",
-      "getContact",
-      "getContactGroup",
       "getCustomFieldDefinition",
-      "getList",
       "getProduct",
       "getProductGroup",
-      "getProject",
       "getProjectStatement",
       "getProjectTemplate",
-      "getService",
-      "getTag",
-      "getTask",
-      "getTimeEntry",
-      "getWorkspace",
-      "listCallNotes",
-      "listContactGroups",
-      "listContacts",
       "listCustomFieldDefinitions",
-      "listLists",
       "listProductGroups",
       "listProducts",
       "listProjectStatements",
       "listProjectTemplates",
-      "listProjects",
-      "listServices",
-      "listTags",
-      "listTasks",
-      "listTimeEntries",
-      "listUsers",
       "reopenTask",
       "restoreCallNote",
       "restoreContactGroup",
@@ -5180,13 +5160,19 @@
       "developerApi.v1.workspaceSettings.update",
       "teamgrid/internal/v1/callNotes/archive",
       "teamgrid/internal/v1/callNotes/create",
+      "teamgrid/internal/v1/callNotes/get",
+      "teamgrid/internal/v1/callNotes/list",
       "teamgrid/internal/v1/callNotes/restore",
       "teamgrid/internal/v1/changes/list",
       "teamgrid/internal/v1/contactGroups/archive",
       "teamgrid/internal/v1/contactGroups/create",
+      "teamgrid/internal/v1/contactGroups/get",
+      "teamgrid/internal/v1/contactGroups/list",
       "teamgrid/internal/v1/contactGroups/restore",
       "teamgrid/internal/v1/contactGroups/update",
       "teamgrid/internal/v1/contacts/create",
+      "teamgrid/internal/v1/contacts/get",
+      "teamgrid/internal/v1/contacts/list",
       "teamgrid/internal/v1/contacts/update",
       "teamgrid/internal/v1/customFieldDefinitions/archive",
       "teamgrid/internal/v1/customFieldDefinitions/assertAccess",
@@ -5210,26 +5196,36 @@
       "teamgrid/internal/v1/files/uploadIntent/finalize",
       "teamgrid/internal/v1/lists/archive",
       "teamgrid/internal/v1/lists/create",
+      "teamgrid/internal/v1/lists/get",
+      "teamgrid/internal/v1/lists/list",
       "teamgrid/internal/v1/lists/restore",
       "teamgrid/internal/v1/lists/update",
       "teamgrid/internal/v1/projectLifecycleOperations/get",
       "teamgrid/internal/v1/projects/archive",
       "teamgrid/internal/v1/projects/complete",
       "teamgrid/internal/v1/projects/create",
+      "teamgrid/internal/v1/projects/get",
+      "teamgrid/internal/v1/projects/list",
       "teamgrid/internal/v1/projects/reopen",
       "teamgrid/internal/v1/projects/restore",
       "teamgrid/internal/v1/projects/update",
       "teamgrid/internal/v1/services/archive",
       "teamgrid/internal/v1/services/create",
+      "teamgrid/internal/v1/services/get",
+      "teamgrid/internal/v1/services/list",
       "teamgrid/internal/v1/services/restore",
       "teamgrid/internal/v1/services/update",
       "teamgrid/internal/v1/tags/archive",
       "teamgrid/internal/v1/tags/create",
+      "teamgrid/internal/v1/tags/get",
+      "teamgrid/internal/v1/tags/list",
       "teamgrid/internal/v1/tags/restore",
       "teamgrid/internal/v1/tags/update",
       "teamgrid/internal/v1/tasks/archive",
       "teamgrid/internal/v1/tasks/complete",
       "teamgrid/internal/v1/tasks/create",
+      "teamgrid/internal/v1/tasks/get",
+      "teamgrid/internal/v1/tasks/list",
       "teamgrid/internal/v1/tasks/reopen",
       "teamgrid/internal/v1/tasks/restore",
       "teamgrid/internal/v1/tasks/timer/start",
@@ -5237,34 +5233,17 @@
       "teamgrid/internal/v1/tasks/update",
       "teamgrid/internal/v1/timeEntries/archive",
       "teamgrid/internal/v1/timeEntries/create",
+      "teamgrid/internal/v1/timeEntries/get",
+      "teamgrid/internal/v1/timeEntries/list",
       "teamgrid/internal/v1/timeEntries/restore",
       "teamgrid/internal/v1/timeEntries/update",
+      "teamgrid/internal/v1/users/list",
       "teamgrid/internal/v1/webhookDeliveries/get",
       "teamgrid/internal/v1/webhookDeliveries/list",
       "teamgrid/internal/v1/webhooks/create",
-      "teamgrid/internal/v1/webhooks/remove"
+      "teamgrid/internal/v1/webhooks/remove",
+      "teamgrid/internal/v1/workspace/get"
     ],
-    "unmediatedCellReadOperations": [
-      "getCallNote",
-      "getContact",
-      "getContactGroup",
-      "getList",
-      "getProject",
-      "getService",
-      "getTag",
-      "getTask",
-      "getTimeEntry",
-      "getWorkspace",
-      "listCallNotes",
-      "listContactGroups",
-      "listContacts",
-      "listLists",
-      "listProjects",
-      "listServices",
-      "listTags",
-      "listTasks",
-      "listTimeEntries",
-      "listUsers"
-    ]
+    "unmediatedCellReadOperations": []
   }
 }
