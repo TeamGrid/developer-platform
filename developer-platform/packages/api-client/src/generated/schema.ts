@@ -3170,7 +3170,7 @@ export interface components {
                 region: string;
                 resourceId: string;
                 /** @enum {string} */
-                resourceType: "callNote" | "contact" | "contactGroup" | "customFieldDefinition" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "service" | "tag" | "task" | "timeEntry";
+                resourceType: "absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook";
                 sequence: number;
                 tombstone: boolean;
             };
@@ -4208,7 +4208,7 @@ export interface operations {
                 /** @description Filter by one or more change operations. Repeat the query parameter for multiple values. */
                 operations?: ("created" | "deleted" | "updated")[];
                 /** @description Filter by one or more public resource types. Repeat the query parameter for multiple values. */
-                resourceTypes?: ("callNote" | "contact" | "contactGroup" | "customFieldDefinition" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "service" | "tag" | "task" | "timeEntry")[];
+                resourceTypes?: ("absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook")[];
                 /** @description Create an empty checkpoint at the latest committed cell sequence. Cannot be combined with cursor. Use this before a full resource snapshot, then poll with the returned cursor. */
                 startAtLatest?: boolean;
             };

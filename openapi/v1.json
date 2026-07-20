@@ -5298,19 +5298,29 @@
               },
               "resourceType": {
                 "enum": [
+                  "absence",
+                  "appointment",
+                  "automationDefinition",
+                  "automationRun",
                   "callNote",
+                  "comment",
                   "contact",
                   "contactGroup",
                   "customFieldDefinition",
+                  "document",
+                  "file",
+                  "integration",
                   "list",
                   "product",
                   "productGroup",
                   "project",
                   "projectStatement",
+                  "projectTemplate",
                   "service",
                   "tag",
                   "task",
-                  "timeEntry"
+                  "timeEntry",
+                  "webhook"
                 ],
                 "type": "string"
               },
@@ -9482,19 +9492,29 @@
             "schema": {
               "items": {
                 "enum": [
+                  "absence",
+                  "appointment",
+                  "automationDefinition",
+                  "automationRun",
                   "callNote",
+                  "comment",
                   "contact",
                   "contactGroup",
                   "customFieldDefinition",
+                  "document",
+                  "file",
+                  "integration",
                   "list",
                   "product",
                   "productGroup",
                   "project",
                   "projectStatement",
+                  "projectTemplate",
                   "service",
                   "tag",
                   "task",
-                  "timeEntry"
+                  "timeEntry",
+                  "webhook"
                 ],
                 "type": "string"
               },
