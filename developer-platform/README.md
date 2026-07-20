@@ -229,9 +229,11 @@ Cloudflare Quick Tunnel is known to be reachable.
 
 The staging proof also spawns the built CLI for a live workspace request and negotiates with the
 built MCP stdio binary before making changes. It then verifies the fixed-watermark change feed,
-custom-field compare-and-set values, project-template capture/instantiation, and planned-work
-replacement against disposable staging resources. The script never permits these mutation smokes
-against an unmarked production hostname. Release qualification is stricter: cleanup failures fail
+custom-field compare-and-set values, project-template capture/instantiation, planned-work
+replacement, and a bounded asynchronous private export through job completion, download-intent
+creation, and SDK-streamed CSV download. Export metadata expires with the job queue and the tiny
+test object is removed by the required one-day bucket lifecycle. The script never permits these
+mutation smokes against an unmarked production hostname. Release qualification is stricter: cleanup failures fail
 the run, every created API resource is re-read until its archived or absent terminal state is proven,
 and the machine-readable
 evidence is written atomically only after reconciliation. The staging deployment embeds that report
