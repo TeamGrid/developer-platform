@@ -130,6 +130,25 @@ async function expectRawFailure(candidateToken, expectedStatus) {
   assert.match(response.headers.get('x-request-id') || '', /^[A-Za-z0-9._:-]+$/)
 }
 
+async function expectRawJsonApiError({ body, idempotencyKey, path }, expectedStatus, expectedCode) {
+  const response = await fetch(new URL(path, `${baseUrl.replace(/\/$/, '')}/`), {
+    body: JSON.stringify(body),
+    headers: {
+      authorization: `Bearer ${token}`,
+      'content-type': 'application/json',
+      'idempotency-key': idempotencyKey,
+    },
+    method: 'POST',
+    redirect: 'manual',
+  })
+  assert.equal(response.status, expectedStatus)
+  const requestId = response.headers.get('x-request-id') || ''
+  assert.match(requestId, /^[A-Za-z0-9._:-]{1,128}$/)
+  const payload = await response.json()
+  assert.equal(payload?.errors?.[0]?.code, expectedCode)
+  assert.equal(payload?.meta?.requestId, requestId)
+}
+
 async function archiveProject(id) {
   const current = await client.projects.get(id)
   const accepted = await client.projects.archive(id, {
@@ -295,9 +314,13 @@ try {
     assert.match(directOriginResponse.headers.get('x-request-id') || '', /^[A-Za-z0-9._:-]+$/)
   }
 
-  await expectApiError(
-    () => client.webhooks.create({ actions: ['task_created'], url: 'http://127.0.0.1/hook' }),
+  await expectRawJsonApiError({
+    body: { actions: ['task_created'], url: 'https://127.0.0.1/hook' },
+    idempotencyKey: `staging-e2e-forbidden-webhook-${runId}`,
+    path: 'webhooks',
+  },
     400,
+    'invalid_request',
   )
   const createdWebhook = await client.webhooks.create({
     actions: ['task_created'],
