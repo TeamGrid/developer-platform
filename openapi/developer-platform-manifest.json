@@ -3,6 +3,12 @@
   "contractVersion": "1.0.0-beta.1",
   "artifacts": [
     {
+      "bytes": 602,
+      "id": "action-policy-registry",
+      "path": "contracts/developer-action-policy-registry.json",
+      "sha256": "5dcd82242ee1d6948693789dbda5fa720573e9384dd06d416c2414023c3d4ff3"
+    },
+    {
       "bytes": 62150,
       "id": "capability-ledger",
       "path": "contracts/developer-capabilities.json",
@@ -46,10 +52,15 @@
     }
   ],
   "summary": {
+    "actionPolicyRegistryOperations": 182,
+    "actionPolicyRegistrySha256": "b953f04a8769377a48514429ba681d6963eb65d1826183f907bc331129ba4ec5",
+    "actionPolicyRegistryVersion": "developer-action-policy-v3",
+    "authenticatedActionPolicies": 181,
     "classifiedProductCapabilities": 73,
     "canonicalScopes": 79,
     "governedV1Operations": 182,
     "operationBindings": 182,
+    "principalPolicyFamilies": 12,
     "referencedAppMethods": 181,
     "remainingDirectCellReads": 0,
     "unmediatedDirectCellReads": 0,

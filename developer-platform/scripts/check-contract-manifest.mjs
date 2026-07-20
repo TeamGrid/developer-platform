@@ -8,6 +8,7 @@ const provenance = JSON.parse(
   await readFile(new URL('../../openapi/source.json', import.meta.url), 'utf8'),
 )
 const localArtifacts = {
+  'contracts/developer-action-policy-registry.json': '../../openapi/developer-action-policy-registry.json',
   'contracts/developer-capabilities.json': '../../openapi/developer-capabilities.json',
   'contracts/developer-operation-bindings.json': '../../openapi/developer-operation-bindings.json',
   'contracts/developer-scopes.json': '../../openapi/developer-scopes.json',

@@ -174,6 +174,12 @@ the exact repository, commit, manifest size, and manifest digest in
 `../openapi/source.json`. Never copy contract files from an uncommitted API
 working tree.
 
+The mirrored manifest also contains `developer-action-policy-registry.json`.
+It pins the App/API authorization registry version, SHA-256 identity, all 182
+action policies, and 12 principal-policy rollout families. SDK, CLI, and MCP do
+not evaluate or broaden this policy locally; every request remains subject to
+the owning App cell's authorization decision.
+
 Before publishing, also run `npm audit --omit=dev` and `npm pack --dry-run` in
 each package directory, then inspect the file lists. Releases are submitted by
 the public repository's stage-only trusted publisher and require an explicit

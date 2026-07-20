@@ -8,6 +8,7 @@ const execFileAsync = promisify(execFile)
 const workspaceRoot = path.resolve(import.meta.dirname, '../..')
 const sourceRepository = 'TeamGrid/teamgrid-api'
 const artifactDestinations = {
+  'contracts/developer-action-policy-registry.json': 'developer-action-policy-registry.json',
   'contracts/developer-capabilities.json': 'developer-capabilities.json',
   'contracts/developer-operation-bindings.json': 'developer-operation-bindings.json',
   'contracts/developer-scopes.json': 'developer-scopes.json',
