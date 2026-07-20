@@ -947,7 +947,7 @@ describe('TeamGrid API client', () => {
         { ifMatch: current.data.attributes.revision },
       ),
     ).resolves.toMatchObject({ data: { attributes: { revision: nextRevision } } })
-    expect(() =>
+    await expect(() =>
       client.customFieldValues.clear('project', 'project-1', 'field1', { ifMatch: '*' }),
     ).rejects.toMatchObject({ code: 'invalid_arguments' })
   })
