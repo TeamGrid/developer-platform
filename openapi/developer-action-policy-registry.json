@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "registryVersion": "developer-action-policy-v4",
+  "registrySha256": "66f732888d35542f29470545d4601c1c5cc653d37a9c55d7d2329896ad779002",
+  "actionPolicyCount": 182,
+  "authenticatedActionPolicyCount": 181,
+  "principalPolicyFamilyIds": [
+    "administration",
+    "automation",
+    "calendar",
+    "collaboration",
+    "commerce",
+    "content",
+    "core",
+    "customer-data",
+    "governance",
+    "integrations-events",
+    "search-export",
+    "work-management"
+  ],
+  "operationBindingCatalogSha256": "316514512924b0917018576e1d013120c2eb5f37e5d475a7e0b1695911427749"
+}

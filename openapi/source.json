@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "TeamGrid/teamgrid-api",
+  "sourceCommit": "176493414891c5bb289c28586080451a6cc68275",
+  "contractManifest": {
+    "path": "contracts/developer-platform-manifest.json",
+    "bytes": 2365,
+    "sha256": "fc6d7162b4529910ccfd08312ab8ac8d2f13af884e85faf9f52e550d41599129"
+  }
+}

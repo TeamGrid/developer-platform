@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": "1.0.0-beta.1",
+  "artifacts": [
+    {
+      "bytes": 602,
+      "id": "action-policy-registry",
+      "path": "contracts/developer-action-policy-registry.json",
+      "sha256": "a18a4c36a0c41eda1ee25a1644d834e1e22114e28be2710f6b0951fd5bcf9748"
+    },
+    {
+      "bytes": 62150,
+      "id": "capability-ledger",
+      "path": "contracts/developer-capabilities.json",
+      "sha256": "a1f91460803bd862021224e8c87e239b6464aa1ee190ff7e0d2bbaa100fcd7a7"
+    },
+    {
+      "bytes": 131517,
+      "id": "operation-bindings",
+      "path": "contracts/developer-operation-bindings.json",
+      "sha256": "316514512924b0917018576e1d013120c2eb5f37e5d475a7e0b1695911427749"
+    },
+    {
+      "bytes": 8853,
+      "id": "scope-contract",
+      "path": "contracts/developer-scopes.json",
+      "sha256": "930a215e5a2f9852b1b8af036eb67a4946a2a16d3b19405622332fa7ebaf4757"
+    },
+    {
+      "bytes": 15389,
+      "id": "v0-route-inventory",
+      "path": "contracts/v0-routes.json",
+      "sha256": "95a559e8cc46e6c6aaeab4239ea5e1fd4841438fc220cbfa8ef7ca7068b0dd9d"
+    },
+    {
+      "bytes": 67801,
+      "id": "v0-to-v1-migration",
+      "path": "contracts/v0-to-v1-migration.json",
+      "sha256": "313ab009498a200421a87ac3bd5b46b4453f8c81addea69be58699525b2a0567"
+    },
+    {
+      "bytes": 210370,
+      "id": "openapi-v0",
+      "path": "openapi/v0.json",
+      "sha256": "46da62dba5b8a459362f4edd3c74fed1dac92300c414e606dfa9f433120da947"
+    },
+    {
+      "bytes": 733884,
+      "id": "openapi-v1",
+      "path": "openapi/v1.json",
+      "sha256": "4d390162bdef601d0e217e1e5ebe1ca48ee70e7f43e5d373d3edfd8ce38f85d9"
+    }
+  ],
+  "summary": {
+    "actionPolicyRegistryOperations": 182,
+    "actionPolicyRegistrySha256": "66f732888d35542f29470545d4601c1c5cc653d37a9c55d7d2329896ad779002",
+    "actionPolicyRegistryVersion": "developer-action-policy-v4",
+    "authenticatedActionPolicies": 181,
+    "classifiedProductCapabilities": 73,
+    "canonicalScopes": 79,
+    "governedV1Operations": 182,
+    "operationBindings": 182,
+    "principalPolicyFamilies": 12,
+    "referencedAppMethods": 181,
+    "remainingDirectCellReads": 0,
+    "unmediatedDirectCellReads": 0,
+    "resourceCasMutationOperations": 14,
+    "resourceCasOperationReads": 2,
+    "v0Operations": 87,
+    "v0MigrationRoutes": 87,
+    "v1Operations": 182
+  }
+}

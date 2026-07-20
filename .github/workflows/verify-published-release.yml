@@ -1,0 +1,93 @@
+name: Verify published npm release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact published package version
+        required: true
+        type: string
+      dist_tag:
+        description: Expected npm dist-tag
+        required: true
+        type: choice
+        options:
+          - next
+          - latest
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-release-verification
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: npm
+    steps:
+      - name: Set up the current supported npm toolchain
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install npm 11.18.0
+        run: npm install --global npm@11.18.0
+
+      - name: Wait for all three exact versions and dist-tags
+        env:
+          RELEASE_DIST_TAG: ${{ inputs.dist_tag }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          packages=(@teamgrid/api-client @teamgrid/cli @teamgrid/mcp-server)
+          for attempt in $(seq 1 30); do
+            ready=true
+            for package_name in "${packages[@]}"; do
+              version="$(npm view "${package_name}@${RELEASE_VERSION}" version 2>/dev/null || true)"
+              tag_version="$(npm view "$package_name" "dist-tags.${RELEASE_DIST_TAG}" 2>/dev/null || true)"
+              if [[ "$version" != "$RELEASE_VERSION" || "$tag_version" != "$RELEASE_VERSION" ]]; then
+                ready=false
+              fi
+            done
+            if [[ "$ready" == "true" ]]; then exit 0; fi
+            if [[ "$attempt" != 30 ]]; then sleep 10; fi
+          done
+          echo "The exact version and dist-tag did not converge for every TeamGrid package." >&2
+          exit 1
+
+      - name: Clean-install the public package set
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir clean-install
+          cd clean-install
+          npm init -y >/dev/null
+          npm install --ignore-scripts \
+            "@teamgrid/api-client@${RELEASE_VERSION}" \
+            "@teamgrid/cli@${RELEASE_VERSION}" \
+            "@teamgrid/mcp-server@${RELEASE_VERSION}"
+          npm audit signatures
+          node --input-type=module -e \
+            "await import('@teamgrid/api-client'); await import('@teamgrid/cli'); await import('@teamgrid/mcp-server')"
+          ./node_modules/.bin/teamgrid --help >/dev/null
+          ./node_modules/.bin/teamgrid-mcp --help >/dev/null
+
+      - name: Record registry verification
+        env:
+          RELEASE_DIST_TAG: ${{ inputs.dist_tag }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          {
+            echo "## npm release verification"
+            echo
+            echo "- Version: $RELEASE_VERSION"
+            echo "- Dist-tag: $RELEASE_DIST_TAG"
+            echo "- Packages: API client, CLI, MCP server"
+            echo "- Registry versions/tags, clean install, signatures, imports, and binaries: passed"
+          } >> "$GITHUB_STEP_SUMMARY"

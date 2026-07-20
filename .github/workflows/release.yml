@@ -15,6 +15,15 @@ on:
         options:
           - next
           - latest
+      production_release_run_url:
+        description: Successful TeamGrid multi-cell production run that promoted this exact contract.
+        required: true
+        type: string
+      confirm_ga:
+        description: Confirm the separately approved GA gate; required only for latest.
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -57,8 +66,47 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
+      - name: Verify immutable runtime promotion evidence
+        env:
+          GH_TOKEN: ${{ secrets.TEAMGRID_REPOSITORY_TOKEN }}
+          PRODUCTION_RELEASE_RUN_URL: ${{ inputs.production_release_run_url }}
+        run: |
+          set -euo pipefail
+          [[ "$PRODUCTION_RELEASE_RUN_URL" =~ ^https://github\.com/TeamGrid/teamgrid/actions/runs/[0-9]+$ ]] || {
+            echo "production_release_run_url must be a TeamGrid/teamgrid Actions run URL." >&2
+            exit 1
+          }
+          run_id="${PRODUCTION_RELEASE_RUN_URL##*/}"
+          [[ "$(gh run view "$run_id" --repo TeamGrid/teamgrid --json name --jq '.name')" == \
+            "Deploy multi-cell production" ]]
+          [[ "$(gh run view "$run_id" --repo TeamGrid/teamgrid --json conclusion --jq '.conclusion')" == \
+            "success" ]]
+          evidence_dir="$RUNNER_TEMP/teamgrid-production-release"
+          mkdir -p "$evidence_dir"
+          gh run download "$run_id" --repo TeamGrid/teamgrid --dir "$evidence_dir"
+          manifest_path="$(find "$evidence_dir" -name manifest.json -type f -print -quit)"
+          [[ -n "$manifest_path" ]] || {
+            echo "The production run has no release manifest artifact." >&2
+            exit 1
+          }
+          RELEASE_MANIFEST_PATH="$manifest_path" node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto'
+          import { readFileSync } from 'node:fs'
+
+          const release = JSON.parse(readFileSync(process.env.RELEASE_MANIFEST_PATH, 'utf8'))
+          const contract = readFileSync('../openapi/developer-platform-manifest.json')
+          const expectedHash = createHash('sha256').update(contract).digest('hex')
+          if (release.developerPlatform?.sourceGitSha !== process.env.GITHUB_SHA) {
+            throw new Error('Production did not qualify this exact developer-platform commit.')
+          }
+          if (release.developerPlatform?.contractManifestSha256 !== expectedHash) {
+            throw new Error('Production did not qualify this exact contract manifest.')
+          }
+          NODE
+
       - name: Validate release
         env:
+          RELEASE_CONFIRM_GA: ${{ inputs.confirm_ga }}
           RELEASE_VERSION: ${{ inputs.version }}
           RELEASE_DIST_TAG: ${{ inputs.dist_tag }}
         run: node scripts/validate-release.mjs --mode stage

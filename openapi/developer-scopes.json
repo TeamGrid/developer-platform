@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "apiVersion": "v1",
+  "scopes": [
+    { "name": "workspace:read", "availability": "issuable" },
+    { "name": "workspace-settings:read", "availability": "issuable" },
+    { "name": "workspace-settings:write", "availability": "issuable", "sensitive": true },
+    { "name": "projects:read", "availability": "issuable" },
+    { "name": "projects:write", "availability": "issuable" },
+    { "name": "projects:lifecycle", "availability": "issuable" },
+    { "name": "tasks:read", "availability": "issuable" },
+    { "name": "tasks:write", "availability": "issuable" },
+    { "name": "time-entries:read", "availability": "issuable" },
+    { "name": "time-entries:write", "availability": "issuable" },
+    { "name": "contacts:read", "availability": "issuable" },
+    { "name": "contacts:write", "availability": "issuable" },
+    { "name": "call-notes:read", "availability": "issuable" },
+    { "name": "call-notes:write", "availability": "issuable" },
+    { "name": "contact-groups:read", "availability": "issuable" },
+    { "name": "contact-groups:write", "availability": "issuable" },
+    { "name": "products:read", "availability": "issuable" },
+    { "name": "products:write", "availability": "issuable" },
+    { "name": "products:finance:read", "availability": "issuable", "sensitive": true },
+    { "name": "products:finance:write", "availability": "issuable", "sensitive": true },
+    { "name": "product-groups:read", "availability": "issuable" },
+    { "name": "product-groups:write", "availability": "issuable" },
+    { "name": "project-statements:read", "availability": "issuable" },
+    { "name": "project-statements:write", "availability": "issuable" },
+    { "name": "project-statements:finance:read", "availability": "issuable", "sensitive": true },
+    { "name": "project-statements:finance:write", "availability": "issuable", "sensitive": true },
+    { "name": "project-templates:read", "availability": "issuable" },
+    { "name": "project-templates:write", "availability": "issuable" },
+    { "name": "planned-work:read", "availability": "issuable" },
+    { "name": "planned-work:write", "availability": "issuable" },
+    { "name": "appointments:read", "availability": "issuable" },
+    { "name": "appointments:write", "availability": "issuable" },
+    { "name": "appointments:delegated:read", "availability": "issuable", "sensitive": true },
+    { "name": "appointments:delegated:write", "availability": "issuable", "sensitive": true },
+    { "name": "absences:read", "availability": "issuable" },
+    { "name": "absences:write", "availability": "issuable" },
+    { "name": "absences:delegated:read", "availability": "issuable", "sensitive": true },
+    { "name": "absences:admin:write", "availability": "issuable", "sensitive": true },
+    { "name": "availability:read", "availability": "issuable" },
+    { "name": "availability:delegated:read", "availability": "issuable", "sensitive": true },
+    { "name": "activity:read", "availability": "issuable" },
+    { "name": "comments:read", "availability": "issuable" },
+    { "name": "comments:write", "availability": "issuable" },
+    { "name": "documents:read", "availability": "issuable" },
+    { "name": "documents:write", "availability": "issuable" },
+    { "name": "files:read", "availability": "issuable" },
+    { "name": "files:write", "availability": "issuable" },
+    { "name": "custom-field-definitions:read", "availability": "issuable" },
+    { "name": "custom-field-definitions:write", "availability": "issuable" },
+    { "name": "custom-field-values:read", "availability": "issuable" },
+    { "name": "custom-field-values:write", "availability": "issuable" },
+    { "name": "lists:read", "availability": "issuable" },
+    { "name": "lists:write", "availability": "issuable" },
+    { "name": "services:read", "availability": "issuable" },
+    { "name": "services:write", "availability": "issuable" },
+    { "name": "tags:read", "availability": "issuable" },
+    { "name": "tags:write", "availability": "issuable" },
+    { "name": "users:read", "availability": "issuable" },
+    { "name": "members:read", "availability": "issuable", "sensitive": true },
+    { "name": "members:pii:read", "availability": "issuable", "sensitive": true },
+    { "name": "members:write", "availability": "issuable", "sensitive": true },
+    { "name": "invitations:read", "availability": "issuable", "sensitive": true },
+    { "name": "invitations:write", "availability": "issuable", "sensitive": true },
+    { "name": "roles:read", "availability": "issuable", "sensitive": true },
+    { "name": "roles:write", "availability": "issuable", "sensitive": true },
+    { "name": "groups:read", "availability": "issuable", "sensitive": true },
+    { "name": "groups:write", "availability": "issuable", "sensitive": true },
+    { "name": "search:read", "availability": "issuable" },
+    { "name": "exports:read", "availability": "issuable", "sensitive": true },
+    { "name": "exports:write", "availability": "issuable", "sensitive": true },
+    { "name": "automations:read", "availability": "issuable", "sensitive": true },
+    { "name": "automations:write", "availability": "issuable", "sensitive": true },
+    { "name": "automations:run", "availability": "issuable", "sensitive": true },
+    { "name": "integrations:read", "availability": "issuable", "sensitive": true },
+    { "name": "webhooks:read", "availability": "issuable" },
+    { "name": "webhooks:write", "availability": "issuable" },
+    { "name": "audit:read", "availability": "issuable", "sensitive": true },
+    { "name": "changes:read", "availability": "issuable" },
+    { "name": "events:read", "availability": "issuable" }
+  ],
+  "dynamicPolicies": [
+    {
+      "id": "collaboration-target-domain",
+      "scopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read"
+      ],
+      "reason": "Comments and activity require the matching target-domain read scope in addition to their base operation scope and product plan permission."
+    },
+    {
+      "id": "calendar-delegated-access",
+      "scopes": [
+        "appointments:delegated:read",
+        "appointments:delegated:write",
+        "absences:delegated:read",
+        "absences:admin:write",
+        "availability:delegated:read"
+      ],
+      "reason": "Delegated calendar access requires the matching overlay scope plus product permissions, active membership and, for appointments or availability, calendar sharing."
+    },
+    {
+      "id": "commerce-sensitive-fields",
+      "scopes": [
+        "products:finance:read",
+        "products:finance:write",
+        "project-statements:finance:read",
+        "project-statements:finance:write"
+      ],
+      "reason": "Finance scopes are evaluated against requested or mutated sensitive fields in addition to the operation's base scope."
+    },
+    {
+      "id": "custom-field-target-domain",
+      "scopes": [
+        "contacts:read",
+        "contacts:write",
+        "projects:read",
+        "projects:write",
+        "project-statements:read",
+        "project-statements:write",
+        "tasks:read",
+        "tasks:write",
+        "tags:read",
+        "users:read"
+      ],
+      "reason": "Custom-field value operations require the target-domain scope and any reference-target read scopes in addition to the custom-field-value scope."
+    },
+    {
+      "id": "administration-pii-overlay",
+      "scopes": [
+        "members:pii:read"
+      ],
+      "reason": "Member and invitation resources omit names, email addresses, positions and contact identifiers unless the credential has the explicit PII overlay scope in addition to the base administration read scope."
+    },
+    {
+      "id": "search-target-domain",
+      "scopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read"
+      ],
+      "reason": "Federated search requires the matching target-domain read scope and product permission for every requested resource type in addition to search:read."
+    },
+    {
+      "id": "export-target-domain",
+      "scopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read",
+        "time-entries:read"
+      ],
+      "reason": "Export creation and download require the matching resource-domain scope and analytics permission in addition to the export operation scope."
+    },
+    {
+      "id": "automation-action-domain",
+      "scopes": [
+        "custom-field-values:read",
+        "lists:write",
+        "projects:read",
+        "projects:write",
+        "project-statements:write",
+        "services:write",
+        "tasks:read",
+        "tasks:write",
+        "time-entries:write"
+      ],
+      "reason": "Automation definitions may contain only public triggers and action types and require every domain read or write scope implied by their trigger, conditions, waits, and flow in addition to automations:write."
+    }
+  ]
+}

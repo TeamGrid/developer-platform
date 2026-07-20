@@ -1,0 +1,696 @@
+[
+  {
+    "auth": false,
+    "description": "Legacy API discovery redirect",
+    "method": "GET",
+    "path": "/"
+  },
+  {
+    "auth": false,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "",
+    "method": "GET",
+    "path": "/calendar/{token}.ics"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Delete call note",
+    "method": "DELETE",
+    "path": "/callnotes"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all call notes",
+    "method": "GET",
+    "path": "/callnotes"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Create call note",
+    "method": "POST",
+    "path": "/callnotes"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Delete call note",
+    "method": "DELETE",
+    "path": "/callnotes/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a call note",
+    "method": "GET",
+    "path": "/callnotes/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": true,
+    "description": "Delete contact group",
+    "method": "DELETE",
+    "path": "/contactgroups"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all contact groups",
+    "method": "GET",
+    "path": "/contactgroups"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": false,
+    "description": "Create contact group",
+    "method": "POST",
+    "path": "/contactgroups"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": true,
+    "description": "Update contact group",
+    "method": "PUT",
+    "path": "/contactgroups"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": false,
+    "description": "Delete contact group",
+    "method": "DELETE",
+    "path": "/contactgroups/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a contact group",
+    "method": "GET",
+    "path": "/contactgroups/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": false,
+    "description": "Update contact group",
+    "method": "PUT",
+    "path": "/contactgroups/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all contacts",
+    "method": "GET",
+    "path": "/contacts"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Create contact",
+    "method": "POST",
+    "path": "/contacts"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Update contact",
+    "method": "PUT",
+    "path": "/contacts"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a contact",
+    "method": "GET",
+    "path": "/contacts/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Update contact",
+    "method": "PUT",
+    "path": "/contacts/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": true,
+    "description": "Delete journal entry",
+    "method": "DELETE",
+    "path": "/journalEntries"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all journal entries",
+    "method": "GET",
+    "path": "/journalEntries"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": false,
+    "description": "Create journal entry",
+    "method": "POST",
+    "path": "/journalEntries"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": true,
+    "description": "Update journal entry",
+    "method": "PUT",
+    "path": "/journalEntries"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": false,
+    "description": "Delete journal entry",
+    "method": "DELETE",
+    "path": "/journalEntries/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a journal entry",
+    "method": "GET",
+    "path": "/journalEntries/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": false,
+    "description": "Update journal entry",
+    "method": "PUT",
+    "path": "/journalEntries/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Delete list",
+    "method": "DELETE",
+    "path": "/lists"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all lists",
+    "method": "GET",
+    "path": "/lists"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Create list",
+    "method": "POST",
+    "path": "/lists"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Update list",
+    "method": "PUT",
+    "path": "/lists"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Delete list",
+    "method": "DELETE",
+    "path": "/lists/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a list",
+    "method": "GET",
+    "path": "/lists/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Update list",
+    "method": "PUT",
+    "path": "/lists/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Delete product group",
+    "method": "DELETE",
+    "path": "/productgroups"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all product groups",
+    "method": "GET",
+    "path": "/productgroups"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Create product group",
+    "method": "POST",
+    "path": "/productgroups"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Update product group",
+    "method": "PUT",
+    "path": "/productgroups"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Delete product group",
+    "method": "DELETE",
+    "path": "/productgroups/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a product group",
+    "method": "GET",
+    "path": "/productgroups/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Update product group",
+    "method": "PUT",
+    "path": "/productgroups/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Delete product",
+    "method": "DELETE",
+    "path": "/products"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all products",
+    "method": "GET",
+    "path": "/products"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Create product",
+    "method": "POST",
+    "path": "/products"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Update product",
+    "method": "PUT",
+    "path": "/products"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Delete product",
+    "method": "DELETE",
+    "path": "/products/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a product",
+    "method": "GET",
+    "path": "/products/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Update product",
+    "method": "PUT",
+    "path": "/products/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all projects",
+    "method": "GET",
+    "path": "/projects"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Create project",
+    "method": "POST",
+    "path": "/projects"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Update project",
+    "method": "PUT",
+    "path": "/projects"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a project",
+    "method": "GET",
+    "path": "/projects/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Update project",
+    "method": "PUT",
+    "path": "/projects/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": true,
+    "description": "Delete project template",
+    "method": "DELETE",
+    "path": "/projectTemplates"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all project templates",
+    "method": "GET",
+    "path": "/projectTemplates"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": false,
+    "description": "Create project template",
+    "method": "POST",
+    "path": "/projectTemplates"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": true,
+    "description": "Update project template",
+    "method": "PUT",
+    "path": "/projectTemplates"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": false,
+    "description": "Delete project template",
+    "method": "DELETE",
+    "path": "/projectTemplates/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a project template",
+    "method": "GET",
+    "path": "/projectTemplates/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "unavailable",
+    "deprecated": false,
+    "description": "Update project template",
+    "method": "PUT",
+    "path": "/projectTemplates/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all scheduled work",
+    "method": "GET",
+    "path": "/scheduledWork"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all services",
+    "method": "GET",
+    "path": "/services"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a service",
+    "method": "GET",
+    "path": "/services/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all tags",
+    "method": "GET",
+    "path": "/tags"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a tag",
+    "method": "GET",
+    "path": "/tags/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Delete task",
+    "method": "DELETE",
+    "path": "/tasks"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all tasks",
+    "method": "GET",
+    "path": "/tasks"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Create task",
+    "method": "POST",
+    "path": "/tasks"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Update task",
+    "method": "PUT",
+    "path": "/tasks"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Delete task",
+    "method": "DELETE",
+    "path": "/tasks/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a task",
+    "method": "GET",
+    "path": "/tasks/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Update task",
+    "method": "PUT",
+    "path": "/tasks/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Starts time tracking for a task",
+    "method": "POST",
+    "path": "/tasks/{_id}/startTracking"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Stops time tracking for a task",
+    "method": "POST",
+    "path": "/tasks/{_id}/stopTracking"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get team",
+    "method": "GET",
+    "path": "/teams"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Delete time entry",
+    "method": "DELETE",
+    "path": "/times"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all time entries",
+    "method": "GET",
+    "path": "/times"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Create time entry",
+    "method": "POST",
+    "path": "/times"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Update time entry",
+    "method": "PUT",
+    "path": "/times"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Delete time entry",
+    "method": "DELETE",
+    "path": "/times/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get a time entry",
+    "method": "GET",
+    "path": "/times/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Update time entry",
+    "method": "PUT",
+    "path": "/times/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get users",
+    "method": "GET",
+    "path": "/users"
+  },
+  {
+    "auth": true,
+    "contractStatus": "deprecated-alias",
+    "deprecated": true,
+    "description": "Delete webhook",
+    "method": "DELETE",
+    "path": "/webhooks"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get all webhooks",
+    "method": "GET",
+    "path": "/webhooks"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Create a webhook",
+    "method": "POST",
+    "path": "/webhooks"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Delete webhook",
+    "method": "DELETE",
+    "path": "/webhooks/{_id}"
+  },
+  {
+    "auth": true,
+    "contractStatus": "supported",
+    "deprecated": false,
+    "description": "Get webhook",
+    "method": "GET",
+    "path": "/webhooks/{_id}"
+  }
+]

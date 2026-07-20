@@ -1,11 +1,100 @@
 import { describe, expect, it, vi } from 'vitest'
 import { TeamGridClient } from './client.js'
 import { TeamGridApiError, TeamGridClientError } from './errors.js'
+import {
+  canonicalProjectStrongETag,
+  canonicalProjectTemplateStrongETag,
+  canonicalTaskStrongETag,
+} from './resourceConcurrency.js'
 import { buildRegionalApiBaseUrl, normalizeApiBaseUrl, parseCredentialLocation } from './routing.js'
 
 const token = // gitleaks:allow -- synthetic fixed-format test credential
   'tg_sk_v1_us_us-mnz-001_0123456789abcdef01234567_' +
   '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+const projectEtag = canonicalProjectStrongETag('a'.repeat(64))
+const projectTemplateEtag = canonicalProjectTemplateStrongETag('b'.repeat(64))
+const taskEtag = canonicalTaskStrongETag('c'.repeat(64))
+const fixtureDate = '2026-07-19T10:00:00.000Z'
+
+function taskResource(overrides: Record<string, unknown> = {}) {
+  return {
+    attributes: {
+      archived: false,
+      assigneeId: null,
+      billable: null,
+      completed: false,
+      createdAt: fixtureDate,
+      description: '',
+      developerRevision: 'c'.repeat(64),
+      developerUpdatedAt: fixtureDate,
+      dueAt: null,
+      groupId: null,
+      listId: null,
+      name: 'Task',
+      plannedEndAt: null,
+      plannedMinutes: null,
+      plannedStartAt: null,
+      projectId: null,
+      serviceId: null,
+      subscriberIds: [],
+      tagIds: [],
+      updatedAt: fixtureDate,
+      ...overrides,
+    },
+    id: 'task-1',
+    type: 'task',
+  }
+}
+
+function projectResource(overrides: Record<string, unknown> = {}) {
+  return {
+    attributes: {
+      additionalContactIds: [],
+      archived: false,
+      color: null,
+      completed: false,
+      contactId: null,
+      createdAt: fixtureDate,
+      description: '',
+      developerRevision: 'a'.repeat(64),
+      developerUpdatedAt: fixtureDate,
+      dueAt: null,
+      individualId: null,
+      listId: null,
+      managerId: null,
+      name: 'Integration project',
+      plannedEndAt: null,
+      plannedStartAt: null,
+      showInScheduling: false,
+      subscriberIds: [],
+      updatedAt: fixtureDate,
+      ...overrides,
+    },
+    id: 'project-1',
+    type: 'project',
+  }
+}
+
+function projectTemplateResource(overrides: Record<string, unknown> = {}) {
+  return {
+    attributes: {
+      archived: false,
+      color: '#123456',
+      createdAt: fixtureDate,
+      description: '',
+      developerRevision: 'b'.repeat(64),
+      developerUpdatedAt: fixtureDate,
+      originProjectId: 'project-source',
+      snapshotVersion: 1,
+      stats: { listCount: 1, taskCount: 1 },
+      title: 'Delivery',
+      updatedAt: fixtureDate,
+      ...overrides,
+    },
+    id: 'template-1',
+    type: 'projectTemplate',
+  }
+}
 
 function json(body: unknown, status = 200, headers: HeadersInit = {}) {
   return new Response(JSON.stringify(body), {
@@ -16,12 +105,27 @@ function json(body: unknown, status = 200, headers: HeadersInit = {}) {
 
 function taskPage(nextCursor: string | null) {
   return {
-    data: [{ attributes: { name: 'Task' }, id: 'task-1', type: 'task' }],
+    data: [taskResource()],
     meta: { page: { limit: 1, nextCursor }, requestId: 'request-1' },
   }
 }
 
 describe('TeamGrid API client', () => {
+  it('exposes the API discovery operation through the typed system client', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL) => {
+      expect(new URL(String(input)).pathname).toBe('/v1/')
+      return json({
+        data: { documentation: 'https://developer.teamgridapp.com/api/v1', version: '1' },
+        meta: { requestId: 'request-version' },
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(client.system.getApiVersion()).resolves.toMatchObject({
+      data: { version: '1' },
+      meta: { requestId: 'request-version' },
+    })
+  })
+
   it('derives a regional endpoint without exposing the credential secret', () => {
     expect(parseCredentialLocation(token)).toEqual({
       cellId: 'us-mnz-001',
@@ -42,7 +146,14 @@ describe('TeamGrid API client', () => {
       const headers = new Headers(init?.headers)
       expect(headers.get('authorization')).toBe(`Bearer ${token}`)
       expect(headers.get('x-request-id')).toBe('client-request')
-      return json(taskPage(null))
+      expect(headers.get('x-teamgrid-client')).toBe('@teamgrid/api-client')
+      expect(headers.get('x-teamgrid-client-version')).toBe('1.0.0-alpha.3')
+      return json(taskPage(null), 200, {
+        'x-ratelimit-limit': '100',
+        'x-ratelimit-remaining': '99',
+        'x-ratelimit-reset': '1700000000000',
+        'x-request-id': 'request-transport',
+      })
     })
     const client = new TeamGridClient({ fetch, token })
     const page = await client.tasks.list({
@@ -52,6 +163,13 @@ describe('TeamGrid API client', () => {
     })
     expect(page.meta.requestId).toBe('request-1')
     expect(page.data[0]?.id).toBe('task-1')
+    expect(page.transport).toMatchObject({
+      attempts: 1,
+      rateLimit: { limit: 100, remaining: 99, reset: 1_700_000_000_000 },
+      requestId: 'request-transport',
+      status: 200,
+    })
+    expect(JSON.stringify(page)).not.toContain('transport')
   })
 
   it('retries safe reads and idempotent creates but not patches', async () => {
@@ -64,10 +182,11 @@ describe('TeamGrid API client', () => {
       .mockResolvedValueOnce(
         json(
           {
-            data: { attributes: { name: 'Created' }, id: 'task-2', type: 'task' },
+            data: { ...taskResource({ name: 'Created' }), id: 'task-2' },
             meta: { requestId: 'request-2' },
           },
           201,
+          { etag: `"tsk1-${'c'.repeat(64)}"`, 'idempotency-replayed': 'false' },
         ),
       )
       .mockResolvedValueOnce(
@@ -88,12 +207,13 @@ describe('TeamGrid API client', () => {
       )
     const client = new TeamGridClient({ fetch, random: () => 0, sleep, token })
 
-    await client.tasks.list()
+    const retriedPage = await client.tasks.list()
     await client.tasks.create({ name: 'Created' }, { idempotencyKey: 'stable-key' })
-    await expect(client.tasks.update('task-2', { name: 'Changed' })).rejects.toBeInstanceOf(
-      TeamGridApiError,
-    )
+    await expect(
+      client.tasks.update('task-2', { name: 'Changed' }, { ifMatch: taskEtag }),
+    ).rejects.toBeInstanceOf(TeamGridApiError)
     expect(fetch).toHaveBeenCalledTimes(5)
+    expect(retriedPage.transport.attempts).toBe(2)
     expect(sleep).toHaveBeenCalledTimes(2)
     expect(sleep.mock.calls[0]?.[0]).toBe(1000)
   })
@@ -142,6 +262,7 @@ describe('TeamGrid API client', () => {
     const error = await client.tasks.list().catch((caught: unknown) => caught)
     expect(error).toBeInstanceOf(TeamGridApiError)
     expect(error).toMatchObject({ requestId: 'request-error', status: 403 })
+    expect(error).toMatchObject({ transport: { attempts: 1, status: 403 } })
     expect(JSON.stringify(error)).not.toContain(token)
   })
 
@@ -185,7 +306,10 @@ describe('TeamGrid API client', () => {
               disabled: false,
               failCount: 0,
               lastStatus: null,
+              revision: `whk1-${'a'.repeat(64)}`,
+              signingSecret: `whsec_v2_${'A'.repeat(43)}`,
               url: 'https://hooks.example.com/teamgrid',
+              version: 2,
             },
             id: 'webhook-1',
             type: 'webhook',
@@ -193,6 +317,12 @@ describe('TeamGrid API client', () => {
           meta: { requestId: 'request-webhook' },
         },
         201,
+        {
+          'cache-control': 'private, no-store',
+          etag: `"whk1-${'a'.repeat(64)}"`,
+          'idempotency-replayed': 'false',
+          'x-request-id': 'request-webhook-header',
+        },
       )
     })
     const client = new TeamGridClient({ fetch, token })
@@ -201,5 +331,951 @@ describe('TeamGrid API client', () => {
       { idempotencyKey: 'webhook-request-1' },
     )
     expect(result.data.id).toBe('webhook-1')
+    expect(result.transport).toMatchObject({
+      idempotencyReplayed: false,
+      requestId: 'request-webhook-header',
+      status: 201,
+    })
+  })
+
+  it('routes commerce and credential-owned delivery filters through bounded list requests', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input))
+      if (url.pathname === '/v1/products') {
+        expect(Object.fromEntries(url.searchParams)).toEqual({
+          disabled: 'false',
+          productGroupId: 'group-1',
+        })
+        return json({
+          data: [{ attributes: { name: 'Consulting' }, id: 'product-1', type: 'product' }],
+          meta: { page: { limit: 50, nextCursor: null }, requestId: 'request-products' },
+        })
+      }
+      expect(url.pathname).toBe('/v1/webhook-deliveries')
+      expect(Object.fromEntries(url.searchParams)).toEqual({
+        event: 'task.created',
+        state: 'failed',
+        webhookId: 'webhook-1',
+      })
+      return json({
+        data: [
+          {
+            attributes: { event: 'task.created', state: 'failed', webhookId: 'webhook-1' },
+            id: 'delivery-1',
+            type: 'webhookDelivery',
+          },
+        ],
+        meta: { page: { limit: 50, nextCursor: null }, requestId: 'request-deliveries' },
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(
+      client.products.list({ disabled: false, productGroupId: 'group-1' }),
+    ).resolves.toMatchObject({ data: [{ id: 'product-1' }] })
+    await expect(
+      client.webhookDeliveries.list({
+        event: 'task.created',
+        state: 'failed',
+        webhookId: 'webhook-1',
+      }),
+    ).resolves.toMatchObject({ data: [{ id: 'delivery-1' }] })
+  })
+
+  it('lists typed change metadata with repeated filters and opaque checkpoints', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input))
+      expect(url.pathname).toBe('/v1/changes')
+      expect(url.searchParams.getAll('operations')).toEqual(['created', 'updated'])
+      expect(url.searchParams.getAll('resourceTypes')).toEqual(['project', 'task'])
+      expect(url.searchParams.get('cursor')).toBe('checkpoint-1')
+      return json({
+        data: [
+          {
+            attributes: {
+              operation: 'updated',
+              occurredAt: '2026-07-19T12:00:00.000Z',
+              region: 'us',
+              resourceId: 'task-1',
+              resourceType: 'task',
+              sequence: 42,
+              tombstone: false,
+            },
+            id: 'change-42',
+            type: 'changeEvent',
+          },
+        ],
+        meta: {
+          page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-2' },
+          requestId: 'request-changes',
+        },
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(
+      client.changes.list({
+        cursor: 'checkpoint-1',
+        operations: ['created', 'updated'],
+        resourceTypes: ['project', 'task'],
+      }),
+    ).resolves.toMatchObject({
+      data: [{ attributes: { resourceId: 'task-1', sequence: 42 }, type: 'changeEvent' }],
+      meta: { page: { nextCursor: 'checkpoint-2' } },
+    })
+  })
+
+  it('takes a checkpoint before a snapshot and catches up only to an empty page', async () => {
+    const order: string[] = []
+    const fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input))
+      const cursor = url.searchParams.get('cursor')
+      if (url.searchParams.get('startAtLatest') === 'true') {
+        order.push('checkpoint')
+        return json({
+          data: [],
+          meta: {
+            page: { caughtUp: true, limit: 1, nextCursor: 'checkpoint-start' },
+            requestId: 'checkpoint',
+          },
+        })
+      }
+      order.push(`changes:${cursor}`)
+      if (cursor === 'checkpoint-start') {
+        return json({
+          data: [
+            {
+              attributes: {
+                operation: 'created',
+                occurredAt: '2026-07-19T12:00:00.000Z',
+                region: 'us',
+                resourceId: 'project-1',
+                resourceType: 'project',
+                sequence: 43,
+                tombstone: false,
+              },
+              id: 'change-43',
+              type: 'changeEvent',
+            },
+          ],
+          meta: {
+            page: { caughtUp: false, limit: 1, nextCursor: 'checkpoint-43' },
+            requestId: 'changes-1',
+          },
+        })
+      }
+      return json({
+        data: [],
+        meta: {
+          page: { caughtUp: true, limit: 1, nextCursor: 'checkpoint-latest' },
+          requestId: 'changes-2',
+        },
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    const bootstrap = await client.changes.snapshotThenCatchUp(
+      async (checkpoint) => {
+        order.push(`snapshot:${checkpoint}`)
+        return ['project-1']
+      },
+      { limit: 1, operations: ['created'], resourceTypes: ['project'] },
+    )
+    const pages = []
+    for await (const page of bootstrap.pages) pages.push(page)
+
+    expect(bootstrap.checkpoint).toBe('checkpoint-start')
+    expect(bootstrap.snapshot).toEqual(['project-1'])
+    expect(pages.map((page) => page.data.length)).toEqual([1, 0])
+    expect(pages.at(-1)?.meta.page.nextCursor).toBe('checkpoint-latest')
+    expect(order).toEqual([
+      'checkpoint',
+      'snapshot:checkpoint-start',
+      'changes:checkpoint-start',
+      'changes:checkpoint-43',
+    ])
+  })
+
+  it.each([410, 503])('keeps change-feed HTTP %i responses as typed API errors', async (status) => {
+    const client = new TeamGridClient({
+      fetch: vi.fn(async () =>
+        json(
+          {
+            errors: [
+              {
+                code: status === 410 ? 'change_feed_reset_required' : 'change_feed_unavailable',
+                detail: 'Change feed unavailable.',
+                status: String(status),
+                title: status === 410 ? 'Gone' : 'Service Unavailable',
+              },
+            ],
+            meta: { requestId: `request-${status}` },
+          },
+          status,
+        ),
+      ),
+      retries: 0,
+      token,
+    })
+    await expect(client.changes.list({ cursor: 'checkpoint' })).rejects.toMatchObject({ status })
+  })
+
+  it('rejects a repeated change checkpoint before requesting or yielding a duplicate page', async () => {
+    const fetch = vi.fn(async () =>
+      json({
+        data: [
+          {
+            attributes: {
+              operation: 'updated',
+              occurredAt: '2026-07-19T12:00:00.000Z',
+              region: 'us',
+              resourceId: 'task-1',
+              resourceType: 'task',
+              sequence: 42,
+              tombstone: false,
+            },
+            id: 'change-42',
+            type: 'changeEvent',
+          },
+        ],
+        meta: {
+          page: { caughtUp: false, limit: 1, nextCursor: 'same' },
+          requestId: 'request-cycle',
+        },
+      }),
+    )
+    const client = new TeamGridClient({ fetch, token })
+    const yielded: unknown[] = []
+    await expect(async () => {
+      for await (const page of client.changes.pages({ cursor: 'same', limit: 1 })) {
+        yielded.push(page)
+      }
+    }).rejects.toMatchObject({ code: 'pagination_cycle' })
+    expect(yielded).toHaveLength(1)
+    expect(fetch).toHaveBeenCalledOnce()
+  })
+
+  it.each([
+    {
+      create: (client: TeamGridClient) =>
+        client.projects.create(
+          { name: 'Integration project' },
+          { idempotencyKey: 'project-create-1' },
+        ),
+      createBody: { name: 'Integration project' },
+      createPath: '/v1/projects',
+      idempotencyKey: 'project-create-1',
+      resource: projectResource(),
+      update: (client: TeamGridClient) =>
+        client.projects.update('project-1', { color: '#123456' }, { ifMatch: projectEtag }),
+      updateBody: { color: '#123456' },
+      updatePath: '/v1/projects/project-1',
+    },
+    {
+      create: (client: TeamGridClient) =>
+        client.contacts.create(
+          { firstName: 'Ada', lastName: 'Lovelace', type: 'person' },
+          { idempotencyKey: 'contact-create-1' },
+        ),
+      createBody: { firstName: 'Ada', lastName: 'Lovelace', type: 'person' },
+      createPath: '/v1/contacts',
+      idempotencyKey: 'contact-create-1',
+      resource: {
+        attributes: { firstName: 'Ada', lastName: 'Lovelace' },
+        id: 'contact-1',
+        type: 'contact',
+      },
+      update: (client: TeamGridClient) => client.contacts.update('contact-1', { nickname: 'Ada' }),
+      updateBody: { nickname: 'Ada' },
+      updatePath: '/v1/contacts/contact-1',
+    },
+  ])(
+    'supports idempotent create and typed update for $createPath',
+    async ({
+      create,
+      createBody,
+      createPath,
+      idempotencyKey,
+      resource,
+      update,
+      updateBody,
+      updatePath,
+    }) => {
+      const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = new URL(String(input))
+        if (init?.method === 'POST') {
+          expect(url.pathname).toBe(createPath)
+          expect(new Headers(init.headers).get('idempotency-key')).toBe(idempotencyKey)
+          expect(JSON.parse(String(init.body))).toEqual(createBody)
+          return json(
+            { data: resource, meta: { requestId: 'request-create' } },
+            201,
+            resource.type === 'project'
+              ? { etag: `"prj1-${'a'.repeat(64)}"`, 'idempotency-replayed': 'false' }
+              : {},
+          )
+        }
+        expect(init?.method).toBe('PATCH')
+        expect(url.pathname).toBe(updatePath)
+        expect(JSON.parse(String(init?.body))).toEqual(updateBody)
+        return json(
+          { data: resource, meta: { requestId: 'request-update' } },
+          200,
+          resource.type === 'project' ? { etag: `"prj1-${'a'.repeat(64)}"` } : {},
+        )
+      })
+      const client = new TeamGridClient({ fetch, token })
+
+      await expect(create(client)).resolves.toMatchObject({ data: resource })
+      await expect(update(client)).resolves.toMatchObject({ data: resource })
+      expect(fetch).toHaveBeenCalledTimes(2)
+    },
+  )
+
+  it.each([
+    {
+      create: (client: TeamGridClient) =>
+        client.lists.create(
+          { name: 'Delivery', parentId: 'project-1', type: 'tasks' },
+          { idempotencyKey: 'list-create-1' },
+        ),
+      createBody: { name: 'Delivery', parentId: 'project-1', type: 'tasks' },
+      id: 'list-1',
+      list: (client: TeamGridClient) =>
+        client.lists.list({ archived: false, parentId: 'project-1', type: 'tasks' }),
+      listQuery: { archived: 'false', parentId: 'project-1', type: 'tasks' },
+      path: '/v1/lists',
+      resource: {
+        attributes: {
+          archived: false,
+          createdAt: null,
+          name: 'Delivery',
+          order: 100,
+          parentId: 'project-1',
+          type: 'tasks',
+          updatedAt: null,
+        },
+        id: 'list-1',
+        type: 'list',
+      },
+      surface: 'lists' as const,
+      updateBody: { name: 'Shipping' },
+    },
+    {
+      create: (client: TeamGridClient) =>
+        client.services.create(
+          { billable: true, billingRate: 175, title: 'Consulting' },
+          { idempotencyKey: 'service-create-1' },
+        ),
+      createBody: { billable: true, billingRate: 175, title: 'Consulting' },
+      id: 'service-1',
+      list: (client: TeamGridClient) => client.services.list({ archived: false }),
+      listQuery: { archived: 'false' },
+      path: '/v1/services',
+      resource: {
+        attributes: {
+          archived: false,
+          billable: true,
+          billingRate: 175,
+          createdAt: null,
+          title: 'Consulting',
+          updatedAt: null,
+        },
+        id: 'service-1',
+        type: 'service',
+      },
+      surface: 'services' as const,
+      updateBody: { billingRate: 190 },
+    },
+    {
+      create: (client: TeamGridClient) =>
+        client.tags.create(
+          { color: '#123456', name: 'Priority' },
+          { idempotencyKey: 'tag-create-1' },
+        ),
+      createBody: { color: '#123456', name: 'Priority' },
+      id: 'tag-1',
+      list: (client: TeamGridClient) => client.tags.list({ archived: false }),
+      listQuery: { archived: 'false' },
+      path: '/v1/tags',
+      resource: {
+        attributes: {
+          archived: false,
+          color: '#123456',
+          createdAt: null,
+          name: 'Priority',
+          updatedAt: null,
+          usage: 0,
+        },
+        id: 'tag-1',
+        type: 'tag',
+      },
+      surface: 'tags' as const,
+      updateBody: { color: '#654321' },
+    },
+  ])(
+    'supports the complete metadata lifecycle for $surface',
+    async ({ create, createBody, id, list, listQuery, path, resource, surface, updateBody }) => {
+      const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = new URL(String(input))
+        const itemPath = `${path}/${id}`
+
+        if (url.pathname === path && init?.method === 'POST') {
+          expect(new Headers(init.headers).get('idempotency-key')).toBe(
+            `${surface.slice(0, -1)}-create-1`,
+          )
+          expect(JSON.parse(String(init.body))).toEqual(createBody)
+          return json({ data: resource, meta: { requestId: 'request-create' } }, 201)
+        }
+        if (url.pathname === path) {
+          expect(init?.method).toBe('GET')
+          expect(Object.fromEntries(url.searchParams)).toEqual(listQuery)
+          return json({
+            data: [resource],
+            meta: { page: { limit: 50, nextCursor: null }, requestId: 'request-list' },
+          })
+        }
+        if (url.pathname === `${itemPath}/restore`) {
+          expect(init?.method).toBe('POST')
+          return json({ data: resource, meta: { requestId: 'request-restore' } })
+        }
+        if (init?.method === 'PATCH') {
+          expect(url.pathname).toBe(itemPath)
+          expect(JSON.parse(String(init.body))).toEqual(updateBody)
+          return json({ data: resource, meta: { requestId: 'request-update' } })
+        }
+        if (init?.method === 'DELETE') {
+          expect(url.pathname).toBe(itemPath)
+          return new Response(null, { status: 204 })
+        }
+        expect(init?.method).toBe('GET')
+        expect(url.pathname).toBe(itemPath)
+        return json({ data: resource, meta: { requestId: 'request-get' } })
+      })
+      const client = new TeamGridClient({ fetch, token })
+
+      await expect(list(client)).resolves.toMatchObject({ data: [resource] })
+      await expect(client[surface].get(id)).resolves.toMatchObject({ data: resource })
+      await expect(create(client)).resolves.toMatchObject({ data: resource })
+      await expect(client[surface].update(id, updateBody as never)).resolves.toMatchObject({
+        data: resource,
+      })
+      await expect(client[surface].archive(id)).resolves.toMatchObject({ status: 204 })
+      await expect(client[surface].restore(id)).resolves.toMatchObject({ data: resource })
+      expect(fetch).toHaveBeenCalledTimes(6)
+    },
+  )
+
+  it.each([
+    {
+      invoke: (client: TeamGridClient) => client.tasks.complete('task-1', { ifMatch: taskEtag }),
+      path: '/v1/tasks/task-1/complete',
+      resource: taskResource({ completed: true }),
+    },
+    {
+      invoke: (client: TeamGridClient) => client.tasks.reopen('task-1', { ifMatch: taskEtag }),
+      path: '/v1/tasks/task-1/reopen',
+      resource: taskResource({ completed: false }),
+    },
+    {
+      invoke: (client: TeamGridClient) => client.tasks.restore('task-1', { ifMatch: taskEtag }),
+      path: '/v1/tasks/task-1/restore',
+      resource: taskResource({ archived: false }),
+    },
+    {
+      invoke: (client: TeamGridClient) => client.timeEntries.restore('time-1'),
+      path: '/v1/time-entries/time-1/restore',
+      resource: { attributes: { archived: false }, id: 'time-1', type: 'timeEntry' },
+    },
+  ])('executes lifecycle commands with POST $path', async ({ invoke, path, resource }) => {
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(new URL(String(input)).pathname).toBe(path)
+      expect(init?.method).toBe('POST')
+      expect(init?.body).toBeUndefined()
+      if (path.startsWith('/v1/tasks/')) {
+        expect(new Headers(init?.headers).get('if-match')).toBe(taskEtag)
+      }
+      return json(
+        { data: resource, meta: { requestId: 'request-restore' } },
+        200,
+        path.startsWith('/v1/tasks/') ? { etag: `"tsk1-${'c'.repeat(64)}"` } : {},
+      )
+    })
+    await expect(invoke(new TeamGridClient({ fetch, token }))).resolves.toMatchObject({
+      data: resource,
+    })
+  })
+
+  it.each([
+    {
+      action: 'start',
+      invoke: (client: TeamGridClient) =>
+        client.tasks.startTimer('task-1', { at: '2026-07-19T10:00:00.000Z', userId: 'user-1' }),
+    },
+    {
+      action: 'stop',
+      invoke: (client: TeamGridClient) =>
+        client.tasks.stopTimer('task-1', { at: '2026-07-19T10:30:00.000Z', userId: 'user-1' }),
+    },
+  ])('uses the time-entry response contract for task timer $action', async ({ action, invoke }) => {
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(new URL(String(input)).pathname).toBe(`/v1/tasks/task-1/timer/${action}`)
+      expect(init?.method).toBe('POST')
+      expect(JSON.parse(String(init?.body))).toMatchObject({ userId: 'user-1' })
+      return json({
+        data: {
+          attributes: { endAt: action === 'stop' ? '2026-07-19T10:30:00.000Z' : null },
+          id: 'time-1',
+          type: 'timeEntry',
+        },
+        meta: { requestId: 'request-timer' },
+      })
+    })
+    await expect(invoke(new TeamGridClient({ fetch, token }))).resolves.toMatchObject({
+      data: { id: 'time-1', type: 'timeEntry' },
+    })
+  })
+
+  it('supports custom-field definition list and lifecycle operations', async () => {
+    const resource = {
+      attributes: {
+        archived: false,
+        compatibility: 'writable',
+        configuration: { type: 'text' },
+        createdAt: null,
+        defaultEnabled: false,
+        description: '',
+        fieldType: 'text',
+        required: false,
+        targetType: 'task',
+        title: 'Reference',
+        updatedAt: null,
+      },
+      id: 'field-1',
+      type: 'customFieldDefinition',
+    }
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input))
+      if (url.pathname === '/v1/custom-field-definitions') {
+        expect(Object.fromEntries(url.searchParams)).toEqual({
+          archived: 'false',
+          fieldType: 'text',
+          targetType: 'task',
+        })
+        return json({
+          data: [resource],
+          meta: { page: { limit: 50, nextCursor: null }, requestId: 'request-list' },
+        })
+      }
+      if (url.pathname.endsWith('/restore')) {
+        expect(init?.method).toBe('POST')
+        return json({ data: resource, meta: { requestId: 'request-restore' } })
+      }
+      throw new Error(`Unexpected request ${url.pathname}`)
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(
+      client.customFieldDefinitions.list({
+        archived: false,
+        fieldType: 'text',
+        targetType: 'task',
+      }),
+    ).resolves.toMatchObject({ data: [resource] })
+    await expect(client.customFieldDefinitions.restore('field-1')).resolves.toMatchObject({
+      data: resource,
+    })
+  })
+
+  it('uses strong compare-and-set preconditions for custom-field values', async () => {
+    const revision = `cfv1-${'1'.repeat(64)}`
+    const nextRevision = `cfv1-${'2'.repeat(64)}`
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input))
+      expect(url.pathname).toBe('/v1/custom-field-values/project/project-1/field1')
+      if (init?.method === 'GET') {
+        return json(
+          {
+            data: {
+              attributes: {
+                fieldId: 'field1',
+                fieldType: 'text',
+                resourceId: 'project-1',
+                revision,
+                state: 'unset',
+                targetType: 'project',
+              },
+              id: `cfv_${'a'.repeat(64)}`,
+              type: 'customFieldValue',
+            },
+            meta: { requestId: 'custom-value-get' },
+          },
+          200,
+          { etag: `"${revision}"` },
+        )
+      }
+      expect(init?.method).toBe('PUT')
+      expect(new Headers(init?.headers).get('if-match')).toBe(`"${revision}"`)
+      expect(JSON.parse(String(init?.body))).toEqual({ value: 'ACME-42' })
+      return json(
+        {
+          data: {
+            attributes: {
+              fieldId: 'field1',
+              fieldType: 'text',
+              replayed: false,
+              resourceId: 'project-1',
+              revision: nextRevision,
+              state: 'set',
+              targetType: 'project',
+              value: 'ACME-42',
+            },
+            id: `cfv_${'a'.repeat(64)}`,
+            type: 'customFieldValue',
+          },
+          meta: { requestId: 'custom-value-set' },
+        },
+        200,
+        { etag: `"${nextRevision}"` },
+      )
+    })
+    const client = new TeamGridClient({ fetch, token })
+    const current = await client.customFieldValues.get('project', 'project-1', 'field1')
+    expect(current.transport.headers.etag).toBe(`"${revision}"`)
+    await expect(
+      client.customFieldValues.set(
+        'project',
+        'project-1',
+        'field1',
+        { value: 'ACME-42' },
+        { ifMatch: current.data.attributes.revision },
+      ),
+    ).resolves.toMatchObject({ data: { attributes: { revision: nextRevision } } })
+    expect(() =>
+      client.customFieldValues.clear('project', 'project-1', 'field1', { ifMatch: '*' }),
+    ).rejects.toMatchObject({ code: 'invalid_arguments' })
+  })
+
+  it('supports project-template lifecycle and credential-owned instantiation polling', async () => {
+    const template = projectTemplateResource()
+    const pending = {
+      attributes: {
+        createdAt: fixtureDate,
+        progress: { listsCompleted: 0, listsTotal: 1, tasksCompleted: 0, tasksTotal: 1 },
+        projectId: 'project-created',
+        resultRevision: null,
+        sourceRevision: 'b'.repeat(64),
+        state: 'pending',
+        templateId: 'template-1',
+        updatedAt: fixtureDate,
+      },
+      id: 'instantiation-1',
+      type: 'projectTemplateInstantiation',
+    }
+    const succeeded = {
+      ...pending,
+      attributes: {
+        ...pending.attributes,
+        finishedAt: fixtureDate,
+        progress: { listsCompleted: 1, listsTotal: 1, tasksCompleted: 1, tasksTotal: 1 },
+        resultRevision: 'a'.repeat(64),
+        state: 'succeeded',
+      },
+    }
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input))
+      if (url.pathname === '/v1/project-templates') {
+        expect(url.searchParams.get('originProjectId')).toBe('project-source')
+        return json({
+          data: [template],
+          meta: { page: { limit: 50, nextCursor: null }, requestId: 'templates-list' },
+        })
+      }
+      if (url.pathname.endsWith('/instantiate')) {
+        expect(init?.method).toBe('POST')
+        expect(new Headers(init?.headers).get('idempotency-key')).toBe('instantiate-1')
+        expect(new Headers(init?.headers).get('if-match')).toBe(projectTemplateEtag)
+        return json({ data: pending, meta: { requestId: 'instantiate' } }, 202, {
+          'idempotency-replayed': 'false',
+          location: '/v1/project-template-instantiations/instantiation-1',
+        })
+      }
+      expect(url.pathname).toBe('/v1/project-template-instantiations/instantiation-1')
+      return json({ data: succeeded, meta: { requestId: 'instantiation-status' } })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(
+      client.projectTemplates.list({ originProjectId: 'project-source' }),
+    ).resolves.toMatchObject({ data: [template] })
+    const accepted = await client.projectTemplates.instantiate(
+      'template-1',
+      { name: 'Customer rollout' },
+      { idempotencyKey: 'instantiate-1', ifMatch: projectTemplateEtag },
+    )
+    expect(accepted.transport.headers.location).toContain('instantiation-1')
+    await expect(
+      client.projectTemplateInstantiations.wait(accepted.data.id, {
+        acceptedOperation: accepted.data,
+      }),
+    ).resolves.toMatchObject({ data: { attributes: { state: 'succeeded' } } })
+  })
+
+  it('lists and atomically replaces planned work with bounded operation polling', async () => {
+    const revision = `pw1-${'1'.repeat(64)}`
+    const targetRevision = `pw1-${'2'.repeat(64)}`
+    const taskSchedule = {
+      attributes: {
+        items: [],
+        plannedEnd: null,
+        plannedStart: null,
+        projectId: 'project-1',
+        revision,
+        taskId: 'task-1',
+        userId: 'user-1',
+      },
+      id: 'task-1',
+      type: 'taskPlannedWork',
+    }
+    const pending = {
+      attributes: { state: 'pending', targetRevision },
+      id: 'planned-operation-1',
+      type: 'plannedWorkOperation',
+    }
+    const succeeded = { ...pending, attributes: { ...pending.attributes, state: 'succeeded' } }
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input))
+      if (url.pathname === '/v1/planned-work') {
+        expect(Object.fromEntries(url.searchParams)).toMatchObject({
+          end: '2026-07-20T00:00:00.000Z',
+          start: '2026-07-19T00:00:00.000Z',
+        })
+        return json({
+          data: [],
+          meta: { page: { limit: 50, nextCursor: null }, requestId: 'planned-list' },
+        })
+      }
+      if (url.pathname === '/v1/tasks/task-1/planned-work' && init?.method === 'PUT') {
+        const headers = new Headers(init.headers)
+        expect(headers.get('if-match')).toBe(`"${revision}"`)
+        expect(headers.get('idempotency-key')).toBe('replace-planned-1')
+        return json({ data: pending, meta: { requestId: 'planned-replace' } }, 202, {
+          location: '/v1/planned-work-operations/planned-operation-1',
+        })
+      }
+      if (url.pathname === '/v1/tasks/task-1/planned-work') {
+        return json({ data: taskSchedule, meta: { requestId: 'planned-get' } }, 200, {
+          etag: `"${revision}"`,
+        })
+      }
+      expect(url.pathname).toBe('/v1/planned-work-operations/planned-operation-1')
+      return json({ data: succeeded, meta: { requestId: 'planned-status' } })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(
+      client.plannedWork.list({
+        end: new Date('2026-07-20T00:00:00.000Z'),
+        start: new Date('2026-07-19T00:00:00.000Z'),
+      }),
+    ).resolves.toMatchObject({ data: [] })
+    const schedule = await client.plannedWork.getForTask('task-1')
+    const accepted = await client.plannedWork.replaceForTask(
+      'task-1',
+      {
+        dayLoads: [60],
+        plannedEnd: '2026-07-19T23:59:59.999Z',
+        plannedStart: '2026-07-19T00:00:00.000Z',
+      },
+      { idempotencyKey: 'replace-planned-1', ifMatch: schedule.data.attributes.revision },
+    )
+    await expect(client.plannedWorkOperations.wait(accepted.data.id)).resolves.toMatchObject({
+      data: { attributes: { state: 'succeeded' } },
+    })
+  })
+
+  it('supports bounded call-note and contact-group resources', async () => {
+    const callNote = {
+      attributes: { archived: false, callId: 'call-1', content: 'Follow up tomorrow.' },
+      id: 'note-1',
+      type: 'callNote',
+    }
+    const contactGroup = {
+      attributes: { archived: false, parentId: null, title: 'Customers' },
+      id: 'group-1',
+      type: 'contactGroup',
+    }
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input))
+      if (url.pathname === '/v1/call-notes') {
+        expect(url.searchParams.get('archived')).toBe('false')
+        return json({
+          data: [callNote],
+          meta: { page: { limit: 50, nextCursor: null }, requestId: 'request-notes' },
+        })
+      }
+      if (url.pathname === '/v1/contact-groups/group-1') {
+        expect(init?.method).toBe('PATCH')
+        expect(JSON.parse(String(init?.body))).toEqual({ title: 'Key customers' })
+        return json({ data: contactGroup, meta: { requestId: 'request-group' } })
+      }
+      throw new Error(`Unexpected request ${url.pathname}`)
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(client.callNotes.list({ archived: false })).resolves.toMatchObject({
+      data: [callNote],
+    })
+    await expect(
+      client.contactGroups.update('group-1', { title: 'Key customers' }),
+    ).resolves.toMatchObject({ data: contactGroup })
+  })
+
+  it('starts and polls a durable project lifecycle operation', async () => {
+    const pending = {
+      attributes: {
+        action: 'complete',
+        attempts: 0,
+        checkpoints: {},
+        createdAt: '2026-07-19T10:00:00.000Z',
+        noOp: false,
+        projectId: 'project-1',
+        resultRevision: null,
+        sourceRevision: 'a'.repeat(64),
+        state: 'pending',
+        updatedAt: '2026-07-19T10:00:00.000Z',
+      },
+      id: 'operation-1',
+      type: 'projectLifecycleOperation',
+    }
+    const succeeded = {
+      ...pending,
+      attributes: {
+        ...pending.attributes,
+        finishedAt: fixtureDate,
+        resultRevision: 'd'.repeat(64),
+        state: 'succeeded',
+      },
+    }
+    const fetch = vi
+      .fn()
+      .mockImplementationOnce(async (input: RequestInfo | URL, init?: RequestInit) => {
+        expect(new URL(String(input)).pathname).toBe('/v1/projects/project-1/complete')
+        expect(init?.method).toBe('POST')
+        expect(new Headers(init?.headers).get('idempotency-key')).toBe('lifecycle-1')
+        expect(new Headers(init?.headers).get('if-match')).toBe(projectEtag)
+        return json({ data: pending, meta: { requestId: 'request-start' } }, 202, {
+          'idempotency-replayed': 'false',
+          location: '/v1/project-lifecycle-operations/operation-1',
+        })
+      })
+      .mockImplementationOnce(async (input: RequestInfo | URL) => {
+        expect(new URL(String(input)).pathname).toBe('/v1/project-lifecycle-operations/operation-1')
+        return json({ data: succeeded, meta: { requestId: 'request-poll' } })
+      })
+    const sleep = vi.fn(async () => undefined)
+    const client = new TeamGridClient({ fetch, sleep, token })
+    const started = await client.projects.complete('project-1', {
+      idempotencyKey: 'lifecycle-1',
+      ifMatch: projectEtag,
+    })
+    expect(started.data).toEqual(pending)
+    const completed = await client.projectLifecycleOperations.wait(started.data.id, {
+      acceptedOperation: started.data,
+      maxWaitMs: 1000,
+      pollIntervalMs: 100,
+    })
+    expect(completed.data.attributes.state).toBe('succeeded')
+    expect(sleep).not.toHaveBeenCalled()
+  })
+
+  it('rejects every immutable project lifecycle identity change while polling', async () => {
+    const accepted = {
+      attributes: {
+        action: 'complete',
+        attempts: 0,
+        checkpoints: {},
+        createdAt: fixtureDate,
+        noOp: false,
+        projectId: 'project-1',
+        resultRevision: null,
+        sourceRevision: 'a'.repeat(64),
+        state: 'pending',
+        updatedAt: fixtureDate,
+      },
+      id: 'operation-1',
+      type: 'projectLifecycleOperation',
+    }
+    const terminal = {
+      ...accepted,
+      attributes: {
+        ...accepted.attributes,
+        finishedAt: fixtureDate,
+        resultRevision: 'd'.repeat(64),
+        state: 'succeeded',
+      },
+    }
+    const inconsistentOperations = [
+      { ...terminal, id: 'operation-other' },
+      { ...terminal, attributes: { ...terminal.attributes, action: 'restore' } },
+      { ...terminal, attributes: { ...terminal.attributes, projectId: 'project-other' } },
+      {
+        ...terminal,
+        attributes: { ...terminal.attributes, sourceRevision: 'e'.repeat(64) },
+      },
+    ]
+
+    for (const inconsistent of inconsistentOperations) {
+      const client = new TeamGridClient({
+        fetch: vi.fn(async () => json({ data: inconsistent, meta: { requestId: 'request-poll' } })),
+        token,
+      })
+      await expect(
+        client.projectLifecycleOperations.wait(accepted.id, {
+          acceptedOperation: accepted as never,
+        }),
+      ).rejects.toMatchObject({ code: 'invalid_api_response' })
+    }
+  })
+
+  it('rejects every immutable template-instantiation identity change while polling', async () => {
+    const accepted = {
+      attributes: {
+        createdAt: fixtureDate,
+        progress: { listsCompleted: 0, listsTotal: 1, tasksCompleted: 0, tasksTotal: 1 },
+        projectId: 'project-created',
+        resultRevision: null,
+        sourceRevision: 'b'.repeat(64),
+        state: 'pending',
+        templateId: 'template-1',
+        updatedAt: fixtureDate,
+      },
+      id: 'instantiation-1',
+      type: 'projectTemplateInstantiation',
+    }
+    const terminal = {
+      ...accepted,
+      attributes: {
+        ...accepted.attributes,
+        finishedAt: fixtureDate,
+        progress: { listsCompleted: 1, listsTotal: 1, tasksCompleted: 1, tasksTotal: 1 },
+        resultRevision: 'a'.repeat(64),
+        state: 'succeeded',
+      },
+    }
+    const inconsistentOperations = [
+      { ...terminal, id: 'instantiation-other' },
+      { ...terminal, attributes: { ...terminal.attributes, templateId: 'template-other' } },
+      { ...terminal, attributes: { ...terminal.attributes, projectId: 'project-other' } },
+      {
+        ...terminal,
+        attributes: { ...terminal.attributes, sourceRevision: 'e'.repeat(64) },
+      },
+    ]
+
+    for (const inconsistent of inconsistentOperations) {
+      const client = new TeamGridClient({
+        fetch: vi.fn(async () => json({ data: inconsistent, meta: { requestId: 'request-poll' } })),
+        token,
+      })
+      await expect(
+        client.projectTemplateInstantiations.wait(accepted.id, {
+          acceptedOperation: accepted as never,
+        }),
+      ).rejects.toMatchObject({ code: 'invalid_api_response' })
+    }
   })
 })

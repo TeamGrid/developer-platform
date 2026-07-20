@@ -10,6 +10,7 @@ import {
   normalizeProfileName,
   SystemCredentialStore,
 } from '@teamgrid/cli'
+import { type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
 
 export type McpRuntimeDependencies = {
   configStore?: ConfigStore
@@ -17,12 +18,40 @@ export type McpRuntimeDependencies = {
   environment?: NodeJS.ProcessEnv
 }
 
-function profileArgument(argv: string[]) {
-  if (argv.length === 0) return undefined
-  if (argv.length !== 2 || argv[0] !== '--profile' || !argv[1]) {
-    throw new TeamGridClientError('invalid_arguments', "Expected only '--profile <name>'.")
+export type McpArguments = {
+  profile?: string
+  toolProfile?: McpToolProfile
+}
+
+export function parseMcpArguments(argv: string[]): McpArguments {
+  const result: McpArguments = {}
+  for (let index = 0; index < argv.length; index += 2) {
+    const name = argv[index]
+    const value = argv[index + 1]
+    if (!value || !['--profile', '--tool-profile'].includes(name || '')) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        "Expected only '--profile <name>' and '--tool-profile <profile>'.",
+      )
+    }
+    if (name === '--profile') {
+      if (result.profile) throw new TeamGridClientError('invalid_arguments', 'Duplicate profile.')
+      result.profile = normalizeProfileName(value)
+    } else {
+      if (result.toolProfile) {
+        throw new TeamGridClientError('invalid_arguments', 'Duplicate tool profile.')
+      }
+      try {
+        result.toolProfile = parseMcpToolProfile(value)
+      } catch (error) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          error instanceof Error ? error.message : 'Invalid MCP tool profile.',
+        )
+      }
+    }
   }
-  return normalizeProfileName(argv[1])
+  return result
 }
 
 export async function createMcpApiClient(
@@ -30,7 +59,7 @@ export async function createMcpApiClient(
   dependencies: McpRuntimeDependencies = {},
 ) {
   const environment = dependencies.environment || process.env
-  const requestedProfile = profileArgument(argv)
+  const requestedProfile = parseMcpArguments(argv).profile
   const configStore = dependencies.configStore || new ConfigStore({ environment })
   const credentialStore = dependencies.credentialStore || new SystemCredentialStore()
   const config = await configStore.load()
