@@ -4134,6 +4134,8 @@ export interface components {
         ProjectTemplateETag: string;
         /** @description Strong task revision returned by reads and mutations. */
         TaskETag: string;
+        /** @description Prevents shared caching and representation transformations so the strong revision validator remains byte-for-byte usable for conditional requests. */
+        StrongETagCacheControl: "private, no-store, no-transform";
         /** @description Strong member-administration resource revision. */
         AdministrationETag: string;
         /** @description Strong automation-definition revision. */
@@ -4324,6 +4326,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["AppointmentETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4357,6 +4360,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AppointmentETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4395,6 +4399,7 @@ export interface operations {
                     ETag: components["headers"]["AppointmentETag"];
                     /** @description Whether the resource already had the requested lifecycle state. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4438,6 +4443,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AppointmentETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4479,6 +4485,7 @@ export interface operations {
                     ETag: components["headers"]["AppointmentETag"];
                     /** @description Whether the resource already had the requested lifecycle state. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4568,6 +4575,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["AbsenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4601,6 +4609,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AbsenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4639,6 +4648,7 @@ export interface operations {
                     ETag: components["headers"]["AbsenceETag"];
                     /** @description Whether the resource already had the requested lifecycle state. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4682,6 +4692,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AbsenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4723,6 +4734,7 @@ export interface operations {
                     ETag: components["headers"]["AbsenceETag"];
                     /** @description Whether the resource already had the requested lifecycle state. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4900,6 +4912,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["CommentETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4933,6 +4946,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["CommentETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4971,6 +4985,7 @@ export interface operations {
                     ETag: components["headers"]["CommentETag"];
                     /** @description Whether the resource already had the requested lifecycle state. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5012,6 +5027,7 @@ export interface operations {
                     ETag: components["headers"]["CommentETag"];
                     /** @description Whether the resource already had the requested lifecycle state. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5095,6 +5111,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["DocumentETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5128,6 +5145,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["DocumentETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5175,6 +5193,7 @@ export interface operations {
                     ETag: components["headers"]["DocumentETag"];
                     /** @description Whether the resource already had the requested lifecycle state. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5218,6 +5237,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["DocumentETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5259,6 +5279,7 @@ export interface operations {
                     ETag: components["headers"]["DocumentETag"];
                     /** @description Whether the resource already had the requested lifecycle state. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5343,6 +5364,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["FileETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5381,6 +5403,7 @@ export interface operations {
                     ETag: components["headers"]["FileETag"];
                     /** @description Whether the resource already had the requested lifecycle state. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5424,6 +5447,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["FileETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5465,6 +5489,7 @@ export interface operations {
                     ETag: components["headers"]["FileETag"];
                     /** @description Whether the resource already had the requested lifecycle state. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -5599,6 +5624,7 @@ export interface operations {
                 headers: {
                     ETag: components["headers"]["FileETag"];
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6104,6 +6130,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "true";
                     ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6118,6 +6145,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6151,6 +6179,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6190,6 +6219,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6496,6 +6526,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "true";
                     ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6510,6 +6541,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6543,6 +6575,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6579,6 +6612,7 @@ export interface operations {
             204: {
                 headers: {
                     ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content?: never;
@@ -6617,6 +6651,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6656,6 +6691,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6863,6 +6899,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["PlannedWorkETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7233,6 +7270,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "true";
                     ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7247,6 +7285,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7280,6 +7319,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7315,6 +7355,7 @@ export interface operations {
             204: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content?: never;
@@ -7353,6 +7394,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7392,6 +7434,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7431,6 +7474,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7470,6 +7514,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9302,6 +9347,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["CustomFieldValueETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9345,6 +9391,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["CustomFieldValueETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9386,6 +9433,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["CustomFieldValueETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9509,7 +9557,7 @@ export interface operations {
             200: {
                 headers: {
                     "Idempotency-Replayed"?: "true";
-                    "Cache-Control"?: "private, no-store";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     ETag: components["headers"]["WebhookETag"];
                     [name: string]: unknown;
                 };
@@ -9524,7 +9572,7 @@ export interface operations {
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
-                    "Cache-Control"?: "private, no-store";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     ETag: components["headers"]["WebhookETag"];
                     [name: string]: unknown;
                 };
@@ -9636,6 +9684,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["WebhookETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9741,6 +9790,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9814,6 +9864,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9897,6 +9948,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["AdministrationETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -9933,6 +9985,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10080,6 +10133,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["AdministrationETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10113,6 +10167,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10186,6 +10241,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10267,6 +10323,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["AdministrationETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10300,6 +10357,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10373,6 +10431,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10660,6 +10719,7 @@ export interface operations {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     ETag: components["headers"]["AutomationDefinitionETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10693,6 +10753,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AutomationDefinitionETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10731,6 +10792,7 @@ export interface operations {
                     ETag: components["headers"]["AutomationDefinitionETag"];
                     /** @description Whether the requested canonical state was already present. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10776,6 +10838,7 @@ export interface operations {
                     ETag: components["headers"]["AutomationDefinitionETag"];
                     /** @description Whether the requested canonical state was already present. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10817,6 +10880,7 @@ export interface operations {
                     ETag: components["headers"]["AutomationDefinitionETag"];
                     /** @description Whether the requested canonical state was already present. */
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10941,6 +11005,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["AutomationRunETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -10978,6 +11043,7 @@ export interface operations {
                 headers: {
                     ETag: components["headers"]["AutomationRunETag"];
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -11128,6 +11194,7 @@ export interface operations {
             200: {
                 headers: {
                     ETag: components["headers"]["WorkspaceSettingsETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -11168,6 +11235,7 @@ export interface operations {
                 headers: {
                     ETag: components["headers"]["WorkspaceSettingsETag"];
                     "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -11207,7 +11275,7 @@ export interface operations {
             /** @description An exact replay of the completed secret rotation. */
             200: {
                 headers: {
-                    "Cache-Control"?: "private, no-store";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     ETag: components["headers"]["WebhookETag"];
                     "Idempotency-Replayed"?: "true";
                     [name: string]: unknown;
@@ -11222,7 +11290,7 @@ export interface operations {
             /** @description A newly completed signing-secret rotation. */
             201: {
                 headers: {
-                    "Cache-Control"?: "private, no-store";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     ETag: components["headers"]["WebhookETag"];
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;

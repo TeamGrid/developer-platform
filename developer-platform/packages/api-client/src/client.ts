@@ -258,6 +258,7 @@ const maxRetryDelayMs = 30_000
 const defaultMaxResponseBytes = 8 * 1024 * 1024
 const maximumExportDownloadBytes = 50 * 1024 * 1024
 const exportContentType = 'text/csv; charset=utf-8' as const
+const strongEtagCacheControl = 'private, no-store, no-transform' as const
 
 function isoQueryValue(value: QueryValue) {
   return value instanceof Date ? value.toISOString() : String(value)
@@ -2333,7 +2334,7 @@ export class TeamGridClient {
     const isReplay = response.transport.status === 200
     if (
       (response.transport.status !== 200 && response.transport.status !== 201) ||
-      response.transport.headers['cache-control'] !== 'private, no-store' ||
+      response.transport.headers['cache-control'] !== strongEtagCacheControl ||
       response.transport.headers['idempotency-replayed'] !== (isReplay ? 'true' : 'false')
     ) {
       throw new TeamGridClientError(
@@ -2365,7 +2366,7 @@ export class TeamGridClient {
     const isReplay = response.transport.status === 200
     if (
       (response.transport.status !== 200 && response.transport.status !== 201) ||
-      response.transport.headers['cache-control'] !== 'private, no-store' ||
+      response.transport.headers['cache-control'] !== strongEtagCacheControl ||
       replayedHeader !== (isReplay ? 'true' : 'false')
     ) {
       throw new TeamGridClientError(

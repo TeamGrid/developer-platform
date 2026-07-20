@@ -81,6 +81,14 @@
           "type": "string"
         }
       },
+      "StrongETagCacheControl": {
+        "description": "Prevents shared caching and representation transformations so the strong revision validator remains byte-for-byte usable for conditional requests.",
+        "required": true,
+        "schema": {
+          "const": "private, no-store, no-transform",
+          "type": "string"
+        }
+      },
       "AdministrationETag": {
         "description": "Strong member-administration resource revision.",
         "required": true,
@@ -9839,6 +9847,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/AppointmentETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -9929,6 +9940,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -10013,6 +10027,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AppointmentETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -10100,6 +10117,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AppointmentETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -10199,6 +10219,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -10453,6 +10476,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/AbsenceETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -10543,6 +10569,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -10627,6 +10656,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AbsenceETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -10714,6 +10746,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AbsenceETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -10813,6 +10848,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -11328,6 +11366,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/CommentETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -11420,6 +11461,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -11506,6 +11550,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/CommentETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -11597,6 +11644,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -11813,6 +11863,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/DocumentETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -11900,6 +11953,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -11981,6 +12037,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/DocumentETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -12075,6 +12134,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/DocumentETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -12171,6 +12233,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -12407,6 +12472,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -12497,6 +12565,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/FileETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -12581,6 +12652,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/FileETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -12677,6 +12751,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -12958,6 +13035,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -14138,6 +14218,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/ProjectETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -14174,6 +14257,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/ProjectETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -14247,6 +14333,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/ProjectETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -14328,6 +14417,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/ProjectETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -15059,6 +15151,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/ProjectTemplateETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -15095,6 +15190,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/ProjectTemplateETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -15152,6 +15250,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/ProjectTemplateETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -15234,6 +15335,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/ProjectTemplateETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -15319,6 +15423,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/ProjectTemplateETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -15406,6 +15513,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/ProjectTemplateETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -15914,6 +16024,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/PlannedWorkETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -16835,6 +16948,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -16871,6 +16987,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -16927,6 +17046,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -17009,6 +17131,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -17090,6 +17215,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -17177,6 +17305,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -17264,6 +17395,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -17351,6 +17485,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -21549,6 +21686,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/CustomFieldValueETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -21650,6 +21790,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/CustomFieldValueETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -21766,6 +21909,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/CustomFieldValueETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -22116,10 +22262,7 @@
                 }
               },
               "Cache-Control": {
-                "schema": {
-                  "const": "private, no-store",
-                  "type": "string"
-                }
+                "$ref": "#/components/headers/StrongETagCacheControl"
               },
               "ETag": {
                 "$ref": "#/components/headers/WebhookETag"
@@ -22158,10 +22301,7 @@
                 }
               },
               "Cache-Control": {
-                "schema": {
-                  "const": "private, no-store",
-                  "type": "string"
-                }
+                "$ref": "#/components/headers/StrongETagCacheControl"
               },
               "ETag": {
                 "$ref": "#/components/headers/WebhookETag"
@@ -22494,6 +22634,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/WebhookETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -22743,6 +22886,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AdministrationETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -22832,6 +22978,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AdministrationETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -23045,6 +23194,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/AdministrationETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -23179,6 +23331,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AdministrationETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -23454,6 +23609,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/AdministrationETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -23585,6 +23743,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AdministrationETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -23669,6 +23830,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AdministrationETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -23876,6 +24040,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/AdministrationETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -24007,6 +24174,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AdministrationETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -24091,6 +24261,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AdministrationETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -24811,6 +24984,9 @@
               },
               "ETag": {
                 "$ref": "#/components/headers/AutomationDefinitionETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -24908,6 +25084,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -24999,6 +25178,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AutomationDefinitionETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -25093,6 +25275,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -25199,6 +25384,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -25564,6 +25752,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/AutomationRunETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -25649,6 +25840,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -25982,6 +26176,9 @@
             "headers": {
               "ETag": {
                 "$ref": "#/components/headers/WorkspaceSettingsETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -26073,6 +26270,9 @@
                   ],
                   "type": "string"
                 }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -26158,10 +26358,7 @@
             "description": "An exact replay of the completed secret rotation.",
             "headers": {
               "Cache-Control": {
-                "schema": {
-                  "const": "private, no-store",
-                  "type": "string"
-                }
+                "$ref": "#/components/headers/StrongETagCacheControl"
               },
               "ETag": {
                 "$ref": "#/components/headers/WebhookETag"
@@ -26198,10 +26395,7 @@
             "description": "A newly completed signing-secret rotation.",
             "headers": {
               "Cache-Control": {
-                "schema": {
-                  "const": "private, no-store",
-                  "type": "string"
-                }
+                "$ref": "#/components/headers/StrongETagCacheControl"
               },
               "ETag": {
                 "$ref": "#/components/headers/WebhookETag"

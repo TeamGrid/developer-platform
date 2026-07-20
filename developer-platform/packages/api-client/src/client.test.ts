@@ -318,7 +318,7 @@ describe('TeamGrid API client', () => {
         },
         201,
         {
-          'cache-control': 'private, no-store',
+          'cache-control': 'private, no-store, no-transform',
           etag: `"whk1-${'a'.repeat(64)}"`,
           'idempotency-replayed': 'false',
           'x-request-id': 'request-webhook-header',
