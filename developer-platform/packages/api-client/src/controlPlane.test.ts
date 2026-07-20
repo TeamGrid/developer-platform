@@ -136,7 +136,7 @@ describe('developer control-plane SDK surfaces', () => {
         expect(headers.get('if-match')).toBe(`"${webhookRevision}"`)
         expect(headers.get('idempotency-key')).toBe('rotate-1')
         return envelope(rotation(false), 201, {
-          'cache-control': 'private, no-store',
+          'cache-control': 'private, no-store, no-transform',
           etag: `"${nextWebhookRevision}"`,
           'idempotency-replayed': 'false',
         })
@@ -176,7 +176,7 @@ describe('developer control-plane SDK surfaces', () => {
     const client = new TeamGridClient({
       fetch: vi.fn(async () =>
         envelope(rotation(true), 200, {
-          'cache-control': 'private, no-store',
+          'cache-control': 'private, no-store, no-transform',
           etag: `"${nextWebhookRevision}"`,
           'idempotency-replayed': 'true',
         }),
@@ -311,7 +311,7 @@ describe('developer control-plane SDK surfaces', () => {
         etag: `"${nextWebhookRevision}"`,
         'idempotency-replayed': 'false',
       }),
-      envelope(rotation(false), 200, {
+      envelope(rotation(true), 200, {
         'cache-control': 'private, no-store',
         etag: `"${nextWebhookRevision}"`,
         'idempotency-replayed': 'true',
@@ -323,13 +323,13 @@ describe('developer control-plane SDK surfaces', () => {
         },
         201,
         {
-          'cache-control': 'private, no-store',
+          'cache-control': 'private, no-store, no-transform',
           etag: `"${nextWebhookRevision}"`,
           'idempotency-replayed': 'false',
         },
       ),
       envelope(rotation(false), 201, {
-        'cache-control': 'private, no-store',
+        'cache-control': 'private, no-store, no-transform',
         etag: `"whk1-${'0'.repeat(64)}"`,
         'idempotency-replayed': 'false',
       }),
