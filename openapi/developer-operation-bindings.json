@@ -88,10 +88,13 @@
     {
       "authMode": "developerCredential",
       "conditionalScopes": [
+        "custom-field-values:read",
         "lists:write",
+        "projects:read",
         "projects:write",
         "project-statements:write",
         "services:write",
+        "tasks:read",
         "tasks:write",
         "time-entries:write"
       ],
@@ -146,8 +149,14 @@
     },
     {
       "authMode": "developerCredential",
-      "conditionalScopes": [],
-      "dynamicPolicyIds": [],
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read"
+      ],
+      "dynamicPolicyIds": [
+        "collaboration-target-domain"
+      ],
       "executionBindings": [
         {
           "id": "api.v1.archiveComment",
@@ -571,7 +580,12 @@
     },
     {
       "authMode": "developerCredential",
-      "conditionalScopes": [],
+      "conditionalScopes": [
+        "contacts:write",
+        "projects:write",
+        "project-statements:write",
+        "tasks:write"
+      ],
       "dynamicPolicyIds": [
         "custom-field-target-domain"
       ],
@@ -707,10 +721,13 @@
     {
       "authMode": "developerCredential",
       "conditionalScopes": [
+        "custom-field-values:read",
         "lists:write",
+        "projects:read",
         "projects:write",
         "project-statements:write",
         "services:write",
+        "tasks:read",
         "tasks:write",
         "time-entries:write"
       ],
@@ -1737,7 +1754,14 @@
     },
     {
       "authMode": "developerCredential",
-      "conditionalScopes": [],
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "project-statements:read",
+        "tags:read",
+        "tasks:read",
+        "users:read"
+      ],
       "dynamicPolicyIds": [
         "custom-field-target-domain"
       ],
@@ -3688,10 +3712,13 @@
     {
       "authMode": "developerCredential",
       "conditionalScopes": [
+        "custom-field-values:read",
         "lists:write",
+        "projects:read",
         "projects:write",
         "project-statements:write",
         "services:write",
+        "tasks:read",
         "tasks:write",
         "time-entries:write"
       ],
@@ -3746,8 +3773,14 @@
     },
     {
       "authMode": "developerCredential",
-      "conditionalScopes": [],
-      "dynamicPolicyIds": [],
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read"
+      ],
+      "dynamicPolicyIds": [
+        "collaboration-target-domain"
+      ],
       "executionBindings": [
         {
           "id": "api.v1.restoreComment",
@@ -4127,7 +4160,16 @@
     },
     {
       "authMode": "developerCredential",
-      "conditionalScopes": [],
+      "conditionalScopes": [
+        "contacts:read",
+        "contacts:write",
+        "projects:read",
+        "projects:write",
+        "project-statements:write",
+        "tags:read",
+        "tasks:write",
+        "users:read"
+      ],
       "dynamicPolicyIds": [
         "custom-field-target-domain"
       ],
@@ -4265,10 +4307,13 @@
     {
       "authMode": "developerCredential",
       "conditionalScopes": [
+        "custom-field-values:read",
         "lists:write",
+        "projects:read",
         "projects:write",
         "project-statements:write",
         "services:write",
+        "tasks:read",
         "tasks:write",
         "time-entries:write"
       ],

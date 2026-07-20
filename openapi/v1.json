@@ -11466,7 +11466,12 @@
         "x-teamgrid-required-scopes": [
           "comments:write"
         ],
-        "description": "Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag."
+        "description": "Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.",
+        "x-teamgrid-conditional-scopes": [
+          "contacts:read",
+          "projects:read",
+          "tasks:read"
+        ]
       },
       "get": {
         "operationId": "getComment",
@@ -11638,7 +11643,12 @@
         "x-teamgrid-required-scopes": [
           "comments:write"
         ],
-        "description": "Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag."
+        "description": "Requires the latest strong resource ETag. The cell-local App re-authenticates and atomically applies the tenant-bound revision before returning a fresh ETag.",
+        "x-teamgrid-conditional-scopes": [
+          "contacts:read",
+          "projects:read",
+          "tasks:read"
+        ]
       }
     },
     "/documents": {
@@ -21582,6 +21592,12 @@
         "tags": [
           "Custom Field Values"
         ],
+        "x-teamgrid-conditional-scopes": [
+          "contacts:write",
+          "projects:write",
+          "project-statements:write",
+          "tasks:write"
+        ],
         "x-teamgrid-dynamic-scopes": {
           "target": [
             "contacts:write",
@@ -21670,6 +21686,14 @@
         "summary": "Get a custom-field value",
         "tags": [
           "Custom Field Values"
+        ],
+        "x-teamgrid-conditional-scopes": [
+          "contacts:read",
+          "projects:read",
+          "project-statements:read",
+          "tags:read",
+          "tasks:read",
+          "users:read"
         ],
         "x-teamgrid-dynamic-scopes": {
           "referenceRead": [
@@ -21784,6 +21808,16 @@
         "summary": "Set a custom-field value",
         "tags": [
           "Custom Field Values"
+        ],
+        "x-teamgrid-conditional-scopes": [
+          "contacts:read",
+          "contacts:write",
+          "projects:read",
+          "projects:write",
+          "project-statements:write",
+          "tags:read",
+          "tasks:write",
+          "users:read"
         ],
         "x-teamgrid-dynamic-scopes": {
           "referenceRead": [
@@ -24815,10 +24849,13 @@
           "automations:write"
         ],
         "x-teamgrid-conditional-scopes": [
+          "custom-field-values:read",
           "lists:write",
+          "projects:read",
           "projects:write",
           "project-statements:write",
           "services:write",
+          "tasks:read",
           "tasks:write",
           "time-entries:write"
         ]
@@ -24918,10 +24955,13 @@
           "automations:write"
         ],
         "x-teamgrid-conditional-scopes": [
+          "custom-field-values:read",
           "lists:write",
+          "projects:read",
           "projects:write",
           "project-statements:write",
           "services:write",
+          "tasks:read",
           "tasks:write",
           "time-entries:write"
         ]
@@ -25100,10 +25140,13 @@
           "automations:write"
         ],
         "x-teamgrid-conditional-scopes": [
+          "custom-field-values:read",
           "lists:write",
+          "projects:read",
           "projects:write",
           "project-statements:write",
           "services:write",
+          "tasks:read",
           "tasks:write",
           "time-entries:write"
         ]
@@ -25203,10 +25246,13 @@
           "automations:write"
         ],
         "x-teamgrid-conditional-scopes": [
+          "custom-field-values:read",
           "lists:write",
+          "projects:read",
           "projects:write",
           "project-statements:write",
           "services:write",
+          "tasks:read",
           "tasks:write",
           "time-entries:write"
         ]

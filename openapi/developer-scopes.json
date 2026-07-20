@@ -158,14 +158,17 @@
     {
       "id": "automation-action-domain",
       "scopes": [
+        "custom-field-values:read",
         "lists:write",
+        "projects:read",
         "projects:write",
         "project-statements:write",
         "services:write",
+        "tasks:read",
         "tasks:write",
         "time-entries:write"
       ],
-      "reason": "Automation definitions may contain only public action types and require every domain-write scope implied by their trigger and flow in addition to automations:write."
+      "reason": "Automation definitions may contain only public triggers and action types and require every domain read or write scope implied by their trigger, conditions, waits, and flow in addition to automations:write."
     }
   ]
 }
