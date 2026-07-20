@@ -88,7 +88,10 @@ async function runBinarySmokes(expectedWorkspaceId) {
     assert(names.includes('teamgrid_workspace_get'))
     assert(names.every(name => !/(change|custom_field_value|planned_work|project_template)/i.test(name)))
     const result = await mcp.callTool({ arguments: {}, name: 'teamgrid_workspace_get' })
-    assert.equal(result.structuredContent?.data?.id, expectedWorkspaceId)
+    const structuredContent = /** @type {{ data?: { id?: string } }} */ (
+      result.structuredContent
+    )
+    assert.equal(structuredContent?.data?.id, expectedWorkspaceId)
     assert.equal(JSON.stringify(result).includes(token), false)
   } finally {
     await mcp.close()
@@ -117,12 +120,28 @@ async function expectRawFailure(candidateToken, expectedStatus) {
 }
 
 async function archiveProject(id) {
+  const current = await client.projects.get(id)
   const accepted = await client.projects.archive(id, {
     idempotencyKey: `staging-e2e-cleanup-project-${id}-${runId}`,
+    ifMatch: current.data.attributes.developerRevision,
   })
   return client.projectLifecycleOperations.wait(accepted.data.id, {
     maxWaitMs: 120_000,
     pollIntervalMs: 500,
+  })
+}
+
+async function archiveProjectTemplate(id) {
+  const current = await client.projectTemplates.get(id)
+  return client.projectTemplates.archive(id, {
+    ifMatch: current.data.attributes.developerRevision,
+  })
+}
+
+async function archiveTask(id) {
+  const current = await client.tasks.get(id)
+  return client.tasks.archive(id, {
+    ifMatch: current.data.attributes.developerRevision,
   })
 }
 
@@ -250,10 +269,11 @@ try {
   }
 
   const updatedTask = await client.tasks.update(taskId, {
-    completed: false,
     name: `${taskInput.name} updated`,
+  }, {
+    ifMatch: createdTask.data.attributes.developerRevision,
   })
-  assert.equal(updatedTask.data.attributes.completed, false)
+  assert.equal(updatedTask.data.attributes.name, `${taskInput.name} updated`)
   assert.equal((await client.tasks.get(taskId)).data.id, taskId)
 
   const changeDeadline = Date.now() + 30_000
@@ -344,7 +364,10 @@ try {
   const instantiation = await client.projectTemplates.instantiate(
     projectTemplateId,
     { name: `Staging instantiated project ${runId}` },
-    { idempotencyKey: `staging-e2e-instantiate-${runId}` },
+    {
+      idempotencyKey: `staging-e2e-instantiate-${runId}`,
+      ifMatch: projectTemplate.data.attributes.developerRevision,
+    },
   )
   const completedInstantiation = await client.projectTemplateInstantiations.wait(
     instantiation.data.id,
@@ -417,8 +440,8 @@ try {
   if (customFieldDefinitionId) {
     await client.customFieldDefinitions.archive(customFieldDefinitionId).catch(() => {})
   }
-  if (projectTemplateId) await client.projectTemplates.archive(projectTemplateId).catch(() => {})
-  if (taskId) await client.tasks.archive(taskId).catch(() => {})
+  if (projectTemplateId) await archiveProjectTemplate(projectTemplateId).catch(() => {})
+  if (taskId) await archiveTask(taskId).catch(() => {})
   if (instantiatedProjectId) await archiveProject(instantiatedProjectId).catch(() => {})
   if (sourceProjectId) await archiveProject(sourceProjectId).catch(() => {})
   if (webhookReceiver) await webhookReceiver.close().catch(() => {})
