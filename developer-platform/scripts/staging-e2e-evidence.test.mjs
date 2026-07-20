@@ -49,6 +49,7 @@ function qualifyingClaims(overrides = {}) {
     negativeAuthVerified: true,
     originAuthVerified: true,
     plannedWorkVerified: true,
+    privateExportVerified: true,
     projectTemplatesVerified: true,
     readOnlyScopeVerified: true,
     signedWebhookDeliveryVerified: true,
@@ -139,6 +140,10 @@ describe('release-qualifying staging E2E contract', () => {
       ...base,
       claims: { ...base.claims, readOnlyScopeVerified: false },
     })).toThrow('readOnlyScopeVerified')
+    expect(() => buildQualificationEvidence({
+      ...base,
+      claims: { ...base.claims, privateExportVerified: false },
+    })).toThrow('privateExportVerified')
     expect(() => buildQualificationEvidence({
       ...base,
       cleanup: { complete: false, reconciled: false },

@@ -22,6 +22,7 @@ const requiredQualifyingClaims = [
   'negativeAuthVerified',
   'originAuthVerified',
   'plannedWorkVerified',
+  'privateExportVerified',
   'projectTemplatesVerified',
   'readOnlyScopeVerified',
   'signedWebhookDeliveryVerified',

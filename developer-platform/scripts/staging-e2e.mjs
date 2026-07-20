@@ -57,6 +57,7 @@ const client = new TeamGridClient({ baseUrl, retries: 2, timeoutMs: 30_000, toke
 let taskId
 let timeEntryId
 let webhookId
+let exportId
 let customFieldDefinitionId
 let projectTemplateId
 let sourceProjectId
@@ -181,6 +182,19 @@ async function waitUntilReconciled(verifyResource, label) {
     await new Promise(resolve => setTimeout(resolve, 500))
   }
   throw new Error(`Cleanup reconciliation did not observe the terminal state for ${label}.`)
+}
+
+async function waitForExport(id) {
+  const deadline = Date.now() + 120_000
+  while (Date.now() < deadline) {
+    const current = await client.exports.get(id)
+    if (current.data.attributes.state === 'succeeded') return current
+    if (current.data.attributes.state === 'failed') {
+      throw new Error('The private export job failed.')
+    }
+    await new Promise(resolve => setTimeout(resolve, 500))
+  }
+  throw new Error('The private export job did not complete before the deadline.')
 }
 
 async function verifyAbsent(readResource) {
@@ -355,6 +369,32 @@ try {
   assert.equal(updatedTask.data.attributes.name, `${taskInput.name} updated`)
   assert.equal((await client.tasks.get(taskId)).data.id, taskId)
 
+  const exportFileName = `staging-private-export-${runId}`
+  const createdExport = await client.exports.create({
+    fields: ['id', 'name'],
+    fileName: exportFileName,
+    maxRows: 50,
+    resourceType: 'tasks',
+    updatedFrom: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+  }, { idempotencyKey: `staging-e2e-export-${runId}` })
+  exportId = createdExport.data.id
+  const completedExport = await waitForExport(exportId)
+  assert.equal(completedExport.data.attributes.fileName, `${exportFileName}.csv`)
+  assert.equal(completedExport.data.attributes.resourceType, 'tasks')
+  assert.equal(completedExport.data.attributes.rowCount > 0, true)
+  const exportIntent = await client.exports.createDownloadIntent(exportId)
+  assert.equal(exportIntent.data.attributes.fileName, `${exportFileName}.csv`)
+  const downloadedExport = await client.exports.download(exportId, {
+    intentToken: exportIntent.data.attributes.token,
+    maxBytes: 64 * 1024,
+  })
+  assert.equal(downloadedExport.contentType, 'text/csv; charset=utf-8')
+  assert.equal(downloadedExport.fileName, `${exportFileName}.csv`)
+  assert.equal('url' in downloadedExport, false)
+  const exportCsv = new TextDecoder().decode(downloadedExport.data)
+  assert.equal(exportCsv.startsWith('"id";"name"\r\n'), true)
+  assert.equal(exportCsv.includes(`"${taskId}";"${taskInput.name} updated"`), true)
+
   const changeDeadline = Date.now() + 30_000
   let taskChangeVerified = false
   while (!taskChangeVerified && Date.now() < changeDeadline) {
@@ -472,7 +512,7 @@ try {
   assert.equal((await client.timeEntries.get(timeEntryId)).data.attributes.taskId, taskId)
 
   const audit = await client.auditEvents.list({ limit: 100 })
-  const runTargets = new Set([taskId, timeEntryId, webhookId])
+  const runTargets = new Set([exportId, taskId, timeEntryId, webhookId])
   const runAuditEvents = audit.data.filter(event => runTargets.has(event.attributes.targetId || ''))
   assert(runAuditEvents.length >= 5, 'Expected durable audit events for staging mutations')
   assert(runAuditEvents.every(event => event.attributes.outcome === 'success'))
@@ -496,6 +536,7 @@ try {
     originAuthVerified: Boolean(originUrl),
     readOnlyScopeVerified: Boolean(readOnlyToken),
     plannedWorkVerified: true,
+    privateExportVerified: true,
     projectTemplatesVerified: true,
     signedWebhookDeliveryVerified: Boolean(signedDelivery),
     webhookCaptureCleanupVerified,
