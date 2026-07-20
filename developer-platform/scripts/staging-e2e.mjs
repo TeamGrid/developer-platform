@@ -10,6 +10,11 @@ import {
   createSignedWebhookReceiver,
   createWebhookSiteReceiver,
 } from './signed-webhook-receiver.mjs'
+import {
+  buildQualificationEvidence,
+  resolveQualificationConfig,
+  writeQualificationEvidence,
+} from './staging-e2e-evidence.mjs'
 
 const token = String(process.env.TEAMGRID_API_TOKEN || '').trim()
 const baseUrl = String(process.env.TEAMGRID_API_BASE_URL || '').trim()
@@ -26,6 +31,7 @@ const webhookReceiverMode = String(
   process.env.TEAMGRID_E2E_WEBHOOK_RECEIVER || 'webhook-site',
 ).trim()
 const webhookReceiverAttempts = 3
+const qualification = resolveQualificationConfig(process.env)
 const execFileAsync = promisify(execFile)
 const cliBinary = fileURLToPath(new URL('../packages/cli/dist/bin.js', import.meta.url))
 const mcpBinary = fileURLToPath(new URL('../packages/mcp-server/dist/bin.js', import.meta.url))
@@ -56,7 +62,11 @@ let projectTemplateId
 let sourceProjectId
 let instantiatedProjectId
 let webhookReceiver
+let webhookReceiverWasStarted = false
 let webhookCaptureCleanupVerified = false
+let observedWorkspace
+let smokeClaims
+let smokeFailure
 
 async function runBinarySmokes(expectedWorkspaceId) {
   const environment = {
@@ -125,10 +135,12 @@ async function archiveProject(id) {
     idempotencyKey: `staging-e2e-cleanup-project-${id}-${runId}`,
     ifMatch: current.data.attributes.developerRevision,
   })
-  return client.projectLifecycleOperations.wait(accepted.data.id, {
+  const completed = await client.projectLifecycleOperations.wait(accepted.data.id, {
     maxWaitMs: 120_000,
     pollIntervalMs: 500,
   })
+  assert.equal(completed.data.attributes.state, 'succeeded')
+  return completed
 }
 
 async function archiveProjectTemplate(id) {
@@ -162,13 +174,80 @@ async function startSignedWebhookReceiver() {
   throw lastError
 }
 
+async function waitUntilReconciled(verifyResource, label) {
+  const deadline = Date.now() + 30_000
+  while (Date.now() < deadline) {
+    if (await verifyResource()) return
+    await new Promise(resolve => setTimeout(resolve, 500))
+  }
+  throw new Error(`Cleanup reconciliation did not observe the terminal state for ${label}.`)
+}
+
+async function verifyAbsent(readResource) {
+  try {
+    await readResource()
+    return false
+  } catch (error) {
+    if (error instanceof TeamGridApiError && error.status === 404) {
+      assert.match(error.requestId, /^[A-Za-z0-9._:-]{1,128}$/)
+      return true
+    }
+    throw error
+  }
+}
+
+async function verifyArchived(readResource) {
+  const resource = await readResource()
+  return resource.data.attributes.archived === true
+}
+
+async function reconcileResourceCleanup({ cleanup, id, label, verify }, report, failures) {
+  if (!id) {
+    report[label] = {
+      cleanupAttempted: false,
+      cleanupSucceeded: true,
+      created: false,
+      reconciliationVerified: true,
+    }
+    return
+  }
+
+  const record = {
+    cleanupAttempted: true,
+    cleanupSucceeded: false,
+    created: true,
+    reconciliationVerified: false,
+  }
+  report[label] = record
+  try {
+    await cleanup()
+    record.cleanupSucceeded = true
+  } catch (error) {
+    failures.push(new Error(`${label} cleanup failed.`, { cause: error }))
+  }
+  try {
+    await waitUntilReconciled(verify, label)
+    record.reconciliationVerified = true
+  } catch (error) {
+    failures.push(new Error(`${label} terminal-state reconciliation failed.`, { cause: error }))
+  }
+}
+
 try {
-  if (verifyWebhookDelivery) webhookReceiver = await startSignedWebhookReceiver()
+  if (verifyWebhookDelivery) {
+    webhookReceiver = await startSignedWebhookReceiver()
+    webhookReceiverWasStarted = true
+  }
   const webhookUrl = webhookReceiver?.url || configuredWebhookUrl
 
   const workspace = await client.workspace.get()
-  assert.equal(workspace.data.attributes.region, 'de')
-  assert.equal(workspace.data.attributes.cellId, 'de-nbg-001')
+  observedWorkspace = workspace
+  if (qualification.expectedRegion) {
+    assert.equal(workspace.data.attributes.region, qualification.expectedRegion)
+  }
+  if (qualification.expectedCellId) {
+    assert.equal(workspace.data.attributes.cellId, qualification.expectedCellId)
+  }
   await runBinarySmokes(workspace.data.id)
 
   const [projects, users, contacts] = await Promise.all([
@@ -404,9 +483,8 @@ try {
     webhookCaptureCleanupVerified = true
   }
 
-  console.log(JSON.stringify({
+  smokeClaims = {
     auditEventsVerified: runAuditEvents.length,
-    cellId: workspace.data.attributes.cellId,
     expiredCredentialVerified: Boolean(expiredToken),
     foreignTenantMissVerified: Boolean(foreignTaskId),
     idempotencyReplayVerified: true,
@@ -417,32 +495,102 @@ try {
     negativeAuthVerified: true,
     originAuthVerified: Boolean(originUrl),
     readOnlyScopeVerified: Boolean(readOnlyToken),
-    region: workspace.data.attributes.region,
     plannedWorkVerified: true,
     projectTemplatesVerified: true,
     signedWebhookDeliveryVerified: Boolean(signedDelivery),
     webhookCaptureCleanupVerified,
     wrongCellRoutingVerified: Boolean(wrongCellToken),
-    resources: {
-      task: Boolean(taskId),
-      timeEntry: Boolean(timeEntryId),
-      webhook: Boolean(webhookId),
-      customFieldDefinition: Boolean(customFieldDefinitionId),
-      projectTemplate: Boolean(projectTemplateId),
-      sourceProject: Boolean(sourceProjectId),
-      instantiatedProject: Boolean(instantiatedProjectId),
-    },
-    runId,
-  }))
-} finally {
-  if (webhookId) await client.webhooks.remove(webhookId).catch(() => {})
-  if (timeEntryId) await client.timeEntries.archive(timeEntryId).catch(() => {})
-  if (customFieldDefinitionId) {
-    await client.customFieldDefinitions.archive(customFieldDefinitionId).catch(() => {})
   }
-  if (projectTemplateId) await archiveProjectTemplate(projectTemplateId).catch(() => {})
-  if (taskId) await archiveTask(taskId).catch(() => {})
-  if (instantiatedProjectId) await archiveProject(instantiatedProjectId).catch(() => {})
-  if (sourceProjectId) await archiveProject(sourceProjectId).catch(() => {})
-  if (webhookReceiver) await webhookReceiver.close().catch(() => {})
+} catch (error) {
+  smokeFailure = error
 }
+
+const cleanupFailures = []
+const cleanupResources = {}
+await reconcileResourceCleanup({
+  cleanup: () => client.webhooks.remove(webhookId),
+  id: webhookId,
+  label: 'webhook',
+  verify: () => verifyAbsent(() => client.webhooks.get(webhookId)),
+}, cleanupResources, cleanupFailures)
+await reconcileResourceCleanup({
+  cleanup: () => client.timeEntries.archive(timeEntryId),
+  id: timeEntryId,
+  label: 'timeEntry',
+  verify: () => verifyArchived(() => client.timeEntries.get(timeEntryId)),
+}, cleanupResources, cleanupFailures)
+await reconcileResourceCleanup({
+  cleanup: () => client.customFieldDefinitions.archive(customFieldDefinitionId),
+  id: customFieldDefinitionId,
+  label: 'customFieldDefinition',
+  verify: () => verifyArchived(() => client.customFieldDefinitions.get(customFieldDefinitionId)),
+}, cleanupResources, cleanupFailures)
+await reconcileResourceCleanup({
+  cleanup: () => archiveProjectTemplate(projectTemplateId),
+  id: projectTemplateId,
+  label: 'projectTemplate',
+  verify: () => verifyArchived(() => client.projectTemplates.get(projectTemplateId)),
+}, cleanupResources, cleanupFailures)
+await reconcileResourceCleanup({
+  cleanup: () => archiveTask(taskId),
+  id: taskId,
+  label: 'task',
+  verify: () => verifyArchived(() => client.tasks.get(taskId)),
+}, cleanupResources, cleanupFailures)
+await reconcileResourceCleanup({
+  cleanup: () => archiveProject(instantiatedProjectId),
+  id: instantiatedProjectId,
+  label: 'instantiatedProject',
+  verify: () => verifyArchived(() => client.projects.get(instantiatedProjectId)),
+}, cleanupResources, cleanupFailures)
+await reconcileResourceCleanup({
+  cleanup: () => archiveProject(sourceProjectId),
+  id: sourceProjectId,
+  label: 'sourceProject',
+  verify: () => verifyArchived(() => client.projects.get(sourceProjectId)),
+}, cleanupResources, cleanupFailures)
+
+if (webhookReceiver) {
+  try {
+    await webhookReceiver.close()
+    webhookReceiver = null
+    webhookCaptureCleanupVerified = true
+  } catch (error) {
+    cleanupFailures.push(new Error('Webhook capture receiver cleanup failed.', { cause: error }))
+  }
+}
+cleanupResources.webhookCaptureReceiver = {
+  cleanupAttempted: webhookReceiverWasStarted,
+  cleanupSucceeded: webhookCaptureCleanupVerified || !webhookReceiverWasStarted,
+  created: webhookReceiverWasStarted,
+  reconciliationVerified: webhookCaptureCleanupVerified || !webhookReceiverWasStarted,
+}
+
+if (smokeFailure || cleanupFailures.length > 0) {
+  throw new AggregateError(
+    [...(smokeFailure ? [smokeFailure] : []), ...cleanupFailures],
+    'Developer Platform E2E or cleanup reconciliation failed.',
+  )
+}
+
+smokeClaims.webhookCaptureCleanupVerified = webhookCaptureCleanupVerified
+const cleanup = {
+  complete: true,
+  reconciled: Object.values(cleanupResources).every(resource => (
+    resource.cleanupSucceeded && resource.reconciliationVerified
+  )),
+  resources: cleanupResources,
+}
+const evidence = buildQualificationEvidence({
+  bindings: qualification.bindings,
+  claims: smokeClaims,
+  cleanup,
+  qualifying: qualification.qualifying,
+  runId,
+  target: {
+    cellId: observedWorkspace.data.attributes.cellId,
+    region: observedWorkspace.data.attributes.region,
+  },
+})
+const evidenceSha256 = writeQualificationEvidence(qualification.evidencePath, evidence)
+console.log(JSON.stringify({ ...evidence, evidenceSha256 }))

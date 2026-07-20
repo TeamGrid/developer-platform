@@ -205,10 +205,17 @@ package, and invokes both public binaries. Treat that workflow as the registry
 publication gate rather than assuming that npm approval alone proves a usable
 release.
 
-The destructive-safe staging proof is available as `npm run e2e:staging`. It
-refuses mutation outside a staging/loopback base URL unless explicitly
-overridden and accepts negative-test credentials through environment variables
-only. With `TEAMGRID_E2E_WEBHOOK_DELIVERY=true`, the default receiver creates a
+The destructive-safe live proof is available as `npm run e2e:staging`. Local
+and exploratory runs are explicitly non-qualifying by leaving
+`TEAMGRID_E2E_QUALIFY_RELEASE=false`; their negative fixtures remain optional.
+A release workflow must set `TEAMGRID_E2E_QUALIFY_RELEASE=true`. That mode
+fails before its first mutation unless the expired credential, foreign task,
+read-only credential, and wrong-cell credential are all present. It also
+requires the protected direct-origin URL, the expected `de` or `us` region and cell, an evidence output path,
+and exact App, API, Developer Platform, producer, contract-manifest, and
+workflow-run bindings. The script refuses mutation outside a staging/loopback
+base URL unless `TEAMGRID_E2E_ALLOW_NON_STAGING=true` is deliberately set by a
+production qualification workflow. With `TEAMGRID_E2E_WEBHOOK_DELIVERY=true`, the default receiver creates a
 disposable Webhook.site token, captures synthetic staging data, verifies the
 exact raw-body HMAC locally, and deletes the token in cleanup. Set
 `TEAMGRID_E2E_WEBHOOK_RECEIVER=quick-tunnel` only for local experiments where a
@@ -217,5 +224,10 @@ Cloudflare Quick Tunnel is known to be reachable.
 The staging proof also spawns the built CLI for a live workspace request and negotiates with the
 built MCP stdio binary before making changes. It then verifies the fixed-watermark change feed,
 custom-field compare-and-set values, project-template capture/instantiation, and planned-work
-replacement against disposable staging resources. All created resources are best-effort cleaned up;
-the script never permits these mutation smokes against an unmarked production hostname.
+replacement against disposable staging resources. The script never permits these mutation smokes
+against an unmarked production hostname. Release qualification is stricter: cleanup failures fail
+the run, every created API resource is re-read until its archived or absent terminal state is proven,
+and the machine-readable
+evidence is written atomically only after reconciliation. The staging deployment embeds that report
+and its SHA-256 in the immutable promotion artifact; DE promotion revalidates its claims, target,
+exact refs, digest, and cleanup.
