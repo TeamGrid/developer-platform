@@ -16,6 +16,7 @@
   },
   "include": [
     "scripts/staging-e2e.mjs",
-    "scripts/staging-e2e-evidence.mjs"
+    "scripts/staging-e2e-evidence.mjs",
+    "scripts/staging-load.mjs"
   ]
 }

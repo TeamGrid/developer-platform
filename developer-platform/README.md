@@ -231,3 +231,16 @@ and the machine-readable
 evidence is written atomically only after reconciliation. The staging deployment embeds that report
 and its SHA-256 in the immutable promotion artifact; DE promotion revalidates its claims, target,
 exact refs, digest, and cleanup.
+
+The same staging workflow then runs `npm run e2e:staging:load`. Its fixed
+release profile performs 720 authenticated, read-only requests over four
+minutes at three requests per second across workspace, capability,
+entitlement, project, task, contact, user, and change-feed reads. This stays
+below the shared 300-request-per-minute pre-auth limit while exercising eight
+cell-owned query paths. Qualification requires zero HTTP, schema, target,
+request-ID, timeout, and rate-limit failures; at least 2.5 achieved requests
+per second; p95 at most 2 seconds; p99 at most 5 seconds; and no request above
+10 seconds. The redacted load report contains no URL or credential and is
+hashed and embedded beside the mutation/security report in the v4 deployment
+evidence. The load command refuses non-staging hosts unless an explicit local
+or controlled override is present.

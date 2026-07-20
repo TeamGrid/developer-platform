@@ -3,6 +3,8 @@
   "files": {
     "includes": [
       "packages/**/*.ts",
+      "scripts/staging-load.mjs",
+      "scripts/staging-load.test.mjs",
       "scripts/validate-release.mjs",
       "!packages/**/dist/**",
       "!packages/api-client/src/generated/schema.ts"

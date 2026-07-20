@@ -11,6 +11,7 @@
     "check": "node scripts/check-contract-manifest.mjs && npm run generate:types && git diff --exit-code -- packages/api-client/src/generated/schema.ts && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server && npm run typecheck -w @teamgrid/api-client && npm run typecheck -w @teamgrid/cli && npm run typecheck -w @teamgrid/mcp-server && npm run typecheck:staging-e2e && npm run contract:surfaces && node scripts/check-client-version.mjs && biome check packages scripts",
     "contract:surfaces": "node scripts/check-operation-surfaces.mjs",
     "e2e:staging": "node scripts/staging-e2e.mjs",
+    "e2e:staging:load": "node scripts/staging-load.mjs",
     "generate:types": "openapi-typescript ../openapi/v1.json -o packages/api-client/src/generated/schema.ts",
     "sync:contracts": "node scripts/sync-contracts.mjs",
     "test": "npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && vitest run",
