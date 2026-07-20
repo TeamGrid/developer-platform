@@ -9,10 +9,10 @@
       "sha256": "a1f91460803bd862021224e8c87e239b6464aa1ee190ff7e0d2bbaa100fcd7a7"
     },
     {
-      "bytes": 129455,
+      "bytes": 137483,
       "id": "operation-bindings",
       "path": "contracts/developer-operation-bindings.json",
-      "sha256": "66f746e8da503003d1b1b65adfa080626991ba3f32a4902c9d4e0aeab0afd33a"
+      "sha256": "dc7ce03e9769fb4ca80add57a26b7e79b9fa61d20057443482be14ca8f01ef3b"
     },
     {
       "bytes": 8729,
@@ -51,7 +51,8 @@
     "governedV1Operations": 182,
     "operationBindings": 182,
     "referencedAppMethods": 156,
-    "remainingDirectCellReads": 20,
+    "remainingDirectCellReads": 71,
+    "unmediatedDirectCellReads": 20,
     "resourceCasMutationOperations": 14,
     "resourceCasOperationReads": 2,
     "v0Operations": 87,

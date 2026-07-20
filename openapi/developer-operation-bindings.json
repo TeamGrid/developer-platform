@@ -635,6 +635,11 @@
           "id": "teamgrid/internal/v1/tasks/complete",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.tasks.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "completeTask",
@@ -752,6 +757,11 @@
           "id": "teamgrid/internal/v1/callNotes/create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.callNotes.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createCallNote",
@@ -808,6 +818,11 @@
           "id": "teamgrid/internal/v1/contacts/create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.contacts.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createContact",
@@ -833,6 +848,11 @@
           "id": "teamgrid/internal/v1/contactGroups/create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.contactGroups.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createContactGroup",
@@ -858,6 +878,11 @@
           "id": "teamgrid/internal/v1/customFieldDefinitions/create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.customFieldDefinitions.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createCustomFieldDefinition",
@@ -1072,6 +1097,11 @@
           "id": "teamgrid/internal/v1/lists/create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.lists.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createList",
@@ -1099,6 +1129,11 @@
           "id": "developerApi.v1.products.create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.products.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createProduct",
@@ -1126,6 +1161,11 @@
           "id": "developerApi.v1.productGroups.create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.productGroups.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createProductGroup",
@@ -1151,6 +1191,11 @@
           "id": "teamgrid/internal/v1/projects/create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projects.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createProject",
@@ -1178,6 +1223,11 @@
           "id": "developerApi.v1.projectStatements.create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projectStatements.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createProjectStatement",
@@ -1205,6 +1255,11 @@
           "id": "developerApi.v1.projectTemplates.create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projectTemplates.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createProjectTemplate",
@@ -1255,6 +1310,11 @@
           "id": "teamgrid/internal/v1/services/create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.services.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createService",
@@ -1280,6 +1340,11 @@
           "id": "teamgrid/internal/v1/tags/create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.tags.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createTag",
@@ -1305,6 +1370,11 @@
           "id": "teamgrid/internal/v1/tasks/create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.tasks.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createTask",
@@ -1330,6 +1400,11 @@
           "id": "teamgrid/internal/v1/timeEntries/create",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.timeEntries.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "createTimeEntry",
@@ -1724,6 +1799,11 @@
           "id": "teamgrid/internal/v1/customFieldDefinitions/assertAccess",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.customFieldDefinitions.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "getCustomFieldDefinition",
@@ -2018,6 +2098,11 @@
           "id": "developerApi.v1.products.assertAccess",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.products.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "getProduct",
@@ -2045,6 +2130,11 @@
           "id": "developerApi.v1.productGroups.assertAccess",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.productGroups.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "getProductGroup",
@@ -2122,6 +2212,11 @@
           "id": "developerApi.v1.projectStatements.assertAccess",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projectStatements.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "getProjectStatement",
@@ -2149,6 +2244,11 @@
           "id": "developerApi.v1.projectTemplates.assertAccess",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projectTemplates.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "getProjectTemplate",
@@ -2900,6 +3000,11 @@
           "id": "teamgrid/internal/v1/customFieldDefinitions/assertAccess",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.customFieldDefinitions.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "listCustomFieldDefinitions",
@@ -3133,6 +3238,11 @@
           "id": "developerApi.v1.productGroups.assertAccess",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.productGroups.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "listProductGroups",
@@ -3160,6 +3270,11 @@
           "id": "developerApi.v1.products.assertAccess",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.products.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "listProducts",
@@ -3214,6 +3329,11 @@
           "id": "developerApi.v1.projectStatements.assertAccess",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projectStatements.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "listProjectStatements",
@@ -3241,6 +3361,11 @@
           "id": "developerApi.v1.projectTemplates.assertAccess",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projectTemplates.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "listProjectTemplates",
@@ -3566,6 +3691,11 @@
           "id": "teamgrid/internal/v1/tasks/reopen",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.tasks.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "reopenTask",
@@ -3733,6 +3863,11 @@
           "id": "teamgrid/internal/v1/callNotes/restore",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.callNotes.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "restoreCallNote",
@@ -3783,6 +3918,11 @@
           "id": "teamgrid/internal/v1/contactGroups/restore",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.contactGroups.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "restoreContactGroup",
@@ -3808,6 +3948,11 @@
           "id": "teamgrid/internal/v1/customFieldDefinitions/restore",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.customFieldDefinitions.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "restoreCustomFieldDefinition",
@@ -3883,6 +4028,11 @@
           "id": "teamgrid/internal/v1/lists/restore",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.lists.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "restoreList",
@@ -3933,6 +4083,11 @@
           "id": "developerApi.v1.projectStatements.restore",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projectStatements.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "restoreProjectStatement",
@@ -3958,6 +4113,11 @@
           "id": "developerApi.v1.projectTemplates.restore",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projectTemplates.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "restoreProjectTemplate",
@@ -3983,6 +4143,11 @@
           "id": "teamgrid/internal/v1/services/restore",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.services.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "restoreService",
@@ -4008,6 +4173,11 @@
           "id": "teamgrid/internal/v1/tags/restore",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.tags.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "restoreTag",
@@ -4033,6 +4203,11 @@
           "id": "teamgrid/internal/v1/tasks/restore",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.tasks.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "restoreTask",
@@ -4058,6 +4233,11 @@
           "id": "teamgrid/internal/v1/timeEntries/restore",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.timeEntries.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "restoreTimeEntry",
@@ -4166,6 +4346,11 @@
           "id": "teamgrid/internal/v1/tasks/timer/start",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.timeEntries.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "startTaskTimer",
@@ -4192,6 +4377,11 @@
           "id": "teamgrid/internal/v1/tasks/timer/stop",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.timeEntries.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "stopTaskTimer",
@@ -4310,6 +4500,11 @@
           "id": "teamgrid/internal/v1/contacts/update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.contacts.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateContact",
@@ -4335,6 +4530,11 @@
           "id": "teamgrid/internal/v1/contactGroups/update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.contactGroups.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateContactGroup",
@@ -4360,6 +4560,11 @@
           "id": "teamgrid/internal/v1/customFieldDefinitions/update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.customFieldDefinitions.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateCustomFieldDefinition",
@@ -4435,6 +4640,11 @@
           "id": "teamgrid/internal/v1/lists/update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.lists.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateList",
@@ -4487,6 +4697,11 @@
           "id": "developerApi.v1.products.update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.products.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateProduct",
@@ -4514,6 +4729,11 @@
           "id": "developerApi.v1.productGroups.update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.productGroups.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateProductGroup",
@@ -4539,6 +4759,11 @@
           "id": "teamgrid/internal/v1/projects/update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projects.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateProject",
@@ -4566,6 +4791,11 @@
           "id": "developerApi.v1.projectStatements.update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projectStatements.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateProjectStatement",
@@ -4593,6 +4823,11 @@
           "id": "developerApi.v1.projectTemplates.update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.projectTemplates.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateProjectTemplate",
@@ -4643,6 +4878,11 @@
           "id": "teamgrid/internal/v1/services/update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.services.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateService",
@@ -4668,6 +4908,11 @@
           "id": "teamgrid/internal/v1/tags/update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.tags.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateTag",
@@ -4693,6 +4938,11 @@
           "id": "teamgrid/internal/v1/tasks/update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.tasks.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateTask",
@@ -4718,6 +4968,11 @@
           "id": "teamgrid/internal/v1/timeEntries/update",
           "kind": "appMethod",
           "role": "authorization"
+        },
+        {
+          "id": "api.mongo.timeEntries.read",
+          "kind": "cellRead",
+          "role": "data"
         }
       ],
       "handlerId": "updateTimeEntry",
@@ -4759,11 +5014,31 @@
   "summary": {
     "authenticatedOperations": 181,
     "directCellReadOperations": [
+      "completeTask",
+      "createCallNote",
+      "createContact",
+      "createContactGroup",
+      "createCustomFieldDefinition",
+      "createList",
+      "createProduct",
+      "createProductGroup",
+      "createProject",
+      "createProjectStatement",
+      "createProjectTemplate",
+      "createService",
+      "createTag",
+      "createTask",
+      "createTimeEntry",
       "getCallNote",
       "getContact",
       "getContactGroup",
+      "getCustomFieldDefinition",
       "getList",
+      "getProduct",
+      "getProductGroup",
       "getProject",
+      "getProjectStatement",
+      "getProjectTemplate",
       "getService",
       "getTag",
       "getTask",
@@ -4772,13 +5047,44 @@
       "listCallNotes",
       "listContactGroups",
       "listContacts",
+      "listCustomFieldDefinitions",
       "listLists",
+      "listProductGroups",
+      "listProducts",
+      "listProjectStatements",
+      "listProjectTemplates",
       "listProjects",
       "listServices",
       "listTags",
       "listTasks",
       "listTimeEntries",
-      "listUsers"
+      "listUsers",
+      "reopenTask",
+      "restoreCallNote",
+      "restoreContactGroup",
+      "restoreCustomFieldDefinition",
+      "restoreList",
+      "restoreProjectStatement",
+      "restoreProjectTemplate",
+      "restoreService",
+      "restoreTag",
+      "restoreTask",
+      "restoreTimeEntry",
+      "startTaskTimer",
+      "stopTaskTimer",
+      "updateContact",
+      "updateContactGroup",
+      "updateCustomFieldDefinition",
+      "updateList",
+      "updateProduct",
+      "updateProductGroup",
+      "updateProject",
+      "updateProjectStatement",
+      "updateProjectTemplate",
+      "updateService",
+      "updateTag",
+      "updateTask",
+      "updateTimeEntry"
     ],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -4937,6 +5243,28 @@
       "teamgrid/internal/v1/webhookDeliveries/list",
       "teamgrid/internal/v1/webhooks/create",
       "teamgrid/internal/v1/webhooks/remove"
+    ],
+    "unmediatedCellReadOperations": [
+      "getCallNote",
+      "getContact",
+      "getContactGroup",
+      "getList",
+      "getProject",
+      "getService",
+      "getTag",
+      "getTask",
+      "getTimeEntry",
+      "getWorkspace",
+      "listCallNotes",
+      "listContactGroups",
+      "listContacts",
+      "listLists",
+      "listProjects",
+      "listServices",
+      "listTags",
+      "listTasks",
+      "listTimeEntries",
+      "listUsers"
     ]
   }
 }
