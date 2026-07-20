@@ -9,6 +9,7 @@ const workspaceRoot = path.resolve(import.meta.dirname, '../..')
 const sourceRepository = 'TeamGrid/teamgrid-api'
 const artifactDestinations = {
   'contracts/developer-capabilities.json': 'developer-capabilities.json',
+  'contracts/developer-operation-bindings.json': 'developer-operation-bindings.json',
   'contracts/developer-scopes.json': 'developer-scopes.json',
   'contracts/v0-routes.json': 'v0-routes.json',
   'contracts/v0-to-v1-migration.json': 'v0-to-v1-migration.json',

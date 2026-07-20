@@ -9,6 +9,7 @@ const provenance = JSON.parse(
 )
 const localArtifacts = {
   'contracts/developer-capabilities.json': '../../openapi/developer-capabilities.json',
+  'contracts/developer-operation-bindings.json': '../../openapi/developer-operation-bindings.json',
   'contracts/developer-scopes.json': '../../openapi/developer-scopes.json',
   'contracts/v0-routes.json': '../../openapi/v0-routes.json',
   'contracts/v0-to-v1-migration.json': '../../openapi/v0-to-v1-migration.json',

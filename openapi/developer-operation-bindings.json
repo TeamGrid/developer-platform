@@ -1,0 +1,4942 @@
+{
+  "apiVersion": "v1",
+  "catalogVersion": "developer-operation-bindings-v1",
+  "operations": [
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.abortAutomationRun",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationRuns.abort",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "abortAutomationRun",
+      "method": "POST",
+      "operationId": "abortAutomationRun",
+      "optionalScopes": [],
+      "path": "/automation-runs/{id}/abort",
+      "requiredScopes": [
+        "automations:run"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "absences:admin:write"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveAbsence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.absences.archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveAbsence",
+      "method": "DELETE",
+      "operationId": "archiveAbsence",
+      "optionalScopes": [],
+      "path": "/absences/{id}",
+      "requiredScopes": [
+        "absences:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "appointments:delegated:write"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveAppointment",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.appointments.archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveAppointment",
+      "method": "DELETE",
+      "operationId": "archiveAppointment",
+      "optionalScopes": [],
+      "path": "/appointments/{id}",
+      "requiredScopes": [
+        "appointments:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "lists:write",
+        "projects:write",
+        "project-statements:write",
+        "services:write",
+        "tasks:write",
+        "time-entries:write"
+      ],
+      "dynamicPolicyIds": [
+        "automation-action-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveAutomationDefinition",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationDefinitions.archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveAutomationDefinition",
+      "method": "DELETE",
+      "operationId": "archiveAutomationDefinition",
+      "optionalScopes": [],
+      "path": "/automation-definitions/{id}",
+      "requiredScopes": [
+        "automations:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveCallNote",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/callNotes/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveCallNote",
+      "method": "DELETE",
+      "operationId": "archiveCallNote",
+      "optionalScopes": [],
+      "path": "/call-notes/{id}",
+      "requiredScopes": [
+        "call-notes:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveComment",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.comments.archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveComment",
+      "method": "DELETE",
+      "operationId": "archiveComment",
+      "optionalScopes": [],
+      "path": "/comments/{id}",
+      "requiredScopes": [
+        "comments:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveContactGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/contactGroups/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveContactGroup",
+      "method": "DELETE",
+      "operationId": "archiveContactGroup",
+      "optionalScopes": [],
+      "path": "/contact-groups/{id}",
+      "requiredScopes": [
+        "contact-groups:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveCustomFieldDefinition",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/customFieldDefinitions/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveCustomFieldDefinition",
+      "method": "DELETE",
+      "operationId": "archiveCustomFieldDefinition",
+      "optionalScopes": [],
+      "path": "/custom-field-definitions/{id}",
+      "requiredScopes": [
+        "custom-field-definitions:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveDocument",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/documents/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveDocument",
+      "method": "DELETE",
+      "operationId": "archiveDocument",
+      "optionalScopes": [],
+      "path": "/documents/{id}",
+      "requiredScopes": [
+        "documents:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveFile",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/files/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveFile",
+      "method": "DELETE",
+      "operationId": "archiveFile",
+      "optionalScopes": [],
+      "path": "/files/{id}",
+      "requiredScopes": [
+        "files:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveList",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/lists/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveList",
+      "method": "DELETE",
+      "operationId": "archiveList",
+      "optionalScopes": [],
+      "path": "/lists/{id}",
+      "requiredScopes": [
+        "lists:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveProduct",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.products.archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveProduct",
+      "method": "DELETE",
+      "operationId": "archiveProduct",
+      "optionalScopes": [],
+      "path": "/products/{id}",
+      "requiredScopes": [
+        "products:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveProductGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.productGroups.archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveProductGroup",
+      "method": "DELETE",
+      "operationId": "archiveProductGroup",
+      "optionalScopes": [],
+      "path": "/product-groups/{id}",
+      "requiredScopes": [
+        "product-groups:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveProject",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/projects/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveProject",
+      "method": "POST",
+      "operationId": "archiveProject",
+      "optionalScopes": [],
+      "path": "/projects/{id}/archive",
+      "requiredScopes": [
+        "projects:lifecycle"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveProjectStatement",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectStatements.archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveProjectStatement",
+      "method": "DELETE",
+      "operationId": "archiveProjectStatement",
+      "optionalScopes": [],
+      "path": "/project-statements/{id}",
+      "requiredScopes": [
+        "project-statements:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveProjectTemplate",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectTemplates.archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveProjectTemplate",
+      "method": "DELETE",
+      "operationId": "archiveProjectTemplate",
+      "optionalScopes": [],
+      "path": "/project-templates/{id}",
+      "requiredScopes": [
+        "project-templates:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveService",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/services/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveService",
+      "method": "DELETE",
+      "operationId": "archiveService",
+      "optionalScopes": [],
+      "path": "/services/{id}",
+      "requiredScopes": [
+        "services:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveTag",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tags/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveTag",
+      "method": "DELETE",
+      "operationId": "archiveTag",
+      "optionalScopes": [],
+      "path": "/tags/{id}",
+      "requiredScopes": [
+        "tags:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveTask",
+      "method": "DELETE",
+      "operationId": "archiveTask",
+      "optionalScopes": [],
+      "path": "/tasks/{id}",
+      "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.archiveTimeEntry",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/timeEntries/archive",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveTimeEntry",
+      "method": "DELETE",
+      "operationId": "archiveTimeEntry",
+      "optionalScopes": [],
+      "path": "/time-entries/{id}",
+      "requiredScopes": [
+        "time-entries:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.cancelFileUploadIntent",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/files/uploadIntent/cancel",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "cancelFileUploadIntent",
+      "method": "DELETE",
+      "operationId": "cancelFileUploadIntent",
+      "optionalScopes": [],
+      "path": "/file-upload-intents/{id}",
+      "requiredScopes": [
+        "files:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.cancelInvitation",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.invitations.cancel",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "cancelInvitation",
+      "method": "DELETE",
+      "operationId": "cancelInvitation",
+      "optionalScopes": [],
+      "path": "/invitations/{id}",
+      "requiredScopes": [
+        "invitations:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "custom-field-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.clearCustomFieldValue",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.customFieldValues.clear",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "clearCustomFieldValue",
+      "method": "DELETE",
+      "operationId": "clearCustomFieldValue",
+      "optionalScopes": [],
+      "path": "/custom-field-values/{targetType}/{resourceId}/{fieldId}",
+      "requiredScopes": [
+        "custom-field-values:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.completeProject",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/projects/complete",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "completeProject",
+      "method": "POST",
+      "operationId": "completeProject",
+      "optionalScopes": [],
+      "path": "/projects/{id}/complete",
+      "requiredScopes": [
+        "projects:lifecycle"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.completeTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/complete",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "completeTask",
+      "method": "POST",
+      "operationId": "completeTask",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/complete",
+      "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "absences:admin:write"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.createAbsence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.absences.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createAbsence",
+      "method": "POST",
+      "operationId": "createAbsence",
+      "optionalScopes": [],
+      "path": "/absences",
+      "requiredScopes": [
+        "absences:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "appointments:delegated:write"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.createAppointment",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.appointments.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createAppointment",
+      "method": "POST",
+      "operationId": "createAppointment",
+      "optionalScopes": [],
+      "path": "/appointments",
+      "requiredScopes": [
+        "appointments:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "lists:write",
+        "projects:write",
+        "project-statements:write",
+        "services:write",
+        "tasks:write",
+        "time-entries:write"
+      ],
+      "dynamicPolicyIds": [
+        "automation-action-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.createAutomationDefinition",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationDefinitions.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createAutomationDefinition",
+      "method": "POST",
+      "operationId": "createAutomationDefinition",
+      "optionalScopes": [],
+      "path": "/automation-definitions",
+      "requiredScopes": [
+        "automations:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createCallNote",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/callNotes/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createCallNote",
+      "method": "POST",
+      "operationId": "createCallNote",
+      "optionalScopes": [],
+      "path": "/call-notes",
+      "requiredScopes": [
+        "call-notes:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read"
+      ],
+      "dynamicPolicyIds": [
+        "collaboration-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.createComment",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.comments.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createComment",
+      "method": "POST",
+      "operationId": "createComment",
+      "optionalScopes": [],
+      "path": "/comments",
+      "requiredScopes": [
+        "comments:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createContact",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/contacts/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createContact",
+      "method": "POST",
+      "operationId": "createContact",
+      "optionalScopes": [],
+      "path": "/contacts",
+      "requiredScopes": [
+        "contacts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createContactGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/contactGroups/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createContactGroup",
+      "method": "POST",
+      "operationId": "createContactGroup",
+      "optionalScopes": [],
+      "path": "/contact-groups",
+      "requiredScopes": [
+        "contact-groups:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createCustomFieldDefinition",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/customFieldDefinitions/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createCustomFieldDefinition",
+      "method": "POST",
+      "operationId": "createCustomFieldDefinition",
+      "optionalScopes": [],
+      "path": "/custom-field-definitions",
+      "requiredScopes": [
+        "custom-field-definitions:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createDocument",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/documents/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createDocument",
+      "method": "POST",
+      "operationId": "createDocument",
+      "optionalScopes": [],
+      "path": "/documents",
+      "requiredScopes": [
+        "documents:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read",
+        "time-entries:read"
+      ],
+      "dynamicPolicyIds": [
+        "export-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.createExport",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.exports.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createExport",
+      "method": "POST",
+      "operationId": "createExport",
+      "optionalScopes": [],
+      "path": "/exports",
+      "requiredScopes": [
+        "exports:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read",
+        "time-entries:read"
+      ],
+      "dynamicPolicyIds": [
+        "export-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.createExportDownloadIntent",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.exports.downloadIntent",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createExportDownloadIntent",
+      "method": "POST",
+      "operationId": "createExportDownloadIntent",
+      "optionalScopes": [],
+      "path": "/exports/{id}/download-intent",
+      "requiredScopes": [
+        "exports:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createFileDownloadIntent",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/files/downloadIntent/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createFileDownloadIntent",
+      "method": "POST",
+      "operationId": "createFileDownloadIntent",
+      "optionalScopes": [],
+      "path": "/files/{id}/download-intent",
+      "requiredScopes": [
+        "files:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createFileUploadIntent",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/files/uploadIntent/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createFileUploadIntent",
+      "method": "POST",
+      "operationId": "createFileUploadIntent",
+      "optionalScopes": [],
+      "path": "/file-upload-intents",
+      "requiredScopes": [
+        "files:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.groups.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createGroup",
+      "method": "POST",
+      "operationId": "createGroup",
+      "optionalScopes": [],
+      "path": "/groups",
+      "requiredScopes": [
+        "groups:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createInvitation",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.invitations.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createInvitation",
+      "method": "POST",
+      "operationId": "createInvitation",
+      "optionalScopes": [],
+      "path": "/invitations",
+      "requiredScopes": [
+        "invitations:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createList",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/lists/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createList",
+      "method": "POST",
+      "operationId": "createList",
+      "optionalScopes": [],
+      "path": "/lists",
+      "requiredScopes": [
+        "lists:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "commerce-sensitive-fields"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.createProduct",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.products.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createProduct",
+      "method": "POST",
+      "operationId": "createProduct",
+      "optionalScopes": [
+        "products:finance:write"
+      ],
+      "path": "/products",
+      "requiredScopes": [
+        "products:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createProductGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.productGroups.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createProductGroup",
+      "method": "POST",
+      "operationId": "createProductGroup",
+      "optionalScopes": [],
+      "path": "/product-groups",
+      "requiredScopes": [
+        "product-groups:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createProject",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/projects/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createProject",
+      "method": "POST",
+      "operationId": "createProject",
+      "optionalScopes": [],
+      "path": "/projects",
+      "requiredScopes": [
+        "projects:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "commerce-sensitive-fields"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.createProjectStatement",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectStatements.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createProjectStatement",
+      "method": "POST",
+      "operationId": "createProjectStatement",
+      "optionalScopes": [
+        "project-statements:finance:write"
+      ],
+      "path": "/project-statements",
+      "requiredScopes": [
+        "project-statements:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createProjectTemplate",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectTemplates.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createProjectTemplate",
+      "method": "POST",
+      "operationId": "createProjectTemplate",
+      "optionalScopes": [],
+      "path": "/project-templates",
+      "requiredScopes": [
+        "project-templates:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createRole",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.roles.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createRole",
+      "method": "POST",
+      "operationId": "createRole",
+      "optionalScopes": [],
+      "path": "/roles",
+      "requiredScopes": [
+        "roles:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createService",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/services/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createService",
+      "method": "POST",
+      "operationId": "createService",
+      "optionalScopes": [],
+      "path": "/services",
+      "requiredScopes": [
+        "services:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createTag",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tags/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createTag",
+      "method": "POST",
+      "operationId": "createTag",
+      "optionalScopes": [],
+      "path": "/tags",
+      "requiredScopes": [
+        "tags:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createTask",
+      "method": "POST",
+      "operationId": "createTask",
+      "optionalScopes": [],
+      "path": "/tasks",
+      "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createTimeEntry",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/timeEntries/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createTimeEntry",
+      "method": "POST",
+      "operationId": "createTimeEntry",
+      "optionalScopes": [],
+      "path": "/time-entries",
+      "requiredScopes": [
+        "time-entries:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createWebhook",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/webhooks/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        },
+        {
+          "id": "developerApi.v1.webhooks.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createWebhook",
+      "method": "POST",
+      "operationId": "createWebhook",
+      "optionalScopes": [],
+      "path": "/webhooks",
+      "requiredScopes": [
+        "webhooks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.deleteGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.groups.delete",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "deleteGroup",
+      "method": "DELETE",
+      "operationId": "deleteGroup",
+      "optionalScopes": [],
+      "path": "/groups/{id}",
+      "requiredScopes": [
+        "groups:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.deleteRole",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.roles.delete",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "deleteRole",
+      "method": "DELETE",
+      "operationId": "deleteRole",
+      "optionalScopes": [],
+      "path": "/roles/{id}",
+      "requiredScopes": [
+        "roles:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read",
+        "time-entries:read"
+      ],
+      "dynamicPolicyIds": [
+        "export-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.streamExportDownload",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.exports.resolveDownloadIntent",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "streamExportDownload",
+      "method": "GET",
+      "operationId": "downloadExport",
+      "optionalScopes": [],
+      "path": "/exports/{id}/download",
+      "requiredScopes": [
+        "exports:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.finalizeFileUploadIntent",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/files/uploadIntent/finalize",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "finalizeFileUploadIntent",
+      "method": "POST",
+      "operationId": "finalizeFileUploadIntent",
+      "optionalScopes": [],
+      "path": "/file-upload-intents/{id}/finalize",
+      "requiredScopes": [
+        "files:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "absences:delegated:read"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getAbsence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.absences.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getAbsence",
+      "method": "GET",
+      "operationId": "getAbsence",
+      "optionalScopes": [],
+      "path": "/absences/{id}",
+      "requiredScopes": [
+        "absences:read"
+      ]
+    },
+    {
+      "authMode": "anonymous",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getApiVersion",
+          "kind": "httpLocal",
+          "role": "transport"
+        }
+      ],
+      "handlerId": "getApiVersion",
+      "method": "GET",
+      "operationId": "getApiVersion",
+      "optionalScopes": [],
+      "path": "/",
+      "requiredScopes": []
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "appointments:delegated:read"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getAppointment",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.appointments.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getAppointment",
+      "method": "GET",
+      "operationId": "getAppointment",
+      "optionalScopes": [],
+      "path": "/appointments/{id}",
+      "requiredScopes": [
+        "appointments:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getAutomationDefinition",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationDefinitions.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getAutomationDefinition",
+      "method": "GET",
+      "operationId": "getAutomationDefinition",
+      "optionalScopes": [],
+      "path": "/automation-definitions/{id}",
+      "requiredScopes": [
+        "automations:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getAutomationRun",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationRuns.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getAutomationRun",
+      "method": "GET",
+      "operationId": "getAutomationRun",
+      "optionalScopes": [],
+      "path": "/automation-runs/{id}",
+      "requiredScopes": [
+        "automations:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getCallNote",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.callNotes.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "getCallNote",
+      "method": "GET",
+      "operationId": "getCallNote",
+      "optionalScopes": [],
+      "path": "/call-notes/{id}",
+      "requiredScopes": [
+        "call-notes:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read"
+      ],
+      "dynamicPolicyIds": [
+        "collaboration-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getComment",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.comments.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getComment",
+      "method": "GET",
+      "operationId": "getComment",
+      "optionalScopes": [],
+      "path": "/comments/{id}",
+      "requiredScopes": [
+        "comments:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getContact",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.contacts.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "getContact",
+      "method": "GET",
+      "operationId": "getContact",
+      "optionalScopes": [],
+      "path": "/contacts/{id}",
+      "requiredScopes": [
+        "contacts:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getContactGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.contactGroups.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "getContactGroup",
+      "method": "GET",
+      "operationId": "getContactGroup",
+      "optionalScopes": [],
+      "path": "/contact-groups/{id}",
+      "requiredScopes": [
+        "contact-groups:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getCustomFieldDefinition",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/customFieldDefinitions/assertAccess",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getCustomFieldDefinition",
+      "method": "GET",
+      "operationId": "getCustomFieldDefinition",
+      "optionalScopes": [],
+      "path": "/custom-field-definitions/{id}",
+      "requiredScopes": [
+        "custom-field-definitions:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "custom-field-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getCustomFieldValue",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.customFieldValues.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getCustomFieldValue",
+      "method": "GET",
+      "operationId": "getCustomFieldValue",
+      "optionalScopes": [],
+      "path": "/custom-field-values/{targetType}/{resourceId}/{fieldId}",
+      "requiredScopes": [
+        "custom-field-values:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getDocument",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/documents/get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getDocument",
+      "method": "GET",
+      "operationId": "getDocument",
+      "optionalScopes": [],
+      "path": "/documents/{id}",
+      "requiredScopes": [
+        "documents:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getEventCatalog",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.events.catalog",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getEventCatalog",
+      "method": "GET",
+      "operationId": "getEventCatalog",
+      "optionalScopes": [],
+      "path": "/events/catalog",
+      "requiredScopes": [
+        "events:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read",
+        "time-entries:read"
+      ],
+      "dynamicPolicyIds": [
+        "export-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getExport",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.exports.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getExport",
+      "method": "GET",
+      "operationId": "getExport",
+      "optionalScopes": [],
+      "path": "/exports/{id}",
+      "requiredScopes": [
+        "exports:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getFile",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/files/get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getFile",
+      "method": "GET",
+      "operationId": "getFile",
+      "optionalScopes": [],
+      "path": "/files/{id}",
+      "requiredScopes": [
+        "files:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.groups.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getGroup",
+      "method": "GET",
+      "operationId": "getGroup",
+      "optionalScopes": [],
+      "path": "/groups/{id}",
+      "requiredScopes": [
+        "groups:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "administration-pii-overlay"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getInvitation",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.invitations.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getInvitation",
+      "method": "GET",
+      "operationId": "getInvitation",
+      "optionalScopes": [
+        "members:pii:read"
+      ],
+      "path": "/invitations/{id}",
+      "requiredScopes": [
+        "invitations:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getList",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.lists.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "getList",
+      "method": "GET",
+      "operationId": "getList",
+      "optionalScopes": [],
+      "path": "/lists/{id}",
+      "requiredScopes": [
+        "lists:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "administration-pii-overlay"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getMember",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.members.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getMember",
+      "method": "GET",
+      "operationId": "getMember",
+      "optionalScopes": [
+        "members:pii:read"
+      ],
+      "path": "/members/{id}",
+      "requiredScopes": [
+        "members:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getPlannedWorkOperation",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.plannedWorkOperations.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getPlannedWorkOperation",
+      "method": "GET",
+      "operationId": "getPlannedWorkOperation",
+      "optionalScopes": [],
+      "path": "/planned-work-operations/{id}",
+      "requiredScopes": [
+        "planned-work:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "commerce-sensitive-fields"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getProduct",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.products.assertAccess",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getProduct",
+      "method": "GET",
+      "operationId": "getProduct",
+      "optionalScopes": [
+        "products:finance:read"
+      ],
+      "path": "/products/{id}",
+      "requiredScopes": [
+        "products:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getProductGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.productGroups.assertAccess",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getProductGroup",
+      "method": "GET",
+      "operationId": "getProductGroup",
+      "optionalScopes": [],
+      "path": "/product-groups/{id}",
+      "requiredScopes": [
+        "product-groups:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getProject",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.projects.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "getProject",
+      "method": "GET",
+      "operationId": "getProject",
+      "optionalScopes": [],
+      "path": "/projects/{id}",
+      "requiredScopes": [
+        "projects:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getProjectLifecycleOperation",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/projectLifecycleOperations/get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getProjectLifecycleOperation",
+      "method": "GET",
+      "operationId": "getProjectLifecycleOperation",
+      "optionalScopes": [],
+      "path": "/project-lifecycle-operations/{id}",
+      "requiredScopes": [
+        "projects:lifecycle"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "commerce-sensitive-fields"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getProjectStatement",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectStatements.assertAccess",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getProjectStatement",
+      "method": "GET",
+      "operationId": "getProjectStatement",
+      "optionalScopes": [
+        "project-statements:finance:read"
+      ],
+      "path": "/project-statements/{id}",
+      "requiredScopes": [
+        "project-statements:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getProjectTemplate",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectTemplates.assertAccess",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getProjectTemplate",
+      "method": "GET",
+      "operationId": "getProjectTemplate",
+      "optionalScopes": [],
+      "path": "/project-templates/{id}",
+      "requiredScopes": [
+        "project-templates:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getProjectTemplateInstantiation",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectTemplateInstantiations.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getProjectTemplateInstantiation",
+      "method": "GET",
+      "operationId": "getProjectTemplateInstantiation",
+      "optionalScopes": [],
+      "path": "/project-template-instantiations/{id}",
+      "requiredScopes": [
+        "project-templates:write",
+        "projects:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getRole",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.roles.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getRole",
+      "method": "GET",
+      "operationId": "getRole",
+      "optionalScopes": [],
+      "path": "/roles/{id}",
+      "requiredScopes": [
+        "roles:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getService",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.services.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "getService",
+      "method": "GET",
+      "operationId": "getService",
+      "optionalScopes": [],
+      "path": "/services/{id}",
+      "requiredScopes": [
+        "services:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getSystemCapabilities",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.systemCapabilities.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getSystemCapabilities",
+      "method": "GET",
+      "operationId": "getSystemCapabilities",
+      "optionalScopes": [],
+      "path": "/system/capabilities",
+      "requiredScopes": [
+        "workspace:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getTag",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.tags.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "getTag",
+      "method": "GET",
+      "operationId": "getTag",
+      "optionalScopes": [],
+      "path": "/tags/{id}",
+      "requiredScopes": [
+        "tags:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.tasks.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "getTask",
+      "method": "GET",
+      "operationId": "getTask",
+      "optionalScopes": [],
+      "path": "/tasks/{id}",
+      "requiredScopes": [
+        "tasks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getTaskPlannedWork",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.plannedWork.getForTask",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getTaskPlannedWork",
+      "method": "GET",
+      "operationId": "getTaskPlannedWork",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/planned-work",
+      "requiredScopes": [
+        "planned-work:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getTimeEntry",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.timeEntries.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "getTimeEntry",
+      "method": "GET",
+      "operationId": "getTimeEntry",
+      "optionalScopes": [],
+      "path": "/time-entries/{id}",
+      "requiredScopes": [
+        "time-entries:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getWebhook",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.webhooks.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getWebhook",
+      "method": "GET",
+      "operationId": "getWebhook",
+      "optionalScopes": [],
+      "path": "/webhooks/{id}",
+      "requiredScopes": [
+        "webhooks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getWebhookDelivery",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/webhookDeliveries/get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getWebhookDelivery",
+      "method": "GET",
+      "operationId": "getWebhookDelivery",
+      "optionalScopes": [],
+      "path": "/webhook-deliveries/{id}",
+      "requiredScopes": [
+        "webhooks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getWorkspace",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.workspaces.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "getWorkspace",
+      "method": "GET",
+      "operationId": "getWorkspace",
+      "optionalScopes": [],
+      "path": "/workspace",
+      "requiredScopes": [
+        "workspace:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getWorkspaceEntitlements",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.workspaceEntitlements.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getWorkspaceEntitlements",
+      "method": "GET",
+      "operationId": "getWorkspaceEntitlements",
+      "optionalScopes": [],
+      "path": "/workspace/entitlements",
+      "requiredScopes": [
+        "workspace:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getWorkspaceSettings",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.workspaceSettings.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getWorkspaceSettings",
+      "method": "GET",
+      "operationId": "getWorkspaceSettings",
+      "optionalScopes": [],
+      "path": "/workspace/settings",
+      "requiredScopes": [
+        "workspace-settings:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.instantiateProjectTemplate",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectTemplates.instantiate",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "instantiateProjectTemplate",
+      "method": "POST",
+      "operationId": "instantiateProjectTemplate",
+      "optionalScopes": [],
+      "path": "/project-templates/{id}/instantiate",
+      "requiredScopes": [
+        "project-templates:write",
+        "projects:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "absences:delegated:read"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.listAbsences",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.absences.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listAbsences",
+      "method": "GET",
+      "operationId": "listAbsences",
+      "optionalScopes": [],
+      "path": "/absences",
+      "requiredScopes": [
+        "absences:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read"
+      ],
+      "dynamicPolicyIds": [
+        "collaboration-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.listActivity",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.activity.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listActivity",
+      "method": "GET",
+      "operationId": "listActivity",
+      "optionalScopes": [],
+      "path": "/activity",
+      "requiredScopes": [
+        "activity:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "appointments:delegated:read"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.listAppointments",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.appointments.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listAppointments",
+      "method": "GET",
+      "operationId": "listAppointments",
+      "optionalScopes": [],
+      "path": "/appointments",
+      "requiredScopes": [
+        "appointments:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listAuditEvents",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.auditEvents.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listAuditEvents",
+      "method": "GET",
+      "operationId": "listAuditEvents",
+      "optionalScopes": [],
+      "path": "/audit-events",
+      "requiredScopes": [
+        "audit:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listAutomationActions",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationActions.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listAutomationActions",
+      "method": "GET",
+      "operationId": "listAutomationActions",
+      "optionalScopes": [],
+      "path": "/automation-actions",
+      "requiredScopes": [
+        "automations:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listAutomationDefinitions",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationDefinitions.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listAutomationDefinitions",
+      "method": "GET",
+      "operationId": "listAutomationDefinitions",
+      "optionalScopes": [],
+      "path": "/automation-definitions",
+      "requiredScopes": [
+        "automations:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listAutomationDefinitionVersions",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationDefinitions.versions.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listAutomationDefinitionVersions",
+      "method": "GET",
+      "operationId": "listAutomationDefinitionVersions",
+      "optionalScopes": [],
+      "path": "/automation-definitions/{id}/versions",
+      "requiredScopes": [
+        "automations:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listAutomationRuns",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationRuns.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listAutomationRuns",
+      "method": "GET",
+      "operationId": "listAutomationRuns",
+      "optionalScopes": [],
+      "path": "/automation-runs",
+      "requiredScopes": [
+        "automations:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "availability:delegated:read"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getAvailability",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.availability.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getAvailability",
+      "method": "GET",
+      "operationId": "listAvailability",
+      "optionalScopes": [],
+      "path": "/availability",
+      "requiredScopes": [
+        "availability:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listCallNotes",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.callNotes.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "listCallNotes",
+      "method": "GET",
+      "operationId": "listCallNotes",
+      "optionalScopes": [],
+      "path": "/call-notes",
+      "requiredScopes": [
+        "call-notes:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listChanges",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/changes/list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listChanges",
+      "method": "GET",
+      "operationId": "listChanges",
+      "optionalScopes": [],
+      "path": "/changes",
+      "requiredScopes": [
+        "changes:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read"
+      ],
+      "dynamicPolicyIds": [
+        "collaboration-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.listComments",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.comments.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listComments",
+      "method": "GET",
+      "operationId": "listComments",
+      "optionalScopes": [],
+      "path": "/comments",
+      "requiredScopes": [
+        "comments:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listContactGroups",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.contactGroups.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "listContactGroups",
+      "method": "GET",
+      "operationId": "listContactGroups",
+      "optionalScopes": [],
+      "path": "/contact-groups",
+      "requiredScopes": [
+        "contact-groups:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listContacts",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.contacts.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "listContacts",
+      "method": "GET",
+      "operationId": "listContacts",
+      "optionalScopes": [],
+      "path": "/contacts",
+      "requiredScopes": [
+        "contacts:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listCustomFieldDefinitions",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/customFieldDefinitions/assertAccess",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listCustomFieldDefinitions",
+      "method": "GET",
+      "operationId": "listCustomFieldDefinitions",
+      "optionalScopes": [],
+      "path": "/custom-field-definitions",
+      "requiredScopes": [
+        "custom-field-definitions:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listDocuments",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/documents/list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listDocuments",
+      "method": "GET",
+      "operationId": "listDocuments",
+      "optionalScopes": [],
+      "path": "/documents",
+      "requiredScopes": [
+        "documents:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listFiles",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/files/list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listFiles",
+      "method": "GET",
+      "operationId": "listFiles",
+      "optionalScopes": [],
+      "path": "/files",
+      "requiredScopes": [
+        "files:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listGroups",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.groups.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listGroups",
+      "method": "GET",
+      "operationId": "listGroups",
+      "optionalScopes": [],
+      "path": "/groups",
+      "requiredScopes": [
+        "groups:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listIntegrationInstallations",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.integrationInstallations.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listIntegrationInstallations",
+      "method": "GET",
+      "operationId": "listIntegrationInstallations",
+      "optionalScopes": [],
+      "path": "/integration-installations",
+      "requiredScopes": [
+        "integrations:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "administration-pii-overlay"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.listInvitations",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.invitations.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listInvitations",
+      "method": "GET",
+      "operationId": "listInvitations",
+      "optionalScopes": [
+        "members:pii:read"
+      ],
+      "path": "/invitations",
+      "requiredScopes": [
+        "invitations:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listLists",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.lists.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "listLists",
+      "method": "GET",
+      "operationId": "listLists",
+      "optionalScopes": [],
+      "path": "/lists",
+      "requiredScopes": [
+        "lists:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "administration-pii-overlay"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.listMembers",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.members.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listMembers",
+      "method": "GET",
+      "operationId": "listMembers",
+      "optionalScopes": [
+        "members:pii:read"
+      ],
+      "path": "/members",
+      "requiredScopes": [
+        "members:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listPlannedWork",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.plannedWork.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listPlannedWork",
+      "method": "GET",
+      "operationId": "listPlannedWork",
+      "optionalScopes": [],
+      "path": "/planned-work",
+      "requiredScopes": [
+        "planned-work:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listProductGroups",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.productGroups.assertAccess",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listProductGroups",
+      "method": "GET",
+      "operationId": "listProductGroups",
+      "optionalScopes": [],
+      "path": "/product-groups",
+      "requiredScopes": [
+        "product-groups:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "commerce-sensitive-fields"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.listProducts",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.products.assertAccess",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listProducts",
+      "method": "GET",
+      "operationId": "listProducts",
+      "optionalScopes": [
+        "products:finance:read"
+      ],
+      "path": "/products",
+      "requiredScopes": [
+        "products:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listProjects",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.projects.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "listProjects",
+      "method": "GET",
+      "operationId": "listProjects",
+      "optionalScopes": [],
+      "path": "/projects",
+      "requiredScopes": [
+        "projects:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "commerce-sensitive-fields"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.listProjectStatements",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectStatements.assertAccess",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listProjectStatements",
+      "method": "GET",
+      "operationId": "listProjectStatements",
+      "optionalScopes": [
+        "project-statements:finance:read"
+      ],
+      "path": "/project-statements",
+      "requiredScopes": [
+        "project-statements:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listProjectTemplates",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectTemplates.assertAccess",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listProjectTemplates",
+      "method": "GET",
+      "operationId": "listProjectTemplates",
+      "optionalScopes": [],
+      "path": "/project-templates",
+      "requiredScopes": [
+        "project-templates:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listRoles",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.roles.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listRoles",
+      "method": "GET",
+      "operationId": "listRoles",
+      "optionalScopes": [],
+      "path": "/roles",
+      "requiredScopes": [
+        "roles:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listServices",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.services.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "listServices",
+      "method": "GET",
+      "operationId": "listServices",
+      "optionalScopes": [],
+      "path": "/services",
+      "requiredScopes": [
+        "services:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listTags",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.tags.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "listTags",
+      "method": "GET",
+      "operationId": "listTags",
+      "optionalScopes": [],
+      "path": "/tags",
+      "requiredScopes": [
+        "tags:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listTasks",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.tasks.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "listTasks",
+      "method": "GET",
+      "operationId": "listTasks",
+      "optionalScopes": [],
+      "path": "/tasks",
+      "requiredScopes": [
+        "tasks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listTimeEntries",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.timeEntries.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "listTimeEntries",
+      "method": "GET",
+      "operationId": "listTimeEntries",
+      "optionalScopes": [],
+      "path": "/time-entries",
+      "requiredScopes": [
+        "time-entries:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listUsers",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "api.mongo.users.read",
+          "kind": "cellRead",
+          "role": "data"
+        }
+      ],
+      "handlerId": "listUsers",
+      "method": "GET",
+      "operationId": "listUsers",
+      "optionalScopes": [],
+      "path": "/users",
+      "requiredScopes": [
+        "users:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listWebhookDeliveries",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/webhookDeliveries/list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listWebhookDeliveries",
+      "method": "GET",
+      "operationId": "listWebhookDeliveries",
+      "optionalScopes": [],
+      "path": "/webhook-deliveries",
+      "requiredScopes": [
+        "webhooks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listWebhooks",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.webhooks.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listWebhooks",
+      "method": "GET",
+      "operationId": "listWebhooks",
+      "optionalScopes": [],
+      "path": "/webhooks",
+      "requiredScopes": [
+        "webhooks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.removeMember",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.members.remove",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "removeMember",
+      "method": "DELETE",
+      "operationId": "removeMember",
+      "optionalScopes": [],
+      "path": "/members/{id}",
+      "requiredScopes": [
+        "members:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.removeWebhook",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/webhooks/remove",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "removeWebhook",
+      "method": "DELETE",
+      "operationId": "removeWebhook",
+      "optionalScopes": [],
+      "path": "/webhooks/{id}",
+      "requiredScopes": [
+        "webhooks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.renameFile",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/files/rename",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "renameFile",
+      "method": "PATCH",
+      "operationId": "renameFile",
+      "optionalScopes": [],
+      "path": "/files/{id}",
+      "requiredScopes": [
+        "files:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.reopenProject",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/projects/reopen",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "reopenProject",
+      "method": "POST",
+      "operationId": "reopenProject",
+      "optionalScopes": [],
+      "path": "/projects/{id}/reopen",
+      "requiredScopes": [
+        "projects:lifecycle"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.reopenTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/reopen",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "reopenTask",
+      "method": "POST",
+      "operationId": "reopenTask",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/reopen",
+      "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.replaceTaskPlannedWork",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.plannedWork.replaceForTask",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "replaceTaskPlannedWork",
+      "method": "PUT",
+      "operationId": "replaceTaskPlannedWork",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/planned-work",
+      "requiredScopes": [
+        "planned-work:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.resendInvitation",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.invitations.resend",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "resendInvitation",
+      "method": "POST",
+      "operationId": "resendInvitation",
+      "optionalScopes": [],
+      "path": "/invitations/{id}/resend",
+      "requiredScopes": [
+        "invitations:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "absences:admin:write"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreAbsence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.absences.restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreAbsence",
+      "method": "POST",
+      "operationId": "restoreAbsence",
+      "optionalScopes": [],
+      "path": "/absences/{id}/restore",
+      "requiredScopes": [
+        "absences:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "appointments:delegated:write"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreAppointment",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.appointments.restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreAppointment",
+      "method": "POST",
+      "operationId": "restoreAppointment",
+      "optionalScopes": [],
+      "path": "/appointments/{id}/restore",
+      "requiredScopes": [
+        "appointments:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "lists:write",
+        "projects:write",
+        "project-statements:write",
+        "services:write",
+        "tasks:write",
+        "time-entries:write"
+      ],
+      "dynamicPolicyIds": [
+        "automation-action-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreAutomationDefinition",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationDefinitions.restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreAutomationDefinition",
+      "method": "POST",
+      "operationId": "restoreAutomationDefinition",
+      "optionalScopes": [],
+      "path": "/automation-definitions/{id}/restore",
+      "requiredScopes": [
+        "automations:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreCallNote",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/callNotes/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreCallNote",
+      "method": "POST",
+      "operationId": "restoreCallNote",
+      "optionalScopes": [],
+      "path": "/call-notes/{id}/restore",
+      "requiredScopes": [
+        "call-notes:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreComment",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.comments.restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreComment",
+      "method": "POST",
+      "operationId": "restoreComment",
+      "optionalScopes": [],
+      "path": "/comments/{id}/restore",
+      "requiredScopes": [
+        "comments:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreContactGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/contactGroups/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreContactGroup",
+      "method": "POST",
+      "operationId": "restoreContactGroup",
+      "optionalScopes": [],
+      "path": "/contact-groups/{id}/restore",
+      "requiredScopes": [
+        "contact-groups:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreCustomFieldDefinition",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/customFieldDefinitions/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreCustomFieldDefinition",
+      "method": "POST",
+      "operationId": "restoreCustomFieldDefinition",
+      "optionalScopes": [],
+      "path": "/custom-field-definitions/{id}/restore",
+      "requiredScopes": [
+        "custom-field-definitions:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreDocument",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/documents/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreDocument",
+      "method": "POST",
+      "operationId": "restoreDocument",
+      "optionalScopes": [],
+      "path": "/documents/{id}/restore",
+      "requiredScopes": [
+        "documents:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreFile",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/files/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreFile",
+      "method": "POST",
+      "operationId": "restoreFile",
+      "optionalScopes": [],
+      "path": "/files/{id}/restore",
+      "requiredScopes": [
+        "files:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreList",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/lists/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreList",
+      "method": "POST",
+      "operationId": "restoreList",
+      "optionalScopes": [],
+      "path": "/lists/{id}/restore",
+      "requiredScopes": [
+        "lists:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreProject",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/projects/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreProject",
+      "method": "POST",
+      "operationId": "restoreProject",
+      "optionalScopes": [],
+      "path": "/projects/{id}/restore",
+      "requiredScopes": [
+        "projects:lifecycle"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreProjectStatement",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectStatements.restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreProjectStatement",
+      "method": "POST",
+      "operationId": "restoreProjectStatement",
+      "optionalScopes": [],
+      "path": "/project-statements/{id}/restore",
+      "requiredScopes": [
+        "project-statements:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreProjectTemplate",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectTemplates.restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreProjectTemplate",
+      "method": "POST",
+      "operationId": "restoreProjectTemplate",
+      "optionalScopes": [],
+      "path": "/project-templates/{id}/restore",
+      "requiredScopes": [
+        "project-templates:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreService",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/services/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreService",
+      "method": "POST",
+      "operationId": "restoreService",
+      "optionalScopes": [],
+      "path": "/services/{id}/restore",
+      "requiredScopes": [
+        "services:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreTag",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tags/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreTag",
+      "method": "POST",
+      "operationId": "restoreTag",
+      "optionalScopes": [],
+      "path": "/tags/{id}/restore",
+      "requiredScopes": [
+        "tags:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreTask",
+      "method": "POST",
+      "operationId": "restoreTask",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/restore",
+      "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreTimeEntry",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/timeEntries/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreTimeEntry",
+      "method": "POST",
+      "operationId": "restoreTimeEntry",
+      "optionalScopes": [],
+      "path": "/time-entries/{id}/restore",
+      "requiredScopes": [
+        "time-entries:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.rotateWebhookSecret",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.webhooks.rotateSecret",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "rotateWebhookSecret",
+      "method": "POST",
+      "operationId": "rotateWebhookSecret",
+      "optionalScopes": [],
+      "path": "/webhooks/{id}/secret-rotation",
+      "requiredScopes": [
+        "webhooks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read"
+      ],
+      "dynamicPolicyIds": [
+        "search-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.search",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.search.query",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "search",
+      "method": "POST",
+      "operationId": "searchResources",
+      "optionalScopes": [],
+      "path": "/search",
+      "requiredScopes": [
+        "search:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "custom-field-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.setCustomFieldValue",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.customFieldValues.set",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "setCustomFieldValue",
+      "method": "PUT",
+      "operationId": "setCustomFieldValue",
+      "optionalScopes": [],
+      "path": "/custom-field-values/{targetType}/{resourceId}/{fieldId}",
+      "requiredScopes": [
+        "custom-field-values:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.startTaskTimer",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/timer/start",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "startTaskTimer",
+      "method": "POST",
+      "operationId": "startTaskTimer",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/timer/start",
+      "requiredScopes": [
+        "tasks:write",
+        "time-entries:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.stopTaskTimer",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/timer/stop",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "stopTaskTimer",
+      "method": "POST",
+      "operationId": "stopTaskTimer",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/timer/stop",
+      "requiredScopes": [
+        "tasks:write",
+        "time-entries:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "absences:admin:write"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateAbsence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.absences.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateAbsence",
+      "method": "PATCH",
+      "operationId": "updateAbsence",
+      "optionalScopes": [],
+      "path": "/absences/{id}",
+      "requiredScopes": [
+        "absences:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "appointments:delegated:write"
+      ],
+      "dynamicPolicyIds": [
+        "calendar-delegated-access"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateAppointment",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.appointments.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateAppointment",
+      "method": "PATCH",
+      "operationId": "updateAppointment",
+      "optionalScopes": [],
+      "path": "/appointments/{id}",
+      "requiredScopes": [
+        "appointments:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "lists:write",
+        "projects:write",
+        "project-statements:write",
+        "services:write",
+        "tasks:write",
+        "time-entries:write"
+      ],
+      "dynamicPolicyIds": [
+        "automation-action-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateAutomationDefinition",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.automationDefinitions.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateAutomationDefinition",
+      "method": "PATCH",
+      "operationId": "updateAutomationDefinition",
+      "optionalScopes": [],
+      "path": "/automation-definitions/{id}",
+      "requiredScopes": [
+        "automations:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateContact",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/contacts/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateContact",
+      "method": "PATCH",
+      "operationId": "updateContact",
+      "optionalScopes": [],
+      "path": "/contacts/{id}",
+      "requiredScopes": [
+        "contacts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateContactGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/contactGroups/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateContactGroup",
+      "method": "PATCH",
+      "operationId": "updateContactGroup",
+      "optionalScopes": [],
+      "path": "/contact-groups/{id}",
+      "requiredScopes": [
+        "contact-groups:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateCustomFieldDefinition",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/customFieldDefinitions/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateCustomFieldDefinition",
+      "method": "PATCH",
+      "operationId": "updateCustomFieldDefinition",
+      "optionalScopes": [],
+      "path": "/custom-field-definitions/{id}",
+      "requiredScopes": [
+        "custom-field-definitions:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateDocument",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/documents/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateDocument",
+      "method": "PATCH",
+      "operationId": "updateDocument",
+      "optionalScopes": [],
+      "path": "/documents/{id}",
+      "requiredScopes": [
+        "documents:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.groups.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateGroup",
+      "method": "PATCH",
+      "operationId": "updateGroup",
+      "optionalScopes": [],
+      "path": "/groups/{id}",
+      "requiredScopes": [
+        "groups:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateList",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/lists/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateList",
+      "method": "PATCH",
+      "operationId": "updateList",
+      "optionalScopes": [],
+      "path": "/lists/{id}",
+      "requiredScopes": [
+        "lists:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateMemberRole",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.members.updateRole",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateMemberRole",
+      "method": "PATCH",
+      "operationId": "updateMemberRole",
+      "optionalScopes": [],
+      "path": "/members/{id}/role",
+      "requiredScopes": [
+        "members:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "commerce-sensitive-fields"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateProduct",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.products.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateProduct",
+      "method": "PATCH",
+      "operationId": "updateProduct",
+      "optionalScopes": [
+        "products:finance:write"
+      ],
+      "path": "/products/{id}",
+      "requiredScopes": [
+        "products:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateProductGroup",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.productGroups.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateProductGroup",
+      "method": "PATCH",
+      "operationId": "updateProductGroup",
+      "optionalScopes": [],
+      "path": "/product-groups/{id}",
+      "requiredScopes": [
+        "product-groups:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateProject",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/projects/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateProject",
+      "method": "PATCH",
+      "operationId": "updateProject",
+      "optionalScopes": [],
+      "path": "/projects/{id}",
+      "requiredScopes": [
+        "projects:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [
+        "commerce-sensitive-fields"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateProjectStatement",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectStatements.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateProjectStatement",
+      "method": "PATCH",
+      "operationId": "updateProjectStatement",
+      "optionalScopes": [
+        "project-statements:finance:write"
+      ],
+      "path": "/project-statements/{id}",
+      "requiredScopes": [
+        "project-statements:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateProjectTemplate",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectTemplates.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateProjectTemplate",
+      "method": "PATCH",
+      "operationId": "updateProjectTemplate",
+      "optionalScopes": [],
+      "path": "/project-templates/{id}",
+      "requiredScopes": [
+        "project-templates:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateRole",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.roles.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateRole",
+      "method": "PATCH",
+      "operationId": "updateRole",
+      "optionalScopes": [],
+      "path": "/roles/{id}",
+      "requiredScopes": [
+        "roles:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateService",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/services/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateService",
+      "method": "PATCH",
+      "operationId": "updateService",
+      "optionalScopes": [],
+      "path": "/services/{id}",
+      "requiredScopes": [
+        "services:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateTag",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tags/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateTag",
+      "method": "PATCH",
+      "operationId": "updateTag",
+      "optionalScopes": [],
+      "path": "/tags/{id}",
+      "requiredScopes": [
+        "tags:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateTask",
+      "method": "PATCH",
+      "operationId": "updateTask",
+      "optionalScopes": [],
+      "path": "/tasks/{id}",
+      "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateTimeEntry",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/timeEntries/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateTimeEntry",
+      "method": "PATCH",
+      "operationId": "updateTimeEntry",
+      "optionalScopes": [],
+      "path": "/time-entries/{id}",
+      "requiredScopes": [
+        "time-entries:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateWorkspaceSettings",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.workspaceSettings.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateWorkspaceSettings",
+      "method": "PATCH",
+      "operationId": "updateWorkspaceSettings",
+      "optionalScopes": [],
+      "path": "/workspace/settings",
+      "requiredScopes": [
+        "workspace-settings:write"
+      ]
+    }
+  ],
+  "schemaVersion": 1,
+  "summary": {
+    "authenticatedOperations": 181,
+    "directCellReadOperations": [
+      "getCallNote",
+      "getContact",
+      "getContactGroup",
+      "getList",
+      "getProject",
+      "getService",
+      "getTag",
+      "getTask",
+      "getTimeEntry",
+      "getWorkspace",
+      "listCallNotes",
+      "listContactGroups",
+      "listContacts",
+      "listLists",
+      "listProjects",
+      "listServices",
+      "listTags",
+      "listTasks",
+      "listTimeEntries",
+      "listUsers"
+    ],
+    "referencedAppMethodIds": [
+      "developerApi.v1.absences.archive",
+      "developerApi.v1.absences.create",
+      "developerApi.v1.absences.get",
+      "developerApi.v1.absences.list",
+      "developerApi.v1.absences.restore",
+      "developerApi.v1.absences.update",
+      "developerApi.v1.activity.list",
+      "developerApi.v1.appointments.archive",
+      "developerApi.v1.appointments.create",
+      "developerApi.v1.appointments.get",
+      "developerApi.v1.appointments.list",
+      "developerApi.v1.appointments.restore",
+      "developerApi.v1.appointments.update",
+      "developerApi.v1.auditEvents.list",
+      "developerApi.v1.automationActions.list",
+      "developerApi.v1.automationDefinitions.archive",
+      "developerApi.v1.automationDefinitions.create",
+      "developerApi.v1.automationDefinitions.get",
+      "developerApi.v1.automationDefinitions.list",
+      "developerApi.v1.automationDefinitions.restore",
+      "developerApi.v1.automationDefinitions.update",
+      "developerApi.v1.automationDefinitions.versions.list",
+      "developerApi.v1.automationRuns.abort",
+      "developerApi.v1.automationRuns.get",
+      "developerApi.v1.automationRuns.list",
+      "developerApi.v1.availability.list",
+      "developerApi.v1.comments.archive",
+      "developerApi.v1.comments.create",
+      "developerApi.v1.comments.get",
+      "developerApi.v1.comments.list",
+      "developerApi.v1.comments.restore",
+      "developerApi.v1.customFieldValues.clear",
+      "developerApi.v1.customFieldValues.get",
+      "developerApi.v1.customFieldValues.set",
+      "developerApi.v1.events.catalog",
+      "developerApi.v1.exports.create",
+      "developerApi.v1.exports.downloadIntent",
+      "developerApi.v1.exports.get",
+      "developerApi.v1.exports.resolveDownloadIntent",
+      "developerApi.v1.groups.create",
+      "developerApi.v1.groups.delete",
+      "developerApi.v1.groups.get",
+      "developerApi.v1.groups.list",
+      "developerApi.v1.groups.update",
+      "developerApi.v1.integrationInstallations.list",
+      "developerApi.v1.invitations.cancel",
+      "developerApi.v1.invitations.create",
+      "developerApi.v1.invitations.get",
+      "developerApi.v1.invitations.list",
+      "developerApi.v1.invitations.resend",
+      "developerApi.v1.members.get",
+      "developerApi.v1.members.list",
+      "developerApi.v1.members.remove",
+      "developerApi.v1.members.updateRole",
+      "developerApi.v1.plannedWork.getForTask",
+      "developerApi.v1.plannedWork.list",
+      "developerApi.v1.plannedWork.replaceForTask",
+      "developerApi.v1.plannedWorkOperations.get",
+      "developerApi.v1.productGroups.archive",
+      "developerApi.v1.productGroups.assertAccess",
+      "developerApi.v1.productGroups.create",
+      "developerApi.v1.productGroups.update",
+      "developerApi.v1.products.archive",
+      "developerApi.v1.products.assertAccess",
+      "developerApi.v1.products.create",
+      "developerApi.v1.products.update",
+      "developerApi.v1.projectStatements.archive",
+      "developerApi.v1.projectStatements.assertAccess",
+      "developerApi.v1.projectStatements.create",
+      "developerApi.v1.projectStatements.restore",
+      "developerApi.v1.projectStatements.update",
+      "developerApi.v1.projectTemplateInstantiations.get",
+      "developerApi.v1.projectTemplates.archive",
+      "developerApi.v1.projectTemplates.assertAccess",
+      "developerApi.v1.projectTemplates.create",
+      "developerApi.v1.projectTemplates.instantiate",
+      "developerApi.v1.projectTemplates.restore",
+      "developerApi.v1.projectTemplates.update",
+      "developerApi.v1.roles.create",
+      "developerApi.v1.roles.delete",
+      "developerApi.v1.roles.get",
+      "developerApi.v1.roles.list",
+      "developerApi.v1.roles.update",
+      "developerApi.v1.search.query",
+      "developerApi.v1.systemCapabilities.get",
+      "developerApi.v1.webhooks.get",
+      "developerApi.v1.webhooks.list",
+      "developerApi.v1.webhooks.rotateSecret",
+      "developerApi.v1.workspaceEntitlements.get",
+      "developerApi.v1.workspaceSettings.get",
+      "developerApi.v1.workspaceSettings.update",
+      "teamgrid/internal/v1/callNotes/archive",
+      "teamgrid/internal/v1/callNotes/create",
+      "teamgrid/internal/v1/callNotes/restore",
+      "teamgrid/internal/v1/changes/list",
+      "teamgrid/internal/v1/contactGroups/archive",
+      "teamgrid/internal/v1/contactGroups/create",
+      "teamgrid/internal/v1/contactGroups/restore",
+      "teamgrid/internal/v1/contactGroups/update",
+      "teamgrid/internal/v1/contacts/create",
+      "teamgrid/internal/v1/contacts/update",
+      "teamgrid/internal/v1/customFieldDefinitions/archive",
+      "teamgrid/internal/v1/customFieldDefinitions/assertAccess",
+      "teamgrid/internal/v1/customFieldDefinitions/create",
+      "teamgrid/internal/v1/customFieldDefinitions/restore",
+      "teamgrid/internal/v1/customFieldDefinitions/update",
+      "teamgrid/internal/v1/documents/archive",
+      "teamgrid/internal/v1/documents/create",
+      "teamgrid/internal/v1/documents/get",
+      "teamgrid/internal/v1/documents/list",
+      "teamgrid/internal/v1/documents/restore",
+      "teamgrid/internal/v1/documents/update",
+      "teamgrid/internal/v1/files/archive",
+      "teamgrid/internal/v1/files/downloadIntent/create",
+      "teamgrid/internal/v1/files/get",
+      "teamgrid/internal/v1/files/list",
+      "teamgrid/internal/v1/files/rename",
+      "teamgrid/internal/v1/files/restore",
+      "teamgrid/internal/v1/files/uploadIntent/cancel",
+      "teamgrid/internal/v1/files/uploadIntent/create",
+      "teamgrid/internal/v1/files/uploadIntent/finalize",
+      "teamgrid/internal/v1/lists/archive",
+      "teamgrid/internal/v1/lists/create",
+      "teamgrid/internal/v1/lists/restore",
+      "teamgrid/internal/v1/lists/update",
+      "teamgrid/internal/v1/projectLifecycleOperations/get",
+      "teamgrid/internal/v1/projects/archive",
+      "teamgrid/internal/v1/projects/complete",
+      "teamgrid/internal/v1/projects/create",
+      "teamgrid/internal/v1/projects/reopen",
+      "teamgrid/internal/v1/projects/restore",
+      "teamgrid/internal/v1/projects/update",
+      "teamgrid/internal/v1/services/archive",
+      "teamgrid/internal/v1/services/create",
+      "teamgrid/internal/v1/services/restore",
+      "teamgrid/internal/v1/services/update",
+      "teamgrid/internal/v1/tags/archive",
+      "teamgrid/internal/v1/tags/create",
+      "teamgrid/internal/v1/tags/restore",
+      "teamgrid/internal/v1/tags/update",
+      "teamgrid/internal/v1/tasks/archive",
+      "teamgrid/internal/v1/tasks/complete",
+      "teamgrid/internal/v1/tasks/create",
+      "teamgrid/internal/v1/tasks/reopen",
+      "teamgrid/internal/v1/tasks/restore",
+      "teamgrid/internal/v1/tasks/timer/start",
+      "teamgrid/internal/v1/tasks/timer/stop",
+      "teamgrid/internal/v1/tasks/update",
+      "teamgrid/internal/v1/timeEntries/archive",
+      "teamgrid/internal/v1/timeEntries/create",
+      "teamgrid/internal/v1/timeEntries/restore",
+      "teamgrid/internal/v1/timeEntries/update",
+      "teamgrid/internal/v1/webhookDeliveries/get",
+      "teamgrid/internal/v1/webhookDeliveries/list",
+      "teamgrid/internal/v1/webhooks/create",
+      "teamgrid/internal/v1/webhooks/remove"
+    ]
+  }
+}
