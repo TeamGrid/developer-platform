@@ -1,6 +1,6 @@
 {
   "name": "@teamgrid/cli",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-beta.2",
   "description": "Official command-line interface for the TeamGrid Developer Platform",
   "license": "MIT",
   "repository": {
@@ -37,11 +37,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "engines": {
-    "node": ">=22.13 <25"
+    "node": ">=22.14 <25"
   },
   "dependencies": {
     "@inquirer/prompts": "8.5.2",
-    "@teamgrid/api-client": "1.0.0-alpha.3",
+    "@teamgrid/api-client": "1.0.0-beta.2",
     "commander": "15.0.0"
   },
   "devDependencies": {

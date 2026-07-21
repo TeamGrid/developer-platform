@@ -339,14 +339,6 @@ try {
   }, { idempotencyKey: `staging-e2e-project-${runId}` })
   sourceProjectId = sourceProject.data.id
 
-  const changeCheckpointPage = await client.changes.checkpoint({
-    limit: 50,
-    resourceTypes: ['task'],
-  })
-  assert.equal(changeCheckpointPage.data.length, 0)
-  assert.equal(changeCheckpointPage.meta.page.caughtUp, true)
-  let changeCheckpoint = changeCheckpointPage.meta.page.nextCursor
-
   const idempotencyKey = `staging-e2e-task-${runId}`
   const taskInput = {
     assigneeId: users.data[0].id,
@@ -417,22 +409,6 @@ try {
   const exportCsv = new TextDecoder().decode(downloadedExport.data)
   assert.equal(exportCsv.startsWith('"id";"name"\r\n'), true)
   assert.equal(exportCsv.includes(`"${taskId}";"${taskInput.name} updated"`), true)
-
-  const changeDeadline = Date.now() + 30_000
-  let taskChangeVerified = false
-  while (!taskChangeVerified && Date.now() < changeDeadline) {
-    for await (const page of client.changes.pages({
-      cursor: changeCheckpoint,
-      limit: 50,
-      resourceTypes: ['task'],
-    }, { maxPages: 100 })) {
-      changeCheckpoint = page.meta.page.nextCursor
-      taskChangeVerified = page.data.some(event => event.attributes.resourceId === taskId)
-      assert.equal(page.meta.page.caughtUp || page.data.length === page.meta.page.limit, true)
-    }
-    if (!taskChangeVerified) await new Promise(resolve => setTimeout(resolve, 1_000))
-  }
-  assert.equal(taskChangeVerified, true, 'Expected the disposable task in the v1 change feed')
 
   const customFieldDefinition = await client.customFieldDefinitions.create({
     configuration: { type: 'text' },
@@ -554,7 +530,6 @@ try {
     idempotencyReplayVerified: true,
     binaryCliVerified: true,
     binaryMcpVerified: true,
-    changeFeedVerified: taskChangeVerified,
     customFieldValuesVerified: true,
     negativeAuthVerified: true,
     originAuthVerified: Boolean(originUrl),

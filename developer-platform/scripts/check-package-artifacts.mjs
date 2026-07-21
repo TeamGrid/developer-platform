@@ -21,6 +21,9 @@ const manifests = packages.map((entry) => {
   if (manifest.repository?.url !== repositoryUrl) fail(`${entry.name} repository is not canonical`)
   if (manifest.publishConfig?.access !== 'public') fail(`${entry.name} must publish as public`)
   if (manifest.publishConfig?.provenance !== true) fail(`${entry.name} must require provenance`)
+  if (manifest.engines?.node !== '>=22.14 <25') {
+    fail(`${entry.name} must support the tested Node.js 22.14 through 24 range`)
+  }
   if (manifest.publishConfig?.registry !== 'https://registry.npmjs.org/') {
     fail(`${entry.name} registry is not canonical`)
   }
@@ -31,6 +34,12 @@ const versions = new Set(manifests.map(({ manifest }) => manifest.version))
 if (versions.size !== 1) fail('all public packages must use one release version')
 const [version] = versions
 if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version)) fail('release version is invalid')
+const contractManifest = JSON.parse(
+  readFileSync(resolve('..', 'openapi', 'developer-platform-manifest.json'), 'utf8'),
+)
+if (contractManifest.contractVersion !== version) {
+  fail('all public package versions must equal the canonical contract version')
+}
 
 for (const { manifest, name, requiredFiles } of manifests) {
   for (const dependencyName of ['@teamgrid/api-client', '@teamgrid/cli']) {

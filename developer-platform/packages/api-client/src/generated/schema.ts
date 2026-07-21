@@ -38,23 +38,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/changes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List cell-local resource changes */
-        get: operations["listChanges"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/appointments": {
         parameters: {
             query?: never;
@@ -2078,7 +2061,7 @@ export interface paths {
         };
         /**
          * Get the scoped public event catalog
-         * @description Returns only webhook and change-feed events whose complete required-scope set is granted to this credential. Internal collections, automation implementation names, and unscoped product events remain private.
+         * @description Returns only webhook events whose complete required-scope set is granted to this credential. Change-feed events, internal collections, automation implementation names, and unscoped product events remain private.
          */
         get: operations["getEventCatalog"];
         put?: never;
@@ -3161,23 +3144,6 @@ export interface components {
             /** @constant */
             type: "auditEvent";
         };
-        ChangeEvent: {
-            attributes: {
-                /** @enum {string} */
-                operation: "created" | "deleted" | "updated";
-                /** Format: date-time */
-                occurredAt: string;
-                region: string;
-                resourceId: string;
-                /** @enum {string} */
-                resourceType: "absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook";
-                sequence: number;
-                tombstone: boolean;
-            };
-            id: string;
-            /** @constant */
-            type: "changeEvent";
-        };
         /** @description Credential-owned v2 webhook. List and get responses are secret-free and carry a strong whk1 revision. Only create may include the reveal-only initial signing secret. */
         Webhook: {
             attributes: {
@@ -3895,13 +3861,14 @@ export interface components {
         };
         EventDefinition: {
             attributes: {
-                /** @enum {string} */
-                channel: "changeFeed" | "webhook";
-                /** @enum {string|null} */
-                operation: "created" | "deleted" | "updated" | null;
+                /** @constant */
+                channel: "webhook";
+                /** @constant */
+                operation: null;
                 requiredScopes: string[];
-                resourceType: string | null;
-            } & unknown;
+                /** @constant */
+                resourceType: null;
+            };
             id: string;
             /** @constant */
             type: "eventDefinition";
@@ -4198,63 +4165,6 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             429: components["responses"]["RateLimited"];
-            503: components["responses"]["ServiceUnavailable"];
-        };
-    };
-    listChanges: {
-        parameters: {
-            query?: {
-                /** @description Opaque cursor returned in meta.page.nextCursor. */
-                cursor?: components["parameters"]["Cursor"];
-                limit?: components["parameters"]["Limit"];
-                /** @description Filter by one or more change operations. Repeat the query parameter for multiple values. */
-                operations?: ("created" | "deleted" | "updated")[];
-                /** @description Filter by one or more public resource types. Repeat the query parameter for multiple values. */
-                resourceTypes?: ("absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook")[];
-                /** @description Create an empty checkpoint at the latest committed cell sequence. Cannot be combined with cursor. Use this before a full resource snapshot, then poll with the returned cursor. */
-                startAtLatest?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A fixed-watermark change page and the checkpoint for the next poll. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["ChangeEvent"][];
-                        meta: {
-                            page: {
-                                limit: number;
-                                /** @description Credential-bound checkpoint for the next poll. It is present even when this page is empty. */
-                                nextCursor: string;
-                                /** @description True when this page reaches its fixed watermark. False pages are always full. */
-                                caughtUp: boolean;
-                            };
-                            requestId: string;
-                        };
-                    };
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            /** @description The cursor is outside retained history or cell continuity cannot be proven. A full resynchronization is required. */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorEnvelope"];
-                };
-            };
-            429: components["responses"]["RateLimited"];
-            502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
         };
     };

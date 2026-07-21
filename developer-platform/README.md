@@ -14,6 +14,8 @@ none imports Meteor runtime code.
 - `@teamgrid/mcp-server`: optional local stdio MCP adapter. It exposes only
   bounded read tools and delegates every request to the same API client.
 
+All three packages support and are qualified on Node.js 22.14 through Node.js 24.
+
 The current prerelease is available from npm through the explicit `next`
 channel:
 
@@ -65,8 +67,6 @@ teamgrid webhooks create \
   --data '{"url":"https://hooks.example.com/teamgrid","actions":["task_created"]}' \
   --idempotency-key webhook-1 \
   --output json
-teamgrid changes checkpoint --resource-type project,task --output json
-teamgrid changes list --cursor "$CHECKPOINT" --resource-type project,task --output json
 teamgrid custom-field-values get project project-id field-id --output json
 teamgrid project-templates list --origin-project-id project-id --output json
 teamgrid tasks update task-id --data '{"name":"Reviewed"}' --if-match "$TASK_REVISION"
@@ -97,11 +97,9 @@ for await (const page of client.tasks.pages({ projectId: 'project-id' })) {
 }
 ```
 
-For race-free mirrors, call `client.changes.snapshotThenCatchUp()`: it takes a cell-local checkpoint
-before running the supplied full-snapshot callback and returns a bounded change-page iterator from
-that checkpoint. Change events contain resource identity and operation metadata, not document
-payloads. Persist every returned checkpoint only after applying the page. Continue until
-`page.meta.page.caughtUp` is true; an empty page alone is not the completion contract.
+The change feed is deliberately deferred beyond the `1.0.0-beta.2` public contract. The API,
+SDK, CLI, MCP adapter, and issuable scopes do not expose it in this release. Use signed webhooks
+for event-driven integration and bounded list reads for reconciliation.
 
 GET requests, POST requests with an idempotency key, and compare-and-set planned-work PUTs with an
 idempotency key are retried for bounded transient failures. Task, project, and project-template
@@ -175,7 +173,7 @@ the exact repository, commit, manifest size, and manifest digest in
 working tree.
 
 The mirrored manifest also contains `developer-action-policy-registry.json`.
-It pins the App/API authorization registry version, SHA-256 identity, all 182
+It pins the App/API authorization registry version, SHA-256 identity, all 181
 action policies, and 12 principal-policy rollout families. SDK, CLI, and MCP do
 not evaluate or broaden this policy locally; every request remains subject to
 the owning App cell's authorization decision.
@@ -230,8 +228,8 @@ exact raw-body HMAC locally, and deletes the token in cleanup. Set
 Cloudflare Quick Tunnel is known to be reachable.
 
 The staging proof also spawns the built CLI for a live workspace request and negotiates with the
-built MCP stdio binary before making changes. It then verifies the fixed-watermark change feed,
-custom-field compare-and-set values, project-template capture/instantiation, planned-work
+built MCP stdio binary before making changes. It then verifies custom-field compare-and-set values,
+project-template capture/instantiation, planned-work
 replacement, and a bounded asynchronous private export through job completion, download-intent
 creation, and SDK-streamed CSV download. Export metadata expires with the job queue and the tiny
 test object is removed by the required one-day bucket lifecycle. The script never permits these
@@ -245,9 +243,9 @@ exact refs, digest, and cleanup.
 The same staging workflow then runs `npm run e2e:staging:load`. Its fixed
 release profile performs 720 authenticated, read-only requests over four
 minutes at three requests per second across workspace, capability,
-entitlement, project, task, contact, user, and change-feed reads. This stays
-below the shared 300-request-per-minute pre-auth limit while exercising eight
-cell-owned query paths. Qualification requires zero HTTP, schema, target,
+entitlement, project, task, contact, and user reads. This stays
+below the shared 300-request-per-minute pre-auth limit while exercising seven
+cell-owned query scenarios. Qualification requires zero HTTP, schema, target,
 request-ID, timeout, and rate-limit failures; at least 2.5 achieved requests
 per second; p95 at most 2 seconds; p99 at most 5 seconds; and no request above
 10 seconds. The redacted load report contains no URL or credential and is

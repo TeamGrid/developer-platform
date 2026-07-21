@@ -106,16 +106,6 @@ describe('developer control-plane SDK surfaces', () => {
             id: 'task.updated',
             type: 'eventDefinition',
           },
-          {
-            attributes: {
-              channel: 'changeFeed',
-              operation: 'updated',
-              requiredScopes: ['tasks:read'],
-              resourceType: 'task',
-            },
-            id: 'task.updated',
-            type: 'eventDefinition',
-          },
         ])
       }
       if (url.pathname === '/v1/workspace/settings' && method === 'GET') {

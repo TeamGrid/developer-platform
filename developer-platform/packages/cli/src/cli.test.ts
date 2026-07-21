@@ -2,11 +2,7 @@ import { chmod, mkdtemp, readFile, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { PassThrough } from 'node:stream'
-import {
-  TEAMGRID_CHANGE_FEED_RESOURCE_TYPES,
-  TeamGridApiError,
-  TeamGridClientError,
-} from '@teamgrid/api-client'
+import { TeamGridApiError, TeamGridClientError } from '@teamgrid/api-client'
 import { describe, expect, it, vi } from 'vitest'
 import { ConfigStore } from './config.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
@@ -119,6 +115,26 @@ describe('TeamGrid CLI', () => {
       }),
     ).toBe(0)
     expect(output.value().trim()).toBe(packageManifest.version)
+  })
+
+  it('does not advertise or accept deferred change-feed commands in beta.2', async () => {
+    const helpOutput = capture()
+    expect(
+      await runCli(['node', 'teamgrid', '--help'], {
+        errorOutput: capture().stream,
+        output: helpOutput.stream,
+      }),
+    ).toBe(0)
+    expect(helpOutput.value()).not.toMatch(/^\s+changes\b/m)
+
+    const errorOutput = capture()
+    expect(
+      await runCli(['node', 'teamgrid', 'changes'], {
+        errorOutput: errorOutput.stream,
+        output: capture().stream,
+      }),
+    ).toBe(2)
+    expect(errorOutput.value()).toContain("unknown command 'changes'")
   })
 
   it('prints API discovery data through the system client', async () => {
@@ -650,210 +666,6 @@ describe('TeamGrid CLI', () => {
       }),
     ).toBe(0)
     expect(list).toHaveBeenCalledWith(expected)
-  })
-
-  it('creates a script-safe change checkpoint with repeatable and CSV filters', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
-    const output = capture()
-    const checkpoint = vi.fn(async () => ({
-      data: [],
-      meta: {
-        page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-1' },
-        requestId: 'request-checkpoint',
-      },
-    }))
-    expect(
-      await runCli(
-        [
-          'node',
-          'teamgrid',
-          '--output',
-          'json',
-          'changes',
-          'checkpoint',
-          '--operation',
-          'created,updated',
-          '--operation',
-          'deleted',
-          '--resource-type',
-          'project,task',
-        ],
-        {
-          clientFactory: () => ({ changes: { checkpoint } }) as never,
-          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
-          environment: { TEAMGRID_API_TOKEN: token },
-          output: output.stream,
-        },
-      ),
-    ).toBe(0)
-    expect(checkpoint).toHaveBeenCalledWith({
-      operations: ['created', 'updated', 'deleted'],
-      resourceTypes: ['project', 'task'],
-    })
-    expect(JSON.parse(output.value())).toEqual({
-      caughtUp: true,
-      cursor: 'checkpoint-1',
-      requestId: 'request-checkpoint',
-    })
-  })
-
-  it.each(TEAMGRID_CHANGE_FEED_RESOURCE_TYPES)(
-    'accepts the canonical %s change-feed resource type',
-    async (resourceType) => {
-      const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
-      const checkpoint = vi.fn(async () => ({
-        data: [],
-        meta: {
-          page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-1' },
-          requestId: `request-${resourceType}`,
-        },
-      }))
-
-      expect(
-        await runCli(
-          ['node', 'teamgrid', 'changes', 'checkpoint', '--resource-type', resourceType],
-          {
-            clientFactory: () => ({ changes: { checkpoint } }) as never,
-            configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
-            environment: { TEAMGRID_API_TOKEN: token },
-            output: capture().stream,
-          },
-        ),
-      ).toBe(0)
-      expect(checkpoint).toHaveBeenCalledWith({ resourceTypes: [resourceType] })
-    },
-  )
-
-  it('reads one change page by default and emits an explicit JSONL checkpoint', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
-    const output = capture()
-    const list = vi.fn(async () => ({
-      data: [
-        {
-          attributes: { operation: 'updated', resourceId: 'task-1', resourceType: 'task' },
-          id: 'change-1',
-          type: 'changeEvent',
-        },
-      ],
-      meta: {
-        page: { caughtUp: true, limit: 10, nextCursor: 'checkpoint-2' },
-        requestId: 'request-changes',
-      },
-    }))
-    expect(
-      await runCli(
-        [
-          'node',
-          'teamgrid',
-          '--output',
-          'jsonl',
-          'changes',
-          'list',
-          '--cursor',
-          'checkpoint-1',
-          '--limit',
-          '10',
-          '--resource-type',
-          'task',
-        ],
-        {
-          clientFactory: () => ({ changes: { list } }) as never,
-          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
-          environment: { TEAMGRID_API_TOKEN: token },
-          output: output.stream,
-        },
-      ),
-    ).toBe(0)
-    expect(list).toHaveBeenCalledWith({
-      cursor: 'checkpoint-1',
-      limit: 10,
-      resourceTypes: ['task'],
-    })
-    expect(
-      output
-        .value()
-        .trim()
-        .split('\n')
-        .map((line) => JSON.parse(line)),
-    ).toEqual([
-      {
-        data: {
-          attributes: { operation: 'updated', resourceId: 'task-1', resourceType: 'task' },
-          id: 'change-1',
-          type: 'changeEvent',
-        },
-        kind: 'change',
-      },
-      {
-        caughtUp: true,
-        cursor: 'checkpoint-2',
-        kind: 'checkpoint',
-        requestId: 'request-changes',
-      },
-    ])
-  })
-
-  it('bounds explicit change catch-up and never enters an implicit polling loop', async () => {
-    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
-    const output = capture()
-    const pages = vi.fn((_options, pagination) => {
-      expect(pagination).toEqual({ maxPages: 3 })
-      return (async function* changes() {
-        yield {
-          data: [{ attributes: {}, id: 'change-1', type: 'changeEvent' }],
-          meta: {
-            page: { caughtUp: false, limit: 50, nextCursor: 'checkpoint-2' },
-            requestId: 'request-1',
-          },
-        }
-        yield {
-          data: [],
-          meta: {
-            page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-3' },
-            requestId: 'request-2',
-          },
-        }
-      })()
-    })
-    expect(
-      await runCli(
-        [
-          'node',
-          'teamgrid',
-          '--output',
-          'json',
-          'changes',
-          'list',
-          '--cursor',
-          'checkpoint-1',
-          '--all',
-          '--max-pages',
-          '3',
-        ],
-        {
-          clientFactory: () => ({ changes: { pages } }) as never,
-          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
-          environment: { TEAMGRID_API_TOKEN: token },
-          output: output.stream,
-        },
-      ),
-    ).toBe(0)
-    expect(pages).toHaveBeenCalledWith({ cursor: 'checkpoint-1' }, { maxPages: 3 })
-    expect(JSON.parse(output.value())).toMatchObject({
-      data: [{ id: 'change-1' }],
-      meta: { page: { nextCursor: 'checkpoint-3' } },
-    })
-  })
-
-  it('rejects unknown change filters locally', async () => {
-    const errorOutput = capture()
-    expect(
-      await runCli(['node', 'teamgrid', 'changes', 'list', '--operation', 'renamed'], {
-        errorOutput: errorOutput.stream,
-        output: capture().stream,
-      }),
-    ).toBe(2)
-    expect(errorOutput.value()).toContain('created, deleted, updated')
   })
 
   it.each([

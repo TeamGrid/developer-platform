@@ -14,7 +14,6 @@ const requiredNegativeInputs = [
 const requiredQualifyingClaims = [
   'binaryCliVerified',
   'binaryMcpVerified',
-  'changeFeedVerified',
   'customFieldValuesVerified',
   'expiredCredentialVerified',
   'foreignTenantMissVerified',
@@ -171,12 +170,12 @@ export function buildQualificationEvidence({
     bindings: bindings || null,
     claims,
     cleanup,
-    evidenceContract: 'teamgrid-developer-platform-release-qualification-v1',
+    evidenceContract: 'teamgrid-developer-platform-release-qualification-v2',
     generatedAt,
     qualifying,
     result: 'passed',
     runId,
-    schemaVersion: 1,
+    schemaVersion: 2,
     target,
   }
 }

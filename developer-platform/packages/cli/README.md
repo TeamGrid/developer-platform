@@ -10,8 +10,6 @@ teamgrid tasks create --data @task.json --idempotency-key task-1
 teamgrid lists create --data @list.json --idempotency-key list-1
 teamgrid services update service-id --data '{"billingRate":175}'
 teamgrid tags archive tag-id --yes
-teamgrid changes checkpoint --resource-type project,task --output json
-teamgrid changes list --cursor "$CHECKPOINT" --resource-type project,task --output json
 teamgrid custom-field-values set project project-id field-id \
   --data '{"value":"ACME-42"}' --if-match "$REVISION" --output json
 teamgrid project-templates instantiate template-id \
@@ -34,19 +32,9 @@ history, custom-field values, project templates, and planned work. Use
 original direct list form for lists, services, and tags remains available as a
 compatibility alias.
 
-`changes checkpoint` creates the empty latest checkpoint required before a full snapshot.
-`changes list` performs exactly one request unless `--all` is explicitly supplied; `--all` remains
-bounded by `--max-pages`. Repeat `--operation` and `--resource-type` or supply comma-separated
-values. JSON output preserves the response envelope and cursor. JSONL emits one `kind: "change"`
-record per event followed by an explicit `kind: "checkpoint"` record so scripts can durably advance
-only after applying the preceding events. Every checkpoint also carries `caughtUp`; `--all` stops
-only when the API marks the fixed watermark as reached.
-
-`--resource-type` accepts all 23 canonical types: `absence`, `appointment`,
-`automationDefinition`, `automationRun`, `callNote`, `comment`, `contact`, `contactGroup`,
-`customFieldDefinition`, `document`, `file`, `integration`, `list`, `product`, `productGroup`,
-`project`, `projectStatement`, `projectTemplate`, `service`, `tag`, `task`, `timeEntry`, and
-`webhook`. Unknown values are rejected before any network request.
+The change feed is deliberately deferred beyond the `1.0.0-beta.2` public contract. This release
+does not install `teamgrid changes` commands or request a `changes:read` scope. Use signed webhooks
+for event-driven integration and bounded list commands for reconciliation.
 
 Custom-field `set`/`clear` and planned-work `replace` require a revision from the latest GET.
 Task, project, and project-template updates and state changes also require `--if-match`. Read the

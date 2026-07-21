@@ -21,35 +21,13 @@ time entries, contacts, call notes, contact groups, products and product groups,
 project statements, lists, services, tags, custom-field definitions and values,
 project templates and instantiations, planned work and replacement operations, users,
 webhooks and credential-owned delivery history, audit events, and workspace
-discovery. The `changes` client adds metadata-only checkpoints, bounded catch-up
-pages, and a checkpoint-before-snapshot bootstrap helper. Every public operation is checked against the canonical capability
+discovery. Every public operation is checked against the canonical capability
 manifest during CI. Finance-gated fields are typed as optional and are absent
 unless the credential has the documented overlay scope and workspace entitlement.
 
-The canonical change-feed contract covers all 23 public resource types: absences,
-appointments, automation definitions and runs, call notes, comments, contacts and
-contact groups, custom-field definitions, documents, files, integrations, lists,
-products and product groups, projects and project statements, project templates,
-services, tags, tasks, time entries, and webhooks. The exported
-`TEAMGRID_CHANGE_FEED_RESOURCE_TYPES` constant can be used to build exhaustive consumers.
-
-```ts
-const bootstrap = await teamgrid.changes.snapshotThenCatchUp(async () => {
-  const projects = []
-  for await (const page of teamgrid.projects.pages()) projects.push(...page.data)
-  return projects
-}, { resourceTypes: ['project'] })
-
-for await (const page of bootstrap.pages) {
-  // Persist this only after applying page.data successfully.
-  await saveCheckpoint(page.meta.page.nextCursor)
-  if (page.meta.page.caughtUp) break
-}
-```
-
-Change-feed cursors are bound to the credential, workspace, cell, and filter set. HTTP `410`
-requires a new checkpoint plus a full resynchronization; HTTP `503` is a temporary fail-closed
-condition and does not invalidate the last durable checkpoint.
+The change feed is deliberately deferred beyond the `1.0.0-beta.2` public contract. This release
+does not expose a `changes` client or a `changes:read` scope. Use signed webhooks for event-driven
+integration and regular bounded list requests for reconciliation.
 
 Custom-field values and planned-work schedules use strong compare-and-set revisions. Read the
 latest resource first and pass its revision explicitly; the SDK sends a strong `If-Match` header:
@@ -108,5 +86,5 @@ successful response when the body revision and ETag differ. Pass the accepted op
 as shown above: the client then binds every poll to the accepted operation ID, source revision,
 action, and target resource, and also rejects inconsistent result revisions or terminal states.
 
-Node.js 22.13–24 is supported. See the workspace README and checked OpenAPI v1
+Node.js 22.14–24 is supported. See the workspace README and checked OpenAPI v1
 contract for the complete resource and security model.
