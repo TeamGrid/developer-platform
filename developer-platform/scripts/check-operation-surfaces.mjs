@@ -1,7 +1,10 @@
 import { readFile } from 'node:fs/promises'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
-import { TeamGridClient } from '../packages/api-client/dist/index.js'
+import {
+  TEAMGRID_CHANGE_FEED_RESOURCE_TYPES,
+  TeamGridClient,
+} from '../packages/api-client/dist/index.js'
 import { createProgram } from '../packages/cli/dist/index.js'
 import { createTeamGridMcpServer } from '../packages/mcp-server/dist/index.js'
 
@@ -79,6 +82,33 @@ const policyOperations = ledger.operationPolicy
   .sort((left, right) => left.operationId.localeCompare(right.operationId))
 if (JSON.stringify(expectedOperations) !== JSON.stringify(policyOperations)) {
   fail('OpenAPI and developer capability policy operation sets differ')
+}
+
+const changeOperation = openapi.paths['/changes']?.get
+const changeResourceTypes = changeOperation?.parameters
+  ?.find((parameter) => parameter.name === 'resourceTypes')
+  ?.schema?.items?.enum
+const changeEventResourceTypes = openapi.components?.schemas?.ChangeEvent?.properties?.attributes
+  ?.properties?.resourceType?.enum
+if (
+  !Array.isArray(changeResourceTypes) ||
+  changeResourceTypes.length !== 23 ||
+  new Set(changeResourceTypes).size !== changeResourceTypes.length ||
+  JSON.stringify(changeResourceTypes) !== JSON.stringify(changeEventResourceTypes) ||
+  JSON.stringify(changeResourceTypes) !== JSON.stringify(TEAMGRID_CHANGE_FEED_RESOURCE_TYPES)
+) {
+  fail('change-feed resource types differ between query, event schema, and SDK runtime contract')
+}
+
+const changePolicy = ledger.operationPolicy.find((operation) => operation.operationId === 'listChanges')
+if (
+  changePolicy?.sdk !== 'changes.list' ||
+  changePolicy?.cli !== 'changes list' ||
+  changePolicy?.mcp?.exposure !== 'forbidden' ||
+  'tool' in changePolicy.mcp ||
+  !/high-volume synchronization primitive/i.test(changePolicy.mcp.reason || '')
+) {
+  fail('listChanges must stay available through SDK/CLI and explicitly forbidden through MCP')
 }
 
 const expectedCasOperationIds = [

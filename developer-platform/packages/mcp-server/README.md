@@ -34,3 +34,6 @@ custom-field values, project templates and instantiation status, and planned-wor
 operation status are also forbidden in every profile because they contain sensitive workflow or
 workload data. Even `all` does not register or advertise any of these operations. Custom-field
 *definition* reads remain the narrow exception in `governance`; all writes remain forbidden.
+The release gate checks this explicit decision against the same 23-resource OpenAPI contract used
+by the SDK and CLI, so adding a resource type cannot accidentally create an MCP tool or disappear
+from the supported synchronization surfaces.

@@ -26,6 +26,13 @@ pages, and a checkpoint-before-snapshot bootstrap helper. Every public operation
 manifest during CI. Finance-gated fields are typed as optional and are absent
 unless the credential has the documented overlay scope and workspace entitlement.
 
+The canonical change-feed contract covers all 23 public resource types: absences,
+appointments, automation definitions and runs, call notes, comments, contacts and
+contact groups, custom-field definitions, documents, files, integrations, lists,
+products and product groups, projects and project statements, project templates,
+services, tags, tasks, time entries, and webhooks. The exported
+`TEAMGRID_CHANGE_FEED_RESOURCE_TYPES` constant can be used to build exhaustive consumers.
+
 ```ts
 const bootstrap = await teamgrid.changes.snapshotThenCatchUp(async () => {
   const projects = []

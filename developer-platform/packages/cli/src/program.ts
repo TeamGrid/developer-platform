@@ -4,6 +4,7 @@ import { confirm, password } from '@inquirer/prompts'
 import {
   normalizeApiBaseUrl,
   parseCredentialLocation,
+  TEAMGRID_CHANGE_FEED_RESOURCE_TYPES,
   TeamGridApiError,
   TeamGridClient,
   TeamGridClientError,
@@ -470,21 +471,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   }
 
   const changeOperations = new Set(['created', 'deleted', 'updated'])
-  const changeResourceTypes = new Set([
-    'callNote',
-    'contact',
-    'contactGroup',
-    'customFieldDefinition',
-    'list',
-    'product',
-    'productGroup',
-    'project',
-    'projectStatement',
-    'service',
-    'tag',
-    'task',
-    'timeEntry',
-  ])
+  const changeResourceTypes = new Set(TEAMGRID_CHANGE_FEED_RESOURCE_TYPES)
 
   function addChangeFilterOptions(command: Command) {
     return command

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { TEAMGRID_CHANGE_FEED_RESOURCE_TYPES } from './changeFeedContract.js'
 import { TeamGridClient } from './client.js'
 import { TeamGridApiError, TeamGridClientError } from './errors.js'
 import {
@@ -422,6 +423,43 @@ describe('TeamGrid API client', () => {
       meta: { page: { nextCursor: 'checkpoint-2' } },
     })
   })
+
+  it.each(TEAMGRID_CHANGE_FEED_RESOURCE_TYPES)(
+    'accepts the canonical %s change-feed resource type',
+    async (resourceType) => {
+      const fetch = vi.fn(async (input: RequestInfo | URL) => {
+        const url = new URL(String(input))
+        expect(url.pathname).toBe('/v1/changes')
+        expect(url.searchParams.getAll('resourceTypes')).toEqual([resourceType])
+        return json({
+          data: [
+            {
+              attributes: {
+                operation: 'updated',
+                occurredAt: '2026-07-19T12:00:00.000Z',
+                region: 'us',
+                resourceId: `${resourceType}-1`,
+                resourceType,
+                sequence: 42,
+                tombstone: false,
+              },
+              id: `change-${resourceType}`,
+              type: 'changeEvent',
+            },
+          ],
+          meta: {
+            page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-2' },
+            requestId: `request-${resourceType}`,
+          },
+        })
+      })
+      const client = new TeamGridClient({ fetch, token })
+
+      await expect(client.changes.list({ resourceTypes: [resourceType] })).resolves.toMatchObject({
+        data: [{ attributes: { resourceType }, type: 'changeEvent' }],
+      })
+    },
+  )
 
   it('takes a checkpoint before a snapshot and catches up only to an empty page', async () => {
     const order: string[] = []
