@@ -2,7 +2,11 @@ import { chmod, mkdtemp, readFile, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { PassThrough } from 'node:stream'
-import { TeamGridApiError, TeamGridClientError } from '@teamgrid/api-client'
+import {
+  TEAMGRID_CHANGE_FEED_RESOURCE_TYPES,
+  TeamGridApiError,
+  TeamGridClientError,
+} from '@teamgrid/api-client'
 import { describe, expect, it, vi } from 'vitest'
 import { ConfigStore } from './config.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
@@ -692,6 +696,33 @@ describe('TeamGrid CLI', () => {
       requestId: 'request-checkpoint',
     })
   })
+
+  it.each(TEAMGRID_CHANGE_FEED_RESOURCE_TYPES)(
+    'accepts the canonical %s change-feed resource type',
+    async (resourceType) => {
+      const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+      const checkpoint = vi.fn(async () => ({
+        data: [],
+        meta: {
+          page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-1' },
+          requestId: `request-${resourceType}`,
+        },
+      }))
+
+      expect(
+        await runCli(
+          ['node', 'teamgrid', 'changes', 'checkpoint', '--resource-type', resourceType],
+          {
+            clientFactory: () => ({ changes: { checkpoint } }) as never,
+            configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+            environment: { TEAMGRID_API_TOKEN: token },
+            output: capture().stream,
+          },
+        ),
+      ).toBe(0)
+      expect(checkpoint).toHaveBeenCalledWith({ resourceTypes: [resourceType] })
+    },
+  )
 
   it('reads one change page by default and emits an explicit JSONL checkpoint', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))

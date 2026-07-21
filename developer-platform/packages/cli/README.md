@@ -42,6 +42,12 @@ record per event followed by an explicit `kind: "checkpoint"` record so scripts 
 only after applying the preceding events. Every checkpoint also carries `caughtUp`; `--all` stops
 only when the API marks the fixed watermark as reached.
 
+`--resource-type` accepts all 23 canonical types: `absence`, `appointment`,
+`automationDefinition`, `automationRun`, `callNote`, `comment`, `contact`, `contactGroup`,
+`customFieldDefinition`, `document`, `file`, `integration`, `list`, `product`, `productGroup`,
+`project`, `projectStatement`, `projectTemplate`, `service`, `tag`, `task`, `timeEntry`, and
+`webhook`. Unknown values are rejected before any network request.
+
 Custom-field `set`/`clear` and planned-work `replace` require a revision from the latest GET.
 Task, project, and project-template updates and state changes also require `--if-match`. Read the
 latest resource as JSON, use its `attributes.developerRevision`, and do not reuse revisions across
