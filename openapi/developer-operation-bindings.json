@@ -2806,31 +2806,6 @@
     },
     {
       "authMode": "developerCredential",
-      "conditionalScopes": [],
-      "dynamicPolicyIds": [],
-      "executionBindings": [
-        {
-          "id": "api.v1.listChanges",
-          "kind": "httpLocal",
-          "role": "transport"
-        },
-        {
-          "id": "teamgrid/internal/v1/changes/list",
-          "kind": "appMethod",
-          "role": "authorization"
-        }
-      ],
-      "handlerId": "listChanges",
-      "method": "GET",
-      "operationId": "listChanges",
-      "optionalScopes": [],
-      "path": "/changes",
-      "requiredScopes": [
-        "changes:read"
-      ]
-    },
-    {
-      "authMode": "developerCredential",
       "conditionalScopes": [
         "contacts:read",
         "projects:read",
@@ -4802,7 +4777,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 181,
+    "authenticatedOperations": 180,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -4905,7 +4880,6 @@
       "teamgrid/internal/v1/callNotes/get",
       "teamgrid/internal/v1/callNotes/list",
       "teamgrid/internal/v1/callNotes/restore",
-      "teamgrid/internal/v1/changes/list",
       "teamgrid/internal/v1/contactGroups/archive",
       "teamgrid/internal/v1/contactGroups/create",
       "teamgrid/internal/v1/contactGroups/get",

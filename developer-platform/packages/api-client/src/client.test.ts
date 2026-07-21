@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from 'vitest'
-import { TEAMGRID_CHANGE_FEED_RESOURCE_TYPES } from './changeFeedContract.js'
 import { TeamGridClient } from './client.js'
 import { TeamGridApiError, TeamGridClientError } from './errors.js'
 import {
@@ -112,6 +111,11 @@ function taskPage(nextCursor: string | null) {
 }
 
 describe('TeamGrid API client', () => {
+  it('does not expose the deferred change feed in the beta.2 SDK', () => {
+    const client = new TeamGridClient({ fetch: vi.fn(), token })
+    expect('changes' in client).toBe(false)
+  })
+
   it('exposes the API discovery operation through the typed system client', async () => {
     const fetch = vi.fn(async (input: RequestInfo | URL) => {
       expect(new URL(String(input)).pathname).toBe('/v1/')
@@ -148,7 +152,7 @@ describe('TeamGrid API client', () => {
       expect(headers.get('authorization')).toBe(`Bearer ${token}`)
       expect(headers.get('x-request-id')).toBe('client-request')
       expect(headers.get('x-teamgrid-client')).toBe('@teamgrid/api-client')
-      expect(headers.get('x-teamgrid-client-version')).toBe('1.0.0-alpha.3')
+      expect(headers.get('x-teamgrid-client-version')).toBe('1.0.0-beta.2')
       return json(taskPage(null), 200, {
         'x-ratelimit-limit': '100',
         'x-ratelimit-remaining': '99',
@@ -380,214 +384,6 @@ describe('TeamGrid API client', () => {
         webhookId: 'webhook-1',
       }),
     ).resolves.toMatchObject({ data: [{ id: 'delivery-1' }] })
-  })
-
-  it('lists typed change metadata with repeated filters and opaque checkpoints', async () => {
-    const fetch = vi.fn(async (input: RequestInfo | URL) => {
-      const url = new URL(String(input))
-      expect(url.pathname).toBe('/v1/changes')
-      expect(url.searchParams.getAll('operations')).toEqual(['created', 'updated'])
-      expect(url.searchParams.getAll('resourceTypes')).toEqual(['project', 'task'])
-      expect(url.searchParams.get('cursor')).toBe('checkpoint-1')
-      return json({
-        data: [
-          {
-            attributes: {
-              operation: 'updated',
-              occurredAt: '2026-07-19T12:00:00.000Z',
-              region: 'us',
-              resourceId: 'task-1',
-              resourceType: 'task',
-              sequence: 42,
-              tombstone: false,
-            },
-            id: 'change-42',
-            type: 'changeEvent',
-          },
-        ],
-        meta: {
-          page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-2' },
-          requestId: 'request-changes',
-        },
-      })
-    })
-    const client = new TeamGridClient({ fetch, token })
-    await expect(
-      client.changes.list({
-        cursor: 'checkpoint-1',
-        operations: ['created', 'updated'],
-        resourceTypes: ['project', 'task'],
-      }),
-    ).resolves.toMatchObject({
-      data: [{ attributes: { resourceId: 'task-1', sequence: 42 }, type: 'changeEvent' }],
-      meta: { page: { nextCursor: 'checkpoint-2' } },
-    })
-  })
-
-  it.each(TEAMGRID_CHANGE_FEED_RESOURCE_TYPES)(
-    'accepts the canonical %s change-feed resource type',
-    async (resourceType) => {
-      const fetch = vi.fn(async (input: RequestInfo | URL) => {
-        const url = new URL(String(input))
-        expect(url.pathname).toBe('/v1/changes')
-        expect(url.searchParams.getAll('resourceTypes')).toEqual([resourceType])
-        return json({
-          data: [
-            {
-              attributes: {
-                operation: 'updated',
-                occurredAt: '2026-07-19T12:00:00.000Z',
-                region: 'us',
-                resourceId: `${resourceType}-1`,
-                resourceType,
-                sequence: 42,
-                tombstone: false,
-              },
-              id: `change-${resourceType}`,
-              type: 'changeEvent',
-            },
-          ],
-          meta: {
-            page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-2' },
-            requestId: `request-${resourceType}`,
-          },
-        })
-      })
-      const client = new TeamGridClient({ fetch, token })
-
-      await expect(client.changes.list({ resourceTypes: [resourceType] })).resolves.toMatchObject({
-        data: [{ attributes: { resourceType }, type: 'changeEvent' }],
-      })
-    },
-  )
-
-  it('takes a checkpoint before a snapshot and catches up only to an empty page', async () => {
-    const order: string[] = []
-    const fetch = vi.fn(async (input: RequestInfo | URL) => {
-      const url = new URL(String(input))
-      const cursor = url.searchParams.get('cursor')
-      if (url.searchParams.get('startAtLatest') === 'true') {
-        order.push('checkpoint')
-        return json({
-          data: [],
-          meta: {
-            page: { caughtUp: true, limit: 1, nextCursor: 'checkpoint-start' },
-            requestId: 'checkpoint',
-          },
-        })
-      }
-      order.push(`changes:${cursor}`)
-      if (cursor === 'checkpoint-start') {
-        return json({
-          data: [
-            {
-              attributes: {
-                operation: 'created',
-                occurredAt: '2026-07-19T12:00:00.000Z',
-                region: 'us',
-                resourceId: 'project-1',
-                resourceType: 'project',
-                sequence: 43,
-                tombstone: false,
-              },
-              id: 'change-43',
-              type: 'changeEvent',
-            },
-          ],
-          meta: {
-            page: { caughtUp: false, limit: 1, nextCursor: 'checkpoint-43' },
-            requestId: 'changes-1',
-          },
-        })
-      }
-      return json({
-        data: [],
-        meta: {
-          page: { caughtUp: true, limit: 1, nextCursor: 'checkpoint-latest' },
-          requestId: 'changes-2',
-        },
-      })
-    })
-    const client = new TeamGridClient({ fetch, token })
-    const bootstrap = await client.changes.snapshotThenCatchUp(
-      async (checkpoint) => {
-        order.push(`snapshot:${checkpoint}`)
-        return ['project-1']
-      },
-      { limit: 1, operations: ['created'], resourceTypes: ['project'] },
-    )
-    const pages = []
-    for await (const page of bootstrap.pages) pages.push(page)
-
-    expect(bootstrap.checkpoint).toBe('checkpoint-start')
-    expect(bootstrap.snapshot).toEqual(['project-1'])
-    expect(pages.map((page) => page.data.length)).toEqual([1, 0])
-    expect(pages.at(-1)?.meta.page.nextCursor).toBe('checkpoint-latest')
-    expect(order).toEqual([
-      'checkpoint',
-      'snapshot:checkpoint-start',
-      'changes:checkpoint-start',
-      'changes:checkpoint-43',
-    ])
-  })
-
-  it.each([410, 503])('keeps change-feed HTTP %i responses as typed API errors', async (status) => {
-    const client = new TeamGridClient({
-      fetch: vi.fn(async () =>
-        json(
-          {
-            errors: [
-              {
-                code: status === 410 ? 'change_feed_reset_required' : 'change_feed_unavailable',
-                detail: 'Change feed unavailable.',
-                status: String(status),
-                title: status === 410 ? 'Gone' : 'Service Unavailable',
-              },
-            ],
-            meta: { requestId: `request-${status}` },
-          },
-          status,
-        ),
-      ),
-      retries: 0,
-      token,
-    })
-    await expect(client.changes.list({ cursor: 'checkpoint' })).rejects.toMatchObject({ status })
-  })
-
-  it('rejects a repeated change checkpoint before requesting or yielding a duplicate page', async () => {
-    const fetch = vi.fn(async () =>
-      json({
-        data: [
-          {
-            attributes: {
-              operation: 'updated',
-              occurredAt: '2026-07-19T12:00:00.000Z',
-              region: 'us',
-              resourceId: 'task-1',
-              resourceType: 'task',
-              sequence: 42,
-              tombstone: false,
-            },
-            id: 'change-42',
-            type: 'changeEvent',
-          },
-        ],
-        meta: {
-          page: { caughtUp: false, limit: 1, nextCursor: 'same' },
-          requestId: 'request-cycle',
-        },
-      }),
-    )
-    const client = new TeamGridClient({ fetch, token })
-    const yielded: unknown[] = []
-    await expect(async () => {
-      for await (const page of client.changes.pages({ cursor: 'same', limit: 1 })) {
-        yielded.push(page)
-      }
-    }).rejects.toMatchObject({ code: 'pagination_cycle' })
-    expect(yielded).toHaveLength(1)
-    expect(fetch).toHaveBeenCalledOnce()
   })
 
   it.each([

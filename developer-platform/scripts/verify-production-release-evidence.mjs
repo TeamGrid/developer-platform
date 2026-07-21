@@ -47,15 +47,20 @@ const commonEvidenceKeys = [
   'schemaVersion',
 ]
 
-function assertCommonEvidence(evidence, { developerPlatformSha, manifestSha }, description) {
+function assertCommonEvidence(
+  evidence,
+  { apiSourceCommit, developerPlatformSha, manifestSha },
+  description,
+) {
   if (
-    evidence.evidenceContract !== 'teamgrid-developer-platform-deployment-evidence-v2' ||
-    evidence.schemaVersion !== 2 ||
+    evidence.evidenceContract !== 'teamgrid-developer-platform-deployment-evidence-v5' ||
+    evidence.schemaVersion !== 5 ||
     !sha40.test(String(evidence.apiTag || '')) ||
     !sha40.test(String(evidence.appTag || '')) ||
     !sha40.test(String(evidence.developerPlatformRef || '')) ||
     !sha40.test(String(evidence.producerAppSha || '')) ||
     !sha64.test(String(evidence.contractManifestSha256 || '')) ||
+    evidence.apiTag !== apiSourceCommit ||
     evidence.developerPlatformRef !== developerPlatformSha ||
     evidence.contractManifestSha256 !== manifestSha
   ) {
@@ -64,6 +69,7 @@ function assertCommonEvidence(evidence, { developerPlatformSha, manifestSha }, d
 }
 
 export function verifyProductionReleaseEvidence({
+  apiSourceCommit,
   deCanaryEvidence,
   deCanaryRun,
   developerPlatformSha,
@@ -72,6 +78,9 @@ export function verifyProductionReleaseEvidence({
   usPromotionEvidence,
   usPromotionRun,
 }) {
+  if (!sha40.test(String(apiSourceCommit || ''))) {
+    fail('expected OpenAPI source commit is malformed')
+  }
   if (!sha40.test(String(developerPlatformSha || ''))) {
     fail('expected Developer Platform SHA is malformed')
   }
@@ -88,7 +97,7 @@ export function verifyProductionReleaseEvidence({
   )
   assertCommonEvidence(
     usPromotionEvidence,
-    { developerPlatformSha, manifestSha },
+    { apiSourceCommit, developerPlatformSha, manifestSha },
     'US promotion evidence',
   )
   if (
@@ -116,7 +125,7 @@ export function verifyProductionReleaseEvidence({
   ], 'DE canary evidence')
   assertCommonEvidence(
     deCanaryEvidence,
-    { developerPlatformSha, manifestSha },
+    { apiSourceCommit, developerPlatformSha, manifestSha },
     'DE canary evidence',
   )
   if (
@@ -163,6 +172,7 @@ function readJson(path) {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const result = verifyProductionReleaseEvidence({
+    apiSourceCommit: readJson(new URL('../../openapi/source.json', import.meta.url)).sourceCommit,
     deCanaryEvidence: readJson(requiredEnvironment('DE_CANARY_EVIDENCE_PATH')),
     deCanaryRun: readJson(requiredEnvironment('DE_CANARY_RUN_PATH')),
     developerPlatformSha: requiredEnvironment('EXPECTED_DEVELOPER_PLATFORM_SHA'),

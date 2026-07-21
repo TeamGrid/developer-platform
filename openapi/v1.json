@@ -5276,95 +5276,6 @@
         ],
         "type": "object"
       },
-      "ChangeEvent": {
-        "additionalProperties": false,
-        "properties": {
-          "attributes": {
-            "additionalProperties": false,
-            "properties": {
-              "operation": {
-                "enum": [
-                  "created",
-                  "deleted",
-                  "updated"
-                ],
-                "type": "string"
-              },
-              "occurredAt": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "region": {
-                "maxLength": 64,
-                "minLength": 1,
-                "type": "string"
-              },
-              "resourceId": {
-                "maxLength": 256,
-                "minLength": 1,
-                "type": "string"
-              },
-              "resourceType": {
-                "enum": [
-                  "absence",
-                  "appointment",
-                  "automationDefinition",
-                  "automationRun",
-                  "callNote",
-                  "comment",
-                  "contact",
-                  "contactGroup",
-                  "customFieldDefinition",
-                  "document",
-                  "file",
-                  "integration",
-                  "list",
-                  "product",
-                  "productGroup",
-                  "project",
-                  "projectStatement",
-                  "projectTemplate",
-                  "service",
-                  "tag",
-                  "task",
-                  "timeEntry",
-                  "webhook"
-                ],
-                "type": "string"
-              },
-              "sequence": {
-                "minimum": 1,
-                "type": "integer"
-              },
-              "tombstone": {
-                "type": "boolean"
-              }
-            },
-            "required": [
-              "operation",
-              "occurredAt",
-              "region",
-              "resourceId",
-              "resourceType",
-              "sequence",
-              "tombstone"
-            ],
-            "type": "object"
-          },
-          "id": {
-            "type": "string"
-          },
-          "type": {
-            "const": "changeEvent"
-          }
-        },
-        "required": [
-          "type",
-          "id",
-          "attributes"
-        ],
-        "type": "object"
-      },
       "Webhook": {
         "properties": {
           "attributes": {
@@ -9007,23 +8918,12 @@
             "additionalProperties": false,
             "properties": {
               "channel": {
-                "enum": [
-                  "changeFeed",
-                  "webhook"
-                ],
+                "const": "webhook",
                 "type": "string"
               },
               "operation": {
-                "enum": [
-                  "created",
-                  "deleted",
-                  "updated",
-                  null
-                ],
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "const": null,
+                "type": "null"
               },
               "requiredScopes": {
                 "items": {
@@ -9037,12 +8937,8 @@
                 "uniqueItems": true
               },
               "resourceType": {
-                "maxLength": 128,
-                "pattern": "^[A-Za-z][A-Za-z0-9]*$",
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "const": null,
+                "type": "null"
               }
             },
             "required": [
@@ -9051,48 +8947,7 @@
               "requiredScopes",
               "resourceType"
             ],
-            "type": "object",
-            "allOf": [
-              {
-                "if": {
-                  "properties": {
-                    "channel": {
-                      "const": "webhook"
-                    }
-                  },
-                  "required": [
-                    "channel"
-                  ]
-                },
-                "then": {
-                  "properties": {
-                    "operation": {
-                      "const": null
-                    },
-                    "resourceType": {
-                      "const": null
-                    }
-                  }
-                },
-                "else": {
-                  "properties": {
-                    "operation": {
-                      "enum": [
-                        "created",
-                        "deleted",
-                        "updated"
-                      ],
-                      "type": "string"
-                    },
-                    "resourceType": {
-                      "maxLength": 128,
-                      "pattern": "^[A-Za-z][A-Za-z0-9]*$",
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            ]
+            "type": "object"
           },
           "id": {
             "type": "string"
@@ -9375,7 +9230,7 @@
   "info": {
     "description": "Stable, cell-aware TeamGrid API for service credentials and the TeamGrid CLI.",
     "title": "TeamGrid API v1",
-    "version": "1.0.0-beta.1"
+    "version": "1.0.0-beta.2"
   },
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "openapi": "3.1.0",
@@ -9463,185 +9318,6 @@
         ],
         "x-teamgrid-required-scopes": [
           "workspace:read"
-        ]
-      }
-    },
-    "/changes": {
-      "get": {
-        "operationId": "listChanges",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/Cursor"
-          },
-          {
-            "$ref": "#/components/parameters/Limit"
-          },
-          {
-            "description": "Filter by one or more change operations. Repeat the query parameter for multiple values.",
-            "in": "query",
-            "name": "operations",
-            "schema": {
-              "items": {
-                "enum": [
-                  "created",
-                  "deleted",
-                  "updated"
-                ],
-                "type": "string"
-              },
-              "type": "array",
-              "uniqueItems": true
-            }
-          },
-          {
-            "description": "Filter by one or more public resource types. Repeat the query parameter for multiple values.",
-            "in": "query",
-            "name": "resourceTypes",
-            "schema": {
-              "items": {
-                "enum": [
-                  "absence",
-                  "appointment",
-                  "automationDefinition",
-                  "automationRun",
-                  "callNote",
-                  "comment",
-                  "contact",
-                  "contactGroup",
-                  "customFieldDefinition",
-                  "document",
-                  "file",
-                  "integration",
-                  "list",
-                  "product",
-                  "productGroup",
-                  "project",
-                  "projectStatement",
-                  "projectTemplate",
-                  "service",
-                  "tag",
-                  "task",
-                  "timeEntry",
-                  "webhook"
-                ],
-                "type": "string"
-              },
-              "type": "array",
-              "uniqueItems": true
-            }
-          },
-          {
-            "description": "Create an empty checkpoint at the latest committed cell sequence. Cannot be combined with cursor. Use this before a full resource snapshot, then poll with the returned cursor.",
-            "in": "query",
-            "name": "startAtLatest",
-            "schema": {
-              "default": false,
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/ChangeEvent"
-                      },
-                      "type": "array"
-                    },
-                    "meta": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "page": {
-                          "additionalProperties": false,
-                          "properties": {
-                            "limit": {
-                              "maximum": 200,
-                              "minimum": 1,
-                              "type": "integer"
-                            },
-                            "nextCursor": {
-                              "description": "Credential-bound checkpoint for the next poll. It is present even when this page is empty.",
-                              "minLength": 1,
-                              "type": "string"
-                            },
-                            "caughtUp": {
-                              "description": "True when this page reaches its fixed watermark. False pages are always full.",
-                              "type": "boolean"
-                            }
-                          },
-                          "required": [
-                            "limit",
-                            "nextCursor",
-                            "caughtUp"
-                          ],
-                          "type": "object"
-                        },
-                        "requestId": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "page",
-                        "requestId"
-                      ],
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "A fixed-watermark change page and the checkpoint for the next poll."
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "410": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorEnvelope"
-                }
-              }
-            },
-            "description": "The cursor is outside retained history or cell continuity cannot be proven. A full resynchronization is required."
-          },
-          "429": {
-            "$ref": "#/components/responses/RateLimited"
-          },
-          "502": {
-            "$ref": "#/components/responses/BadGateway"
-          },
-          "503": {
-            "$ref": "#/components/responses/ServiceUnavailable"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "List cell-local resource changes",
-        "tags": [
-          "Changes"
-        ],
-        "x-teamgrid-required-scopes": [
-          "changes:read"
         ]
       }
     },
@@ -26016,7 +25692,7 @@
         "x-teamgrid-required-scopes": [
           "events:read"
         ],
-        "description": "Returns only webhook and change-feed events whose complete required-scope set is granted to this credential. Internal collections, automation implementation names, and unscoped product events remain private."
+        "description": "Returns only webhook events whose complete required-scope set is granted to this credential. Change-feed events, internal collections, automation implementation names, and unscoped product events remain private."
       }
     },
     "/system/capabilities": {
@@ -26469,10 +26145,6 @@
     }
   ],
   "tags": [
-    {
-      "description": "Ordered, resumable cell-local resource metadata changes.",
-      "name": "Changes"
-    },
     {
       "description": "Bounded appointment, absence, and derived-availability access. Delegated access composes overlay scopes with active membership, product permissions, and calendar sharing. Provider secrets and personal calendar payloads stay private.",
       "name": "Calendar"

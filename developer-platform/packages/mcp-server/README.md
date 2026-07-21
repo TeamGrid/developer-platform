@@ -28,12 +28,11 @@ reads; or `all` for the explicit 29-tool union. Project statements and webhook
 delivery history remain forbidden in every MCP profile. The adapter does not
 expose write or secret-bearing operations.
 
-The high-volume change feed is forbidden in every MCP profile. It is a synchronization
-primitive for API, SDK, and CLI consumers, not a bounded interactive model tool. Per-resource
+The change feed is deferred beyond the `1.0.0-beta.2` public contract and is absent from every MCP
+profile. Per-resource
 custom-field values, project templates and instantiation status, and planned-work schedules and
 operation status are also forbidden in every profile because they contain sensitive workflow or
 workload data. Even `all` does not register or advertise any of these operations. Custom-field
-*definition* reads remain the narrow exception in `governance`; all writes remain forbidden.
-The release gate checks this explicit decision against the same 23-resource OpenAPI contract used
-by the SDK and CLI, so adding a resource type cannot accidentally create an MCP tool or disappear
-from the supported synchronization surfaces.
+*definition* reads remain the narrow exception in `governance`; all writes remain forbidden. The
+release gate verifies that the contract, SDK, CLI, and MCP adapter all keep the deferred surface
+absent.

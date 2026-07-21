@@ -52,7 +52,6 @@ const webhookSigningSecretPattern = /^whsec_v2_[A-Za-z0-9_-]{43}$/
 const publicCapabilityIdPattern = /^[A-Za-z][A-Za-z0-9-]{0,127}$/
 const webhookIdPattern = /^[A-Za-z0-9_.:-]{1,128}$/
 const eventDefinitionIdPattern = /^[A-Za-z][A-Za-z0-9_.:-]{0,255}$/
-const eventResourceTypePattern = /^[A-Za-z][A-Za-z0-9]{0,127}$/
 const scopePattern = /^[a-z][a-z0-9-]*(?::[a-z][a-z0-9-]*){1,2}$/
 const downloadIntentPattern = /^ex1\.\d{10}\.[a-f0-9]{32}\.[a-f0-9]{64}$/
 const canonicalDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
@@ -1402,14 +1401,10 @@ export const eventDefinitionValidator: ResourceValidator<EventDefinition> = (
     ) {
       return false
     }
-    if (attributes.channel === 'webhook') {
-      return attributes.operation === null && attributes.resourceType === null
-    }
     return (
-      attributes.channel === 'changeFeed' &&
-      ['created', 'deleted', 'updated'].includes(String(attributes.operation)) &&
-      typeof attributes.resourceType === 'string' &&
-      eventResourceTypePattern.test(attributes.resourceType)
+      attributes.channel === 'webhook' &&
+      attributes.operation === null &&
+      attributes.resourceType === null
     )
   })
 

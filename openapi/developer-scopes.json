@@ -79,7 +79,6 @@
     { "name": "webhooks:read", "availability": "issuable" },
     { "name": "webhooks:write", "availability": "issuable" },
     { "name": "audit:read", "availability": "issuable", "sensitive": true },
-    { "name": "changes:read", "availability": "issuable" },
     { "name": "events:read", "availability": "issuable" }
   ],
   "dynamicPolicies": [

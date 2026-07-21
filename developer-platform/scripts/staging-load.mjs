@@ -15,7 +15,6 @@ export const loadScenarios = Object.freeze([
   Object.freeze({ id: 'tasks', path: '/tasks?limit=100' }),
   Object.freeze({ id: 'contacts', path: '/contacts?limit=100' }),
   Object.freeze({ id: 'users', path: '/users?limit=100' }),
-  Object.freeze({ id: 'changes', path: '/changes?limit=100&startAtLatest=true' }),
 ])
 
 export const releaseLoadThresholds = Object.freeze({
@@ -237,7 +236,7 @@ export function buildLoadQualificationEvidence({
   const profile = {
     concurrency: config.concurrency,
     durationSeconds: config.durationSeconds,
-    profileId: 'staging-read-baseline-v1',
+    profileId: 'staging-read-baseline-v2',
     qualifying: config.qualifying,
     requestCount: config.requestCount,
     requestsPerSecond: config.requestsPerSecond,
@@ -246,13 +245,13 @@ export function buildLoadQualificationEvidence({
   }
   const violations = qualificationViolations(profile, metrics)
   return {
-    evidenceContract: 'teamgrid-developer-platform-load-qualification-v1',
+    evidenceContract: 'teamgrid-developer-platform-load-qualification-v2',
     generatedAt,
     metrics,
     profile,
     result: violations.length === 0 ? 'passed' : 'failed',
     runId,
-    schemaVersion: 1,
+    schemaVersion: 2,
     target: { cellId: config.expectedCellId, region: config.expectedRegion },
     thresholds: { ...releaseLoadThresholds },
     violations,

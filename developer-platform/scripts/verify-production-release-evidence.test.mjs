@@ -16,11 +16,12 @@ function fixtures() {
     appTag: appSha,
     contractManifestSha256: manifestSha,
     developerPlatformRef: developerPlatformSha,
-    evidenceContract: 'teamgrid-developer-platform-deployment-evidence-v2',
+    evidenceContract: 'teamgrid-developer-platform-deployment-evidence-v5',
     producerAppSha: appSha,
-    schemaVersion: 2,
+    schemaVersion: 5,
   }
   return {
+    apiSourceCommit: apiSha,
     deCanaryEvidence: {
       ...common,
       automationWorkerRuntime: 'current',
@@ -96,6 +97,14 @@ describe('npm production release evidence', () => {
       value.deCanaryEvidence[field] = replacement
       expect(() => verifyProductionReleaseEvidence(value)).toThrow()
     }
+  })
+
+  it('rejects production evidence whose API image differs from the OpenAPI source commit', () => {
+    const value = fixtures()
+    value.apiSourceCommit = 'e'.repeat(40)
+    expect(() => verifyProductionReleaseEvidence(value)).toThrow(
+      'US promotion evidence revisions or contract are malformed',
+    )
   })
 
   it('rejects unknown evidence fields and non-successful explicit runs', () => {

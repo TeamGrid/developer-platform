@@ -98,6 +98,11 @@ describe('bounded Developer Platform load qualification', () => {
     const evidence = passingEvidence()
     expect(evidence.result).toBe('passed')
     expect(evidence.violations).toEqual([])
+    expect(evidence).toMatchObject({
+      evidenceContract: 'teamgrid-developer-platform-load-qualification-v2',
+      profile: { profileId: 'staging-read-baseline-v2' },
+      schemaVersion: 2,
+    })
     expect(evidence.metrics.attemptedRequests).toBe(releaseLoadThresholds.minimumRequests)
     expect(Object.keys(evidence.metrics.scenarios)).toEqual(loadScenarios.map((item) => item.id))
 

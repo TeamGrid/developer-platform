@@ -41,7 +41,6 @@ function qualifyingClaims(overrides = {}) {
     auditEventsVerified: 5,
     binaryCliVerified: true,
     binaryMcpVerified: true,
-    changeFeedVerified: true,
     customFieldValuesVerified: true,
     expiredCredentialVerified: true,
     foreignTenantMissVerified: true,
@@ -165,5 +164,9 @@ describe('release-qualifying staging E2E contract', () => {
     const digest = writeQualificationEvidence(path, evidence)
     expect(digest).toMatch(/^[a-f0-9]{64}$/)
     expect(JSON.parse(readFileSync(path, 'utf8'))).toEqual(evidence)
+    expect(evidence).toMatchObject({
+      evidenceContract: 'teamgrid-developer-platform-release-qualification-v2',
+      schemaVersion: 2,
+    })
   })
 })

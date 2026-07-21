@@ -25,6 +25,12 @@ const manifests = await Promise.all(
     return JSON.parse(contents)
   }),
 )
+const contractManifest = JSON.parse(
+  await readFile(new URL('../../openapi/developer-platform-manifest.json', import.meta.url)),
+)
+if (contractManifest.contractVersion !== expectedVersion) {
+  fail(`contract is ${contractManifest.contractVersion}, expected ${expectedVersion}`)
+}
 
 for (const manifest of manifests) {
   if (manifest.version !== expectedVersion) {
@@ -34,6 +40,9 @@ for (const manifest of manifests) {
   if (manifest.publishConfig?.access !== 'public') fail(`${manifest.name} is not public`)
   if (manifest.publishConfig?.provenance !== true)
     fail(`${manifest.name} does not require provenance`)
+  if (manifest.engines?.node !== '>=22.14 <25') {
+    fail(`${manifest.name} does not use the qualified Node.js 22.14 through 24 range`)
+  }
   if (manifest.repository?.url !== 'git+https://github.com/TeamGrid/developer-platform.git') {
     fail(`${manifest.name} repository metadata does not match the trusted publisher`)
   }
