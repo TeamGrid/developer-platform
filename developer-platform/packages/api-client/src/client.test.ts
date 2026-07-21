@@ -1,19 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import { TeamGridClient } from './client.js'
 import { TeamGridApiError, TeamGridClientError } from './errors.js'
-import {
-  canonicalProjectStrongETag,
-  canonicalProjectTemplateStrongETag,
-  canonicalTaskStrongETag,
-} from './resourceConcurrency.js'
 import { buildRegionalApiBaseUrl, normalizeApiBaseUrl, parseCredentialLocation } from './routing.js'
 
 const token = // gitleaks:allow -- synthetic fixed-format test credential
   'tg_sk_v1_us_us-mnz-001_0123456789abcdef01234567_' +
   '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
-const projectEtag = canonicalProjectStrongETag('a'.repeat(64))
-const projectTemplateEtag = canonicalProjectTemplateStrongETag('b'.repeat(64))
-const taskEtag = canonicalTaskStrongETag('c'.repeat(64))
 const fixtureDate = '2026-07-19T10:00:00.000Z'
 
 function taskResource(overrides: Record<string, unknown> = {}) {
@@ -25,8 +17,6 @@ function taskResource(overrides: Record<string, unknown> = {}) {
       completed: false,
       createdAt: fixtureDate,
       description: '',
-      developerRevision: 'c'.repeat(64),
-      developerUpdatedAt: fixtureDate,
       dueAt: null,
       groupId: null,
       listId: null,
@@ -56,8 +46,6 @@ function projectResource(overrides: Record<string, unknown> = {}) {
       contactId: null,
       createdAt: fixtureDate,
       description: '',
-      developerRevision: 'a'.repeat(64),
-      developerUpdatedAt: fixtureDate,
       dueAt: null,
       individualId: null,
       listId: null,
@@ -82,8 +70,6 @@ function projectTemplateResource(overrides: Record<string, unknown> = {}) {
       color: '#123456',
       createdAt: fixtureDate,
       description: '',
-      developerRevision: 'b'.repeat(64),
-      developerUpdatedAt: fixtureDate,
       originProjectId: 'project-source',
       snapshotVersion: 1,
       stats: { listCount: 1, taskCount: 1 },
@@ -191,7 +177,7 @@ describe('TeamGrid API client', () => {
             meta: { requestId: 'request-2' },
           },
           201,
-          { etag: `"tsk1-${'c'.repeat(64)}"`, 'idempotency-replayed': 'false' },
+          { 'idempotency-replayed': 'false' },
         ),
       )
       .mockResolvedValueOnce(
@@ -214,9 +200,9 @@ describe('TeamGrid API client', () => {
 
     const retriedPage = await client.tasks.list()
     await client.tasks.create({ name: 'Created' }, { idempotencyKey: 'stable-key' })
-    await expect(
-      client.tasks.update('task-2', { name: 'Changed' }, { ifMatch: taskEtag }),
-    ).rejects.toBeInstanceOf(TeamGridApiError)
+    await expect(client.tasks.update('task-2', { name: 'Changed' })).rejects.toBeInstanceOf(
+      TeamGridApiError,
+    )
     expect(fetch).toHaveBeenCalledTimes(5)
     expect(retriedPage.transport.attempts).toBe(2)
     expect(sleep).toHaveBeenCalledTimes(2)
@@ -397,8 +383,7 @@ describe('TeamGrid API client', () => {
       createPath: '/v1/projects',
       idempotencyKey: 'project-create-1',
       resource: projectResource(),
-      update: (client: TeamGridClient) =>
-        client.projects.update('project-1', { color: '#123456' }, { ifMatch: projectEtag }),
+      update: (client: TeamGridClient) => client.projects.update('project-1', { color: '#123456' }),
       updateBody: { color: '#123456' },
       updatePath: '/v1/projects/project-1',
     },
@@ -441,19 +426,13 @@ describe('TeamGrid API client', () => {
           return json(
             { data: resource, meta: { requestId: 'request-create' } },
             201,
-            resource.type === 'project'
-              ? { etag: `"prj1-${'a'.repeat(64)}"`, 'idempotency-replayed': 'false' }
-              : {},
+            resource.type === 'project' ? { 'idempotency-replayed': 'false' } : {},
           )
         }
         expect(init?.method).toBe('PATCH')
         expect(url.pathname).toBe(updatePath)
         expect(JSON.parse(String(init?.body))).toEqual(updateBody)
-        return json(
-          { data: resource, meta: { requestId: 'request-update' } },
-          200,
-          resource.type === 'project' ? { etag: `"prj1-${'a'.repeat(64)}"` } : {},
-        )
+        return json({ data: resource, meta: { requestId: 'request-update' } })
       })
       const client = new TeamGridClient({ fetch, token })
 
@@ -599,17 +578,17 @@ describe('TeamGrid API client', () => {
 
   it.each([
     {
-      invoke: (client: TeamGridClient) => client.tasks.complete('task-1', { ifMatch: taskEtag }),
+      invoke: (client: TeamGridClient) => client.tasks.complete('task-1'),
       path: '/v1/tasks/task-1/complete',
       resource: taskResource({ completed: true }),
     },
     {
-      invoke: (client: TeamGridClient) => client.tasks.reopen('task-1', { ifMatch: taskEtag }),
+      invoke: (client: TeamGridClient) => client.tasks.reopen('task-1'),
       path: '/v1/tasks/task-1/reopen',
       resource: taskResource({ completed: false }),
     },
     {
-      invoke: (client: TeamGridClient) => client.tasks.restore('task-1', { ifMatch: taskEtag }),
+      invoke: (client: TeamGridClient) => client.tasks.restore('task-1'),
       path: '/v1/tasks/task-1/restore',
       resource: taskResource({ archived: false }),
     },
@@ -623,14 +602,8 @@ describe('TeamGrid API client', () => {
       expect(new URL(String(input)).pathname).toBe(path)
       expect(init?.method).toBe('POST')
       expect(init?.body).toBeUndefined()
-      if (path.startsWith('/v1/tasks/')) {
-        expect(new Headers(init?.headers).get('if-match')).toBe(taskEtag)
-      }
-      return json(
-        { data: resource, meta: { requestId: 'request-restore' } },
-        200,
-        path.startsWith('/v1/tasks/') ? { etag: `"tsk1-${'c'.repeat(64)}"` } : {},
-      )
+      expect(new Headers(init?.headers).has('if-match')).toBe(false)
+      return json({ data: resource, meta: { requestId: 'request-restore' } })
     })
     await expect(invoke(new TeamGridClient({ fetch, token }))).resolves.toMatchObject({
       data: resource,
@@ -793,8 +766,6 @@ describe('TeamGrid API client', () => {
         createdAt: fixtureDate,
         progress: { listsCompleted: 0, listsTotal: 1, tasksCompleted: 0, tasksTotal: 1 },
         projectId: 'project-created',
-        resultRevision: null,
-        sourceRevision: 'b'.repeat(64),
         state: 'pending',
         templateId: 'template-1',
         updatedAt: fixtureDate,
@@ -808,7 +779,6 @@ describe('TeamGrid API client', () => {
         ...pending.attributes,
         finishedAt: fixtureDate,
         progress: { listsCompleted: 1, listsTotal: 1, tasksCompleted: 1, tasksTotal: 1 },
-        resultRevision: 'a'.repeat(64),
         state: 'succeeded',
       },
     }
@@ -824,7 +794,7 @@ describe('TeamGrid API client', () => {
       if (url.pathname.endsWith('/instantiate')) {
         expect(init?.method).toBe('POST')
         expect(new Headers(init?.headers).get('idempotency-key')).toBe('instantiate-1')
-        expect(new Headers(init?.headers).get('if-match')).toBe(projectTemplateEtag)
+        expect(new Headers(init?.headers).has('if-match')).toBe(false)
         return json({ data: pending, meta: { requestId: 'instantiate' } }, 202, {
           'idempotency-replayed': 'false',
           location: '/v1/project-template-instantiations/instantiation-1',
@@ -840,7 +810,7 @@ describe('TeamGrid API client', () => {
     const accepted = await client.projectTemplates.instantiate(
       'template-1',
       { name: 'Customer rollout' },
-      { idempotencyKey: 'instantiate-1', ifMatch: projectTemplateEtag },
+      { idempotencyKey: 'instantiate-1' },
     )
     expect(accepted.transport.headers.location).toContain('instantiation-1')
     await expect(
@@ -967,8 +937,6 @@ describe('TeamGrid API client', () => {
         createdAt: '2026-07-19T10:00:00.000Z',
         noOp: false,
         projectId: 'project-1',
-        resultRevision: null,
-        sourceRevision: 'a'.repeat(64),
         state: 'pending',
         updatedAt: '2026-07-19T10:00:00.000Z',
       },
@@ -980,7 +948,6 @@ describe('TeamGrid API client', () => {
       attributes: {
         ...pending.attributes,
         finishedAt: fixtureDate,
-        resultRevision: 'd'.repeat(64),
         state: 'succeeded',
       },
     }
@@ -990,7 +957,7 @@ describe('TeamGrid API client', () => {
         expect(new URL(String(input)).pathname).toBe('/v1/projects/project-1/complete')
         expect(init?.method).toBe('POST')
         expect(new Headers(init?.headers).get('idempotency-key')).toBe('lifecycle-1')
-        expect(new Headers(init?.headers).get('if-match')).toBe(projectEtag)
+        expect(new Headers(init?.headers).has('if-match')).toBe(false)
         return json({ data: pending, meta: { requestId: 'request-start' } }, 202, {
           'idempotency-replayed': 'false',
           location: '/v1/project-lifecycle-operations/operation-1',
@@ -1004,7 +971,6 @@ describe('TeamGrid API client', () => {
     const client = new TeamGridClient({ fetch, sleep, token })
     const started = await client.projects.complete('project-1', {
       idempotencyKey: 'lifecycle-1',
-      ifMatch: projectEtag,
     })
     expect(started.data).toEqual(pending)
     const completed = await client.projectLifecycleOperations.wait(started.data.id, {
@@ -1025,8 +991,6 @@ describe('TeamGrid API client', () => {
         createdAt: fixtureDate,
         noOp: false,
         projectId: 'project-1',
-        resultRevision: null,
-        sourceRevision: 'a'.repeat(64),
         state: 'pending',
         updatedAt: fixtureDate,
       },
@@ -1038,7 +1002,6 @@ describe('TeamGrid API client', () => {
       attributes: {
         ...accepted.attributes,
         finishedAt: fixtureDate,
-        resultRevision: 'd'.repeat(64),
         state: 'succeeded',
       },
     }
@@ -1046,10 +1009,6 @@ describe('TeamGrid API client', () => {
       { ...terminal, id: 'operation-other' },
       { ...terminal, attributes: { ...terminal.attributes, action: 'restore' } },
       { ...terminal, attributes: { ...terminal.attributes, projectId: 'project-other' } },
-      {
-        ...terminal,
-        attributes: { ...terminal.attributes, sourceRevision: 'e'.repeat(64) },
-      },
     ]
 
     for (const inconsistent of inconsistentOperations) {
@@ -1071,8 +1030,6 @@ describe('TeamGrid API client', () => {
         createdAt: fixtureDate,
         progress: { listsCompleted: 0, listsTotal: 1, tasksCompleted: 0, tasksTotal: 1 },
         projectId: 'project-created',
-        resultRevision: null,
-        sourceRevision: 'b'.repeat(64),
         state: 'pending',
         templateId: 'template-1',
         updatedAt: fixtureDate,
@@ -1086,7 +1043,6 @@ describe('TeamGrid API client', () => {
         ...accepted.attributes,
         finishedAt: fixtureDate,
         progress: { listsCompleted: 1, listsTotal: 1, tasksCompleted: 1, tasksTotal: 1 },
-        resultRevision: 'a'.repeat(64),
         state: 'succeeded',
       },
     }
@@ -1094,10 +1050,6 @@ describe('TeamGrid API client', () => {
       { ...terminal, id: 'instantiation-other' },
       { ...terminal, attributes: { ...terminal.attributes, templateId: 'template-other' } },
       { ...terminal, attributes: { ...terminal.attributes, projectId: 'project-other' } },
-      {
-        ...terminal,
-        attributes: { ...terminal.attributes, sourceRevision: 'e'.repeat(64) },
-      },
     ]
 
     for (const inconsistent of inconsistentOperations) {

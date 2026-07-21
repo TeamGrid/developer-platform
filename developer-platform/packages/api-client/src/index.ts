@@ -1,11 +1,6 @@
 export { TeamGridClient, type TeamGridClientOptions } from './client.js'
 export { TeamGridApiError, TeamGridClientError } from './errors.js'
 export {
-  canonicalProjectStrongETag,
-  canonicalProjectTemplateStrongETag,
-  canonicalTaskStrongETag,
-} from './resourceConcurrency.js'
-export {
   buildRegionalApiBaseUrl,
   type CredentialLocation,
   normalizeApiBaseUrl,

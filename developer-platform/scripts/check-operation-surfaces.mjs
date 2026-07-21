@@ -93,13 +93,24 @@ if (
   fail('the beta.2 public contract must not expose the deferred change feed or changes:read scope')
 }
 
-const expectedCasOperationIds = [
+const expectedBeta2NonCasOperationIds = [
   'archiveProject',
   'archiveProjectTemplate',
   'archiveTask',
   'completeProject',
   'completeTask',
+  'createProject',
+  'createProjectTemplate',
+  'createTask',
+  'getProject',
+  'getProjectLifecycleOperation',
+  'getProjectTemplate',
+  'getProjectTemplateInstantiation',
+  'getTask',
   'instantiateProjectTemplate',
+  'listProjects',
+  'listProjectTemplates',
+  'listTasks',
   'reopenProject',
   'reopenTask',
   'restoreProject',
@@ -109,46 +120,108 @@ const expectedCasOperationIds = [
   'updateProjectTemplate',
   'updateTask',
 ]
-const casOperations = Object.values(openapi.paths)
+const expectedIndependentIfMatchOperationIds = [
+  'abortAutomationRun',
+  'archiveAbsence',
+  'archiveAppointment',
+  'archiveAutomationDefinition',
+  'archiveComment',
+  'archiveDocument',
+  'archiveFile',
+  'cancelInvitation',
+  'clearCustomFieldValue',
+  'deleteGroup',
+  'deleteRole',
+  'removeMember',
+  'renameFile',
+  'replaceTaskPlannedWork',
+  'resendInvitation',
+  'restoreAbsence',
+  'restoreAppointment',
+  'restoreAutomationDefinition',
+  'restoreComment',
+  'restoreDocument',
+  'restoreFile',
+  'rotateWebhookSecret',
+  'setCustomFieldValue',
+  'updateAbsence',
+  'updateAppointment',
+  'updateAutomationDefinition',
+  'updateDocument',
+  'updateGroup',
+  'updateMemberRole',
+  'updateRole',
+  'updateWorkspaceSettings',
+]
+const allOpenApiOperations = Object.values(openapi.paths)
   .flatMap((pathItem) => Object.values(pathItem))
+  .filter((operation) => operation?.operationId)
+const coreOperations = allOpenApiOperations
+  .filter((operation) => expectedBeta2NonCasOperationIds.includes(operation.operationId))
+  .sort((left, right) => left.operationId.localeCompare(right.operationId))
+const residualCasOperations = allOpenApiOperations
   .filter((operation) => operation?.['x-teamgrid-resource-cas'] === 'resource-cas-v1')
+const residualCasReads = allOpenApiOperations.filter(
+  (operation) => operation?.['x-teamgrid-resource-cas-read'] === 'resource-cas-v1',
+)
+const independentIfMatchOperations = allOpenApiOperations
+  .filter((operation) =>
+    (operation.parameters || []).some((parameter) =>
+      /IfMatch/.test(parameter.$ref || parameter.name || ''),
+    ),
+  )
   .sort((left, right) => left.operationId.localeCompare(right.operationId))
 if (
-  casOperations.length !== 14 ||
-  JSON.stringify(casOperations.map((operation) => operation.operationId)) !==
-    JSON.stringify(expectedCasOperationIds) ||
-  manifest.summary?.resourceCasMutationOperations !== 14
+  coreOperations.length !== 25 ||
+  JSON.stringify(coreOperations.map((operation) => operation.operationId)) !==
+    JSON.stringify(expectedBeta2NonCasOperationIds) ||
+  manifest.summary?.beta2NonCasResourceOperations !== 25 ||
+  manifest.summary?.resourceCasMutationOperations !== 0 ||
+  manifest.summary?.resourceCasOperationReads !== 0 ||
+  residualCasOperations.length !== 0 ||
+  residualCasReads.length !== 0
 ) {
-  fail('resource-cas-v1 must cover exactly the governed 14 mutation operations')
+  fail('beta.2 must expose exactly 25 static core operations and zero resource-CAS operations')
+}
+if (
+  JSON.stringify(independentIfMatchOperations.map((operation) => operation.operationId)) !==
+  JSON.stringify(expectedIndependentIfMatchOperationIds)
+) {
+  fail('beta.2 must preserve exactly the 31 independent If-Match operations')
 }
 if (manifest.contractVersion !== openapi.info.version) {
   fail('contract manifest and OpenAPI versions differ')
 }
-for (const operation of casOperations) {
+for (const operation of coreOperations) {
   const ifMatchParameters = (operation.parameters || []).filter((parameter) =>
-    /^#\/components\/parameters\/IfMatch(?:Project|ProjectTemplate|Task)$/.test(
-      parameter.$ref || '',
-    ),
+    /IfMatch(?:Project|ProjectTemplate|Task)$/.test(parameter.$ref || parameter.name || ''),
   )
   if (
-    ifMatchParameters.length !== 1 ||
-    operation.responses?.['412'] === undefined ||
-    operation.responses?.['428'] === undefined
+    ifMatchParameters.length !== 0 ||
+    operation.responses?.['412'] !== undefined ||
+    operation.responses?.['428'] !== undefined ||
+    operation['x-teamgrid-resource-cas'] !== undefined ||
+    operation['x-teamgrid-resource-cas-read'] !== undefined
   ) {
-    fail(`${operation.operationId} lacks its exact If-Match/412/428 contract`)
+    fail(`${operation.operationId} still exposes a retired core resource-CAS contract`)
   }
 }
-const casOperationReadIds = ['getProjectLifecycleOperation', 'getProjectTemplateInstantiation']
-const casOperationReads = Object.values(openapi.paths)
-  .flatMap((pathItem) => Object.values(pathItem))
-  .filter((operation) => casOperationReadIds.includes(operation?.operationId))
-  .sort((left, right) => left.operationId.localeCompare(right.operationId))
-if (
-  casOperationReads.length !== 2 ||
-  manifest.summary?.resourceCasOperationReads !== 2 ||
-  casOperationReads.some((operation) => operation.responses?.['410'] === undefined)
-) {
-  fail('resource CAS operation reads must be exactly two and define legacy-revision 410 responses')
+for (const parameterName of ['IfMatchProject', 'IfMatchProjectTemplate', 'IfMatchTask']) {
+  if (openapi.components?.parameters?.[parameterName] !== undefined) {
+    fail(`retired core parameter ${parameterName} remains in OpenAPI`)
+  }
+}
+for (const [schemaName, retiredFields] of Object.entries({
+  Project: ['developerRevision', 'developerUpdatedAt'],
+  ProjectLifecycleOperation: ['resultRevision', 'sourceRevision'],
+  ProjectTemplate: ['developerRevision', 'developerUpdatedAt'],
+  ProjectTemplateInstantiation: ['resultRevision', 'sourceRevision'],
+  Task: ['developerRevision', 'developerUpdatedAt'],
+})) {
+  const properties = openapi.components?.schemas?.[schemaName]?.properties?.attributes?.properties
+  if (!properties || retiredFields.some((field) => properties[field] !== undefined)) {
+    fail(`${schemaName} still exposes retired core resource-CAS fields`)
+  }
 }
 
 const finalExpansionRoots = new Set([
@@ -201,17 +274,20 @@ const cliCommandMap = commandsByPath(createProgram())
 for (const operation of ledger.operationPolicy) {
   if (!cliCommands.has(operation.cli)) fail(`${operation.operationId} lacks CLI command ${operation.cli}`)
 }
-for (const operation of casOperations) {
+for (const operation of coreOperations) {
   const policy = ledger.operationPolicy.find((entry) => entry.operationId === operation.operationId)
   const command = policy && cliCommandMap.get(policy.cli)
   const ifMatchOptions = command?.options.filter((option) => option.long === '--if-match') || []
-  if (
-    !policy ||
-    policy.mcp.exposure !== 'forbidden' ||
-    ifMatchOptions.length !== 1 ||
-    ifMatchOptions[0].mandatory !== true
-  ) {
-    fail(`${operation.operationId} must have one required CLI --if-match and no MCP exposure`)
+  if (!policy || ifMatchOptions.length !== 0) {
+    fail(`${operation.operationId} must not expose a CLI --if-match option in beta.2`)
+  }
+}
+for (const operation of independentIfMatchOperations) {
+  const policy = ledger.operationPolicy.find((entry) => entry.operationId === operation.operationId)
+  const command = policy && cliCommandMap.get(policy.cli)
+  const ifMatchOptions = command?.options.filter((option) => option.long === '--if-match') || []
+  if (!policy || ifMatchOptions.length !== 1 || ifMatchOptions[0].mandatory !== true) {
+    fail(`${operation.operationId} must preserve one required CLI --if-match option`)
   }
 }
 

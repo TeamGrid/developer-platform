@@ -17,7 +17,7 @@ export async function runCli(argv = process.argv, dependencies: ProgramDependenc
     const message =
       error instanceof TeamGridApiError
         ? error.status === 412
-          ? `${apiDetail} Fetch the resource again and retry with its latest developerRevision or ETag in --if-match.`
+          ? `${apiDetail} Fetch the resource again and retry with its latest revision or ETag in --if-match.`
           : error.status === 428
             ? `${apiDetail} Provide the latest server-issued resource revision or ETag with --if-match.`
             : apiDetail

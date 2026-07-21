@@ -1,11 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import { TeamGridClient } from './client.js'
 import {
-  canonicalProjectStrongETag,
-  canonicalProjectTemplateStrongETag,
-  canonicalTaskStrongETag,
   projectLifecycleOperationValidator,
   projectTemplateInstantiationValidator,
+  taskValidator,
 } from './resourceConcurrency.js'
 
 const token = // gitleaks:allow -- synthetic fixed-format test credential
@@ -22,8 +20,6 @@ function task() {
       completed: false,
       createdAt: now,
       description: '',
-      developerRevision: 'a'.repeat(64),
-      developerUpdatedAt: now,
       dueAt: null,
       groupId: null,
       listId: null,
@@ -51,8 +47,6 @@ function pendingLifecycleOperation() {
       createdAt: now,
       noOp: false,
       projectId: 'project-1',
-      resultRevision: null,
-      sourceRevision: 'a'.repeat(64),
       state: 'pending',
       updatedAt: now,
     },
@@ -67,8 +61,6 @@ function pendingInstantiation() {
       createdAt: now,
       progress: { listsCompleted: 0, listsTotal: 1, tasksCompleted: 0, tasksTotal: 1 },
       projectId: 'project-1',
-      resultRevision: null,
-      sourceRevision: 'b'.repeat(64),
       state: 'pending',
       templateId: 'template-1',
       updatedAt: now,
@@ -78,64 +70,45 @@ function pendingInstantiation() {
   }
 }
 
-describe('resource concurrency runtime contract', () => {
-  it('canonicalizes only exact raw revisions or resource-specific strong ETags', () => {
-    const revision = 'a'.repeat(64)
-    expect(canonicalTaskStrongETag(revision)).toBe(`"tsk1-${revision}"`)
-    expect(canonicalProjectStrongETag(`"prj1-${revision}"`)).toBe(`"prj1-${revision}"`)
-    expect(canonicalProjectTemplateStrongETag(revision)).toBe(`"tpl1-${revision}"`)
-
-    for (const invalid of [
-      '*',
-      ` ${revision}`,
-      `W/"tsk1-${revision}"`,
-      `"prj1-${revision}"`,
-      revision.toUpperCase(),
-      `${revision},${revision}`,
-    ]) {
-      expect(() => canonicalTaskStrongETag(invalid)).toThrowError(
-        expect.objectContaining({ code: 'invalid_arguments' }),
-      )
-    }
+describe('core resource runtime contract', () => {
+  it('accepts the static beta.2 task shape and rejects retired CAS fields', () => {
+    const current = task()
+    expect(taskValidator(current)).toBe(true)
+    expect(
+      taskValidator({
+        ...current,
+        attributes: { ...current.attributes, developerRevision: 'a'.repeat(64) },
+      }),
+    ).toBe(false)
   })
 
-  it('rejects a missing runtime If-Match before making a network request', async () => {
-    const fetch = vi.fn()
+  it('sends core mutations without an If-Match precondition', async () => {
+    const fetch = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      expect(init?.method).toBe('PATCH')
+      expect(new Headers(init?.headers).has('if-match')).toBe(false)
+      return new Response(JSON.stringify({ data: task(), meta: { requestId: 'request-1' } }), {
+        headers: { 'content-type': 'application/json' },
+        status: 200,
+      })
+    })
     const client = new TeamGridClient({ fetch, token })
+    await expect(client.tasks.update('task-1', { name: 'Changed' })).resolves.toMatchObject({
+      data: task(),
+    })
+    expect(fetch).toHaveBeenCalledOnce()
     await expect(
-      client.tasks.update('task-1', { name: 'Changed' }, undefined as never),
-    ).rejects.toMatchObject({
-      code: 'invalid_arguments',
-    })
-    expect(fetch).not.toHaveBeenCalled()
+      client.tasks.update('task-1', { name: 'Changed again' }, { ifMatch: 'legacy' } as never),
+    ).rejects.toMatchObject({ code: 'invalid_arguments' })
+    expect(fetch).toHaveBeenCalledOnce()
   })
 
-  it('fails closed when a resource body revision and response ETag differ', async () => {
-    const client = new TeamGridClient({
-      fetch: vi.fn(
-        async () =>
-          new Response(JSON.stringify({ data: task(), meta: { requestId: 'request-1' } }), {
-            headers: {
-              'content-type': 'application/json',
-              etag: `"tsk1-${'b'.repeat(64)}"`,
-            },
-            status: 200,
-          }),
-      ),
-      token,
-    })
-    await expect(client.tasks.get('task-1')).rejects.toMatchObject({
-      code: 'invalid_api_response',
-    })
-  })
-
-  it('enforces lifecycle source/result revision and terminal-state invariants', () => {
+  it('enforces lifecycle terminal-state invariants without revision fields', () => {
     const pending = pendingLifecycleOperation()
     expect(projectLifecycleOperationValidator(pending)).toBe(true)
     expect(
       projectLifecycleOperationValidator({
         ...pending,
-        attributes: { ...pending.attributes, resultRevision: 'b'.repeat(64) },
+        attributes: { ...pending.attributes, finishedAt: now },
       }),
     ).toBe(false)
     expect(
@@ -143,7 +116,6 @@ describe('resource concurrency runtime contract', () => {
         ...pending,
         attributes: {
           ...pending.attributes,
-          resultRevision: 'b'.repeat(64),
           state: 'succeeded',
         },
       }),
@@ -161,7 +133,7 @@ describe('resource concurrency runtime contract', () => {
     ).toBe(true)
   })
 
-  it('enforces template-instantiation progress and terminal revision invariants', () => {
+  it('enforces template-instantiation progress and terminal-state invariants', () => {
     const pending = pendingInstantiation()
     expect(projectTemplateInstantiationValidator(pending)).toBe(true)
     expect(
@@ -179,7 +151,6 @@ describe('resource concurrency runtime contract', () => {
         attributes: {
           ...pending.attributes,
           finishedAt: now,
-          resultRevision: 'c'.repeat(64),
           state: 'succeeded',
         },
       }),

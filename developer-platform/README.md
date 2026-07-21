@@ -102,11 +102,11 @@ SDK, CLI, MCP adapter, and issuable scopes do not expose it in this release. Use
 for event-driven integration and bounded list reads for reconciliation.
 
 GET requests, POST requests with an idempotency key, and compare-and-set planned-work PUTs with an
-idempotency key are retried for bounded transient failures. Task, project, and project-template
-mutations require the latest typed `developerRevision` or strong ETag. Stale `If-Match` requests
-fail with HTTP `412`; callers must fetch, reconcile, and retry explicitly. Other PUT, PATCH, and
-DELETE requests are not automatically retried. Errors do
-not retain or print the bearer credential.
+idempotency key are retried for bounded transient failures. Tasks, projects, and project templates
+use the static Beta 2 contract without developer revisions, strong ETags, or `If-Match` options.
+Independent compare-and-set contracts such as custom-field values and planned work remain
+unchanged. Other PUT, PATCH, and DELETE requests are not automatically retried. Errors do not
+retain or print the bearer credential.
 
 ## Webhook v2 signatures
 
@@ -189,11 +189,14 @@ To release, update all three package versions, commit and tag the exact source
 as `v<version>`. The same immutable developer-platform commit and contract
 manifest must first pass staging, the DE production canary, and the separate US
 production promotion in `TeamGrid/teamgrid`. Dispatch `Stage npm release` from
-the tag with the matching version, dist-tag, and successful `Promote qualified
-release to US production` run URL. The workflow verifies the exact US artifact,
-its cited DE-canary run and artifact, the App/API/Developer Platform revisions,
-and the contract-manifest SHA-256 as one immutable promotion chain before it can
-stage packages.
+the tag with the matching version, dist-tag, exact API runtime image SHA, and
+successful `Promote qualified release to US production` run URL. The workflow
+verifies the exact US artifact, its cited DE-canary run and artifact, the
+App/API/Developer Platform revisions, and the contract-manifest SHA-256 as one
+immutable promotion chain before it can stage packages. The API runtime SHA is
+validated independently from the API commit that supplied the mirrored OpenAPI
+contract, because a release-hardening commit may legitimately follow the
+contract-source commit.
 It needs the `TEAMGRID_REPOSITORY_TOKEN` secret in the protected `npm`
 environment solely to read that private workflow run and its artifacts.
 
