@@ -57,30 +57,6 @@
           "type": "string"
         }
       },
-      "ProjectETag": {
-        "description": "Strong project revision returned by reads and synchronous mutations.",
-        "required": true,
-        "schema": {
-          "pattern": "^\"prj1-[a-f0-9]{64}\"$",
-          "type": "string"
-        }
-      },
-      "ProjectTemplateETag": {
-        "description": "Strong project-template revision returned by reads and mutations.",
-        "required": true,
-        "schema": {
-          "pattern": "^\"tpl1-[a-f0-9]{64}\"$",
-          "type": "string"
-        }
-      },
-      "TaskETag": {
-        "description": "Strong task revision returned by reads and mutations.",
-        "required": true,
-        "schema": {
-          "pattern": "^\"tsk1-[a-f0-9]{64}\"$",
-          "type": "string"
-        }
-      },
       "StrongETagCacheControl": {
         "description": "Prevents shared caching and representation transformations so the strong revision validator remains byte-for-byte usable for conditional requests.",
         "required": true,
@@ -255,36 +231,6 @@
         "required": true,
         "schema": {
           "pattern": "^\"pw1-[a-f0-9]{64}\"$",
-          "type": "string"
-        }
-      },
-      "IfMatchProject": {
-        "description": "Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected.",
-        "in": "header",
-        "name": "If-Match",
-        "required": true,
-        "schema": {
-          "pattern": "^\"prj1-[a-f0-9]{64}\"$",
-          "type": "string"
-        }
-      },
-      "IfMatchProjectTemplate": {
-        "description": "Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected.",
-        "in": "header",
-        "name": "If-Match",
-        "required": true,
-        "schema": {
-          "pattern": "^\"tpl1-[a-f0-9]{64}\"$",
-          "type": "string"
-        }
-      },
-      "IfMatchTask": {
-        "description": "Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected.",
-        "in": "header",
-        "name": "If-Match",
-        "required": true,
-        "schema": {
-          "pattern": "^\"tsk1-[a-f0-9]{64}\"$",
           "type": "string"
         }
       },
@@ -1910,14 +1856,6 @@
               "description": {
                 "type": "string"
               },
-              "developerRevision": {
-                "pattern": "^[a-f0-9]{64}$",
-                "type": "string"
-              },
-              "developerUpdatedAt": {
-                "format": "date-time",
-                "type": "string"
-              },
               "dueAt": {
                 "format": "date-time",
                 "type": [
@@ -1985,8 +1923,6 @@
               "contactId",
               "createdAt",
               "description",
-              "developerRevision",
-              "developerUpdatedAt",
               "dueAt",
               "individualId",
               "listId",
@@ -2037,14 +1973,6 @@
               },
               "description": {
                 "maxLength": 50000,
-                "type": "string"
-              },
-              "developerRevision": {
-                "pattern": "^[a-f0-9]{64}$",
-                "type": "string"
-              },
-              "developerUpdatedAt": {
-                "format": "date-time",
                 "type": "string"
               },
               "originProjectId": {
@@ -2106,8 +2034,6 @@
               "createdAt",
               "description",
               "originProjectId",
-              "developerRevision",
-              "developerUpdatedAt",
               "snapshotVersion",
               "stats",
               "title",
@@ -2139,107 +2065,6 @@
         "properties": {
           "attributes": {
             "additionalProperties": false,
-            "allOf": [
-              {
-                "if": {
-                  "properties": {
-                    "state": {
-                      "const": "failed"
-                    }
-                  },
-                  "required": [
-                    "state"
-                  ]
-                },
-                "then": {
-                  "properties": {
-                    "error": true,
-                    "finishedAt": true,
-                    "resultRevision": {
-                      "type": "null"
-                    }
-                  },
-                  "required": [
-                    "error",
-                    "finishedAt"
-                  ]
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "state": {
-                      "const": "succeeded"
-                    }
-                  },
-                  "required": [
-                    "state"
-                  ]
-                },
-                "then": {
-                  "not": {
-                    "properties": {
-                      "error": true
-                    },
-                    "required": [
-                      "error"
-                    ]
-                  },
-                  "properties": {
-                    "finishedAt": true,
-                    "resultRevision": {
-                      "pattern": "^[a-f0-9]{64}$",
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "finishedAt"
-                  ]
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "state": {
-                      "enum": [
-                        "pending",
-                        "running"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "state"
-                  ]
-                },
-                "then": {
-                  "properties": {
-                    "resultRevision": {
-                      "type": "null"
-                    }
-                  },
-                  "not": {
-                    "anyOf": [
-                      {
-                        "properties": {
-                          "error": true
-                        },
-                        "required": [
-                          "error"
-                        ]
-                      },
-                      {
-                        "properties": {
-                          "finishedAt": true
-                        },
-                        "required": [
-                          "finishedAt"
-                        ]
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
             "properties": {
               "createdAt": {
                 "format": "date-time",
@@ -2309,17 +2134,6 @@
                 "pattern": "^[A-Za-z0-9_-]+$",
                 "type": "string"
               },
-              "resultRevision": {
-                "pattern": "^[a-f0-9]{64}$",
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "sourceRevision": {
-                "pattern": "^[a-f0-9]{64}$",
-                "type": "string"
-              },
               "state": {
                 "enum": [
                   "failed",
@@ -2344,8 +2158,6 @@
               "createdAt",
               "progress",
               "projectId",
-              "resultRevision",
-              "sourceRevision",
               "state",
               "templateId",
               "updatedAt"
@@ -2375,107 +2187,6 @@
         "properties": {
           "attributes": {
             "additionalProperties": false,
-            "allOf": [
-              {
-                "if": {
-                  "properties": {
-                    "state": {
-                      "const": "failed"
-                    }
-                  },
-                  "required": [
-                    "state"
-                  ]
-                },
-                "then": {
-                  "properties": {
-                    "error": true,
-                    "finishedAt": true,
-                    "resultRevision": {
-                      "type": "null"
-                    }
-                  },
-                  "required": [
-                    "error",
-                    "finishedAt"
-                  ]
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "state": {
-                      "const": "succeeded"
-                    }
-                  },
-                  "required": [
-                    "state"
-                  ]
-                },
-                "then": {
-                  "not": {
-                    "properties": {
-                      "error": true
-                    },
-                    "required": [
-                      "error"
-                    ]
-                  },
-                  "properties": {
-                    "finishedAt": true,
-                    "resultRevision": {
-                      "pattern": "^[a-f0-9]{64}$",
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "finishedAt"
-                  ]
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "state": {
-                      "enum": [
-                        "pending",
-                        "running"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "state"
-                  ]
-                },
-                "then": {
-                  "properties": {
-                    "resultRevision": {
-                      "type": "null"
-                    }
-                  },
-                  "not": {
-                    "anyOf": [
-                      {
-                        "properties": {
-                          "error": true
-                        },
-                        "required": [
-                          "error"
-                        ]
-                      },
-                      {
-                        "properties": {
-                          "finishedAt": true
-                        },
-                        "required": [
-                          "finishedAt"
-                        ]
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
             "properties": {
               "action": {
                 "enum": [
@@ -2559,17 +2270,6 @@
                 "minLength": 1,
                 "type": "string"
               },
-              "resultRevision": {
-                "pattern": "^[a-f0-9]{64}$",
-                "type": [
-                  "string",
-                  "null"
-                ]
-              },
-              "sourceRevision": {
-                "pattern": "^[a-f0-9]{64}$",
-                "type": "string"
-              },
               "startedAt": {
                 "format": "date-time",
                 "readOnly": true,
@@ -2596,8 +2296,6 @@
               "createdAt",
               "noOp",
               "projectId",
-              "resultRevision",
-              "sourceRevision",
               "state",
               "updatedAt"
             ],
@@ -2652,14 +2350,6 @@
                 ]
               },
               "description": {
-                "type": "string"
-              },
-              "developerRevision": {
-                "pattern": "^[a-f0-9]{64}$",
-                "type": "string"
-              },
-              "developerUpdatedAt": {
-                "format": "date-time",
                 "type": "string"
               },
               "dueAt": {
@@ -2743,8 +2433,6 @@
               "completed",
               "createdAt",
               "description",
-              "developerRevision",
-              "developerUpdatedAt",
               "dueAt",
               "groupId",
               "listId",
@@ -13891,12 +13579,6 @@
                   ],
                   "type": "string"
                 }
-              },
-              "ETag": {
-                "$ref": "#/components/headers/ProjectETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -13930,12 +13612,6 @@
                   ],
                   "type": "string"
                 }
-              },
-              "ETag": {
-                "$ref": "#/components/headers/ProjectETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -14005,15 +13681,7 @@
                 }
               }
             },
-            "description": "The requested resource.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/ProjectETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The requested resource."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -14052,9 +13720,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchProject"
           }
         ],
         "requestBody": {
@@ -14089,15 +13754,7 @@
                 }
               }
             },
-            "description": "The updated resource.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/ProjectETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The updated resource."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -14113,12 +13770,6 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -14141,9 +13792,7 @@
         ],
         "x-teamgrid-required-scopes": [
           "projects:write"
-        ],
-        "description": "Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.",
-        "x-teamgrid-resource-cas": "resource-cas-v1"
+        ]
       }
     },
     "/projects/{id}/complete": {
@@ -14152,9 +13801,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchProject"
           },
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -14218,12 +13864,6 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
-          },
           "429": {
             "$ref": "#/components/responses/RateLimited"
           },
@@ -14243,7 +13883,6 @@
         "tags": [
           "Projects"
         ],
-        "x-teamgrid-resource-cas": "resource-cas-v1",
         "x-teamgrid-required-scopes": [
           "projects:lifecycle"
         ]
@@ -14255,9 +13894,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchProject"
           },
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -14321,12 +13957,6 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
-          },
           "429": {
             "$ref": "#/components/responses/RateLimited"
           },
@@ -14346,7 +13976,6 @@
         "tags": [
           "Projects"
         ],
-        "x-teamgrid-resource-cas": "resource-cas-v1",
         "x-teamgrid-required-scopes": [
           "projects:lifecycle"
         ]
@@ -14358,9 +13987,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchProject"
           },
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -14424,12 +14050,6 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
-          },
           "429": {
             "$ref": "#/components/responses/RateLimited"
           },
@@ -14449,7 +14069,6 @@
         "tags": [
           "Projects"
         ],
-        "x-teamgrid-resource-cas": "resource-cas-v1",
         "x-teamgrid-required-scopes": [
           "projects:lifecycle"
         ]
@@ -14461,9 +14080,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchProject"
           },
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -14527,12 +14143,6 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
-          },
           "429": {
             "$ref": "#/components/responses/RateLimited"
           },
@@ -14552,7 +14162,6 @@
         "tags": [
           "Projects"
         ],
-        "x-teamgrid-resource-cas": "resource-cas-v1",
         "x-teamgrid-required-scopes": [
           "projects:lifecycle"
         ]
@@ -14602,16 +14211,6 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
-          "410": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorEnvelope"
-                }
-              }
-            },
-            "description": "The operation predates resource revision tracking and can no longer be polled."
-          },
           "429": {
             "$ref": "#/components/responses/RateLimited"
           },
@@ -14633,8 +14232,7 @@
         ],
         "x-teamgrid-required-scopes": [
           "projects:lifecycle"
-        ],
-        "x-teamgrid-resource-cas-read": "resource-cas-v1"
+        ]
       }
     },
     "/project-templates": {
@@ -14824,12 +14422,6 @@
                   ],
                   "type": "string"
                 }
-              },
-              "ETag": {
-                "$ref": "#/components/headers/ProjectTemplateETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -14863,12 +14455,6 @@
                   ],
                   "type": "string"
                 }
-              },
-              "ETag": {
-                "$ref": "#/components/headers/ProjectTemplateETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -14915,22 +14501,11 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchProjectTemplate"
           }
         ],
         "responses": {
           "204": {
-            "description": "The project template was archived, or that state was already present.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/ProjectTemplateETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The project template was archived, or that state was already present."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -14946,12 +14521,6 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -14974,9 +14543,7 @@
         ],
         "x-teamgrid-required-scopes": [
           "project-templates:write"
-        ],
-        "description": "Requires exactly one latest strong resource ETag and returns the post-archive revision in the ETag header.",
-        "x-teamgrid-resource-cas": "resource-cas-v1"
+        ]
       },
       "get": {
         "operationId": "getProjectTemplate",
@@ -15007,15 +14574,7 @@
                 }
               }
             },
-            "description": "The requested resource.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/ProjectTemplateETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The requested resource."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -15058,9 +14617,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchProjectTemplate"
           }
         ],
         "requestBody": {
@@ -15095,15 +14651,7 @@
                 }
               }
             },
-            "description": "The updated resource.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/ProjectTemplateETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The updated resource."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -15119,12 +14667,6 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -15147,9 +14689,7 @@
         ],
         "x-teamgrid-required-scopes": [
           "project-templates:write"
-        ],
-        "description": "Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.",
-        "x-teamgrid-resource-cas": "resource-cas-v1"
+        ]
       }
     },
     "/project-templates/{id}/restore": {
@@ -15158,9 +14698,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchProjectTemplate"
           }
         ],
         "responses": {
@@ -15185,15 +14722,7 @@
                 }
               }
             },
-            "description": "The updated resource.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/ProjectTemplateETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The updated resource."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -15209,12 +14738,6 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -15237,9 +14760,7 @@
         ],
         "x-teamgrid-required-scopes": [
           "project-templates:write"
-        ],
-        "description": "Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.",
-        "x-teamgrid-resource-cas": "resource-cas-v1"
+        ]
       }
     },
     "/project-templates/{id}/instantiate": {
@@ -15249,9 +14770,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchProjectTemplate"
           },
           {
             "$ref": "#/components/parameters/IdempotencyKey"
@@ -15325,12 +14843,6 @@
           "409": {
             "$ref": "#/components/responses/Conflict"
           },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
-          },
           "429": {
             "$ref": "#/components/responses/RateLimited"
           },
@@ -15350,7 +14862,6 @@
         "tags": [
           "Project Templates"
         ],
-        "x-teamgrid-resource-cas": "resource-cas-v1",
         "x-teamgrid-required-scopes": [
           "project-templates:write",
           "projects:write"
@@ -15401,16 +14912,6 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
-          "410": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorEnvelope"
-                }
-              }
-            },
-            "description": "The operation predates resource revision tracking and can no longer be polled."
-          },
           "429": {
             "$ref": "#/components/responses/RateLimited"
           },
@@ -15434,8 +14935,7 @@
           "project-templates:write",
           "projects:write"
         ],
-        "description": "Returns only an operation owned by the authenticated credential in its workspace. The cell-local App re-authenticates both project-templates:write and projects:write scopes before every poll.",
-        "x-teamgrid-resource-cas-read": "resource-cas-v1"
+        "description": "Returns only an operation owned by the authenticated credential in its workspace. The cell-local App re-authenticates both project-templates:write and projects:write scopes before every poll."
       }
     },
     "/planned-work": {
@@ -16621,12 +16121,6 @@
                   ],
                   "type": "string"
                 }
-              },
-              "ETag": {
-                "$ref": "#/components/headers/TaskETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -16660,12 +16154,6 @@
                   ],
                   "type": "string"
                 }
-              },
-              "ETag": {
-                "$ref": "#/components/headers/TaskETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
               }
             }
           },
@@ -16711,22 +16199,11 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchTask"
           }
         ],
         "responses": {
           "204": {
-            "description": "The resource was archived.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/TaskETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The resource was archived."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -16742,12 +16219,6 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -16770,9 +16241,7 @@
         ],
         "x-teamgrid-required-scopes": [
           "tasks:write"
-        ],
-        "description": "Requires exactly one latest strong resource ETag and returns the post-archive revision in the ETag header.",
-        "x-teamgrid-resource-cas": "resource-cas-v1"
+        ]
       },
       "get": {
         "operationId": "getTask",
@@ -16803,15 +16272,7 @@
                 }
               }
             },
-            "description": "The requested resource.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/TaskETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The requested resource."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -16850,9 +16311,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchTask"
           }
         ],
         "requestBody": {
@@ -16887,15 +16345,7 @@
                 }
               }
             },
-            "description": "The updated resource.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/TaskETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The updated resource."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -16911,12 +16361,6 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -16939,9 +16383,7 @@
         ],
         "x-teamgrid-required-scopes": [
           "tasks:write"
-        ],
-        "description": "Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.",
-        "x-teamgrid-resource-cas": "resource-cas-v1"
+        ]
       }
     },
     "/tasks/{id}/restore": {
@@ -16950,9 +16392,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchTask"
           }
         ],
         "responses": {
@@ -16977,15 +16416,7 @@
                 }
               }
             },
-            "description": "The updated resource.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/TaskETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The updated resource."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -17001,12 +16432,6 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -17029,9 +16454,7 @@
         ],
         "x-teamgrid-required-scopes": [
           "tasks:write"
-        ],
-        "description": "Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.",
-        "x-teamgrid-resource-cas": "resource-cas-v1"
+        ]
       }
     },
     "/tasks/{id}/complete": {
@@ -17040,9 +16463,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchTask"
           }
         ],
         "responses": {
@@ -17067,15 +16487,7 @@
                 }
               }
             },
-            "description": "The updated resource.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/TaskETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The updated resource."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -17091,12 +16503,6 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -17119,9 +16525,7 @@
         ],
         "x-teamgrid-required-scopes": [
           "tasks:write"
-        ],
-        "description": "Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.",
-        "x-teamgrid-resource-cas": "resource-cas-v1"
+        ]
       }
     },
     "/tasks/{id}/reopen": {
@@ -17130,9 +16534,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
-          },
-          {
-            "$ref": "#/components/parameters/IfMatchTask"
           }
         ],
         "responses": {
@@ -17157,15 +16558,7 @@
                 }
               }
             },
-            "description": "The updated resource.",
-            "headers": {
-              "ETag": {
-                "$ref": "#/components/headers/TaskETag"
-              },
-              "Cache-Control": {
-                "$ref": "#/components/headers/StrongETagCacheControl"
-              }
-            }
+            "description": "The updated resource."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -17181,12 +16574,6 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
-          },
-          "412": {
-            "$ref": "#/components/responses/PreconditionFailed"
-          },
-          "428": {
-            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -17209,9 +16596,7 @@
         ],
         "x-teamgrid-required-scopes": [
           "tasks:write"
-        ],
-        "description": "Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.",
-        "x-teamgrid-resource-cas": "resource-cas-v1"
+        ]
       }
     },
     "/tasks/{id}/timer/start": {

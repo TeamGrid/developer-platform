@@ -19,6 +19,10 @@ on:
         description: Successful US production promotion that completed this exact DE-to-US contract release.
         required: true
         type: string
+      api_runtime_sha:
+        description: Exact 40-character TeamGrid API runtime image SHA promoted through staging, DE, and US.
+        required: true
+        type: string
       confirm_ga:
         description: Confirm the separately approved GA gate; required only for latest.
         required: true
@@ -68,10 +72,15 @@ jobs:
 
       - name: Verify immutable runtime promotion evidence
         env:
+          API_RUNTIME_SHA: ${{ inputs.api_runtime_sha }}
           GH_TOKEN: ${{ secrets.TEAMGRID_REPOSITORY_TOKEN }}
           PRODUCTION_RELEASE_RUN_URL: ${{ inputs.production_release_run_url }}
         run: |
           set -euo pipefail
+          [[ "$API_RUNTIME_SHA" =~ ^[a-f0-9]{40}$ ]] || {
+            echo "api_runtime_sha must be an exact lowercase 40-character API runtime image SHA." >&2
+            exit 1
+          }
           [[ "$PRODUCTION_RELEASE_RUN_URL" =~ ^https://github\.com/TeamGrid/teamgrid/actions/runs/[0-9]+$ ]] || {
             echo "production_release_run_url must be a TeamGrid/teamgrid Actions run URL." >&2
             exit 1
@@ -109,6 +118,7 @@ jobs:
           manifest_sha256="$(sha256sum ../openapi/developer-platform-manifest.json | awk '{print $1}')"
           DE_CANARY_EVIDENCE_PATH="${de_evidence_paths[0]}" \
           DE_CANARY_RUN_PATH="$de_run_path" \
+          EXPECTED_API_RUNTIME_SHA="$API_RUNTIME_SHA" \
           EXPECTED_DEVELOPER_PLATFORM_SHA="$GITHUB_SHA" \
           EXPECTED_MANIFEST_SHA256="$manifest_sha256" \
           PRODUCTION_RELEASE_RUN_URL="$PRODUCTION_RELEASE_RUN_URL" \

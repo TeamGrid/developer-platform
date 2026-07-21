@@ -2,35 +2,16 @@ import { TeamGridClientError } from './errors.js'
 import type {
   Project,
   ProjectLifecycleOperation,
-  ProjectRevision,
-  ProjectStrongETag,
   ProjectTemplate,
   ProjectTemplateInstantiation,
-  ProjectTemplateRevision,
-  ProjectTemplateStrongETag,
   Task,
-  TaskRevision,
-  TaskStrongETag,
-  TransportMetadata,
 } from './types.js'
 
 type RecordValue = Record<string, unknown>
-type ResourceKind = 'project' | 'projectTemplate' | 'task'
 
-const revisionPattern = /^[a-f0-9]{64}$/
 const canonicalDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
 const templateIdPattern = /^[A-Za-z0-9_-]{1,128}$/
 const anyStringPattern = /^[\s\S]*$/
-
-const etagPrefixes = Object.freeze({
-  project: 'prj1',
-  projectTemplate: 'tpl1',
-  task: 'tsk1',
-} as const)
-
-function invalidArguments(message: string): never {
-  throw new TeamGridClientError('invalid_arguments', message)
-}
 
 function invalidResponse(label: string, detail: string): never {
   throw new TeamGridClientError(
@@ -93,13 +74,9 @@ function stringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string')
 }
 
-function resourceRevision(value: unknown): value is string {
-  return typeof value === 'string' && revisionPattern.test(value)
-}
-
 function exactResource(
   value: unknown,
-  type: ResourceKind,
+  type: 'project' | 'projectTemplate' | 'task',
   idPattern: RegExp,
   attributes: (value: unknown) => boolean,
 ) {
@@ -122,8 +99,6 @@ export const taskValidator = (value: unknown): value is Task =>
         'completed',
         'createdAt',
         'description',
-        'developerRevision',
-        'developerUpdatedAt',
         'dueAt',
         'groupId',
         'listId',
@@ -147,8 +122,6 @@ export const taskValidator = (value: unknown): value is Task =>
       typeof attributes.completed === 'boolean' &&
       nullableDate(attributes.createdAt) &&
       typeof attributes.description === 'string' &&
-      resourceRevision(attributes.developerRevision) &&
-      canonicalDate(attributes.developerUpdatedAt) &&
       nullableDate(attributes.dueAt) &&
       nullableId(attributes.groupId) &&
       nullableId(attributes.listId) &&
@@ -175,8 +148,6 @@ export const projectValidator = (value: unknown): value is Project =>
         'contactId',
         'createdAt',
         'description',
-        'developerRevision',
-        'developerUpdatedAt',
         'dueAt',
         'individualId',
         'listId',
@@ -199,8 +170,6 @@ export const projectValidator = (value: unknown): value is Project =>
       nullableId(attributes.contactId) &&
       nullableDate(attributes.createdAt) &&
       typeof attributes.description === 'string' &&
-      resourceRevision(attributes.developerRevision) &&
-      canonicalDate(attributes.developerUpdatedAt) &&
       nullableDate(attributes.dueAt) &&
       nullableId(attributes.individualId) &&
       nullableId(attributes.listId) &&
@@ -222,8 +191,6 @@ export const projectTemplateValidator = (value: unknown): value is ProjectTempla
         'color',
         'createdAt',
         'description',
-        'developerRevision',
-        'developerUpdatedAt',
         'originProjectId',
         'snapshotVersion',
         'stats',
@@ -240,8 +207,6 @@ export const projectTemplateValidator = (value: unknown): value is ProjectTempla
       /^#[0-9a-f]{6}$/.test(attributes.color) &&
       nullableDate(attributes.createdAt) &&
       boundedString(attributes.description, 50_000) &&
-      resourceRevision(attributes.developerRevision) &&
-      canonicalDate(attributes.developerUpdatedAt) &&
       (attributes.originProjectId === null ||
         (typeof attributes.originProjectId === 'string' &&
           boundedString(attributes.originProjectId, 128))) &&
@@ -274,7 +239,6 @@ function terminalStateIsConsistent(attributes: RecordValue, maximumErrorLength: 
   if (hasStartedAt && !canonicalDate(attributes.startedAt)) return false
   if (attributes.state === 'failed') {
     return (
-      attributes.resultRevision === null &&
       hasError &&
       operationError(attributes.error, maximumErrorLength) &&
       hasFinishedAt &&
@@ -282,16 +246,10 @@ function terminalStateIsConsistent(attributes: RecordValue, maximumErrorLength: 
     )
   }
   if (attributes.state === 'succeeded') {
-    return (
-      resourceRevision(attributes.resultRevision) &&
-      !hasError &&
-      hasFinishedAt &&
-      canonicalDate(attributes.finishedAt)
-    )
+    return !hasError && hasFinishedAt && canonicalDate(attributes.finishedAt)
   }
   return (
     (attributes.state === 'pending' || attributes.state === 'running') &&
-    attributes.resultRevision === null &&
     !hasError &&
     !hasFinishedAt
   )
@@ -331,24 +289,11 @@ export const projectLifecycleOperationValidator = (
         'finishedAt',
         'noOp',
         'projectId',
-        'resultRevision',
-        'sourceRevision',
         'startedAt',
         'state',
         'updatedAt',
       ],
-      [
-        'action',
-        'attempts',
-        'checkpoints',
-        'createdAt',
-        'noOp',
-        'projectId',
-        'resultRevision',
-        'sourceRevision',
-        'state',
-        'updatedAt',
-      ],
+      ['action', 'attempts', 'checkpoints', 'createdAt', 'noOp', 'projectId', 'state', 'updatedAt'],
     )
   ) {
     return false
@@ -363,7 +308,6 @@ export const projectLifecycleOperationValidator = (
     typeof attributes.noOp === 'boolean' &&
     typeof attributes.projectId === 'string' &&
     boundedString(attributes.projectId, 128, false) &&
-    resourceRevision(attributes.sourceRevision) &&
     canonicalDate(attributes.updatedAt) &&
     terminalStateIsConsistent(attributes, 5000)
   )
@@ -385,22 +329,11 @@ export const projectTemplateInstantiationValidator = (
         'finishedAt',
         'progress',
         'projectId',
-        'resultRevision',
-        'sourceRevision',
         'state',
         'templateId',
         'updatedAt',
       ],
-      [
-        'createdAt',
-        'progress',
-        'projectId',
-        'resultRevision',
-        'sourceRevision',
-        'state',
-        'templateId',
-        'updatedAt',
-      ],
+      ['createdAt', 'progress', 'projectId', 'state', 'templateId', 'updatedAt'],
     )
   ) {
     return false
@@ -424,84 +357,11 @@ export const projectTemplateInstantiationValidator = (
     Number(progress.tasksTotal) <= 5000 &&
     typeof attributes.projectId === 'string' &&
     templateIdPattern.test(attributes.projectId) &&
-    resourceRevision(attributes.sourceRevision) &&
     typeof attributes.templateId === 'string' &&
     templateIdPattern.test(attributes.templateId) &&
     canonicalDate(attributes.updatedAt) &&
     terminalStateIsConsistent(attributes, 500)
   )
-}
-
-function canonicalStrongEtag(kind: ResourceKind, value: unknown) {
-  if (typeof value !== 'string') {
-    invalidArguments(`The ${kind} If-Match value must be a server-issued revision or strong ETag.`)
-  }
-  const prefix = etagPrefixes[kind]
-  const rawRevision = revisionPattern.test(value)
-    ? value
-    : new RegExp(`^"${prefix}-([a-f0-9]{64})"$`).exec(value)?.[1]
-  if (!rawRevision) {
-    invalidArguments(
-      `The ${kind} If-Match value must be one lowercase 64-character revision or the exact quoted ${prefix} strong ETag.`,
-    )
-  }
-  return `"${prefix}-${rawRevision}"`
-}
-
-export function canonicalTaskStrongETag(value: TaskRevision | TaskStrongETag | string) {
-  return canonicalStrongEtag('task', value) as TaskStrongETag
-}
-
-export function canonicalProjectStrongETag(value: ProjectRevision | ProjectStrongETag | string) {
-  return canonicalStrongEtag('project', value) as ProjectStrongETag
-}
-
-export function canonicalProjectTemplateStrongETag(
-  value: ProjectTemplateRevision | ProjectTemplateStrongETag | string,
-) {
-  return canonicalStrongEtag('projectTemplate', value) as ProjectTemplateStrongETag
-}
-
-export function rawRevisionFromStrongETag(kind: ResourceKind, etag: string) {
-  const match = new RegExp(`^"${etagPrefixes[kind]}-([a-f0-9]{64})"$`).exec(etag)
-  if (!match?.[1]) invalidArguments(`The ${kind} ETag is invalid.`)
-  return match[1]
-}
-
-export function assertResourceRevisionEtag(
-  kind: ResourceKind,
-  transport: TransportMetadata,
-  revision: unknown,
-  label: string,
-) {
-  if (!resourceRevision(revision)) invalidResponse(label, 'missing resource revision')
-  const expected = `"${etagPrefixes[kind]}-${revision}"`
-  if (transport.headers.etag !== expected) invalidResponse(label, 'ETag does not match the body')
-}
-
-export function assertStrongResponseEtag(
-  kind: ResourceKind,
-  transport: TransportMetadata,
-  label: string,
-) {
-  const etag = transport.headers.etag
-  if (
-    typeof etag !== 'string' ||
-    !new RegExp(`^"${etagPrefixes[kind]}-[a-f0-9]{64}"$`).test(etag)
-  ) {
-    invalidResponse(label, 'missing or malformed strong ETag')
-  }
-  return etag
-}
-
-export function assertOperationSourceRevision(
-  operation: ProjectLifecycleOperation | ProjectTemplateInstantiation,
-  expectedRevision: string,
-  label: string,
-) {
-  if (operation.attributes.sourceRevision !== expectedRevision) {
-    invalidResponse(label, 'source revision does not match If-Match')
-  }
 }
 
 export function assertProjectLifecycleOperationContinuity(
@@ -516,9 +376,6 @@ export function assertProjectLifecycleOperationContinuity(
   if (operation.attributes.projectId !== expected.attributes.projectId) {
     invalidResponse(label, 'project id changed while polling')
   }
-  if (operation.attributes.sourceRevision !== expected.attributes.sourceRevision) {
-    invalidResponse(label, 'source revision changed while polling')
-  }
 }
 
 export function assertProjectTemplateInstantiationContinuity(
@@ -532,8 +389,5 @@ export function assertProjectTemplateInstantiationContinuity(
   }
   if (operation.attributes.projectId !== expected.attributes.projectId) {
     invalidResponse(label, 'project id changed while polling')
-  }
-  if (operation.attributes.sourceRevision !== expected.attributes.sourceRevision) {
-    invalidResponse(label, 'source revision changed while polling')
   }
 }

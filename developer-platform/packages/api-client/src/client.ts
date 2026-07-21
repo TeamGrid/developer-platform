@@ -50,19 +50,12 @@ import {
   workspaceSettingsValidator,
 } from './newDomainValidation.js'
 import {
-  assertOperationSourceRevision,
   assertProjectLifecycleOperationContinuity,
   assertProjectTemplateInstantiationContinuity,
-  assertResourceRevisionEtag,
-  assertStrongResponseEtag,
-  canonicalProjectStrongETag,
-  canonicalProjectTemplateStrongETag,
-  canonicalTaskStrongETag,
   projectLifecycleOperationValidator,
   projectTemplateInstantiationValidator,
   projectTemplateValidator,
   projectValidator,
-  rawRevisionFromStrongETag,
   taskValidator,
 } from './resourceConcurrency.js'
 import { buildRegionalApiBaseUrl, normalizeApiBaseUrl, parseCredentialLocation } from './routing.js'
@@ -153,24 +146,18 @@ import type {
   ProductListOptions,
   ProductUpdate,
   ProjectCreate,
-  ProjectLifecycleMutationOptions,
   ProjectLifecycleOperation,
   ProjectLifecycleWaitOptions,
   ProjectListOptions,
-  ProjectMutationOptions,
   ProjectStatement,
   ProjectStatementCreate,
   ProjectStatementListOptions,
   ProjectStatementUpdate,
-  ProjectStrongETag,
   ProjectTemplateCreate,
   ProjectTemplateInstantiate,
-  ProjectTemplateInstantiateOptions,
   ProjectTemplateInstantiation,
   ProjectTemplateInstantiationWaitOptions,
   ProjectTemplateListOptions,
-  ProjectTemplateMutationOptions,
-  ProjectTemplateStrongETag,
   ProjectTemplateUpdate,
   ProjectUpdate,
   RequestOptions,
@@ -186,9 +173,7 @@ import type {
   TagUpdate,
   TaskCreate,
   TaskListOptions,
-  TaskMutationOptions,
   TaskPlannedWork,
-  TaskStrongETag,
   TaskUpdate,
   TimeEntry,
   TimeEntryCreate,
@@ -197,8 +182,6 @@ import type {
   TimerAction,
   TransportMetadata,
   User,
-  VersionedResourceEnvelope,
-  VersionedResourceTransport,
   WebhookCreate,
   WebhookDelivery,
   WebhookDeliveryListOptions,
@@ -214,12 +197,6 @@ type Fetch = typeof globalThis.fetch
 type Sleep = (milliseconds: number, signal?: AbortSignal) => Promise<void>
 type QueryValue = boolean | number | string | Date | null | undefined
 type Query = Record<string, QueryValue | readonly QueryValue[]>
-type VersionedResourceKind = 'project' | 'projectTemplate' | 'task'
-type StrongETagForKind<TKind extends VersionedResourceKind> = TKind extends 'project'
-  ? ProjectStrongETag
-  : TKind extends 'projectTemplate'
-    ? ProjectTemplateStrongETag
-    : TaskStrongETag
 type ResourceValidator<T> = (value: unknown) => value is T
 
 type InternalRequestOptions = RequestOptions & {
@@ -318,6 +295,15 @@ function canonicalIdempotencyKey(value?: string) {
     )
   }
   return key
+}
+
+function assertNoCoreIfMatch(options: object) {
+  if (Object.hasOwn(options, 'ifMatch')) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Tasks, projects, and project templates do not support ifMatch in the static Beta 2 contract.',
+    )
+  }
 }
 
 function buildCombinedSignal(signal: AbortSignal | undefined, timeoutMs: number) {
@@ -1702,71 +1688,62 @@ export class TeamGridClient {
         this.#waitForPlannedWorkOperation(id, options),
     }
     this.projects = {
-      archive: (id: string, options: ProjectLifecycleMutationOptions) =>
-        this.#createRevisionOperation(
+      archive: (id: string, options: MutationOptions = {}) =>
+        this.#createCoreOperation(
           `/projects/${encodeURIComponent(id)}/archive`,
           undefined,
           options,
           projectLifecycleOperationValidator,
-          'project',
+          '/v1/project-lifecycle-operations/',
           'project archive',
         ),
-      complete: (id: string, options: ProjectLifecycleMutationOptions) =>
-        this.#createRevisionOperation(
+      complete: (id: string, options: MutationOptions = {}) =>
+        this.#createCoreOperation(
           `/projects/${encodeURIComponent(id)}/complete`,
           undefined,
           options,
           projectLifecycleOperationValidator,
-          'project',
+          '/v1/project-lifecycle-operations/',
           'project completion',
         ),
       create: (data: ProjectCreate, options?: MutationOptions) =>
-        this.#createVersionedResource(
-          '/projects',
-          data,
-          options,
-          projectValidator,
-          'project',
-          'project creation',
-        ),
+        this.#createCoreResource('/projects', data, options, projectValidator, 'project creation'),
       get: (id: string, options?: RequestOptions) =>
-        this.#versionedResource(
+        this.#strictResource(
           `/projects/${encodeURIComponent(id)}`,
-          options,
           projectValidator,
           'project',
-          'project',
+          options,
         ),
       list: (options: ProjectListOptions = {}) =>
         this.#strictPage('/projects', projectValidator, 'project list', options),
       pages: (options?: ProjectListOptions, pagination?: PaginationOptions) =>
         this.#strictPages('/projects', projectValidator, 'project list', options, pagination),
-      reopen: (id: string, options: ProjectLifecycleMutationOptions) =>
-        this.#createRevisionOperation(
+      reopen: (id: string, options: MutationOptions = {}) =>
+        this.#createCoreOperation(
           `/projects/${encodeURIComponent(id)}/reopen`,
           undefined,
           options,
           projectLifecycleOperationValidator,
-          'project',
+          '/v1/project-lifecycle-operations/',
           'project reopen',
         ),
-      restore: (id: string, options: ProjectLifecycleMutationOptions) =>
-        this.#createRevisionOperation(
+      restore: (id: string, options: MutationOptions = {}) =>
+        this.#createCoreOperation(
           `/projects/${encodeURIComponent(id)}/restore`,
           undefined,
           options,
           projectLifecycleOperationValidator,
-          'project',
+          '/v1/project-lifecycle-operations/',
           'project restore',
         ),
-      update: (id: string, data: ProjectUpdate, options: ProjectMutationOptions) =>
-        this.#mutateVersionedResource(
+      update: (id: string, data: ProjectUpdate, options: RequestOptions = {}) =>
+        this.#mutateCoreResource(
           `/projects/${encodeURIComponent(id)}`,
           'PATCH',
           data,
           options,
           projectValidator,
-          'project',
           'project update',
         ),
     }
@@ -1834,76 +1811,54 @@ export class TeamGridClient {
         ),
     }
     this.tasks = {
-      archive: (id: string, options: TaskMutationOptions) =>
-        this.#archiveVersionedResource(
-          `/tasks/${encodeURIComponent(id)}`,
-          options,
-          'task',
-          'task archive',
-        ),
-      complete: (id: string, options: TaskMutationOptions) =>
-        this.#mutateVersionedResource(
+      archive: (id: string, options: RequestOptions = {}) =>
+        this.#archiveCoreResource(`/tasks/${encodeURIComponent(id)}`, options, 'task archive'),
+      complete: (id: string, options: RequestOptions = {}) =>
+        this.#mutateCoreResource(
           `/tasks/${encodeURIComponent(id)}/complete`,
           'POST',
           undefined,
           options,
           taskValidator,
-          'task',
           'task completion',
         ),
       create: (data: TaskCreate, options?: MutationOptions) =>
-        this.#createVersionedResource(
-          '/tasks',
-          data,
-          options,
-          taskValidator,
-          'task',
-          'task creation',
-        ),
+        this.#createCoreResource('/tasks', data, options, taskValidator, 'task creation'),
       get: (id: string, options?: RequestOptions) =>
-        this.#versionedResource(
-          `/tasks/${encodeURIComponent(id)}`,
-          options,
-          taskValidator,
-          'task',
-          'task',
-        ),
+        this.#strictResource(`/tasks/${encodeURIComponent(id)}`, taskValidator, 'task', options),
       list: (options: TaskListOptions = {}) =>
         this.#strictPage('/tasks', taskValidator, 'task list', options),
       pages: (options?: TaskListOptions, pagination?: PaginationOptions) =>
         this.#strictPages('/tasks', taskValidator, 'task list', options, pagination),
-      restore: (id: string, options: TaskMutationOptions) =>
-        this.#mutateVersionedResource(
+      restore: (id: string, options: RequestOptions = {}) =>
+        this.#mutateCoreResource(
           `/tasks/${encodeURIComponent(id)}/restore`,
           'POST',
           undefined,
           options,
           taskValidator,
-          'task',
           'task restore',
         ),
-      reopen: (id: string, options: TaskMutationOptions) =>
-        this.#mutateVersionedResource(
+      reopen: (id: string, options: RequestOptions = {}) =>
+        this.#mutateCoreResource(
           `/tasks/${encodeURIComponent(id)}/reopen`,
           'POST',
           undefined,
           options,
           taskValidator,
-          'task',
           'task reopen',
         ),
       startTimer: (id: string, data: TimerAction, options?: RequestOptions) =>
         this.#action<TimeEntry>(`/tasks/${encodeURIComponent(id)}/timer/start`, data, options),
       stopTimer: (id: string, data: TimerAction, options?: RequestOptions) =>
         this.#action<TimeEntry>(`/tasks/${encodeURIComponent(id)}/timer/stop`, data, options),
-      update: (id: string, data: TaskUpdate, options: TaskMutationOptions) =>
-        this.#mutateVersionedResource(
+      update: (id: string, data: TaskUpdate, options: RequestOptions = {}) =>
+        this.#mutateCoreResource(
           `/tasks/${encodeURIComponent(id)}`,
           'PATCH',
           data,
           options,
           taskValidator,
-          'task',
           'task update',
         ),
     }
@@ -2035,41 +1990,34 @@ export class TeamGridClient {
         ),
     }
     this.projectTemplates = {
-      archive: (id: string, options: ProjectTemplateMutationOptions) =>
-        this.#archiveVersionedResource(
+      archive: (id: string, options: RequestOptions = {}) =>
+        this.#archiveCoreResource(
           `/project-templates/${encodeURIComponent(id)}`,
           options,
-          'projectTemplate',
           'project-template archive',
         ),
       create: (data: ProjectTemplateCreate, options?: MutationOptions) =>
-        this.#createVersionedResource(
+        this.#createCoreResource(
           '/project-templates',
           data,
           options,
           projectTemplateValidator,
-          'projectTemplate',
           'project-template creation',
         ),
       get: (id: string, options?: RequestOptions) =>
-        this.#versionedResource(
+        this.#strictResource(
           `/project-templates/${encodeURIComponent(id)}`,
-          options,
           projectTemplateValidator,
-          'projectTemplate',
           'project template',
+          options,
         ),
-      instantiate: (
-        id: string,
-        data: ProjectTemplateInstantiate,
-        options: ProjectTemplateInstantiateOptions,
-      ) =>
-        this.#createRevisionOperation(
+      instantiate: (id: string, data: ProjectTemplateInstantiate, options: MutationOptions = {}) =>
+        this.#createCoreOperation(
           `/project-templates/${encodeURIComponent(id)}/instantiate`,
           data,
           options,
           projectTemplateInstantiationValidator,
-          'projectTemplate',
+          '/v1/project-template-instantiations/',
           'project-template instantiation',
         ),
       list: (options: ProjectTemplateListOptions = {}) =>
@@ -2087,24 +2035,22 @@ export class TeamGridClient {
           options,
           pagination,
         ),
-      restore: (id: string, options: ProjectTemplateMutationOptions) =>
-        this.#mutateVersionedResource(
+      restore: (id: string, options: RequestOptions = {}) =>
+        this.#mutateCoreResource(
           `/project-templates/${encodeURIComponent(id)}/restore`,
           'POST',
           undefined,
           options,
           projectTemplateValidator,
-          'projectTemplate',
           'project-template restore',
         ),
-      update: (id: string, data: ProjectTemplateUpdate, options: ProjectTemplateMutationOptions) =>
-        this.#mutateVersionedResource(
+      update: (id: string, data: ProjectTemplateUpdate, options: RequestOptions = {}) =>
+        this.#mutateCoreResource(
           `/project-templates/${encodeURIComponent(id)}`,
           'PATCH',
           data,
           options,
           projectTemplateValidator,
-          'projectTemplate',
           'project-template update',
         ),
     }
@@ -2924,53 +2870,13 @@ export class TeamGridClient {
     )
   }
 
-  #canonicalResourceEtag(kind: VersionedResourceKind, value: unknown) {
-    if (kind === 'project') return canonicalProjectStrongETag(value as string)
-    if (kind === 'projectTemplate') return canonicalProjectTemplateStrongETag(value as string)
-    return canonicalTaskStrongETag(value as string)
-  }
-
-  async #versionedResource<
-    T extends { attributes: { developerRevision: string } },
-    TKind extends VersionedResourceKind,
-  >(
-    path: string,
-    options: RequestOptions | undefined,
-    validator: ResourceValidator<T>,
-    kind: TKind,
-    label: string,
-  ): Promise<VersionedResourceEnvelope<T, StrongETagForKind<TKind>>> {
-    const response = await this.#request(path, options)
-    if (response.transport.status !== 200) {
-      throw new TeamGridClientError(
-        'invalid_api_response',
-        `The TeamGrid API returned an unexpected status for ${label}.`,
-      )
-    }
-    const envelope = assertStrictResource(response.payload, validator, label)
-    assertResourceRevisionEtag(
-      kind,
-      response.transport,
-      envelope.data.attributes.developerRevision,
-      label,
-    )
-    return attachTransport(
-      envelope,
-      response.transport as VersionedResourceTransport<StrongETagForKind<TKind>>,
-    )
-  }
-
-  async #createVersionedResource<
-    T extends { attributes: { developerRevision: string } },
-    TKind extends VersionedResourceKind,
-  >(
+  async #createCoreResource<T>(
     path: string,
     data: unknown,
     options: MutationOptions | undefined,
     validator: ResourceValidator<T>,
-    kind: TKind,
     label: string,
-  ): Promise<VersionedResourceEnvelope<T, StrongETagForKind<TKind>>> {
+  ) {
     const mutationOptions = options || {}
     const response = await this.#request(path, {
       ...mutationOptions,
@@ -2989,37 +2895,24 @@ export class TeamGridClient {
       )
     }
     const envelope = assertStrictResource(response.payload, validator, label)
-    assertResourceRevisionEtag(
-      kind,
-      response.transport,
-      envelope.data.attributes.developerRevision,
-      label,
-    )
-    return attachTransport(
-      envelope,
-      response.transport as VersionedResourceTransport<StrongETagForKind<TKind>>,
-    )
+    return attachTransport(envelope, response.transport)
   }
 
-  async #mutateVersionedResource<
-    T extends { attributes: { developerRevision: string } },
-    TKind extends VersionedResourceKind,
-  >(
+  async #mutateCoreResource<T>(
     path: string,
     method: 'PATCH' | 'POST',
     data: unknown,
-    options: ProjectMutationOptions | ProjectTemplateMutationOptions | TaskMutationOptions,
+    options: RequestOptions,
     validator: ResourceValidator<T>,
-    kind: TKind,
     label: string,
-  ): Promise<VersionedResourceEnvelope<T, StrongETagForKind<TKind>>> {
-    const ifMatch = this.#canonicalResourceEtag(kind, options?.ifMatch)
-    const { ifMatch: _ifMatch, ...requestOptions } = options || {}
+  ) {
+    assertNoCoreIfMatch(options)
+    const { requestId, signal } = options
     const response = await this.#request(path, {
-      ...requestOptions,
       ...(data === undefined ? {} : { body: data }),
-      ifMatch,
       method,
+      requestId,
+      signal,
     })
     if (response.transport.status !== 200) {
       throw new TeamGridClientError(
@@ -3028,60 +2921,38 @@ export class TeamGridClient {
       )
     }
     const envelope = assertStrictResource(response.payload, validator, label)
-    assertResourceRevisionEtag(
-      kind,
-      response.transport,
-      envelope.data.attributes.developerRevision,
-      label,
-    )
-    return attachTransport(
-      envelope,
-      response.transport as VersionedResourceTransport<StrongETagForKind<TKind>>,
-    )
+    return attachTransport(envelope, response.transport)
   }
 
-  async #archiveVersionedResource<TKind extends 'projectTemplate' | 'task'>(
-    path: string,
-    options: ProjectTemplateMutationOptions | TaskMutationOptions,
-    kind: TKind,
-    label: string,
-  ): Promise<
-    VersionedResourceTransport<TKind extends 'task' ? TaskStrongETag : ProjectTemplateStrongETag>
-  > {
-    const ifMatch = this.#canonicalResourceEtag(kind, options?.ifMatch)
-    const { ifMatch: _ifMatch, ...requestOptions } = options || {}
-    const response = await this.#request(path, { ...requestOptions, ifMatch, method: 'DELETE' })
+  async #archiveCoreResource(path: string, options: RequestOptions, label: string) {
+    assertNoCoreIfMatch(options)
+    const { requestId, signal } = options
+    const response = await this.#request(path, { method: 'DELETE', requestId, signal })
     if (response.transport.status !== 204 || response.payload !== undefined) {
       throw new TeamGridClientError(
         'invalid_api_response',
         `The TeamGrid API returned an invalid empty ${label} response.`,
       )
     }
-    assertStrongResponseEtag(kind, response.transport, label)
-    return response.transport as VersionedResourceTransport<
-      TKind extends 'task' ? TaskStrongETag : ProjectTemplateStrongETag
-    >
+    return response.transport
   }
 
-  async #createRevisionOperation<
-    T extends ProjectLifecycleOperation | ProjectTemplateInstantiation,
-  >(
+  async #createCoreOperation<T extends ProjectLifecycleOperation | ProjectTemplateInstantiation>(
     path: string,
     data: unknown,
-    options: ProjectLifecycleMutationOptions | ProjectTemplateInstantiateOptions,
+    options: MutationOptions,
     validator: ResourceValidator<T>,
-    kind: 'project' | 'projectTemplate',
+    operationRoot: string,
     label: string,
   ) {
-    const ifMatch = this.#canonicalResourceEtag(kind, options?.ifMatch)
-    const expectedRevision = rawRevisionFromStrongETag(kind, ifMatch)
-    const { idempotencyKey, ifMatch: _ifMatch, ...requestOptions } = options || {}
+    assertNoCoreIfMatch(options)
+    const { idempotencyKey, requestId, signal } = options
     const response = await this.#request(path, {
-      ...requestOptions,
       ...(data === undefined ? {} : { body: data }),
       idempotencyKey: canonicalIdempotencyKey(idempotencyKey),
-      ifMatch,
       method: 'POST',
+      requestId,
+      signal,
     })
     const replayed = response.transport.headers['idempotency-replayed']
     if (response.transport.status !== 202 || (replayed !== 'false' && replayed !== 'true')) {
@@ -3091,11 +2962,6 @@ export class TeamGridClient {
       )
     }
     const envelope = assertStrictResource(response.payload, validator, label)
-    assertOperationSourceRevision(envelope.data, expectedRevision, label)
-    const operationRoot =
-      kind === 'project'
-        ? '/v1/project-lifecycle-operations/'
-        : '/v1/project-template-instantiations/'
     if (
       response.transport.headers.location !==
       `${operationRoot}${encodeURIComponent(envelope.data.id)}`

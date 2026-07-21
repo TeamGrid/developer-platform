@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const sha40 = /^[a-f0-9]{40}$/
 const sha64 = /^[a-f0-9]{64}$/
@@ -49,7 +49,7 @@ const commonEvidenceKeys = [
 
 function assertCommonEvidence(
   evidence,
-  { apiSourceCommit, developerPlatformSha, manifestSha },
+  { apiRuntimeSha, developerPlatformSha, manifestSha },
   description,
 ) {
   if (
@@ -60,7 +60,7 @@ function assertCommonEvidence(
     !sha40.test(String(evidence.developerPlatformRef || '')) ||
     !sha40.test(String(evidence.producerAppSha || '')) ||
     !sha64.test(String(evidence.contractManifestSha256 || '')) ||
-    evidence.apiTag !== apiSourceCommit ||
+    evidence.apiTag !== apiRuntimeSha ||
     evidence.developerPlatformRef !== developerPlatformSha ||
     evidence.contractManifestSha256 !== manifestSha
   ) {
@@ -70,6 +70,7 @@ function assertCommonEvidence(
 
 export function verifyProductionReleaseEvidence({
   apiSourceCommit,
+  apiRuntimeSha,
   deCanaryEvidence,
   deCanaryRun,
   developerPlatformSha,
@@ -80,6 +81,9 @@ export function verifyProductionReleaseEvidence({
 }) {
   if (!sha40.test(String(apiSourceCommit || ''))) {
     fail('expected OpenAPI source commit is malformed')
+  }
+  if (!sha40.test(String(apiRuntimeSha || ''))) {
+    fail('expected API runtime SHA is malformed')
   }
   if (!sha40.test(String(developerPlatformSha || ''))) {
     fail('expected Developer Platform SHA is malformed')
@@ -97,7 +101,7 @@ export function verifyProductionReleaseEvidence({
   )
   assertCommonEvidence(
     usPromotionEvidence,
-    { apiSourceCommit, developerPlatformSha, manifestSha },
+    { apiRuntimeSha, developerPlatformSha, manifestSha },
     'US promotion evidence',
   )
   if (
@@ -110,22 +114,26 @@ export function verifyProductionReleaseEvidence({
 
   const deRunUrl = `https://github.com/TeamGrid/teamgrid/actions/runs/${usPromotionEvidence.sourceDeCanaryRunId}`
   assertRun(deCanaryRun, { name: 'Deploy DE production canary', runUrl: deRunUrl })
-  assertExactKeys(deCanaryEvidence, [
-    ...commonEvidenceKeys,
-    'automationWorkerRuntime',
-    'automationWorkerTag',
-    'jobSchedulerTag',
-    'jobWorkerRuntime',
-    'releaseReason',
-    'schedulingWorkerRuntime',
-    'schedulingWorkerTag',
-    'searchSyncRuntime',
-    'stagingRunUrl',
-    'workerTag',
-  ], 'DE canary evidence')
+  assertExactKeys(
+    deCanaryEvidence,
+    [
+      ...commonEvidenceKeys,
+      'automationWorkerRuntime',
+      'automationWorkerTag',
+      'jobSchedulerTag',
+      'jobWorkerRuntime',
+      'releaseReason',
+      'schedulingWorkerRuntime',
+      'schedulingWorkerTag',
+      'searchSyncRuntime',
+      'stagingRunUrl',
+      'workerTag',
+    ],
+    'DE canary evidence',
+  )
   assertCommonEvidence(
     deCanaryEvidence,
-    { apiSourceCommit, developerPlatformSha, manifestSha },
+    { apiRuntimeSha, developerPlatformSha, manifestSha },
     'DE canary evidence',
   )
   if (
@@ -151,6 +159,7 @@ export function verifyProductionReleaseEvidence({
   }
 
   return {
+    apiSourceCommit,
     apiTag: usPromotionEvidence.apiTag,
     appTag: usPromotionEvidence.appTag,
     deCanaryRunId: String(deCanaryRun.id),
@@ -173,6 +182,7 @@ function readJson(path) {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const result = verifyProductionReleaseEvidence({
     apiSourceCommit: readJson(new URL('../../openapi/source.json', import.meta.url)).sourceCommit,
+    apiRuntimeSha: requiredEnvironment('EXPECTED_API_RUNTIME_SHA'),
     deCanaryEvidence: readJson(requiredEnvironment('DE_CANARY_EVIDENCE_PATH')),
     deCanaryRun: readJson(requiredEnvironment('DE_CANARY_RUN_PATH')),
     developerPlatformSha: requiredEnvironment('EXPECTED_DEVELOPER_PLATFORM_SHA'),
@@ -181,5 +191,8 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     usPromotionEvidence: readJson(requiredEnvironment('US_PROMOTION_EVIDENCE_PATH')),
     usPromotionRun: readJson(requiredEnvironment('US_PROMOTION_RUN_PATH')),
   })
-  console.log(`Verified production release chain for App ${result.appTag}.`)
+  console.log(
+    `Verified production release chain for App ${result.appTag}, API runtime ${result.apiTag}, ` +
+      `and API contract source ${result.apiSourceCommit}.`,
+  )
 }

@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { verifyProductionReleaseEvidence } from './verify-production-release-evidence.mjs'
 
 const appSha = 'a'.repeat(40)
-const apiSha = 'b'.repeat(40)
+const apiRuntimeSha = '810b24b98d73dffbca21643cfe267d27cf988f1e'
+const apiSourceCommit = '96fe8ca0d9aefd68a8cb602ab7cf14a652e9e6f4'
 const developerPlatformSha = 'c'.repeat(40)
 const manifestSha = 'd'.repeat(64)
 const deRunId = '321'
@@ -12,7 +13,7 @@ const usRunUrl = `https://github.com/TeamGrid/teamgrid/actions/runs/${usRunId}`
 
 function fixtures() {
   const common = {
-    apiTag: apiSha,
+    apiTag: apiRuntimeSha,
     appTag: appSha,
     contractManifestSha256: manifestSha,
     developerPlatformRef: developerPlatformSha,
@@ -21,7 +22,8 @@ function fixtures() {
     schemaVersion: 5,
   }
   return {
-    apiSourceCommit: apiSha,
+    apiRuntimeSha,
+    apiSourceCommit,
     deCanaryEvidence: {
       ...common,
       automationWorkerRuntime: 'current',
@@ -61,7 +63,8 @@ function fixtures() {
 describe('npm production release evidence', () => {
   it('accepts one exact successful Staging-to-DE-to-US release chain', () => {
     expect(verifyProductionReleaseEvidence(fixtures())).toEqual({
-      apiTag: apiSha,
+      apiSourceCommit,
+      apiTag: apiRuntimeSha,
       appTag: appSha,
       deCanaryRunId: deRunId,
       developerPlatformRef: developerPlatformSha,
@@ -99,11 +102,31 @@ describe('npm production release evidence', () => {
     }
   })
 
-  it('rejects production evidence whose API image differs from the OpenAPI source commit', () => {
+  it('accepts a runtime commit that differs from the OpenAPI contract source commit', () => {
     const value = fixtures()
-    value.apiSourceCommit = 'e'.repeat(40)
+    expect(value.apiRuntimeSha).not.toBe(value.apiSourceCommit)
+    expect(() => verifyProductionReleaseEvidence(value)).not.toThrow()
+  })
+
+  it('rejects production evidence whose API image differs from the expected runtime commit', () => {
+    const value = fixtures()
+    value.apiRuntimeSha = 'e'.repeat(40)
     expect(() => verifyProductionReleaseEvidence(value)).toThrow(
       'US promotion evidence revisions or contract are malformed',
+    )
+  })
+
+  it('rejects malformed contract-source and runtime revisions independently', () => {
+    const malformedSource = fixtures()
+    malformedSource.apiSourceCommit = 'not-a-source-sha'
+    expect(() => verifyProductionReleaseEvidence(malformedSource)).toThrow(
+      'expected OpenAPI source commit is malformed',
+    )
+
+    const malformedRuntime = fixtures()
+    malformedRuntime.apiRuntimeSha = 'not-a-runtime-sha'
+    expect(() => verifyProductionReleaseEvidence(malformedRuntime)).toThrow(
+      'expected API runtime SHA is malformed',
     )
   })
 
