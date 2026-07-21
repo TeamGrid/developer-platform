@@ -436,12 +436,13 @@ try {
 
   const customFieldDefinition = await client.customFieldDefinitions.create({
     configuration: { type: 'text' },
-    defaultEnabled: false,
+    defaultEnabled: true,
     fieldType: 'text',
     targetType: 'task',
     title: `Staging reference ${runId}`,
   }, { idempotencyKey: `staging-e2e-field-${runId}` })
   customFieldDefinitionId = customFieldDefinition.data.id
+  assert.equal(customFieldDefinition.data.attributes.defaultEnabled, true)
   const emptyCustomValue = await client.customFieldValues.get(
     'task',
     taskId,
