@@ -16,7 +16,7 @@ on:
           - next
           - latest
       production_release_run_url:
-        description: Successful TeamGrid multi-cell production run that promoted this exact contract.
+        description: Successful US production promotion that completed this exact DE-to-US contract release.
         required: true
         type: string
       confirm_ga:
@@ -77,32 +77,44 @@ jobs:
             exit 1
           }
           run_id="${PRODUCTION_RELEASE_RUN_URL##*/}"
-          [[ "$(gh run view "$run_id" --repo TeamGrid/teamgrid --json name --jq '.name')" == \
-            "Deploy multi-cell production" ]]
-          [[ "$(gh run view "$run_id" --repo TeamGrid/teamgrid --json conclusion --jq '.conclusion')" == \
-            "success" ]]
           evidence_dir="$RUNNER_TEMP/teamgrid-production-release"
-          mkdir -p "$evidence_dir"
-          gh run download "$run_id" --repo TeamGrid/teamgrid --dir "$evidence_dir"
-          manifest_path="$(find "$evidence_dir" -name manifest.json -type f -print -quit)"
-          [[ -n "$manifest_path" ]] || {
-            echo "The production run has no release manifest artifact." >&2
+          mkdir -p "$evidence_dir/us" "$evidence_dir/de"
+          us_run_path="$evidence_dir/us-run.json"
+          gh api "repos/TeamGrid/teamgrid/actions/runs/$run_id" > "$us_run_path"
+          gh run download "$run_id" --repo TeamGrid/teamgrid \
+            --name developer-platform-us-promotion-evidence --dir "$evidence_dir/us"
+          us_evidence_path="$evidence_dir/us/developer-platform-us-promotion-evidence.json"
+          [[ -f "$us_evidence_path" ]] || {
+            echo "The US production run has no immutable promotion evidence." >&2
             exit 1
           }
-          RELEASE_MANIFEST_PATH="$manifest_path" node --input-type=module <<'NODE'
-          import { createHash } from 'node:crypto'
-          import { readFileSync } from 'node:fs'
 
-          const release = JSON.parse(readFileSync(process.env.RELEASE_MANIFEST_PATH, 'utf8'))
-          const contract = readFileSync('../openapi/developer-platform-manifest.json')
-          const expectedHash = createHash('sha256').update(contract).digest('hex')
-          if (release.developerPlatform?.sourceGitSha !== process.env.GITHUB_SHA) {
-            throw new Error('Production did not qualify this exact developer-platform commit.')
+          de_run_id="$(jq -r '.sourceDeCanaryRunId // empty' "$us_evidence_path")"
+          [[ "$de_run_id" =~ ^[0-9]+$ ]] || {
+            echo "The US promotion evidence has no exact DE canary run id." >&2
+            exit 1
           }
-          if (release.developerPlatform?.contractManifestSha256 !== expectedHash) {
-            throw new Error('Production did not qualify this exact contract manifest.')
+          de_run_path="$evidence_dir/de-run.json"
+          gh api "repos/TeamGrid/teamgrid/actions/runs/$de_run_id" > "$de_run_path"
+          gh run download "$de_run_id" --repo TeamGrid/teamgrid \
+            --pattern 'teamgrid-multi-cell-release-*' --dir "$evidence_dir/de"
+          mapfile -t de_evidence_paths < <(
+            find "$evidence_dir/de" -type f -name promotion-evidence.json -print
+          )
+          [[ "${#de_evidence_paths[@]}" -eq 1 ]] || {
+            echo "The DE canary run must contain exactly one promotion evidence document." >&2
+            exit 1
           }
-          NODE
+
+          manifest_sha256="$(sha256sum ../openapi/developer-platform-manifest.json | awk '{print $1}')"
+          DE_CANARY_EVIDENCE_PATH="${de_evidence_paths[0]}" \
+          DE_CANARY_RUN_PATH="$de_run_path" \
+          EXPECTED_DEVELOPER_PLATFORM_SHA="$GITHUB_SHA" \
+          EXPECTED_MANIFEST_SHA256="$manifest_sha256" \
+          PRODUCTION_RELEASE_RUN_URL="$PRODUCTION_RELEASE_RUN_URL" \
+          US_PROMOTION_EVIDENCE_PATH="$us_evidence_path" \
+          US_PROMOTION_RUN_PATH="$us_run_path" \
+            node scripts/verify-production-release-evidence.mjs
 
       - name: Validate release
         env:

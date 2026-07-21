@@ -189,11 +189,13 @@ the `next` dist-tag; future stable releases use `latest`.
 
 To release, update all three package versions, commit and tag the exact source
 as `v<version>`. The same immutable developer-platform commit and contract
-manifest must first pass staging and be promoted by a successful
-`Deploy multi-cell production` run in `TeamGrid/teamgrid`. Dispatch `Stage npm
-release` from the tag with the matching version, dist-tag, and that production
-run URL. The workflow downloads the production release evidence and refuses to
-stage packages unless both the source SHA and contract-manifest SHA-256 match.
+manifest must first pass staging, the DE production canary, and the separate US
+production promotion in `TeamGrid/teamgrid`. Dispatch `Stage npm release` from
+the tag with the matching version, dist-tag, and successful `Promote qualified
+release to US production` run URL. The workflow verifies the exact US artifact,
+its cited DE-canary run and artifact, the App/API/Developer Platform revisions,
+and the contract-manifest SHA-256 as one immutable promotion chain before it can
+stage packages.
 It needs the `TEAMGRID_REPOSITORY_TOKEN` secret in the protected `npm`
 environment solely to read that private workflow run and its artifacts.
 
