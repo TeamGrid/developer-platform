@@ -23,7 +23,7 @@
     "dist"
   ],
   "bin": {
-    "teamgrid": "./dist/bin.js"
+    "teamgrid": "dist/bin.js"
   },
   "exports": {
     ".": {
