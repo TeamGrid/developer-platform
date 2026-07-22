@@ -23,7 +23,7 @@
     "dist"
   ],
   "bin": {
-    "teamgrid-mcp": "./dist/bin.js"
+    "teamgrid-mcp": "dist/bin.js"
   },
   "exports": {
     ".": {
