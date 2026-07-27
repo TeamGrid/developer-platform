@@ -2746,9 +2746,12 @@ export interface components {
                 archived: boolean;
                 billable: boolean | null;
                 billed: boolean;
+                /** Format: date-time */
+                billedAt: string | null;
                 comment: string;
                 /** Format: date-time */
                 createdAt: string | null;
+                createdById: string | null;
                 durationMinutes: number | null;
                 /** Format: date-time */
                 endAt: string | null;
@@ -2756,8 +2759,10 @@ export interface components {
                 /** Format: date-time */
                 startAt: string | null;
                 taskId: string;
+                trackingActive: boolean;
                 /** Format: date-time */
                 updatedAt: string | null;
+                updatedById: string | null;
                 userId: string;
             };
             id: string;
@@ -7835,8 +7840,16 @@ export interface operations {
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
+                /** @description Filter by billable status. */
+                billable?: boolean;
+                /** @description Filter by billed and therefore locked status. */
+                billed?: boolean;
+                /** @description Filter by creator id. */
+                createdById?: string;
                 /** @description Include entries starting at or after this time. */
                 from?: string;
+                /** @description Filter by service id. */
+                serviceId?: string;
                 /** @description Include entries starting at or before this time. */
                 to?: string;
                 /** @description Filter by task id. */

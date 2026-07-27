@@ -3023,11 +3023,24 @@
               "billed": {
                 "type": "boolean"
               },
+              "billedAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "comment": {
                 "type": "string"
               },
               "createdAt": {
                 "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdById": {
                 "type": [
                   "string",
                   "null"
@@ -3062,8 +3075,17 @@
               "taskId": {
                 "type": "string"
               },
+              "trackingActive": {
+                "type": "boolean"
+              },
               "updatedAt": {
                 "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "updatedById": {
                 "type": [
                   "string",
                   "null"
@@ -3077,14 +3099,18 @@
               "archived",
               "billable",
               "billed",
+              "billedAt",
               "comment",
               "createdAt",
+              "createdById",
               "durationMinutes",
               "endAt",
               "serviceId",
               "startAt",
               "taskId",
+              "trackingActive",
               "updatedAt",
+              "updatedById",
               "userId"
             ],
             "type": "object"
@@ -18241,11 +18267,45 @@
             }
           },
           {
+            "description": "Filter by billable status.",
+            "in": "query",
+            "name": "billable",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Filter by billed and therefore locked status.",
+            "in": "query",
+            "name": "billed",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Filter by creator id.",
+            "in": "query",
+            "name": "createdById",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
             "description": "Include entries starting at or after this time.",
             "in": "query",
             "name": "from",
             "schema": {
               "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by service id.",
+            "in": "query",
+            "name": "serviceId",
+            "schema": {
+              "maxLength": 128,
               "type": "string"
             }
           },

@@ -607,7 +607,11 @@ export type TaskListOptions = ListOptions &
 
 export type TimeEntryListOptions = ListOptions &
   ArchiveFilter & {
+    billable?: boolean
+    billed?: boolean
+    createdById?: string
     from?: string | Date
+    serviceId?: string
     taskId?: string
     to?: string | Date
     userId?: string

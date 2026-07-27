@@ -9,10 +9,10 @@
       "sha256": "872e6e40221c78ef0541edf786927f891c4c16022b652f9d05e70df33fae8e29"
     },
     {
-      "bytes": 62748,
+      "bytes": 62750,
       "id": "capability-ledger",
       "path": "contracts/developer-capabilities.json",
-      "sha256": "c4475f86e4ae247c45a70daa249ae2ba70a84ec2cef57af43dc347e764bc7df7"
+      "sha256": "7e0c813a652f75e3564048c6e42e5a493f7f3fdf1c6a2e7499f1ef16ba924141"
     },
     {
       "bytes": 132930,
@@ -45,10 +45,10 @@
       "sha256": "46da62dba5b8a459362f4edd3c74fed1dac92300c414e606dfa9f433120da947"
     },
     {
-      "bytes": 754812,
+      "bytes": 756401,
       "id": "openapi-v1",
       "path": "openapi/v1.json",
-      "sha256": "a38a47fb7af3ba1249fcf43e19f03fbbd80baae4030ba3c5fccf1dae92c4af31"
+      "sha256": "f92a3f9bbb51596ed1a07b9d79f62e3a2dc6c4595adfc1d9a0bb6a369b42f253"
     }
   ],
   "summary": {
