@@ -546,6 +546,12 @@ export type ListEnvelope<T> = TransportAware & {
   meta: PageMeta
 }
 
+export type AuditEventListEnvelope = ListEnvelope<AuditEvent> & {
+  meta: PageMeta & {
+    retentionDays: number
+  }
+}
+
 export type ListOptions = {
   cursor?: string
   limit?: number

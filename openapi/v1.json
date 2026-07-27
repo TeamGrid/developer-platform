@@ -23225,11 +23225,18 @@
                         },
                         "requestId": {
                           "type": "string"
+                        },
+                        "retentionDays": {
+                          "description": "Configured cell-local audit retention in days.",
+                          "maximum": 3650,
+                          "minimum": 30,
+                          "type": "integer"
                         }
                       },
                       "required": [
                         "page",
-                        "requestId"
+                        "requestId",
+                        "retentionDays"
                       ],
                       "type": "object"
                     }

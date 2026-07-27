@@ -194,6 +194,38 @@ describe('TeamGrid API client', () => {
     })
   })
 
+  it('exposes and validates cell-local audit retention metadata', async () => {
+    const fetch = vi.fn(async () =>
+      json({
+        data: [],
+        meta: {
+          page: { limit: 50, nextCursor: null },
+          requestId: 'request-audit',
+          retentionDays: 365,
+        },
+      }),
+    )
+    const client = new TeamGridClient({ fetch, token })
+    await expect(client.auditEvents.list()).resolves.toMatchObject({
+      data: [],
+      meta: { retentionDays: 365 },
+    })
+
+    fetch.mockImplementationOnce(async () =>
+      json({
+        data: [],
+        meta: {
+          page: { limit: 50, nextCursor: null },
+          requestId: 'request-audit-invalid',
+          retentionDays: 0,
+        },
+      }),
+    )
+    await expect(client.auditEvents.list()).rejects.toMatchObject({
+      code: 'invalid_api_response',
+    })
+  })
+
   it('derives a regional endpoint without exposing the credential secret', () => {
     expect(parseCredentialLocation(token)).toEqual({
       cellId: 'us-mnz-001',

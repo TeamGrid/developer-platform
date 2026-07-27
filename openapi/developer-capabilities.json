@@ -248,7 +248,7 @@
     { "id": "reports.jobs", "family": "search-analytics", "classification": "public-service", "status": "planned", "wave": 3 },
     { "id": "exports.jobs", "family": "search-analytics", "classification": "public-service", "status": "released", "wave": 2 },
     { "id": "imports.jobs", "family": "search-analytics", "classification": "admin", "status": "planned", "wave": 3 },
-    { "id": "audit.read", "family": "events-governance", "classification": "admin", "status": "partial", "wave": 0 },
+    { "id": "audit.read", "family": "events-governance", "classification": "admin", "status": "released", "wave": 0 },
     { "id": "audit.export", "family": "events-governance", "classification": "admin", "status": "planned", "wave": 2 },
     { "id": "events.catalog", "family": "events-governance", "classification": "public-service", "status": "released", "wave": 1 },
     { "id": "events.change-feed", "family": "events-governance", "classification": "public-service", "status": "partial", "wave": 1 },

@@ -9830,6 +9830,8 @@ export interface operations {
                                 nextCursor: string | null;
                             };
                             requestId: string;
+                            /** @description Configured cell-local audit retention in days. */
+                            retentionDays: number;
                         };
                     };
                 };

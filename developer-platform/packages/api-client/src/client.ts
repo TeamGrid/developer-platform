@@ -71,6 +71,7 @@ import type {
   AppointmentMutationOptions,
   AppointmentUpdate,
   AuditEvent,
+  AuditEventListEnvelope,
   AuditEventListOptions,
   AutomationDefinitionCreate,
   AutomationDefinitionListOptions,
@@ -638,6 +639,21 @@ function assertPage<T>(value: unknown, expectedTypes: string[]): ListEnvelope<T>
     assertResourceValue(resource, expectedTypes)
   })
   return value as ListEnvelope<T>
+}
+
+function assertAuditEventPage(value: ListEnvelope<AuditEvent>): AuditEventListEnvelope {
+  const retentionDays = (value.meta as { retentionDays?: unknown }).retentionDays
+  if (
+    !Number.isSafeInteger(retentionDays) ||
+    (retentionDays as number) < 30 ||
+    (retentionDays as number) > 3_650
+  ) {
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'Expected TeamGrid audit retention metadata.',
+    )
+  }
+  return value as AuditEventListEnvelope
 }
 
 function assertResource<T>(value: unknown, expectedTypes: string[]): ResourceEnvelope<T> {
@@ -2249,7 +2265,8 @@ export class TeamGridClient {
         this.#update<Tag>(`/tags/${encodeURIComponent(id)}`, data, options),
     }
     this.auditEvents = {
-      list: (options?: AuditEventListOptions) => this.#page<AuditEvent>('/audit-events', options),
+      list: async (options?: AuditEventListOptions) =>
+        assertAuditEventPage(await this.#page<AuditEvent>('/audit-events', options)),
       pages: (options?: AuditEventListOptions, pagination?: PaginationOptions) =>
         this.#pages<AuditEvent>('/audit-events', options, pagination),
     }
