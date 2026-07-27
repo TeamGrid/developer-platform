@@ -1,6 +1,6 @@
 import { TeamGridClientError } from './errors.js'
 
-const tokenPattern = /^tg_sk_v1_([a-z0-9-]+)_([a-z0-9-]+)_([a-f0-9]{24})_([a-f0-9]{64})$/
+const tokenPattern = /^(?:tg_sk_v1|tg_pat_v2|tg_sa_v2)_([a-z0-9-]+)_([a-z0-9-]+)_([a-f0-9]{24})_([a-f0-9]{64})$/
 const locationPattern = /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/
 
 export type CredentialLocation = Readonly<{
@@ -14,7 +14,7 @@ export function parseCredentialLocation(token: string): CredentialLocation {
   if (!match) {
     throw new TeamGridClientError(
       'invalid_credential',
-      'Expected a TeamGrid Developer Platform credential in tg_sk_v1_… format.',
+      'Expected a TeamGrid Developer Platform credential in a supported TeamGrid token format.',
     )
   }
   const region = match[1]

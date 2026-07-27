@@ -227,11 +227,17 @@ describe('TeamGrid API client', () => {
   })
 
   it('derives a regional endpoint without exposing the credential secret', () => {
-    expect(parseCredentialLocation(token)).toEqual({
-      cellId: 'us-mnz-001',
-      credentialId: '0123456789abcdef01234567',
-      region: 'us',
-    })
+    for (const routedToken of [
+      token,
+      token.replace('tg_sk_v1_', 'tg_pat_v2_'),
+      token.replace('tg_sk_v1_', 'tg_sa_v2_'),
+    ]) {
+      expect(parseCredentialLocation(routedToken)).toEqual({
+        cellId: 'us-mnz-001',
+        credentialId: '0123456789abcdef01234567',
+        region: 'us',
+      })
+    }
     expect(buildRegionalApiBaseUrl('us')).toBe('https://api.us.teamgrid.app/v1')
     expect(normalizeApiBaseUrl('http://localhost:2201/v1/')).toBe('http://localhost:2201/v1')
     expect(normalizeApiBaseUrl('http://[::1]:2201/v1/')).toBe('http://[::1]:2201/v1')
