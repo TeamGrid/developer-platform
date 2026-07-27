@@ -2582,6 +2582,9 @@ export interface components {
                 groupId: string | null;
                 listId: string | null;
                 name: string;
+                order: number | null;
+                personalListId: string | null;
+                personalListOrder: number | null;
                 /** Format: date-time */
                 plannedEndAt: string | null;
                 plannedMinutes: number | null;
@@ -2590,6 +2593,12 @@ export interface components {
                 projectId: string | null;
                 serviceId: string | null;
                 subscriberIds: string[];
+                subtasks: {
+                    completed: boolean;
+                    id: string;
+                    order: number | null;
+                    title: string;
+                }[];
                 tagIds: string[];
                 /** Format: date-time */
                 updatedAt: string | null;

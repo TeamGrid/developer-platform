@@ -2374,6 +2374,24 @@
               "name": {
                 "type": "string"
               },
+              "order": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "personalListId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "personalListOrder": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
               "plannedEndAt": {
                 "format": "date-time",
                 "type": [
@@ -2412,6 +2430,40 @@
                 },
                 "type": "array"
               },
+              "subtasks": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "completed": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "maxLength": 128,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "order": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "title": {
+                      "maxLength": 5000,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "completed",
+                    "order"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 500,
+                "type": "array"
+              },
               "tagIds": {
                 "items": {
                   "type": "string"
@@ -2437,12 +2489,16 @@
               "groupId",
               "listId",
               "name",
+              "order",
+              "personalListId",
+              "personalListOrder",
               "plannedEndAt",
               "plannedMinutes",
               "plannedStartAt",
               "projectId",
               "serviceId",
               "subscriberIds",
+              "subtasks",
               "tagIds",
               "updatedAt"
             ],
