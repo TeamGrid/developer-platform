@@ -913,6 +913,56 @@ describe('TeamGrid API client', () => {
     ).rejects.toMatchObject({ code: 'invalid_arguments' })
   })
 
+  it('batch reads custom-field values in exact requested order and rejects drift', async () => {
+    const fieldIds = ['field2', 'field1']
+    const resource = (fieldId: string, suffix: string) => ({
+      attributes: {
+        fieldId,
+        fieldType: 'text',
+        resourceId: 'project-1',
+        revision: `cfv1-${suffix.repeat(64)}`,
+        state: 'unset',
+        targetType: 'project',
+      },
+      id: `cfv_${suffix.repeat(64)}`,
+      type: 'customFieldValue',
+    })
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input))
+      expect(url.pathname).toBe('/v1/custom-field-values/project/project-1/batch-read')
+      expect(init?.method).toBe('POST')
+      expect(JSON.parse(String(init?.body))).toEqual({ fieldIds })
+      return json({
+        data: [resource('field2', '2'), resource('field1', '1')],
+        meta: { requestId: 'custom-value-batch' },
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(
+      client.customFieldValues.getMany('project', 'project-1', fieldIds),
+    ).resolves.toMatchObject({
+      data: [{ attributes: { fieldId: 'field2' } }, { attributes: { fieldId: 'field1' } }],
+      meta: { requestId: 'custom-value-batch' },
+    })
+    await expect(
+      client.customFieldValues.getMany('project', 'project-1', ['field1', 'field1']),
+    ).rejects.toMatchObject({ code: 'invalid_arguments' })
+    expect(fetch).toHaveBeenCalledTimes(1)
+
+    const reordered = new TeamGridClient({
+      fetch: vi.fn(async () =>
+        json({
+          data: [resource('field1', '1'), resource('field2', '2')],
+          meta: { requestId: 'custom-value-batch-drift' },
+        }),
+      ),
+      token,
+    })
+    await expect(
+      reordered.customFieldValues.getMany('project', 'project-1', fieldIds),
+    ).rejects.toMatchObject({ code: 'invalid_api_response' })
+  })
+
   it('supports project-template lifecycle and credential-owned instantiation polling', async () => {
     const template = projectTemplateResource()
     const pending = {

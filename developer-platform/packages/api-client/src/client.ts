@@ -100,6 +100,7 @@ import type {
   CustomFieldDefinitionListOptions,
   CustomFieldDefinitionUpdate,
   CustomFieldValue,
+  CustomFieldValueBatchEnvelope,
   CustomFieldValueMutation,
   CustomFieldValueMutationOptions,
   CustomFieldValueSet,
@@ -558,6 +559,15 @@ function customFieldValuePath(
   ].join('/')
 }
 
+function customFieldValueBatchPath(targetType: CustomFieldValueTargetType, resourceId: string) {
+  return [
+    '/custom-field-values',
+    encodeURIComponent(targetType),
+    encodeURIComponent(resourceId),
+    'batch-read',
+  ].join('/')
+}
+
 function expectedResourceTypes(path: string) {
   if (/^\/file-upload-intents\/[^/]+\/finalize$/.test(path)) return ['file']
   if (/^\/file-upload-intents\/[^/]+$/.test(path)) return ['fileUploadIntent']
@@ -667,6 +677,41 @@ function assertResource<T>(value: unknown, expectedTypes: string[]): ResourceEnv
   }
   assertResourceValue(value.data, expectedTypes)
   return value as ResourceEnvelope<T>
+}
+
+function assertCustomFieldValueBatch(
+  value: unknown,
+  fieldIds: readonly string[],
+): CustomFieldValueBatchEnvelope {
+  if (
+    !hasExactKeys(value, ['data', 'meta']) ||
+    !Array.isArray(value.data) ||
+    value.data.length !== fieldIds.length ||
+    !hasExactKeys(value.meta, ['requestId']) ||
+    typeof value.meta.requestId !== 'string'
+  ) {
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'Expected an order-preserving TeamGrid custom-field-value batch envelope.',
+    )
+  }
+  const publicIds = new Set<string>()
+  value.data.forEach((resource, index) => {
+    assertResourceValue(resource, ['customFieldValue'])
+    if (
+      !isObject(resource) ||
+      !isObject(resource.attributes) ||
+      resource.attributes.fieldId !== fieldIds[index] ||
+      publicIds.has(resource.id as string)
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'Custom-field-value batch results must be unique and preserve requested field order.',
+      )
+    }
+    publicIds.add(resource.id as string)
+  })
+  return value as CustomFieldValueBatchEnvelope
 }
 
 function assertApiVersion(value: unknown): ApiVersionEnvelope {
@@ -2109,6 +2154,33 @@ export class TeamGridClient {
           customFieldValuePath(targetType, resourceId, fieldId),
           options,
         ),
+      getMany: async (
+        targetType: CustomFieldValueTargetType,
+        resourceId: string,
+        fieldIds: string[],
+        options?: RequestOptions,
+      ) => {
+        if (
+          fieldIds.length < 1 ||
+          fieldIds.length > 100 ||
+          new Set(fieldIds).size !== fieldIds.length ||
+          fieldIds.some((fieldId) => !/^[A-Za-z0-9]{1,128}$/.test(fieldId))
+        ) {
+          throw new TeamGridClientError(
+            'invalid_arguments',
+            'fieldIds must contain between 1 and 100 unique canonical field ids.',
+          )
+        }
+        const response = await this.#request(customFieldValueBatchPath(targetType, resourceId), {
+          ...options,
+          body: { fieldIds },
+          method: 'POST',
+        })
+        return attachTransport(
+          assertCustomFieldValueBatch(response.payload, fieldIds),
+          response.transport,
+        )
+      },
       set: (
         targetType: CustomFieldValueTargetType,
         resourceId: string,

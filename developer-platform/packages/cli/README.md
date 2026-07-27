@@ -12,6 +12,8 @@ teamgrid services update service-id --data '{"billingRate":175}'
 teamgrid tags archive tag-id --yes
 teamgrid custom-field-values set project project-id field-id \
   --data '{"value":"ACME-42"}' --if-match "$REVISION" --output json
+teamgrid custom-field-values get-many project project-id \
+  --field-id field-id another-field-id --output json
 teamgrid project-templates instantiate template-id \
   --data @project.json --idempotency-key rollout-1 --wait --output json
 teamgrid planned-work replace task-id --data @schedule.json \

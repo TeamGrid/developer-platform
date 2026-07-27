@@ -34,6 +34,11 @@ latest resource first and pass its revision explicitly; the SDK sends a strong `
 
 ```ts
 const current = await teamgrid.customFieldValues.get('project', 'project-id', 'field-id')
+const values = await teamgrid.customFieldValues.getMany(
+  'project',
+  'project-id',
+  ['field-id', 'another-field-id'],
+)
 await teamgrid.customFieldValues.set(
   'project',
   'project-id',

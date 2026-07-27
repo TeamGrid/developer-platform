@@ -1550,6 +1550,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/custom-field-values/{targetType}/{resourceId}/batch-read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Read custom-field values for one resource
+         * @description The cell-local App re-authenticates the credential and additionally requires a target-domain scope selected by targetType: contacts:read/write, projects:read/write, project-statements:read/write, or tasks:read/write. Reading a contact, project, tag, or user reference field, and validating a newly set reference, also requires the matching contacts:read, projects:read, tags:read, or users:read scope. Invalid legacy values are classified without exposing their payload. Batch reads accept 1–100 unique field ids for one resource and preserve request order.
+         */
+        post: operations["getCustomFieldValues"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/custom-field-values/{targetType}/{resourceId}/{fieldId}": {
         parameters: {
             query?: never;
@@ -3214,6 +3234,9 @@ export interface components {
             id: string;
             /** @constant */
             type: "customFieldValue";
+        };
+        CustomFieldValueBatchRead: {
+            fieldIds: string[];
         };
         CustomFieldValueSet: {
             value: components["schemas"]["CustomFieldValueValue"];
@@ -9642,6 +9665,44 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["CustomFieldDefinition"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getCustomFieldValues: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                targetType: components["parameters"]["CustomFieldValueTargetType"];
+                resourceId: components["parameters"]["CustomFieldValueResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomFieldValueBatchRead"];
+            };
+        };
+        responses: {
+            /** @description Current value states in the same order as fieldIds. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CustomFieldValue"][];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };

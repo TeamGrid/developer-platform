@@ -1064,6 +1064,41 @@ describe('TeamGrid CLI', () => {
     })
   })
 
+  it('batch reads bounded custom-field ids through the dedicated SDK method', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const getMany = vi.fn(async () => ({
+      data: [
+        { attributes: { fieldId: 'field2' }, id: `cfv_${'2'.repeat(64)}` },
+        { attributes: { fieldId: 'field1' }, id: `cfv_${'1'.repeat(64)}` },
+      ],
+      meta: { requestId: 'custom-field-values-batch' },
+    }))
+    const output = capture()
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          'custom-field-values',
+          'get-many',
+          'project',
+          'project-1',
+          '--field-id',
+          'field2',
+          'field1',
+        ],
+        {
+          clientFactory: () => ({ customFieldValues: { getMany } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          output: output.stream,
+        },
+      ),
+    ).toBe(0)
+    expect(getMany).toHaveBeenCalledWith('project', 'project-1', ['field2', 'field1'])
+    expect(output.value()).toContain('field2')
+  })
+
   it('filters templates and can wait for a credential-owned instantiation', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
     const list = vi.fn(async () => ({

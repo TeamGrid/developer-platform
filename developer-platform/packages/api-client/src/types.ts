@@ -31,6 +31,7 @@ export type CustomFieldDefinition = components['schemas']['CustomFieldDefinition
 export type CustomFieldDefinitionCreate = components['schemas']['CustomFieldDefinitionCreate']
 export type CustomFieldDefinitionUpdate = components['schemas']['CustomFieldDefinitionUpdate']
 export type CustomFieldValue = components['schemas']['CustomFieldValue']
+export type CustomFieldValueBatchRead = components['schemas']['CustomFieldValueBatchRead']
 export type CustomFieldValueMutation = components['schemas']['CustomFieldValueMutation']
 export type CustomFieldValueSet = components['schemas']['CustomFieldValueSet']
 export type CustomFieldValueTargetType = CustomFieldValue['attributes']['targetType']
@@ -538,6 +539,11 @@ export type PageMeta = RequestMeta & {
 
 export type ResourceEnvelope<T> = TransportAware & {
   data: T
+  meta: RequestMeta
+}
+
+export type CustomFieldValueBatchEnvelope = TransportAware & {
+  data: CustomFieldValue[]
   meta: RequestMeta
 }
 

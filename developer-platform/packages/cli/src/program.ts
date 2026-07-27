@@ -1445,6 +1445,21 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       )
     })
   customFieldValues
+    .command('get-many <target-type> <resource-id>')
+    .requiredOption('--field-id <ids...>', 'one to 100 custom-field definition ids')
+    .action(async function action(
+      targetType: 'contact' | 'project' | 'project-journal-entry' | 'task',
+      resourceId: string,
+      options: { fieldId: string[] },
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.customFieldValues.getMany(targetType, resourceId, options.fieldId)).data,
+      )
+    })
+  customFieldValues
     .command('set <target-type> <resource-id> <field-id>')
     .requiredOption('--data <json|@file|->', 'custom-field value JSON, for example {"value":"A"}')
     .requiredOption(
