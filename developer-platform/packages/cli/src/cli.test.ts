@@ -691,6 +691,35 @@ describe('TeamGrid CLI', () => {
 
   it.each([
     [
+      'tasks',
+      'tasks',
+      [
+        '--contact-id',
+        'contact-1',
+        '--group-id',
+        'group-1',
+        '--list-id',
+        'list-1',
+        '--personal-list-id',
+        'personal-list-1',
+        '--service-id',
+        'service-1',
+        '--subscriber-id',
+        'subscriber-1',
+        '--tag-id',
+        'tag-1',
+      ],
+      {
+        contactId: 'contact-1',
+        groupId: 'group-1',
+        listId: 'list-1',
+        personalListId: 'personal-list-1',
+        serviceId: 'service-1',
+        subscriberId: 'subscriber-1',
+        tagId: 'tag-1',
+      },
+    ],
+    [
       'products',
       'products',
       ['--disabled', 'false', '--product-group-id', 'group-1'],

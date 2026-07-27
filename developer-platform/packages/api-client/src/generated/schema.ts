@@ -2668,19 +2668,30 @@ export interface components {
         Task: {
             attributes: {
                 archived: boolean;
+                /** Format: date-time */
+                archivedAt: string | null;
                 assigneeId: string | null;
                 billable: boolean | null;
                 completed: boolean;
                 /** Format: date-time */
+                completedAt: string | null;
+                completedById: string | null;
+                commentsCount: number;
+                contactId: string | null;
+                /** Format: date-time */
                 createdAt: string | null;
+                createdById: string | null;
                 description: string;
                 developerRevision: string;
                 /** Format: date-time */
                 developerUpdatedAt: string;
+                duplicateOfTaskId: string | null;
                 /** Format: date-time */
                 dueAt: string | null;
+                filesCount: number;
                 groupId: string | null;
                 listId: string | null;
+                listOrder: number | null;
                 name: string;
                 order: number | null;
                 personalListId: string | null;
@@ -2693,6 +2704,7 @@ export interface components {
                 projectId: string | null;
                 serviceId: string | null;
                 subscriberIds: string[];
+                subtasksCount: number;
                 subtasks: {
                     completed: boolean;
                     id: string;
@@ -2700,6 +2712,7 @@ export interface components {
                     title: string;
                 }[];
                 tagIds: string[];
+                trackingActive: boolean;
                 /** Format: date-time */
                 updatedAt: string | null;
             };
@@ -7220,8 +7233,22 @@ export interface operations {
                 assigneeId?: string;
                 /** @description Filter by completion status. */
                 completed?: boolean;
+                /** @description Filter by related contact id. */
+                contactId?: string;
+                /** @description Filter by assigned group id. */
+                groupId?: string;
+                /** @description Filter by project task-list id. */
+                listId?: string;
+                /** @description Filter by personal-list id. */
+                personalListId?: string;
                 /** @description Filter by project id. */
                 projectId?: string;
+                /** @description Filter by service id. */
+                serviceId?: string;
+                /** @description Filter by subscriber user id. */
+                subscriberId?: string;
+                /** @description Filter by tag id. */
+                tagId?: string;
             };
             header?: never;
             path?: never;

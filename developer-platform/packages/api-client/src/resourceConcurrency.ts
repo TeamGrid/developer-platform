@@ -95,16 +95,25 @@ export const taskValidator = (value: unknown): value is Task =>
     if (
       !hasExactKeys(attributes, [
         'archived',
+        'archivedAt',
         'assigneeId',
         'billable',
         'completed',
+        'completedAt',
+        'completedById',
+        'commentsCount',
+        'contactId',
         'createdAt',
+        'createdById',
         'description',
         'developerRevision',
         'developerUpdatedAt',
+        'duplicateOfTaskId',
         'dueAt',
+        'filesCount',
         'groupId',
         'listId',
+        'listOrder',
         'name',
         'order',
         'personalListId',
@@ -115,8 +124,10 @@ export const taskValidator = (value: unknown): value is Task =>
         'projectId',
         'serviceId',
         'subscriberIds',
+        'subtasksCount',
         'subtasks',
         'tagIds',
+        'trackingActive',
         'updatedAt',
       ])
     ) {
@@ -124,17 +135,28 @@ export const taskValidator = (value: unknown): value is Task =>
     }
     return (
       typeof attributes.archived === 'boolean' &&
+      nullableDate(attributes.archivedAt) &&
       nullableId(attributes.assigneeId) &&
       (attributes.billable === null || typeof attributes.billable === 'boolean') &&
       typeof attributes.completed === 'boolean' &&
+      nullableDate(attributes.completedAt) &&
+      nullableId(attributes.completedById) &&
+      Number.isSafeInteger(attributes.commentsCount) &&
+      (attributes.commentsCount as number) >= 0 &&
+      nullableId(attributes.contactId) &&
       nullableDate(attributes.createdAt) &&
+      nullableId(attributes.createdById) &&
       typeof attributes.description === 'string' &&
       typeof attributes.developerRevision === 'string' &&
       developerRevisionPattern.test(attributes.developerRevision) &&
       canonicalDate(attributes.developerUpdatedAt) &&
+      nullableId(attributes.duplicateOfTaskId) &&
       nullableDate(attributes.dueAt) &&
+      Number.isSafeInteger(attributes.filesCount) &&
+      (attributes.filesCount as number) >= 0 &&
       nullableId(attributes.groupId) &&
       nullableId(attributes.listId) &&
+      finiteNumberOrNull(attributes.listOrder) &&
       typeof attributes.name === 'string' &&
       finiteNumberOrNull(attributes.order) &&
       nullableId(attributes.personalListId) &&
@@ -145,6 +167,8 @@ export const taskValidator = (value: unknown): value is Task =>
       nullableId(attributes.projectId) &&
       nullableId(attributes.serviceId) &&
       stringArray(attributes.subscriberIds) &&
+      Number.isSafeInteger(attributes.subtasksCount) &&
+      (attributes.subtasksCount as number) >= 0 &&
       Array.isArray(attributes.subtasks) &&
       attributes.subtasks.every(
         (subtask) =>
@@ -156,6 +180,7 @@ export const taskValidator = (value: unknown): value is Task =>
           Number.isFinite(subtask.order),
       ) &&
       stringArray(attributes.tagIds) &&
+      typeof attributes.trackingActive === 'boolean' &&
       nullableDate(attributes.updatedAt)
     )
   })

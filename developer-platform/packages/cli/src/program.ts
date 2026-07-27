@@ -840,6 +840,13 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     .option('--completed <boolean>', 'filter completion', booleanValue)
     .option('--project-id <id>', 'filter by project')
     .option('--assignee-id <id>', 'filter by assignee')
+    .option('--contact-id <id>', 'filter by contact')
+    .option('--group-id <id>', 'filter by group')
+    .option('--list-id <id>', 'filter by task list')
+    .option('--personal-list-id <id>', 'filter by personal list')
+    .option('--service-id <id>', 'filter by service')
+    .option('--subscriber-id <id>', 'filter by subscriber')
+    .option('--tag-id <id>', 'filter by tag')
     .action(async function action(options, command: Command) {
       const client = await loadClient(command)
       await listResources(command, options, client.tasks as never)

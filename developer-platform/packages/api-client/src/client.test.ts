@@ -16,16 +16,25 @@ function taskResource(overrides: Record<string, unknown> = {}) {
   return {
     attributes: {
       archived: false,
+      archivedAt: null,
       assigneeId: null,
       billable: null,
       completed: false,
+      completedAt: null,
+      completedById: null,
+      commentsCount: 0,
+      contactId: null,
       createdAt: fixtureDate,
+      createdById: null,
       description: '',
       developerRevision,
       developerUpdatedAt: fixtureDate,
+      duplicateOfTaskId: null,
       dueAt: null,
+      filesCount: 0,
       groupId: null,
       listId: null,
+      listOrder: null,
       name: 'Task',
       order: null,
       personalListId: null,
@@ -36,8 +45,10 @@ function taskResource(overrides: Record<string, unknown> = {}) {
       projectId: null,
       serviceId: null,
       subscriberIds: [],
+      subtasksCount: 0,
       subtasks: [],
       tagIds: [],
+      trackingActive: false,
       updatedAt: fixtureDate,
       ...overrides,
     },
@@ -147,7 +158,17 @@ describe('TeamGrid API client', () => {
     const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = new URL(String(input))
       expect(`${url.origin}${url.pathname}`).toBe('https://api.us.teamgrid.app/v1/tasks')
-      expect(Object.fromEntries(url.searchParams)).toEqual({ completed: 'false', limit: '1' })
+      expect(Object.fromEntries(url.searchParams)).toEqual({
+        completed: 'false',
+        contactId: 'contact-1',
+        groupId: 'group-1',
+        limit: '1',
+        listId: 'list-1',
+        personalListId: 'personal-list-1',
+        serviceId: 'service-1',
+        subscriberId: 'subscriber-1',
+        tagId: 'tag-1',
+      })
       const headers = new Headers(init?.headers)
       expect(headers.get('authorization')).toBe(`Bearer ${token}`)
       expect(headers.get('x-request-id')).toBe('client-request')
@@ -163,8 +184,15 @@ describe('TeamGrid API client', () => {
     const client = new TeamGridClient({ fetch, token })
     const page = await client.tasks.list({
       completed: false,
+      contactId: 'contact-1',
+      groupId: 'group-1',
       limit: 1,
+      listId: 'list-1',
+      personalListId: 'personal-list-1',
       requestId: 'client-request',
+      serviceId: 'service-1',
+      subscriberId: 'subscriber-1',
+      tagId: 'tag-1',
     })
     expect(page.meta.requestId).toBe('request-1')
     expect(page.data[0]?.id).toBe('task-1')

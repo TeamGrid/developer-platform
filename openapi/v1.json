@@ -2629,6 +2629,13 @@
               "archived": {
                 "type": "boolean"
               },
+              "archivedAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "assigneeId": {
                 "type": [
                   "string",
@@ -2644,8 +2651,40 @@
               "completed": {
                 "type": "boolean"
               },
+              "completedAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "completedById": {
+                "maxLength": 128,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "commentsCount": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "contactId": {
+                "maxLength": 128,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "createdAt": {
                 "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdById": {
+                "maxLength": 128,
                 "type": [
                   "string",
                   "null"
@@ -2662,12 +2701,23 @@
                 "format": "date-time",
                 "type": "string"
               },
+              "duplicateOfTaskId": {
+                "maxLength": 128,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "dueAt": {
                 "format": "date-time",
                 "type": [
                   "string",
                   "null"
                 ]
+              },
+              "filesCount": {
+                "minimum": 0,
+                "type": "integer"
               },
               "groupId": {
                 "type": [
@@ -2678,6 +2728,12 @@
               "listId": {
                 "type": [
                   "string",
+                  "null"
+                ]
+              },
+              "listOrder": {
+                "type": [
+                  "number",
                   "null"
                 ]
               },
@@ -2740,6 +2796,10 @@
                 },
                 "type": "array"
               },
+              "subtasksCount": {
+                "minimum": 0,
+                "type": "integer"
+              },
               "subtasks": {
                 "items": {
                   "additionalProperties": false,
@@ -2780,6 +2840,9 @@
                 },
                 "type": "array"
               },
+              "trackingActive": {
+                "type": "boolean"
+              },
               "updatedAt": {
                 "format": "date-time",
                 "type": [
@@ -2790,16 +2853,25 @@
             },
             "required": [
               "archived",
+              "archivedAt",
               "assigneeId",
               "billable",
               "completed",
+              "completedAt",
+              "completedById",
+              "commentsCount",
+              "contactId",
               "createdAt",
+              "createdById",
               "description",
               "developerRevision",
               "developerUpdatedAt",
+              "duplicateOfTaskId",
               "dueAt",
+              "filesCount",
               "groupId",
               "listId",
+              "listOrder",
               "name",
               "order",
               "personalListId",
@@ -2810,8 +2882,10 @@
               "projectId",
               "serviceId",
               "subscriberIds",
+              "subtasksCount",
               "subtasks",
               "tagIds",
+              "trackingActive",
               "updatedAt"
             ],
             "type": "object"
@@ -16663,9 +16737,72 @@
             }
           },
           {
+            "description": "Filter by related contact id.",
+            "in": "query",
+            "name": "contactId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by assigned group id.",
+            "in": "query",
+            "name": "groupId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by project task-list id.",
+            "in": "query",
+            "name": "listId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by personal-list id.",
+            "in": "query",
+            "name": "personalListId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
             "description": "Filter by project id.",
             "in": "query",
             "name": "projectId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by service id.",
+            "in": "query",
+            "name": "serviceId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by subscriber user id.",
+            "in": "query",
+            "name": "subscriberId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by tag id.",
+            "in": "query",
+            "name": "tagId",
             "schema": {
               "maxLength": 128,
               "type": "string"

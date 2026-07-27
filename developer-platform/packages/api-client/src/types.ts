@@ -589,7 +589,14 @@ export type TaskListOptions = ListOptions &
   ArchiveFilter & {
     assigneeId?: string
     completed?: boolean
+    contactId?: string
+    groupId?: string
+    listId?: string
+    personalListId?: string
     projectId?: string
+    serviceId?: string
+    subscriberId?: string
+    tagId?: string
   }
 
 export type TimeEntryListOptions = ListOptions &
