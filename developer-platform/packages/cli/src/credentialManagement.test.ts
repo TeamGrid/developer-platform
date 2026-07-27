@@ -91,6 +91,8 @@ describe('credential management CLI', () => {
         'service-accounts create',
         'service-accounts update',
         'service-accounts revoke',
+        'service-accounts grants get',
+        'service-accounts grants replace',
         'service-accounts credentials create',
         'service-accounts credentials rotate',
         'service-accounts credentials revoke',
@@ -221,5 +223,58 @@ describe('credential management CLI', () => {
     expect(result.code).toBe(2)
     expect(result.error).toContain('1–100 unique public scopes')
     expect(create).not.toHaveBeenCalled()
+  })
+
+  it('reads and safely replaces a complete service-account resource-grant set', async () => {
+    const serviceAccountId = 'e'.repeat(24)
+    const revision = `dgr1-${'a'.repeat(64)}`
+    const grantSet = {
+      data: {
+        attributes: { grants: [], policyVersion: 2, revision: 'b'.repeat(64) },
+        id: serviceAccountId,
+        type: 'serviceAccountResourceGrantSet',
+      },
+    }
+    const getResourceGrants = vi.fn(async () => grantSet)
+    const replaceResourceGrants = vi.fn(async () => grantSet)
+
+    const fetched = await execute(['service-accounts', 'grants', 'get', serviceAccountId], {
+      serviceAccounts: { getResourceGrants },
+    })
+    expect(fetched.code).toBe(0)
+    expect(getResourceGrants).toHaveBeenCalledWith(serviceAccountId)
+
+    const data =
+      '{"grants":[{"anchorType":"workspace","capabilities":["api.v1.getWorkspace"],' +
+      '"inheritance":"none","resourceKey":"workspace"}]}'
+    const replaced = await execute(
+      [
+        'service-accounts',
+        'grants',
+        'replace',
+        serviceAccountId,
+        '--data',
+        data,
+        '--if-match',
+        revision,
+        '--yes',
+      ],
+      { serviceAccounts: { replaceResourceGrants } },
+    )
+    expect(replaced.code).toBe(0)
+    expect(replaceResourceGrants).toHaveBeenCalledWith(
+      serviceAccountId,
+      {
+        grants: [
+          {
+            anchorType: 'workspace',
+            capabilities: ['api.v1.getWorkspace'],
+            inheritance: 'none',
+            resourceKey: 'workspace',
+          },
+        ],
+      },
+      revision,
+    )
   })
 })

@@ -105,4 +105,88 @@ describe('native credential SDK surfaces', () => {
       code: 'invalid_api_response',
     } satisfies Partial<TeamGridClientError>)
   })
+
+  it('reads and conditionally replaces exact service-account resource-grant sets', async () => {
+    const serviceAccountId = 'f'.repeat(24)
+    const firstRevision = 'a'.repeat(64)
+    const secondRevision = 'b'.repeat(64)
+    const requests: Request[] = []
+    const resource = (revision: string, policyVersion: number) => ({
+      attributes: {
+        grants: [
+          {
+            anchorId: null,
+            anchorType: 'workspace',
+            capabilities: ['api.v1.getWorkspace'],
+            expiresAt: null,
+            id: 'grant-1',
+            inheritance: 'none',
+            resourceKey: 'workspace',
+          },
+        ],
+        policyVersion,
+        revision,
+      },
+      id: serviceAccountId,
+      type: 'serviceAccountResourceGrantSet',
+    })
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const request = new Request(input, init)
+      requests.push(request)
+      const replacing = request.method === 'PUT'
+      const revision = replacing ? secondRevision : firstRevision
+      return envelope(resource(revision, replacing ? 2 : 1), 200, {
+        'cache-control': 'private, no-store, no-transform',
+        etag: `"dgr1-${revision}"`,
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+
+    const current = await client.serviceAccounts.getResourceGrants(serviceAccountId)
+    const replacement = {
+      grants: [
+        {
+          anchorType: 'workspace' as const,
+          capabilities: ['api.v1.getWorkspace'],
+          inheritance: 'none' as const,
+          resourceKey: 'workspace',
+        },
+      ],
+    }
+    const replaced = await client.serviceAccounts.replaceResourceGrants(
+      serviceAccountId,
+      replacement,
+      `"dgr1-${firstRevision}"`,
+    )
+
+    expect(current.data.attributes.policyVersion).toBe(1)
+    expect(replaced.data.attributes.policyVersion).toBe(2)
+    expect(requests[1]?.headers.get('if-match')).toBe(`"dgr1-${firstRevision}"`)
+    await expect(requests[1]?.json()).resolves.toEqual(replacement)
+  })
+
+  it('rejects malformed resource-grant replacements before transport', async () => {
+    const fetch = vi.fn()
+    const client = new TeamGridClient({ fetch, token })
+    await expect(
+      client.serviceAccounts.replaceResourceGrants(
+        'f'.repeat(24),
+        {
+          grants: [
+            {
+              anchorId: 'not-allowed',
+              anchorType: 'workspace',
+              capabilities: ['api.v1.getWorkspace'],
+              inheritance: 'none',
+              resourceKey: 'workspace',
+            },
+          ],
+        },
+        `dgr1-${'a'.repeat(64)}`,
+      ),
+    ).rejects.toMatchObject({
+      code: 'invalid_arguments',
+    } satisfies Partial<TeamGridClientError>)
+    expect(fetch).not.toHaveBeenCalled()
+  })
 })

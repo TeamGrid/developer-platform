@@ -137,6 +137,7 @@ const expectedIndependentIfMatchOperationIds = [
   'deleteRole',
   'removeMember',
   'renameFile',
+  'replaceServiceAccountResourceGrants',
   'replaceTaskPlannedWork',
   'resendInvitation',
   'restoreAbsence',
@@ -214,7 +215,7 @@ if (
   JSON.stringify(independentIfMatchOperations.map((operation) => operation.operationId)) !==
   JSON.stringify(expectedAllIfMatchOperationIds)
 ) {
-  fail('the release candidate must expose exactly the 48 qualified If-Match operations')
+  fail('the release candidate must expose exactly the 49 qualified If-Match operations')
 }
 if (manifest.contractVersion !== openapi.info.version) {
   fail('contract manifest and OpenAPI versions differ')

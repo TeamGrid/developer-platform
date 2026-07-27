@@ -2388,6 +2388,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/service-accounts/{id}/resource-grants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the complete service account resource grant set */
+        get: operations["getServiceAccountResourceGrants"];
+        /**
+         * Replace the complete service account resource grant set
+         * @description Atomically replaces the complete grant policy. Partial and stale publications fail closed.
+         */
+        put: operations["replaceServiceAccountResourceGrants"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -4438,6 +4459,42 @@ export interface components {
             /** @enum {string} */
             status: "active" | "disabled";
         };
+        ResourceGrant: {
+            anchorId: string | null;
+            /** @enum {string} */
+            anchorType: "workspace" | "project" | "memberGroup" | "contactGroup" | "user" | "ownRecords";
+            capabilities: string[];
+            /** Format: date-time */
+            expiresAt: string | null;
+            id: string;
+            /** @enum {string} */
+            inheritance: "domainDescendants" | "none";
+            resourceKey: string;
+        };
+        ResourceGrantInput: {
+            anchorId?: string;
+            /** @enum {string} */
+            anchorType: "workspace" | "project" | "memberGroup" | "contactGroup" | "user" | "ownRecords";
+            capabilities: string[];
+            /** Format: date-time */
+            expiresAt?: string;
+            /** @enum {string} */
+            inheritance: "domainDescendants" | "none";
+            resourceKey: string;
+        };
+        ServiceAccountResourceGrantSet: {
+            attributes: {
+                grants: components["schemas"]["ResourceGrant"][];
+                policyVersion: number;
+                revision: string;
+            };
+            id: string;
+            /** @constant */
+            type: "serviceAccountResourceGrantSet";
+        };
+        ServiceAccountResourceGrantSetReplace: {
+            grants: components["schemas"]["ResourceGrantInput"][];
+        };
     };
     responses: {
         /** @description The cell-local application returned an invalid response. */
@@ -4587,6 +4644,8 @@ export interface components {
         /** @description Exactly one latest strong workspace settings ETag. Wildcards, weak validators, and lists are rejected. */
         IfMatchWorkspaceSettings: string;
         WebhookLimit: number;
+        /** @description Exactly one latest strong service-account grant-policy ETag. */
+        IfMatchResourceGrantSet: string;
     };
     requestBodies: never;
     headers: {
@@ -4622,6 +4681,8 @@ export interface components {
         WebhookETag: string;
         /** @description Strong revision of the complete public workspace settings allowlist. */
         WorkspaceSettingsETag: string;
+        /** @description Strong revision for the complete service-account grant policy. */
+        ResourceGrantSetETag: string;
     };
     pathItems: never;
 }
@@ -12473,6 +12534,79 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getServiceAccountResourceGrants: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The complete, bounded resource grant policy. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ResourceGrantSetETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountResourceGrantSet"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    replaceServiceAccountResourceGrants: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong service-account grant-policy ETag. */
+                "If-Match": components["parameters"]["IfMatchResourceGrantSet"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAccountResourceGrantSetReplace"];
+            };
+        };
+        responses: {
+            /** @description The complete replacement policy was published atomically. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ResourceGrantSetETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountResourceGrantSet"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

@@ -80,6 +80,8 @@
     { "name": "credentials:write", "availability": "issuable", "sensitive": true },
     { "name": "service-accounts:read", "availability": "issuable", "sensitive": true },
     { "name": "service-accounts:write", "availability": "issuable", "sensitive": true },
+    { "name": "resource-grants:read", "availability": "issuable", "sensitive": true },
+    { "name": "resource-grants:write", "availability": "issuable", "sensitive": true },
     { "name": "webhooks:read", "availability": "issuable" },
     { "name": "webhooks:write", "availability": "issuable" },
     { "name": "audit:read", "availability": "issuable", "sensitive": true },

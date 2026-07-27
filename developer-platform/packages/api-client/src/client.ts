@@ -171,6 +171,8 @@ import type {
   ProjectUpdate,
   RequestOptions,
   ResourceEnvelope,
+  ResourceGrant,
+  ResourceGrantInput,
   RoleCreate,
   RoleUpdate,
   SearchQuery,
@@ -180,6 +182,8 @@ import type {
   ServiceAccountCredential,
   ServiceAccountCredentialCreate,
   ServiceAccountCredentialRotation,
+  ServiceAccountResourceGrantSet,
+  ServiceAccountResourceGrantSetReplace,
   ServiceAccountUpdate,
   ServiceCreate,
   ServiceUpdate,
@@ -526,6 +530,8 @@ const strongAbsenceEtag = (value: string) =>
   strongResourceEtag(value, /^ab1-[a-f0-9]{64}$/, 'Absence')
 const strongCommentEtag = (value: string) =>
   strongResourceEtag(value, /^cmt1-[a-f0-9]{64}$/, 'Comment')
+const strongResourceGrantSetEtag = (value: string) =>
+  strongResourceEtag(value, /^dgr1-[a-f0-9]{64}$/, 'Resource grant policy')
 const strongDocumentEtag = (value: string) => {
   const etag = strongResourceEtag(value, /^doc1-[A-Za-z0-9_-]+$/, 'Document')
   const encoded = etag.slice('"doc1-'.length, -1)
@@ -649,6 +655,130 @@ function assertResourceValue(value: unknown, expectedTypes: string[]) {
       `Expected a TeamGrid ${expectedTypes.join(' or ')} resource.`,
     )
   }
+}
+
+const resourceGrantAnchorTypes = new Set([
+  'workspace',
+  'project',
+  'memberGroup',
+  'contactGroup',
+  'user',
+  'ownRecords',
+])
+const resourceGrantInheritance = new Set(['domainDescendants', 'none'])
+
+function boundedResourceGrantString(value: unknown, maximum: number) {
+  return typeof value === 'string' && value.length >= 1 && value.length <= maximum
+}
+
+function resourceGrantCapabilities(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length >= 1 &&
+    value.length <= 200 &&
+    value.every((item) => boundedResourceGrantString(item, 200)) &&
+    new Set(value).size === value.length
+  )
+}
+
+function validResourceGrantAnchor(anchorType: unknown, anchorId: unknown, inheritance: unknown) {
+  if (
+    typeof anchorType !== 'string' ||
+    !resourceGrantAnchorTypes.has(anchorType) ||
+    typeof inheritance !== 'string' ||
+    !resourceGrantInheritance.has(inheritance)
+  ) {
+    return false
+  }
+  const idless = anchorType === 'workspace' || anchorType === 'ownRecords'
+  if (
+    idless
+      ? anchorId !== undefined && anchorId !== null
+      : !boundedResourceGrantString(anchorId, 128)
+  ) {
+    return false
+  }
+  return (
+    inheritance !== 'domainDescendants' || anchorType === 'workspace' || anchorType === 'project'
+  )
+}
+
+function resourceGrantInputValidator(value: unknown): value is ResourceGrantInput {
+  if (
+    !isObject(value) ||
+    Object.keys(value).some(
+      (key) =>
+        ![
+          'anchorId',
+          'anchorType',
+          'capabilities',
+          'expiresAt',
+          'inheritance',
+          'resourceKey',
+        ].includes(key),
+    ) ||
+    !resourceGrantCapabilities(value.capabilities) ||
+    !boundedResourceGrantString(value.resourceKey, 64) ||
+    value.anchorId === null ||
+    !validResourceGrantAnchor(value.anchorType, value.anchorId, value.inheritance) ||
+    (value.expiresAt !== undefined &&
+      (typeof value.expiresAt !== 'string' || !Number.isFinite(Date.parse(value.expiresAt))))
+  ) {
+    return false
+  }
+  return true
+}
+
+function resourceGrantValidator(value: unknown): value is ResourceGrant {
+  return (
+    hasExactKeys(value, [
+      'anchorId',
+      'anchorType',
+      'capabilities',
+      'expiresAt',
+      'id',
+      'inheritance',
+      'resourceKey',
+    ]) &&
+    boundedResourceGrantString(value.id, 128) &&
+    resourceGrantCapabilities(value.capabilities) &&
+    boundedResourceGrantString(value.resourceKey, 64) &&
+    validResourceGrantAnchor(value.anchorType, value.anchorId, value.inheritance) &&
+    (value.expiresAt === null ||
+      (typeof value.expiresAt === 'string' && Number.isFinite(Date.parse(value.expiresAt))))
+  )
+}
+
+function resourceGrantSetReplacementValidator(
+  value: unknown,
+): value is ServiceAccountResourceGrantSetReplace {
+  return (
+    hasExactKeys(value, ['grants']) &&
+    Array.isArray(value.grants) &&
+    value.grants.length <= 1000 &&
+    value.grants.every(resourceGrantInputValidator)
+  )
+}
+
+function resourceGrantSetValidator(value: unknown): value is ServiceAccountResourceGrantSet {
+  if (
+    !hasExactKeys(value, ['attributes', 'id', 'type']) ||
+    value.type !== 'serviceAccountResourceGrantSet' ||
+    typeof value.id !== 'string' ||
+    !hasExactKeys(value.attributes, ['grants', 'policyVersion', 'revision'])
+  ) {
+    return false
+  }
+  const attributes = value.attributes
+  return (
+    Array.isArray(attributes.grants) &&
+    attributes.grants.length <= 1000 &&
+    attributes.grants.every(resourceGrantValidator) &&
+    Number.isSafeInteger(attributes.policyVersion) &&
+    (attributes.policyVersion as number) >= 1 &&
+    typeof attributes.revision === 'string' &&
+    /^[a-f0-9]{64}$/.test(attributes.revision)
+  )
 }
 
 function assertPage<T>(value: unknown, expectedTypes: string[]): ListEnvelope<T> {
@@ -1028,6 +1158,8 @@ export class TeamGridClient {
           `/service-accounts/${encodeURIComponent(id)}`,
           options,
         ),
+      getResourceGrants: (id: string, options?: RequestOptions) =>
+        this.#resourceGrantSet(id, options),
       list: (options?: ListOptions) =>
         this.#redactedCredentialPage<ServiceAccount>('/service-accounts', options),
       pages: (options?: ListOptions, pagination?: PaginationOptions) =>
@@ -1054,6 +1186,12 @@ export class TeamGridClient {
           data,
           options,
         ),
+      replaceResourceGrants: (
+        id: string,
+        data: ServiceAccountResourceGrantSetReplace,
+        ifMatch: string,
+        options?: RequestOptions,
+      ) => this.#replaceResourceGrantSet(id, data, ifMatch, options),
       update: (id: string, data: ServiceAccountUpdate, options?: RequestOptions) =>
         this.#update<ServiceAccount>(`/service-accounts/${encodeURIComponent(id)}`, data, options),
     }
@@ -2496,6 +2634,62 @@ export class TeamGridClient {
       rotateSecret: (id: string, options: WebhookSecretRotationOptions) =>
         this.#rotateWebhookSecret(id, options),
     }
+  }
+
+  async #resourceGrantSet(id: string, options: RequestOptions = {}) {
+    const envelope = await this.#strictResource(
+      `/service-accounts/${encodeURIComponent(id)}/resource-grants`,
+      resourceGrantSetValidator,
+      'service-account resource grants',
+      options,
+      200,
+      undefined,
+      (resource) => `"dgr1-${resource.attributes.revision}"`,
+      true,
+    )
+    if (envelope.data.id !== id) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned resource grants for a different service account.',
+      )
+    }
+    return envelope
+  }
+
+  async #replaceResourceGrantSet(
+    id: string,
+    data: ServiceAccountResourceGrantSetReplace,
+    ifMatch: string,
+    options: RequestOptions = {},
+  ) {
+    if (!resourceGrantSetReplacementValidator(data)) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'Resource-grant replacement requires one exact bounded grant set.',
+      )
+    }
+    const envelope = await this.#strictResource(
+      `/service-accounts/${encodeURIComponent(id)}/resource-grants`,
+      resourceGrantSetValidator,
+      'service-account resource-grant replacement',
+      {
+        ...options,
+        body: data,
+        ifMatch: strongResourceGrantSetEtag(ifMatch),
+        method: 'PUT',
+      },
+      200,
+      undefined,
+      (resource) => `"dgr1-${resource.attributes.revision}"`,
+      true,
+    )
+    if (envelope.data.id !== id) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned resource grants for a different service account.',
+      )
+    }
+    return envelope
   }
 
   async #strictOrderedResourceArray<T>(

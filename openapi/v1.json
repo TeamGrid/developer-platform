@@ -128,6 +128,14 @@
           "pattern": "^\"wst1-[a-f0-9]{64}\"$",
           "type": "string"
         }
+      },
+      "ResourceGrantSetETag": {
+        "description": "Strong revision for the complete service-account grant policy.",
+        "required": true,
+        "schema": {
+          "pattern": "^\"dgr1-[a-f0-9]{64}\"$",
+          "type": "string"
+        }
       }
     },
     "parameters": {
@@ -396,6 +404,16 @@
           "maximum": 100,
           "minimum": 1,
           "type": "integer"
+        }
+      },
+      "IfMatchResourceGrantSet": {
+        "description": "Exactly one latest strong service-account grant-policy ETag.",
+        "in": "header",
+        "name": "If-Match",
+        "required": true,
+        "schema": {
+          "pattern": "^\"dgr1-[a-f0-9]{64}\"$",
+          "type": "string"
         }
       }
     },
@@ -10578,6 +10596,189 @@
         },
         "required": [
           "status"
+        ],
+        "type": "object"
+      },
+      "ResourceGrant": {
+        "additionalProperties": false,
+        "properties": {
+          "anchorId": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "anchorType": {
+            "enum": [
+              "workspace",
+              "project",
+              "memberGroup",
+              "contactGroup",
+              "user",
+              "ownRecords"
+            ],
+            "type": "string"
+          },
+          "capabilities": {
+            "items": {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 200,
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          },
+          "inheritance": {
+            "enum": [
+              "domainDescendants",
+              "none"
+            ],
+            "type": "string"
+          },
+          "resourceKey": {
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "anchorId",
+          "anchorType",
+          "capabilities",
+          "expiresAt",
+          "id",
+          "inheritance",
+          "resourceKey"
+        ],
+        "type": "object"
+      },
+      "ResourceGrantInput": {
+        "additionalProperties": false,
+        "properties": {
+          "anchorId": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          },
+          "anchorType": {
+            "enum": [
+              "workspace",
+              "project",
+              "memberGroup",
+              "contactGroup",
+              "user",
+              "ownRecords"
+            ],
+            "type": "string"
+          },
+          "capabilities": {
+            "items": {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 200,
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "inheritance": {
+            "enum": [
+              "domainDescendants",
+              "none"
+            ],
+            "type": "string"
+          },
+          "resourceKey": {
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "anchorType",
+          "capabilities",
+          "inheritance",
+          "resourceKey"
+        ],
+        "type": "object"
+      },
+      "ServiceAccountResourceGrantSet": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "grants": {
+                "items": {
+                  "$ref": "#/components/schemas/ResourceGrant"
+                },
+                "maxItems": 1000,
+                "type": "array"
+              },
+              "policyVersion": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "revision": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "grants",
+              "policyVersion",
+              "revision"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "serviceAccountResourceGrantSet"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "ServiceAccountResourceGrantSetReplace": {
+        "additionalProperties": false,
+        "properties": {
+          "grants": {
+            "items": {
+              "$ref": "#/components/schemas/ResourceGrantInput"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          }
+        },
+        "required": [
+          "grants"
         ],
         "type": "object"
       }
@@ -29390,6 +29591,169 @@
         ],
         "x-teamgrid-required-scopes": [
           "credentials:write",
+          "service-accounts:write"
+        ]
+      }
+    },
+    "/service-accounts/{id}/resource-grants": {
+      "get": {
+        "operationId": "getServiceAccountResourceGrants",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ServiceAccountResourceGrantSet"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The complete, bounded resource grant policy.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/ResourceGrantSetETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get the complete service account resource grant set",
+        "tags": [
+          "Service Accounts"
+        ],
+        "x-teamgrid-required-scopes": [
+          "resource-grants:read",
+          "service-accounts:read"
+        ]
+      },
+      "put": {
+        "description": "Atomically replaces the complete grant policy. Partial and stale publications fail closed.",
+        "operationId": "replaceServiceAccountResourceGrants",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatchResourceGrantSet"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceAccountResourceGrantSetReplace"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ServiceAccountResourceGrantSet"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The complete replacement policy was published atomically.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/ResourceGrantSetETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Replace the complete service account resource grant set",
+        "tags": [
+          "Service Accounts"
+        ],
+        "x-teamgrid-required-scopes": [
+          "resource-grants:write",
           "service-accounts:write"
         ]
       }

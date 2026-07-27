@@ -6,9 +6,11 @@ import {
   type PersonalAccessTokenCreate,
   type PersonalAccessTokenRotation,
   parseCredentialLocation,
+  type ResourceGrantInput,
   type ServiceAccountCreate,
   type ServiceAccountCredentialCreate,
   type ServiceAccountCredentialRotation,
+  type ServiceAccountResourceGrantSetReplace,
   type ServiceAccountUpdate,
   TeamGridApiError,
   TeamGridClient,
@@ -314,6 +316,76 @@ function serviceAccountUpdate(value: Record<string, unknown>): ServiceAccountUpd
     ...(typeof value.reason === 'string' ? { reason: value.reason } : {}),
     status: value.status,
   }
+}
+
+const resourceGrantAnchorTypes = new Set([
+  'workspace',
+  'project',
+  'memberGroup',
+  'contactGroup',
+  'user',
+  'ownRecords',
+])
+
+function resourceGrantSetReplacement(
+  value: Record<string, unknown>,
+): ServiceAccountResourceGrantSetReplace {
+  const grants = value.grants
+  const validGrant = (grant: unknown): grant is ResourceGrantInput => {
+    if (!grant || typeof grant !== 'object' || Array.isArray(grant)) return false
+    const item = grant as Record<string, unknown>
+    const keys = Object.keys(item)
+    const anchorType = item.anchorType
+    const inheritance = item.inheritance
+    const capabilities = item.capabilities
+    const idless = anchorType === 'workspace' || anchorType === 'ownRecords'
+    return (
+      keys.every((key) =>
+        [
+          'anchorId',
+          'anchorType',
+          'capabilities',
+          'expiresAt',
+          'inheritance',
+          'resourceKey',
+        ].includes(key),
+      ) &&
+      typeof anchorType === 'string' &&
+      resourceGrantAnchorTypes.has(anchorType) &&
+      (idless
+        ? item.anchorId === undefined
+        : typeof item.anchorId === 'string' &&
+          item.anchorId.length >= 1 &&
+          item.anchorId.length <= 128) &&
+      (inheritance === 'none' ||
+        (inheritance === 'domainDescendants' &&
+          (anchorType === 'workspace' || anchorType === 'project'))) &&
+      Array.isArray(capabilities) &&
+      capabilities.length >= 1 &&
+      capabilities.length <= 200 &&
+      capabilities.every(
+        (capability) =>
+          typeof capability === 'string' && capability.length >= 1 && capability.length <= 200,
+      ) &&
+      new Set(capabilities).size === capabilities.length &&
+      typeof item.resourceKey === 'string' &&
+      item.resourceKey.length >= 1 &&
+      item.resourceKey.length <= 64 &&
+      (item.expiresAt === undefined || isIsoDateTime(item.expiresAt))
+    )
+  }
+  if (
+    Object.keys(value).length !== 1 ||
+    !Array.isArray(grants) ||
+    grants.length > 1000 ||
+    !grants.every(validGrant)
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Resource-grant replacement requires an exact set of at most 1000 valid grants.',
+    )
+  }
+  return { grants }
 }
 
 function commaSeparatedValues(
@@ -845,6 +917,38 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const client = await loadClient(command)
     await client.serviceAccounts.revoke(id)
     outputData(command, { id, revoked: true, type: 'serviceAccount' })
+  })
+
+  const serviceAccountGrants = serviceAccounts
+    .command('grants')
+    .description('inspect and replace service-account resource grants')
+  serviceAccountGrants.command('get <serviceAccountId>').action(async function action(
+    serviceAccountId: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.serviceAccounts.getResourceGrants(serviceAccountId)).data)
+  })
+  archiveOptions(
+    serviceAccountGrants
+      .command('replace <serviceAccountId>')
+      .requiredOption('--data <json|@file|->', 'complete resource-grant set JSON')
+      .requiredOption('--if-match <etag>', 'latest strong resource-grant policy ETag'),
+  ).action(async function action(serviceAccountId: string, options, command: Command) {
+    await confirmDestructive(
+      command,
+      'Replace',
+      'service-account resource grants',
+      serviceAccountId,
+    )
+    const data = resourceGrantSetReplacement(await readJsonObject(options.data, input))
+    const client = await loadClient(command)
+    outputData(
+      command,
+      (await client.serviceAccounts.replaceResourceGrants(serviceAccountId, data, options.ifMatch))
+        .data,
+    )
   })
 
   const serviceAccountCredentials = serviceAccounts

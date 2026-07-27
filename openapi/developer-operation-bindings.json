@@ -2427,6 +2427,32 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.getServiceAccountResourceGrants",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccountResourceGrants.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getServiceAccountResourceGrants",
+      "method": "GET",
+      "operationId": "getServiceAccountResourceGrants",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}/resource-grants",
+      "requiredScopes": [
+        "resource-grants:read",
+        "service-accounts:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.getSystemCapabilities",
           "kind": "httpLocal",
           "role": "transport"
@@ -3818,6 +3844,32 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.replaceServiceAccountResourceGrants",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccountResourceGrants.replace",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "replaceServiceAccountResourceGrants",
+      "method": "PUT",
+      "operationId": "replaceServiceAccountResourceGrants",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}/resource-grants",
+      "requiredScopes": [
+        "resource-grants:write",
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.replaceTaskPlannedWork",
           "kind": "httpLocal",
           "role": "transport"
@@ -5190,7 +5242,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 196,
+    "authenticatedOperations": 198,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -5289,6 +5341,8 @@
       "developerApi.v1.serviceAccountCredentials.create",
       "developerApi.v1.serviceAccountCredentials.revoke",
       "developerApi.v1.serviceAccountCredentials.rotate",
+      "developerApi.v1.serviceAccountResourceGrants.get",
+      "developerApi.v1.serviceAccountResourceGrants.replace",
       "developerApi.v1.serviceAccounts.create",
       "developerApi.v1.serviceAccounts.get",
       "developerApi.v1.serviceAccounts.list",

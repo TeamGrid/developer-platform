@@ -78,6 +78,11 @@ export type ServiceAccountCredentialCreate = components['schemas']['ServiceAccou
 export type ServiceAccountCredentialRotation =
   components['schemas']['ServiceAccountCredentialRotation']
 export type ServiceAccountUpdate = components['schemas']['ServiceAccountUpdate']
+export type ResourceGrant = components['schemas']['ResourceGrant']
+export type ResourceGrantInput = components['schemas']['ResourceGrantInput']
+export type ServiceAccountResourceGrantSet = components['schemas']['ServiceAccountResourceGrantSet']
+export type ServiceAccountResourceGrantSetReplace =
+  components['schemas']['ServiceAccountResourceGrantSetReplace']
 export type TaskCreate = components['schemas']['TaskCreate']
 export type TaskDuplicate = Omit<
   components['schemas']['TaskDuplicate'],
