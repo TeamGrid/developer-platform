@@ -1814,6 +1814,40 @@
     },
     {
       "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "project-statements:read",
+        "tags:read",
+        "tasks:read",
+        "users:read"
+      ],
+      "dynamicPolicyIds": [
+        "custom-field-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getCustomFieldValues",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.customFieldValues.getMany",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getCustomFieldValues",
+      "method": "POST",
+      "operationId": "getCustomFieldValues",
+      "optionalScopes": [],
+      "path": "/custom-field-values/{targetType}/{resourceId}/batch-read",
+      "requiredScopes": [
+        "custom-field-values:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
       "conditionalScopes": [],
       "dynamicPolicyIds": [],
       "executionBindings": [
@@ -4853,7 +4887,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 183,
+    "authenticatedOperations": 184,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -4889,6 +4923,7 @@
       "developerApi.v1.comments.restore",
       "developerApi.v1.customFieldValues.clear",
       "developerApi.v1.customFieldValues.get",
+      "developerApi.v1.customFieldValues.getMany",
       "developerApi.v1.customFieldValues.set",
       "developerApi.v1.events.catalog",
       "developerApi.v1.exports.create",

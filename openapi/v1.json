@@ -5328,6 +5328,27 @@
         ],
         "type": "object"
       },
+      "CustomFieldValueBatchRead": {
+        "additionalProperties": false,
+        "properties": {
+          "fieldIds": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9]+$",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "fieldIds"
+        ],
+        "type": "object"
+      },
       "CustomFieldValueSet": {
         "additionalProperties": false,
         "properties": {
@@ -22719,6 +22740,118 @@
         ],
         "x-teamgrid-required-scopes": [
           "custom-field-definitions:write"
+        ]
+      }
+    },
+    "/custom-field-values/{targetType}/{resourceId}/batch-read": {
+      "post": {
+        "description": "The cell-local App re-authenticates the credential and additionally requires a target-domain scope selected by targetType: contacts:read/write, projects:read/write, project-statements:read/write, or tasks:read/write. Reading a contact, project, tag, or user reference field, and validating a newly set reference, also requires the matching contacts:read, projects:read, tags:read, or users:read scope. Invalid legacy values are classified without exposing their payload. Batch reads accept 1–100 unique field ids for one resource and preserve request order.",
+        "operationId": "getCustomFieldValues",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CustomFieldValueTargetType"
+          },
+          {
+            "$ref": "#/components/parameters/CustomFieldValueResourceId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomFieldValueBatchRead"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/CustomFieldValue"
+                      },
+                      "maxItems": 100,
+                      "minItems": 1,
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Current value states in the same order as fieldIds."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Read custom-field values for one resource",
+        "tags": [
+          "Custom Field Values"
+        ],
+        "x-teamgrid-conditional-scopes": [
+          "contacts:read",
+          "projects:read",
+          "project-statements:read",
+          "tags:read",
+          "tasks:read",
+          "users:read"
+        ],
+        "x-teamgrid-dynamic-scopes": {
+          "referenceRead": [
+            "contacts:read",
+            "projects:read",
+            "tags:read",
+            "users:read"
+          ],
+          "target": [
+            "contacts:read",
+            "projects:read",
+            "project-statements:read",
+            "tasks:read"
+          ]
+        },
+        "x-teamgrid-required-scopes": [
+          "custom-field-values:read"
         ]
       }
     },
