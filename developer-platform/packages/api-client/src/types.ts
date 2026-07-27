@@ -105,6 +105,8 @@ export type TaskPlacement = components['schemas']['TaskPlacement']
 export type TaskSubtasksReplace = components['schemas']['TaskSubtasksReplace']
 export type TaskUpdate = components['schemas']['TaskUpdate']
 export type TimeEntryCreate = components['schemas']['TimeEntryCreate']
+export type TimeEntryBilling = components['schemas']['TimeEntryBilling']
+export type TimeEntryBillingUpdate = components['schemas']['TimeEntryBillingUpdate']
 export type TimeEntryUpdate = components['schemas']['TimeEntryUpdate']
 export type TimerAction = components['schemas']['TimerAction']
 export type ProjectLifecycleOperation = components['schemas']['ProjectLifecycleOperation']
@@ -664,6 +666,10 @@ export type TimeEntryListOptions = ListOptions &
     to?: string | Date
     userId?: string
   }
+
+export type TimeEntryBillingMutationOptions = RequestOptions & {
+  ifMatch: string
+}
 
 export type ContactListOptions = ListOptions &
   ArchiveFilter & {

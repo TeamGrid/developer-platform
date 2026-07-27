@@ -12,6 +12,7 @@
     { "name": "tasks:write", "availability": "issuable" },
     { "name": "time-entries:read", "availability": "issuable" },
     { "name": "time-entries:write", "availability": "issuable" },
+    { "name": "time-entries:billing", "availability": "issuable", "sensitive": true },
     { "name": "contacts:read", "availability": "issuable" },
     { "name": "contacts:write", "availability": "issuable" },
     { "name": "call-notes:read", "availability": "issuable" },

@@ -27,6 +27,8 @@ reads; `governance` for webhook, service, and custom-field-definition
 reads; or `all` for the explicit 29-tool union. Project statements and webhook
 delivery history remain forbidden in every MCP profile. The adapter does not
 expose write or secret-bearing operations.
+Time-entry billing state is also forbidden in every profile because it is a
+finance-sensitive lock decision, not an interactive read tool.
 
 Project and task tools include their stable developer revision. MCP remains intentionally
 read-only, so compare-and-set inputs are not part of its curated tool surface.

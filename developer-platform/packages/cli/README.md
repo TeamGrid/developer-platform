@@ -20,6 +20,8 @@ teamgrid planned-work replace task-id --data @schedule.json \
   --if-match "$REVISION" --idempotency-key schedule-1 --yes --wait --output json
 teamgrid changes checkpoint --resource-type task --output json
 teamgrid changes list --cursor "$CHECKPOINT" --resource-type task --all --output jsonl
+teamgrid time-entries billing get time-entry-id --output json
+teamgrid time-entries billing update time-entry-id --billed --if-match "$REVISION"
 ```
 
 Credentials are read from `TEAMGRID_API_TOKEN` or stored in macOS Keychain /
@@ -46,3 +48,6 @@ revision returns exit code `6` and must be refreshed before retrying. Planned-wo
 non-interactive use additionally requires `--yes`; always provide a stable idempotency key.
 Project lifecycle operations, template instantiation, and planned-work replacement can be polled to
 a terminal state with `--wait`, bounded by `--max-wait`.
+Billing updates likewise require an explicit revision and exactly one of
+`--billed` or `--unbilled`; the separate billing scope is never implied by
+ordinary time-entry write access.

@@ -1157,6 +1157,30 @@ export interface paths {
         patch: operations["updateTimeEntry"];
         trace?: never;
     };
+    "/time-entries/{id}/billing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get time-entry billing state
+         * @description Returns the dedicated billing and lock subresource with a strong ETag. Access requires the sensitive billing scope and the TeamGrid tasks.times.lock product permission.
+         */
+        get: operations["getTimeEntryBilling"];
+        /**
+         * Update time-entry billing state
+         * @description Atomically marks a time entry billed or unbilled. The supplied strong ETag must match the current billing subresource; stale concurrent requests fail without overwriting a newer decision.
+         */
+        put: operations["updateTimeEntryBilling"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/time-entries/{id}/restore": {
         parameters: {
             query?: never;
@@ -3023,6 +3047,18 @@ export interface components {
             /** @constant */
             type: "timeEntry";
         };
+        /** @description Conflict-safe billing and lock state for a time entry. TeamGrid currently has no separate approval state: billed means locked, and unbilled means editable subject to normal permissions. */
+        TimeEntryBilling: {
+            attributes: {
+                billed: boolean;
+                /** Format: date-time */
+                billedAt: string | null;
+                revision: string;
+            };
+            id: string;
+            /** @constant */
+            type: "timeEntryBilling";
+        };
         CallNote: {
             attributes: {
                 archived: boolean;
@@ -3937,6 +3973,10 @@ export interface components {
             /** Format: date-time */
             startAt?: string | null;
         };
+        TimeEntryBillingUpdate: {
+            /** @description true locks the time entry as billed; false unlocks it. */
+            billed: boolean;
+        };
         TimerAction: {
             /** Format: date-time */
             at?: string;
@@ -4665,6 +4705,8 @@ export interface components {
         IfMatchProjectTemplate: string;
         /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
         IfMatchTask: string;
+        /** @description Exactly one latest strong time-entry billing ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+        IfMatchTimeEntryBilling: string;
         /** @description Exactly one latest strong comment ETag. Wildcards, weak validators, and lists are rejected. */
         IfMatchComment: string;
         /** @description Exactly one latest strong document ETag. Wildcards, weak validators, and lists are rejected. */
@@ -4716,6 +4758,8 @@ export interface components {
         ProjectTemplateETag: string;
         /** @description Strong task revision returned by reads and mutations. */
         TaskETag: string;
+        /** @description Strong revision of the time entry billing subresource. */
+        TimeEntryBillingETag: string;
         /** @description Prevents shared caching and representation transformations so the strong revision validator remains byte-for-byte usable for conditional requests. */
         StrongETagCacheControl: "private, no-store, no-transform";
         /** @description Strong member-administration resource revision. */
@@ -8511,6 +8555,83 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getTimeEntryBilling: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    ETag: components["headers"]["TimeEntryBillingETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TimeEntryBilling"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateTimeEntryBilling: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong time-entry billing ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTimeEntryBilling"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TimeEntryBillingUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    ETag: components["headers"]["TimeEntryBillingETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TimeEntryBilling"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

@@ -57,6 +57,8 @@ teamgrid tasks create \
   --idempotency-key launch-task-1 \
   --output json
 teamgrid time-entries list --from 2026-07-01 --to 2026-07-31 --output jsonl
+teamgrid time-entries billing get time-entry-id --output json
+teamgrid time-entries billing update time-entry-id --billed --if-match "$REVISION"
 teamgrid lists create \
   --data '{"name":"Delivery","type":"tasks","parentId":"project-id"}' \
   --idempotency-key delivery-list-1 \
@@ -110,6 +112,8 @@ Tasks, projects, and project templates expose developer revisions and strong ETa
 archive, restore, completion, reopen, lifecycle start, and template instantiation requires the
 latest revision through `If-Match`, preventing silent overwrites. Other PUT, PATCH, and DELETE
 requests are not automatically retried. Errors do not retain or print the bearer credential.
+Time-entry billed state has its own finance-sensitive scope and strong revision; it is available
+through API, SDK, and CLI, but intentionally absent from every read-only MCP profile.
 
 ## Webhook v2 signatures
 

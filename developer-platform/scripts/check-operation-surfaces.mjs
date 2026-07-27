@@ -177,6 +177,7 @@ const expectedIndependentIfMatchOperationIds = [
   'updateGroup',
   'updateMemberRole',
   'updateRole',
+  'updateTimeEntryBilling',
   'updateWebhook',
   'updateWorkspaceSettings',
 ]

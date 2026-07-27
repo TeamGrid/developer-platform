@@ -81,6 +81,14 @@
           "type": "string"
         }
       },
+      "TimeEntryBillingETag": {
+        "description": "Strong revision of the time entry billing subresource.",
+        "required": true,
+        "schema": {
+          "pattern": "^\"tib1-[a-f0-9]{64}\"$",
+          "type": "string"
+        }
+      },
       "StrongETagCacheControl": {
         "description": "Prevents shared caching and representation transformations so the strong revision validator remains byte-for-byte usable for conditional requests.",
         "required": true,
@@ -253,6 +261,16 @@
         "required": true,
         "schema": {
           "pattern": "^\"tsk1-[a-f0-9]{64}\"$",
+          "type": "string"
+        }
+      },
+      "IfMatchTimeEntryBilling": {
+        "description": "Exactly one latest strong time-entry billing ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected.",
+        "in": "header",
+        "name": "If-Match",
+        "required": true,
+        "schema": {
+          "pattern": "^\"tib1-[a-f0-9]{64}\"$",
           "type": "string"
         }
       },
@@ -3275,6 +3293,49 @@
           "attributes"
         ],
         "type": "object"
+      },
+      "TimeEntryBilling": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "billed": {
+                "type": "boolean"
+              },
+              "billedAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "revision": {
+                "pattern": "^tib1-[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "billed",
+              "billedAt",
+              "revision"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "timeEntryBilling"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object",
+        "description": "Conflict-safe billing and lock state for a time entry. TeamGrid currently has no separate approval state: billed means locked, and unbilled means editable subject to normal permissions."
       },
       "CallNote": {
         "additionalProperties": false,
@@ -8161,6 +8222,19 @@
             ]
           }
         },
+        "type": "object"
+      },
+      "TimeEntryBillingUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "billed": {
+            "description": "true locks the time entry as billed; false unlocks it.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "billed"
+        ],
         "type": "object"
       },
       "TimerAction": {
@@ -20014,6 +20088,177 @@
         "x-teamgrid-required-scopes": [
           "time-entries:write"
         ]
+      }
+    },
+    "/time-entries/{id}/billing": {
+      "get": {
+        "operationId": "getTimeEntryBilling",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TimeEntryBilling"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The requested resource.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/TimeEntryBillingETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get time-entry billing state",
+        "tags": [
+          "Time Entries"
+        ],
+        "x-teamgrid-required-scopes": [
+          "time-entries:billing"
+        ],
+        "description": "Returns the dedicated billing and lock subresource with a strong ETag. Access requires the sensitive billing scope and the TeamGrid tasks.times.lock product permission."
+      },
+      "put": {
+        "operationId": "updateTimeEntryBilling",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchTimeEntryBilling"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeEntryBillingUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TimeEntryBilling"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The updated resource.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/TimeEntryBillingETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update time-entry billing state",
+        "tags": [
+          "Time Entries"
+        ],
+        "x-teamgrid-required-scopes": [
+          "time-entries:billing"
+        ],
+        "description": "Atomically marks a time entry billed or unbilled. The supplied strong ETag must match the current billing subresource; stale concurrent requests fail without overwriting a newer decision."
       }
     },
     "/time-entries/{id}/restore": {

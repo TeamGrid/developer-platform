@@ -16,6 +16,7 @@ import {
   canonicalAdministrationEtag,
   canonicalAutomationDefinitionEtag,
   canonicalAutomationRunEtag,
+  canonicalTimeEntryBillingEtag,
   canonicalWebhookEtag,
   canonicalWorkspaceSettingsEtag,
   commentValidator,
@@ -45,6 +46,7 @@ import {
   roleValidator,
   searchResultValidator,
   systemCapabilityValidator,
+  timeEntryBillingValidator,
   webhookSecretRotationValidator,
   webhookValidator,
   workspaceEntitlementValidator,
@@ -207,6 +209,9 @@ import type {
   TaskSubtasksReplace,
   TaskUpdate,
   TimeEntry,
+  TimeEntryBilling,
+  TimeEntryBillingMutationOptions,
+  TimeEntryBillingUpdate,
   TimeEntryCreate,
   TimeEntryListOptions,
   TimeEntryUpdate,
@@ -2345,6 +2350,8 @@ export class TeamGridClient {
       get: (id: string, options?: RequestOptions) =>
         this.#resource<TimeEntry>(`/time-entries/${encodeURIComponent(id)}`, options),
       list: (options?: TimeEntryListOptions) => this.#page<TimeEntry>('/time-entries', options),
+      getBilling: (id: string, options?: RequestOptions) =>
+        this.#timeEntryBilling(`/time-entries/${encodeURIComponent(id)}/billing`, id, options),
       pages: (options?: TimeEntryListOptions, pagination?: PaginationOptions) =>
         this.#pages<TimeEntry>('/time-entries', options, pagination),
       restore: (id: string, options?: RequestOptions) =>
@@ -2355,6 +2362,30 @@ export class TeamGridClient {
         ),
       update: (id: string, data: TimeEntryUpdate, options?: RequestOptions) =>
         this.#update<TimeEntry>(`/time-entries/${encodeURIComponent(id)}`, data, options),
+      updateBilling: (
+        id: string,
+        data: TimeEntryBillingUpdate,
+        options: TimeEntryBillingMutationOptions,
+      ) => {
+        if (
+          !data ||
+          typeof data !== 'object' ||
+          Array.isArray(data) ||
+          Object.keys(data).length !== 1 ||
+          typeof data.billed !== 'boolean'
+        ) {
+          throw new TeamGridClientError(
+            'invalid_arguments',
+            'Time-entry billing update must contain exactly one boolean billed field.',
+          )
+        }
+        return this.#timeEntryBilling(`/time-entries/${encodeURIComponent(id)}/billing`, id, {
+          ...options,
+          body: data,
+          ifMatch: canonicalTimeEntryBillingEtag(options.ifMatch),
+          method: 'PUT',
+        })
+      },
     }
     this.callNotes = {
       archive: (id: string, options?: RequestOptions) =>
@@ -2948,6 +2979,27 @@ export class TeamGridClient {
       }
     }
     return attachTransport(envelope, response.transport)
+  }
+
+  async #timeEntryBilling(path: string, expectedId: string, options: InternalRequestOptions = {}) {
+    const envelope = await this.#strictResource<TimeEntryBilling>(
+      path,
+      timeEntryBillingValidator,
+      'time-entry billing',
+      options,
+      200,
+      (resource) => resource.attributes.revision,
+    )
+    if (
+      envelope.data.id !== expectedId ||
+      envelope.transport.headers['cache-control'] !== strongEtagCacheControl
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned mismatched or unsafe time-entry billing metadata.',
+      )
+    }
+    return envelope
   }
 
   async #strictOperationResource<T extends { id: string }>(

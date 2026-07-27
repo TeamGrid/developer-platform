@@ -1575,6 +1575,41 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const client = await loadClient(command)
     outputData(command, (await client.timeEntries.get(id)).data)
   })
+  const timeEntryBilling = times
+    .command('billing')
+    .description('read and conflict-safely update billed state')
+  timeEntryBilling.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.timeEntries.getBilling(id)).data)
+  })
+  timeEntryBilling
+    .command('update <id>')
+    .option('--billed', 'mark the time entry as billed and locked')
+    .option('--unbilled', 'mark the time entry as unbilled and editable')
+    .requiredOption('--if-match <revision>', 'billing revision returned by the latest read')
+    .action(async function action(id: string, options, command: Command) {
+      if (Boolean(options.billed) === Boolean(options.unbilled)) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          'Choose exactly one billing state: --billed or --unbilled.',
+        )
+      }
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.timeEntries.updateBilling(
+            id,
+            { billed: Boolean(options.billed) },
+            { ifMatch: options.ifMatch },
+          )
+        ).data,
+      )
+    })
   times
     .command('create')
     .requiredOption('--data <json|@file|->', 'time-entry create JSON')

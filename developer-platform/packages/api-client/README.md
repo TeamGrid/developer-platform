@@ -24,6 +24,19 @@ webhooks and credential-owned delivery history, audit events, and workspace
 discovery. Every public operation is checked against the canonical capability
 manifest during CI. Finance-gated fields are typed as optional and are absent
 unless the credential has the documented overlay scope and workspace entitlement.
+Time-entry billing is isolated behind `time-entries:billing` and the workspace's
+existing lock permission:
+
+```ts
+const billing = await teamgrid.timeEntries.getBilling('time-entry-id')
+await teamgrid.timeEntries.updateBilling(
+  'time-entry-id',
+  { billed: true },
+  { ifMatch: billing.data.attributes.revision },
+)
+```
+
+The update fails with `412` if the billing state changed after the read.
 
 The stable change feed exposes metadata-only resource changes through `teamgrid.changes`.
 Create a checkpoint immediately before a full snapshot, then consume bounded pages from that

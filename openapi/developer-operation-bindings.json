@@ -2578,6 +2578,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.getTimeEntryBilling",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.timeEntryBilling.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getTimeEntryBilling",
+      "method": "GET",
+      "operationId": "getTimeEntryBilling",
+      "optionalScopes": [],
+      "path": "/time-entries/{id}/billing",
+      "requiredScopes": [
+        "time-entries:billing"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.getWebhook",
           "kind": "httpLocal",
           "role": "transport"
@@ -5245,6 +5270,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.updateTimeEntryBilling",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.timeEntryBilling.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateTimeEntryBilling",
+      "method": "PUT",
+      "operationId": "updateTimeEntryBilling",
+      "optionalScopes": [],
+      "path": "/time-entries/{id}/billing",
+      "requiredScopes": [
+        "time-entries:billing"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.updateWebhook",
           "kind": "httpLocal",
           "role": "transport"
@@ -5292,7 +5342,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 200,
+    "authenticatedOperations": 202,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -5399,6 +5449,8 @@
       "developerApi.v1.serviceAccounts.revoke",
       "developerApi.v1.serviceAccounts.update",
       "developerApi.v1.systemCapabilities.get",
+      "developerApi.v1.timeEntryBilling.get",
+      "developerApi.v1.timeEntryBilling.update",
       "developerApi.v1.webhooks.get",
       "developerApi.v1.webhooks.list",
       "developerApi.v1.webhooks.rotateSecret",

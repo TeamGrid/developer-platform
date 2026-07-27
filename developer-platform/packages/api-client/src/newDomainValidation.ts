@@ -28,6 +28,7 @@ import type {
   Role,
   SearchResult,
   SystemCapability,
+  TimeEntryBilling,
   TransportMetadata,
   Webhook,
   WebhookCreate,
@@ -49,6 +50,7 @@ const automationRunRevisionPattern = /^aur1-[a-f0-9]{64}$/
 const automationDefinitionVersionPattern = /^dav1-[a-f0-9]{64}$/
 const workspaceSettingsRevisionPattern = /^wst1-[a-f0-9]{64}$/
 const webhookRevisionPattern = /^whk1-[a-f0-9]{64}$/
+const timeEntryBillingRevisionPattern = /^tib1-[a-f0-9]{64}$/
 const webhookSigningSecretPattern = /^whsec_v2_[A-Za-z0-9_-]{43}$/
 const publicCapabilityIdPattern = /^[A-Za-z][A-Za-z0-9-]{0,127}$/
 const webhookIdPattern = /^[A-Za-z0-9_.:-]{1,128}$/
@@ -1409,6 +1411,22 @@ export const eventDefinitionValidator: ResourceValidator<EventDefinition> = (
     )
   })
 
+export const timeEntryBillingValidator: ResourceValidator<TimeEntryBilling> = (
+  value,
+): value is TimeEntryBilling =>
+  exactResource(
+    value,
+    'timeEntryBilling',
+    administrationIdPattern,
+    (attributes) =>
+      hasExactKeys(attributes, ['billed', 'billedAt', 'revision']) &&
+      typeof attributes.billed === 'boolean' &&
+      nullableCanonicalDate(attributes.billedAt) &&
+      (attributes.billed ? attributes.billedAt !== null : attributes.billedAt === null) &&
+      typeof attributes.revision === 'string' &&
+      timeEntryBillingRevisionPattern.test(attributes.revision),
+  )
+
 export const webhookSecretRotationValidator: ResourceValidator<WebhookSecretRotation> = (
   value,
 ): value is WebhookSecretRotation =>
@@ -1525,6 +1543,10 @@ export function canonicalWorkspaceSettingsEtag(value: string) {
 
 export function canonicalWebhookEtag(value: string) {
   return canonicalEtag(value, webhookRevisionPattern, 'webhook')
+}
+
+export function canonicalTimeEntryBillingEtag(value: string) {
+  return canonicalEtag(value, timeEntryBillingRevisionPattern, 'time-entry billing')
 }
 
 export function isValidIdempotencyKey(value: string) {
