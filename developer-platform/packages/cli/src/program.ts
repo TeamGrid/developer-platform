@@ -653,12 +653,16 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   projects
     .command('update <id>')
     .requiredOption('--data <json|@file|->', 'project patch JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       outputData(
         command,
-        (await client.projects.update(id, (await readJsonObject(options.data, input)) as never))
-          .data,
+        (
+          await client.projects.update(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
       )
     })
   async function runProjectLifecycle(
@@ -666,6 +670,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     id: string,
     options: {
       idempotencyKey?: string
+      ifMatch: string
       maxWait?: number
       pollInterval?: number
       wait?: boolean
@@ -675,6 +680,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const client = await loadClient(command)
     const started = await client.projects[action](id, {
       idempotencyKey: options.idempotencyKey,
+      ifMatch: options.ifMatch as never,
     })
     const result = options.wait
       ? await client.projectLifecycleOperations.wait(started.data.id, {
@@ -685,35 +691,27 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       : started
     outputData(command, result.data)
   }
-  lifecycleOptions(projects.command('complete <id>')).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await runProjectLifecycle('complete', id, options, command)
-  })
-  lifecycleOptions(projects.command('reopen <id>')).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await runProjectLifecycle('reopen', id, options, command)
-  })
-  lifecycleOptions(projects.command('restore <id>')).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await runProjectLifecycle('restore', id, options, command)
-  })
-  lifecycleOptions(archiveOptions(projects.command('archive <id>'))).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await confirmDestructive(command, 'Archive', 'project', id)
-    await runProjectLifecycle('archive', id, options, command)
-  })
+  lifecycleOptions(projects.command('complete <id>'))
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      await runProjectLifecycle('complete', id, options, command)
+    })
+  lifecycleOptions(projects.command('reopen <id>'))
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      await runProjectLifecycle('reopen', id, options, command)
+    })
+  lifecycleOptions(projects.command('restore <id>'))
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      await runProjectLifecycle('restore', id, options, command)
+    })
+  lifecycleOptions(archiveOptions(projects.command('archive <id>')))
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      await confirmDestructive(command, 'Archive', 'project', id)
+      await runProjectLifecycle('archive', id, options, command)
+    })
 
   const projectLifecycleOperations = program
     .command('project-lifecycle-operations')
@@ -869,47 +867,47 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   tasks
     .command('update <id>')
     .requiredOption('--data <json|@file|->', 'task patch JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       outputData(
         command,
-        (await client.tasks.update(id, (await readJsonObject(options.data, input)) as never)).data,
+        (
+          await client.tasks.update(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
       )
     })
-  archiveOptions(tasks.command('archive <id>')).action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    await confirmDestructive(command, 'Archive', 'task', id)
-    const client = await loadClient(command)
-    await client.tasks.archive(id)
-    outputData(command, { archived: true, id, type: 'task' })
-  })
-  tasks.command('complete <id>').action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    const client = await loadClient(command)
-    outputData(command, (await client.tasks.complete(id)).data)
-  })
-  tasks.command('restore <id>').action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    const client = await loadClient(command)
-    outputData(command, (await client.tasks.restore(id)).data)
-  })
-  tasks.command('reopen <id>').action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    const client = await loadClient(command)
-    outputData(command, (await client.tasks.reopen(id)).data)
-  })
+  archiveOptions(tasks.command('archive <id>'))
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      await confirmDestructive(command, 'Archive', 'task', id)
+      const client = await loadClient(command)
+      await client.tasks.archive(id, { ifMatch: _options.ifMatch })
+      outputData(command, { archived: true, id, type: 'task' })
+    })
+  tasks
+    .command('complete <id>')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.tasks.complete(id, { ifMatch: _options.ifMatch })).data)
+    })
+  tasks
+    .command('restore <id>')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.tasks.restore(id, { ifMatch: _options.ifMatch })).data)
+    })
+  tasks
+    .command('reopen <id>')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.tasks.reopen(id, { ifMatch: _options.ifMatch })).data)
+    })
   const taskTimer = tasks.command('timer').description('start or stop task time tracking')
   taskTimer
     .command('start <id>')
@@ -1462,6 +1460,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   projectTemplates
     .command('update <id>')
     .requiredOption('--data <json|@file|->', 'project-template patch JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest project-template revision or strong ETag')
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       outputData(
@@ -1470,36 +1469,38 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
           await client.projectTemplates.update(
             id,
             (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
           )
         ).data,
       )
     })
-  archiveOptions(projectTemplates.command('archive <id>')).action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    await confirmDestructive(command, 'Archive', 'project template', id)
-    const client = await loadClient(command)
-    await client.projectTemplates.archive(id)
-    outputData(command, { archived: true, id, type: 'projectTemplate' })
-  })
-  projectTemplates.command('restore <id>').action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    const client = await loadClient(command)
-    outputData(command, (await client.projectTemplates.restore(id)).data)
-  })
+  archiveOptions(projectTemplates.command('archive <id>'))
+    .requiredOption('--if-match <revision|etag>', 'latest project-template revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      await confirmDestructive(command, 'Archive', 'project template', id)
+      const client = await loadClient(command)
+      await client.projectTemplates.archive(id, { ifMatch: _options.ifMatch })
+      outputData(command, { archived: true, id, type: 'projectTemplate' })
+    })
+  projectTemplates
+    .command('restore <id>')
+    .requiredOption('--if-match <revision|etag>', 'latest project-template revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.projectTemplates.restore(id, { ifMatch: _options.ifMatch })).data,
+      )
+    })
   lifecycleOptions(projectTemplates.command('instantiate <id>'))
     .requiredOption('--data <json|@file|->', 'project-template instantiation JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest project-template revision or strong ETag')
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       const accepted = await client.projectTemplates.instantiate(
         id,
         (await readJsonObject(options.data, input)) as never,
-        { idempotencyKey: options.idempotencyKey },
+        { idempotencyKey: options.idempotencyKey, ifMatch: options.ifMatch },
       )
       const result = options.wait
         ? await client.projectTemplateInstantiations.wait(accepted.data.id, {

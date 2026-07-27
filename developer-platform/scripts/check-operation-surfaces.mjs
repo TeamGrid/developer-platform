@@ -90,10 +90,10 @@ if (
   !Array.isArray(issuedScopes) ||
   issuedScopes.some((scope) => scope?.name === 'changes:read')
 ) {
-  fail('the beta.2 public contract must not expose the deferred change feed or changes:read scope')
+  fail('the 1.0 release candidate must not expose the deferred change feed or changes:read scope')
 }
 
-const expectedBeta2NonCasOperationIds = [
+const expectedCoreOperationIds = [
   'archiveProject',
   'archiveProjectTemplate',
   'archiveTask',
@@ -153,11 +153,27 @@ const expectedIndependentIfMatchOperationIds = [
   'updateRole',
   'updateWorkspaceSettings',
 ]
+const expectedCoreCasOperationIds = [
+  'archiveProject',
+  'archiveProjectTemplate',
+  'archiveTask',
+  'completeProject',
+  'completeTask',
+  'instantiateProjectTemplate',
+  'reopenProject',
+  'reopenTask',
+  'restoreProject',
+  'restoreProjectTemplate',
+  'restoreTask',
+  'updateProject',
+  'updateProjectTemplate',
+  'updateTask',
+]
 const allOpenApiOperations = Object.values(openapi.paths)
   .flatMap((pathItem) => Object.values(pathItem))
   .filter((operation) => operation?.operationId)
 const coreOperations = allOpenApiOperations
-  .filter((operation) => expectedBeta2NonCasOperationIds.includes(operation.operationId))
+  .filter((operation) => expectedCoreOperationIds.includes(operation.operationId))
   .sort((left, right) => left.operationId.localeCompare(right.operationId))
 const residualCasOperations = allOpenApiOperations
   .filter((operation) => operation?.['x-teamgrid-resource-cas'] === 'resource-cas-v1')
@@ -174,41 +190,45 @@ const independentIfMatchOperations = allOpenApiOperations
 if (
   coreOperations.length !== 25 ||
   JSON.stringify(coreOperations.map((operation) => operation.operationId)) !==
-    JSON.stringify(expectedBeta2NonCasOperationIds) ||
-  manifest.summary?.beta2NonCasResourceOperations !== 25 ||
-  manifest.summary?.resourceCasMutationOperations !== 0 ||
-  manifest.summary?.resourceCasOperationReads !== 0 ||
-  residualCasOperations.length !== 0 ||
-  residualCasReads.length !== 0
+    JSON.stringify(expectedCoreOperationIds) ||
+  manifest.summary?.resourceCasMutationOperations !== 14 ||
+  manifest.summary?.resourceCasOperationReads !== 2 ||
+  JSON.stringify(residualCasOperations.map((operation) => operation.operationId).sort()) !==
+    JSON.stringify(expectedCoreCasOperationIds) ||
+  JSON.stringify(residualCasReads.map((operation) => operation.operationId).sort()) !==
+    JSON.stringify(['getProjectLifecycleOperation', 'getProjectTemplateInstantiation'])
 ) {
-  fail('beta.2 must expose exactly 25 static core operations and zero resource-CAS operations')
+  fail('the release candidate must preserve 25 core operations with 14 CAS mutations and 2 qualified operation reads')
 }
+const expectedAllIfMatchOperationIds = [
+  ...expectedCoreCasOperationIds,
+  ...expectedIndependentIfMatchOperationIds,
+].sort()
 if (
   JSON.stringify(independentIfMatchOperations.map((operation) => operation.operationId)) !==
-  JSON.stringify(expectedIndependentIfMatchOperationIds)
+  JSON.stringify(expectedAllIfMatchOperationIds)
 ) {
-  fail('beta.2 must preserve exactly the 31 independent If-Match operations')
+  fail('the release candidate must expose exactly the 45 qualified If-Match operations')
 }
 if (manifest.contractVersion !== openapi.info.version) {
   fail('contract manifest and OpenAPI versions differ')
 }
-for (const operation of coreOperations) {
+for (const operation of residualCasOperations) {
   const ifMatchParameters = (operation.parameters || []).filter((parameter) =>
     /IfMatch(?:Project|ProjectTemplate|Task)$/.test(parameter.$ref || parameter.name || ''),
   )
   if (
-    ifMatchParameters.length !== 0 ||
-    operation.responses?.['412'] !== undefined ||
-    operation.responses?.['428'] !== undefined ||
-    operation['x-teamgrid-resource-cas'] !== undefined ||
-    operation['x-teamgrid-resource-cas-read'] !== undefined
+    ifMatchParameters.length !== 1 ||
+    operation.responses?.['412'] === undefined ||
+    operation.responses?.['428'] === undefined ||
+    operation['x-teamgrid-resource-cas'] !== 'resource-cas-v1'
   ) {
-    fail(`${operation.operationId} still exposes a retired core resource-CAS contract`)
+    fail(`${operation.operationId} lacks its required resource-CAS contract`)
   }
 }
 for (const parameterName of ['IfMatchProject', 'IfMatchProjectTemplate', 'IfMatchTask']) {
-  if (openapi.components?.parameters?.[parameterName] !== undefined) {
-    fail(`retired core parameter ${parameterName} remains in OpenAPI`)
+  if (openapi.components?.parameters?.[parameterName] === undefined) {
+    fail(`required core parameter ${parameterName} is absent from OpenAPI`)
   }
 }
 for (const [schemaName, retiredFields] of Object.entries({
@@ -219,8 +239,8 @@ for (const [schemaName, retiredFields] of Object.entries({
   Task: ['developerRevision', 'developerUpdatedAt'],
 })) {
   const properties = openapi.components?.schemas?.[schemaName]?.properties?.attributes?.properties
-  if (!properties || retiredFields.some((field) => properties[field] !== undefined)) {
-    fail(`${schemaName} still exposes retired core resource-CAS fields`)
+  if (!properties || retiredFields.some((field) => properties[field] === undefined)) {
+    fail(`${schemaName} lacks required core resource-CAS fields`)
   }
 }
 
@@ -261,25 +281,25 @@ if (
 }
 
 const sdk = new TeamGridClient({ fetch: async () => new Response(null, { status: 500 }), token: syntheticToken })
-if ('changes' in sdk) fail('the beta.2 SDK must not expose a change-feed client')
+if ('changes' in sdk) fail('the release-candidate SDK must not expose a change-feed client')
 for (const operation of ledger.operationPolicy) {
   if (!hasFunction(sdk, operation.sdk)) fail(`${operation.operationId} lacks SDK method ${operation.sdk}`)
 }
 
 const cliCommands = new Set(commandPaths(createProgram()))
 if (cliCommands.has('changes') || [...cliCommands].some((command) => command.startsWith('changes '))) {
-  fail('the beta.2 CLI must not expose change-feed commands')
+  fail('the release-candidate CLI must not expose change-feed commands')
 }
 const cliCommandMap = commandsByPath(createProgram())
 for (const operation of ledger.operationPolicy) {
   if (!cliCommands.has(operation.cli)) fail(`${operation.operationId} lacks CLI command ${operation.cli}`)
 }
-for (const operation of coreOperations) {
+for (const operation of residualCasOperations) {
   const policy = ledger.operationPolicy.find((entry) => entry.operationId === operation.operationId)
   const command = policy && cliCommandMap.get(policy.cli)
   const ifMatchOptions = command?.options.filter((option) => option.long === '--if-match') || []
-  if (!policy || ifMatchOptions.length !== 0) {
-    fail(`${operation.operationId} must not expose a CLI --if-match option in beta.2`)
+  if (!policy || ifMatchOptions.length !== 1 || ifMatchOptions[0].mandatory !== true) {
+    fail(`${operation.operationId} must expose one required CLI --if-match option`)
   }
 }
 for (const operation of independentIfMatchOperations) {

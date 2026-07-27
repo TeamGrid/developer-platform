@@ -28,10 +28,10 @@ reads; or `all` for the explicit 29-tool union. Project statements and webhook
 delivery history remain forbidden in every MCP profile. The adapter does not
 expose write or secret-bearing operations.
 
-Project and task tools return the static Beta 2 resource shape. Core resource revisions, strong
-ETags, and compare-and-set inputs are not part of the MCP surface.
+Project and task tools include their stable developer revision. MCP remains intentionally
+read-only, so compare-and-set inputs are not part of its curated tool surface.
 
-The change feed is deferred beyond the `1.0.0-beta.2` public contract and is absent from every MCP
+The change feed is deferred beyond the `1.0.0-rc.1` public contract and is absent from every MCP
 profile. Per-resource
 custom-field values, project templates and instantiation status, and planned-work schedules and
 operation status are also forbidden in every profile because they contain sensitive workflow or

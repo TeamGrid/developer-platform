@@ -31,14 +31,13 @@ history, custom-field values, project templates, and planned work. Use
 original direct list form for lists, services, and tags remains available as a
 compatibility alias.
 
-The change feed is deliberately deferred beyond the `1.0.0-beta.2` public contract. This release
+The change feed is deliberately deferred beyond the `1.0.0-rc.1` public contract. This release
 does not install `teamgrid changes` commands or request a `changes:read` scope. Use signed webhooks
 for event-driven integration and bounded list commands for reconciliation.
 
-Custom-field `set`/`clear` and planned-work `replace` require a revision from the latest GET. Those
-independent compare-and-set commands keep `--if-match` and return exit code `6` for a stale
-revision. Task, project, and project-template commands use the static Beta 2 contract and therefore
-do not accept `--if-match`. Planned-work replacement is a full schedule replacement, so
+Custom-field `set`/`clear`, planned-work `replace`, and every mutating task, project, or
+project-template command require the revision from the latest GET through `--if-match`. A stale
+revision returns exit code `6` and must be refreshed before retrying. Planned-work replacement is a full schedule replacement, so
 non-interactive use additionally requires `--yes`; always provide a stable idempotency key.
 Project lifecycle operations, template instantiation, and planned-work replacement can be polled to
 a terminal state with `--wait`, bounded by `--max-wait`.

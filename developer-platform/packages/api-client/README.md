@@ -25,7 +25,7 @@ discovery. Every public operation is checked against the canonical capability
 manifest during CI. Finance-gated fields are typed as optional and are absent
 unless the credential has the documented overlay scope and workspace entitlement.
 
-The change feed is deliberately deferred beyond the `1.0.0-beta.2` public contract. This release
+The change feed is deliberately deferred beyond the `1.0.0-rc.1` public contract. This release
 does not expose a `changes` client or a `changes:read` scope. Use signed webhooks for event-driven
 integration and regular bounded list requests for reconciliation.
 
@@ -55,19 +55,23 @@ const accepted = await teamgrid.plannedWork.replaceForTask(
 await teamgrid.plannedWorkOperations.wait(accepted.data.id)
 ```
 
-Tasks, projects, and project templates use the static Beta 2 resource contract. These resources do
-not expose developer revisions or strong ETags, and their update and lifecycle methods do not take
-an `ifMatch` option. Project lifecycle changes and template instantiation remain asynchronous and
-accept a stable idempotency key for safe retries:
+Tasks, projects, and project templates expose a developer revision and strong ETag. Read the
+resource first, then pass that ETag or its prefixed revision to every update or lifecycle mutation.
+Project lifecycle changes and template instantiation remain asynchronous and also accept a stable
+idempotency key for safe retries:
 
 ```ts
+const task = await teamgrid.tasks.get('task-id')
 const updated = await teamgrid.tasks.update(
   'task-id',
   { name: 'Reviewed task' },
+  { ifMatch: task.transport.headers.etag },
 )
 
+const project = await teamgrid.projects.get('project-id')
 const operation = await teamgrid.projects.complete('project-id', {
   idempotencyKey: 'complete-project-id-v1',
+  ifMatch: project.transport.headers.etag,
 })
 await teamgrid.projectLifecycleOperations.wait(operation.data.id, {
   acceptedOperation: operation.data,

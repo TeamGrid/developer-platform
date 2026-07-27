@@ -12,6 +12,7 @@ type RecordValue = Record<string, unknown>
 const canonicalDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
 const templateIdPattern = /^[A-Za-z0-9_-]{1,128}$/
 const anyStringPattern = /^[\s\S]*$/
+const developerRevisionPattern = /^[a-f0-9]{64}$/
 
 function invalidResponse(label: string, detail: string): never {
   throw new TeamGridClientError(
@@ -99,16 +100,22 @@ export const taskValidator = (value: unknown): value is Task =>
         'completed',
         'createdAt',
         'description',
+        'developerRevision',
+        'developerUpdatedAt',
         'dueAt',
         'groupId',
         'listId',
         'name',
+        'order',
+        'personalListId',
+        'personalListOrder',
         'plannedEndAt',
         'plannedMinutes',
         'plannedStartAt',
         'projectId',
         'serviceId',
         'subscriberIds',
+        'subtasks',
         'tagIds',
         'updatedAt',
       ])
@@ -122,16 +129,32 @@ export const taskValidator = (value: unknown): value is Task =>
       typeof attributes.completed === 'boolean' &&
       nullableDate(attributes.createdAt) &&
       typeof attributes.description === 'string' &&
+      typeof attributes.developerRevision === 'string' &&
+      developerRevisionPattern.test(attributes.developerRevision) &&
+      canonicalDate(attributes.developerUpdatedAt) &&
       nullableDate(attributes.dueAt) &&
       nullableId(attributes.groupId) &&
       nullableId(attributes.listId) &&
       typeof attributes.name === 'string' &&
+      finiteNumberOrNull(attributes.order) &&
+      nullableId(attributes.personalListId) &&
+      finiteNumberOrNull(attributes.personalListOrder) &&
       nullableDate(attributes.plannedEndAt) &&
       finiteNumberOrNull(attributes.plannedMinutes) &&
       nullableDate(attributes.plannedStartAt) &&
       nullableId(attributes.projectId) &&
       nullableId(attributes.serviceId) &&
       stringArray(attributes.subscriberIds) &&
+      Array.isArray(attributes.subtasks) &&
+      attributes.subtasks.every(
+        (subtask) =>
+          hasExactKeys(subtask, ['completed', 'id', 'name', 'order']) &&
+          typeof subtask.completed === 'boolean' &&
+          typeof subtask.id === 'string' &&
+          typeof subtask.name === 'string' &&
+          typeof subtask.order === 'number' &&
+          Number.isFinite(subtask.order),
+      ) &&
       stringArray(attributes.tagIds) &&
       nullableDate(attributes.updatedAt)
     )
@@ -148,6 +171,8 @@ export const projectValidator = (value: unknown): value is Project =>
         'contactId',
         'createdAt',
         'description',
+        'developerRevision',
+        'developerUpdatedAt',
         'dueAt',
         'individualId',
         'listId',
@@ -170,6 +195,9 @@ export const projectValidator = (value: unknown): value is Project =>
       nullableId(attributes.contactId) &&
       nullableDate(attributes.createdAt) &&
       typeof attributes.description === 'string' &&
+      typeof attributes.developerRevision === 'string' &&
+      developerRevisionPattern.test(attributes.developerRevision) &&
+      canonicalDate(attributes.developerUpdatedAt) &&
       nullableDate(attributes.dueAt) &&
       nullableId(attributes.individualId) &&
       nullableId(attributes.listId) &&
@@ -191,6 +219,8 @@ export const projectTemplateValidator = (value: unknown): value is ProjectTempla
         'color',
         'createdAt',
         'description',
+        'developerRevision',
+        'developerUpdatedAt',
         'originProjectId',
         'snapshotVersion',
         'stats',
@@ -207,6 +237,9 @@ export const projectTemplateValidator = (value: unknown): value is ProjectTempla
       /^#[0-9a-f]{6}$/.test(attributes.color) &&
       nullableDate(attributes.createdAt) &&
       boundedString(attributes.description, 50_000) &&
+      typeof attributes.developerRevision === 'string' &&
+      developerRevisionPattern.test(attributes.developerRevision) &&
+      canonicalDate(attributes.developerUpdatedAt) &&
       (attributes.originProjectId === null ||
         (typeof attributes.originProjectId === 'string' &&
           boundedString(attributes.originProjectId, 128))) &&
@@ -289,11 +322,24 @@ export const projectLifecycleOperationValidator = (
         'finishedAt',
         'noOp',
         'projectId',
+        'resultRevision',
+        'sourceRevision',
         'startedAt',
         'state',
         'updatedAt',
       ],
-      ['action', 'attempts', 'checkpoints', 'createdAt', 'noOp', 'projectId', 'state', 'updatedAt'],
+      [
+        'action',
+        'attempts',
+        'checkpoints',
+        'createdAt',
+        'noOp',
+        'projectId',
+        'resultRevision',
+        'sourceRevision',
+        'state',
+        'updatedAt',
+      ],
     )
   ) {
     return false
@@ -308,6 +354,13 @@ export const projectLifecycleOperationValidator = (
     typeof attributes.noOp === 'boolean' &&
     typeof attributes.projectId === 'string' &&
     boundedString(attributes.projectId, 128, false) &&
+    (attributes.resultRevision === null ||
+      (typeof attributes.resultRevision === 'string' &&
+        developerRevisionPattern.test(attributes.resultRevision))) &&
+    typeof attributes.sourceRevision === 'string' &&
+    developerRevisionPattern.test(attributes.sourceRevision) &&
+    ((attributes.state === 'succeeded' && typeof attributes.resultRevision === 'string') ||
+      (attributes.state !== 'succeeded' && attributes.resultRevision === null)) &&
     canonicalDate(attributes.updatedAt) &&
     terminalStateIsConsistent(attributes, 5000)
   )
@@ -329,11 +382,22 @@ export const projectTemplateInstantiationValidator = (
         'finishedAt',
         'progress',
         'projectId',
+        'resultRevision',
+        'sourceRevision',
         'state',
         'templateId',
         'updatedAt',
       ],
-      ['createdAt', 'progress', 'projectId', 'state', 'templateId', 'updatedAt'],
+      [
+        'createdAt',
+        'progress',
+        'projectId',
+        'resultRevision',
+        'sourceRevision',
+        'state',
+        'templateId',
+        'updatedAt',
+      ],
     )
   ) {
     return false
@@ -357,6 +421,13 @@ export const projectTemplateInstantiationValidator = (
     Number(progress.tasksTotal) <= 5000 &&
     typeof attributes.projectId === 'string' &&
     templateIdPattern.test(attributes.projectId) &&
+    (attributes.resultRevision === null ||
+      (typeof attributes.resultRevision === 'string' &&
+        developerRevisionPattern.test(attributes.resultRevision))) &&
+    typeof attributes.sourceRevision === 'string' &&
+    developerRevisionPattern.test(attributes.sourceRevision) &&
+    ((attributes.state === 'succeeded' && typeof attributes.resultRevision === 'string') ||
+      (attributes.state !== 'succeeded' && attributes.resultRevision === null)) &&
     typeof attributes.templateId === 'string' &&
     templateIdPattern.test(attributes.templateId) &&
     canonicalDate(attributes.updatedAt) &&

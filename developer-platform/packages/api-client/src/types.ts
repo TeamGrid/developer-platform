@@ -4,6 +4,7 @@ export type Workspace = components['schemas']['Workspace']
 export type ApiVersion = components['schemas']['ApiVersionEnvelope']['data']
 export type ApiVersionEnvelope = components['schemas']['ApiVersionEnvelope'] & TransportAware
 export type Project = components['schemas']['Project']
+export type ProjectRevision = `prj1-${string}`
 export type ProjectCreate = components['schemas']['ProjectCreate']
 export type ProjectUpdate = components['schemas']['ProjectUpdate']
 export type Product = components['schemas']['Product']
@@ -16,6 +17,7 @@ export type ProjectStatement = components['schemas']['ProjectStatement']
 export type ProjectStatementCreate = components['schemas']['ProjectStatementCreate']
 export type ProjectStatementUpdate = components['schemas']['ProjectStatementUpdate']
 export type Task = components['schemas']['Task']
+export type TaskRevision = `tsk1-${string}`
 export type TimeEntry = components['schemas']['TimeEntry']
 export type Contact = components['schemas']['Contact']
 export type ContactCreate = components['schemas']['ContactCreate']
@@ -34,6 +36,7 @@ export type CustomFieldValueSet = components['schemas']['CustomFieldValueSet']
 export type CustomFieldValueTargetType = CustomFieldValue['attributes']['targetType']
 export type CustomFieldValueRevision = CustomFieldValue['attributes']['revision']
 export type ProjectTemplate = components['schemas']['ProjectTemplate']
+export type ProjectTemplateRevision = `tpl1-${string}`
 export type ProjectTemplateCreate = components['schemas']['ProjectTemplateCreate']
 export type ProjectTemplateUpdate = components['schemas']['ProjectTemplateUpdate']
 export type ProjectTemplateInstantiate = components['schemas']['ProjectTemplateInstantiate']
@@ -766,6 +769,26 @@ export type MutationOptions = {
   idempotencyKey?: string
   requestId?: string
   signal?: AbortSignal
+}
+
+export type ProjectMutationOptions = RequestOptions & {
+  ifMatch: ProjectRevision | `"${ProjectRevision}"`
+}
+
+export type ProjectLifecycleMutationOptions = MutationOptions & {
+  ifMatch: ProjectRevision | `"${ProjectRevision}"`
+}
+
+export type ProjectTemplateMutationOptions = RequestOptions & {
+  ifMatch: ProjectTemplateRevision | `"${ProjectTemplateRevision}"`
+}
+
+export type ProjectTemplateInstantiationOptions = MutationOptions & {
+  ifMatch: ProjectTemplateRevision | `"${ProjectTemplateRevision}"`
+}
+
+export type TaskMutationOptions = RequestOptions & {
+  ifMatch: TaskRevision | `"${TaskRevision}"`
 }
 
 /**

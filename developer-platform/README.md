@@ -97,16 +97,15 @@ for await (const page of client.tasks.pages({ projectId: 'project-id' })) {
 }
 ```
 
-The change feed is deliberately deferred beyond the `1.0.0-beta.2` public contract. The API,
+The change feed is deliberately deferred beyond the `1.0.0-rc.1` public contract. The API,
 SDK, CLI, MCP adapter, and issuable scopes do not expose it in this release. Use signed webhooks
 for event-driven integration and bounded list reads for reconciliation.
 
-GET requests, POST requests with an idempotency key, and compare-and-set planned-work PUTs with an
-idempotency key are retried for bounded transient failures. Tasks, projects, and project templates
-use the static Beta 2 contract without developer revisions, strong ETags, or `If-Match` options.
-Independent compare-and-set contracts such as custom-field values and planned work remain
-unchanged. Other PUT, PATCH, and DELETE requests are not automatically retried. Errors do not
-retain or print the bearer credential.
+GET requests and POST requests with an idempotency key are retried for bounded transient failures.
+Tasks, projects, and project templates expose developer revisions and strong ETags. Every update,
+archive, restore, completion, reopen, lifecycle start, and template instantiation requires the
+latest revision through `If-Match`, preventing silent overwrites. Other PUT, PATCH, and DELETE
+requests are not automatically retried. Errors do not retain or print the bearer credential.
 
 ## Webhook v2 signatures
 
