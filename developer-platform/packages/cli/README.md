@@ -18,6 +18,8 @@ teamgrid project-templates instantiate template-id \
   --data @project.json --idempotency-key rollout-1 --wait --output json
 teamgrid planned-work replace task-id --data @schedule.json \
   --if-match "$REVISION" --idempotency-key schedule-1 --yes --wait --output json
+teamgrid changes checkpoint --resource-type task --output json
+teamgrid changes list --cursor "$CHECKPOINT" --resource-type task --all --output jsonl
 ```
 
 Credentials are read from `TEAMGRID_API_TOKEN` or stored in macOS Keychain /
@@ -33,9 +35,10 @@ history, custom-field values, project templates, and planned work. Use
 original direct list form for lists, services, and tags remains available as a
 compatibility alias.
 
-The change feed is deliberately deferred beyond the `1.0.0-rc.1` public contract. This release
-does not install `teamgrid changes` commands or request a `changes:read` scope. Use signed webhooks
-for event-driven integration and bounded list commands for reconciliation.
+The stable `changes` commands expose metadata-only, cell-local reconciliation. Create a checkpoint
+immediately before taking a full resource snapshot, persist the returned opaque cursor verbatim,
+then use `changes list`. `--all` remains bounded by `--max-pages`; JSONL emits an explicit
+checkpoint record after each page. A `410` response requires a new checkpoint and full snapshot.
 
 Custom-field `set`/`clear`, planned-work `replace`, and every mutating task, project, or
 project-template command require the revision from the latest GET through `--if-match`. A stale

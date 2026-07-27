@@ -31,11 +31,12 @@ expose write or secret-bearing operations.
 Project and task tools include their stable developer revision. MCP remains intentionally
 read-only, so compare-and-set inputs are not part of its curated tool surface.
 
-The change feed is deferred beyond the `1.0.0-rc.1` public contract and is absent from every MCP
-profile. Per-resource
+The stable API and SDK expose a high-volume change feed, but it remains intentionally absent from
+every MCP profile because it is a synchronization primitive rather than an interactive model
+tool. Per-resource
 custom-field values, project templates and instantiation status, and planned-work schedules and
 operation status are also forbidden in every profile because they contain sensitive workflow or
 workload data. Even `all` does not register or advertise any of these operations. Custom-field
 *definition* reads remain the narrow exception in `governance`; all writes remain forbidden. The
-release gate verifies that the contract, SDK, CLI, and MCP adapter all keep the deferred surface
-absent.
+release gate verifies that the contract, SDK, and CLI expose it consistently while the MCP adapter
+keeps it forbidden.

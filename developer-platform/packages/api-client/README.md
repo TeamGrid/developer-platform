@@ -25,9 +25,23 @@ discovery. Every public operation is checked against the canonical capability
 manifest during CI. Finance-gated fields are typed as optional and are absent
 unless the credential has the documented overlay scope and workspace entitlement.
 
-The change feed is deliberately deferred beyond the `1.0.0-rc.1` public contract. This release
-does not expose a `changes` client or a `changes:read` scope. Use signed webhooks for event-driven
-integration and regular bounded list requests for reconciliation.
+The stable change feed exposes metadata-only resource changes through `teamgrid.changes`.
+Create a checkpoint immediately before a full snapshot, then consume bounded pages from that
+checkpoint. Cursors are opaque and bound to the credential, workspace, cell, epoch, and exact
+filters; persist and replay them verbatim against the same regional endpoint:
+
+```ts
+const bootstrap = await teamgrid.changes.snapshotThenCatchUp(
+  async () => teamgrid.tasks.list({ limit: 200 }),
+  { resourceTypes: ['task'] },
+)
+for await (const page of bootstrap.pages) {
+  await persistChanges(page.data, page.meta.page.nextCursor)
+}
+```
+
+A `410` response requires a fresh checkpoint and full snapshot. Use signed webhooks for
+low-latency notifications and the change feed for durable reconciliation.
 
 Custom-field values and planned-work schedules use strong compare-and-set revisions. Read the
 latest resource first and pass its revision explicitly; the SDK sends a strong `If-Match` header:

@@ -85,6 +85,12 @@ import type {
   CallNote,
   CallNoteCreate,
   CallNoteListOptions,
+  ChangeCatchUpOptions,
+  ChangeCheckpoint,
+  ChangeFeedBootstrap,
+  ChangeFilterOptions,
+  ChangeListOptions,
+  ChangePageEnvelope,
   CommentCreate,
   CommentListOptions,
   CommentMutationOptions,
@@ -611,6 +617,7 @@ function expectedResourceTypes(path: string) {
     appointments: ['appointment'],
     'audit-events': ['auditEvent'],
     'call-notes': ['callNote'],
+    changes: ['changeEvent'],
     comments: ['comment'],
     contacts: ['contact'],
     'contact-groups': ['contactGroup'],
@@ -800,6 +807,27 @@ function assertPage<T>(value: unknown, expectedTypes: string[]): ListEnvelope<T>
     assertResourceValue(resource, expectedTypes)
   })
   return value as ListEnvelope<T>
+}
+
+function assertChangePage(value: unknown): ChangePageEnvelope {
+  const page = assertPage(value, ['changeEvent'])
+  if (
+    typeof page.meta.page.nextCursor !== 'string' ||
+    !page.meta.page.nextCursor ||
+    typeof (page.meta.page as unknown as { caughtUp?: unknown }).caughtUp !== 'boolean' ||
+    !Number.isInteger(page.meta.page.limit) ||
+    page.meta.page.limit < 1 ||
+    page.meta.page.limit > 200 ||
+    page.data.length > page.meta.page.limit ||
+    (!(page.meta.page as unknown as { caughtUp: boolean }).caughtUp &&
+      page.data.length !== page.meta.page.limit)
+  ) {
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'Expected a TeamGrid change-feed checkpoint.',
+    )
+  }
+  return page as ChangePageEnvelope
 }
 
 function assertAuditEventPage(value: ListEnvelope<AuditEvent>): AuditEventListEnvelope {
@@ -1011,6 +1039,7 @@ export class TeamGridClient {
   readonly availability
   readonly auditEvents
   readonly callNotes
+  readonly changes
   readonly comments
   readonly contacts
   readonly contactGroups
@@ -2040,6 +2069,18 @@ export class TeamGridClient {
           100,
           options,
         ),
+    }
+    this.changes = {
+      checkpoint: (options?: ChangeFilterOptions) =>
+        this.#changePage({ ...options, startAtLatest: true }),
+      list: (options?: ChangeListOptions) => this.#changePage(options),
+      pages: (options?: ChangeCatchUpOptions, pagination?: PaginationOptions) =>
+        this.#changePages(options, pagination),
+      snapshotThenCatchUp: <T>(
+        snapshot: (checkpoint: ChangeCheckpoint) => Promise<T>,
+        options?: ChangeFilterOptions,
+        pagination?: PaginationOptions,
+      ) => this.#snapshotThenCatchUp(snapshot, options, pagination),
     }
     this.plannedWork = {
       getForTask: (id: string, options?: RequestOptions) =>
@@ -3381,6 +3422,16 @@ export class TeamGridClient {
     )
   }
 
+  async #changePage(options: ChangeListOptions = {}) {
+    const { requestId, signal, ...query } = options
+    const response = await this.#request('/changes', {
+      query: query as Query,
+      requestId,
+      signal,
+    })
+    return attachTransport(assertChangePage(response.payload), response.transport)
+  }
+
   async #redactedCredentialResource<T>(path: string, options?: RequestOptions) {
     const envelope = await this.#resource<T>(path, options)
     assertCredentialMetadataIsRedacted(envelope)
@@ -3443,6 +3494,58 @@ export class TeamGridClient {
       assertResource<PlannedWorkOperation>(response.payload, ['plannedWorkOperation']),
       response.transport,
     )
+  }
+
+  async *#changePages(
+    options: ChangeCatchUpOptions = {},
+    pagination: PaginationOptions = {},
+  ): AsyncIterable<ChangePageEnvelope> {
+    let cursor = options.cursor
+    const seen = new Set<string>(cursor ? [cursor] : [])
+    const maxPages = Math.max(1, Math.min(Math.trunc(pagination.maxPages ?? 10_000), 10_000))
+    for (let pageIndex = 0; pageIndex < maxPages; pageIndex += 1) {
+      const page = await this.#changePage({
+        ...options,
+        cursor,
+        signal: pagination.signal || options.signal,
+      })
+      yield page
+      if (page.meta.page.caughtUp) return
+      const nextCursor = page.meta.page.nextCursor
+      if (seen.has(nextCursor)) {
+        throw new TeamGridClientError(
+          'pagination_cycle',
+          'The TeamGrid API returned a repeated change-feed cursor.',
+        )
+      }
+      seen.add(nextCursor)
+      cursor = nextCursor
+    }
+    throw new TeamGridClientError(
+      'pagination_limit',
+      `Change-feed catch-up exceeded the configured ${maxPages}-page safety limit.`,
+    )
+  }
+
+  async #snapshotThenCatchUp<T>(
+    snapshot: (checkpoint: ChangeCheckpoint) => Promise<T>,
+    options: ChangeFilterOptions = {},
+    pagination: PaginationOptions = {},
+  ): Promise<ChangeFeedBootstrap<T>> {
+    const checkpointPage = await this.#changePage({ ...options, startAtLatest: true })
+    if (checkpointPage.data.length !== 0 || !checkpointPage.meta.page.caughtUp) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'Expected an empty TeamGrid change-feed checkpoint page.',
+      )
+    }
+    const checkpoint = checkpointPage.meta.page.nextCursor
+    const snapshotValue = await snapshot(checkpoint)
+    return {
+      checkpoint,
+      pages: this.#changePages({ ...options, cursor: checkpoint }, pagination),
+      snapshot: snapshotValue,
+    }
   }
 
   async *#pages<T>(

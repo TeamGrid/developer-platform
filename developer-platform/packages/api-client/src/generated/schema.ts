@@ -2156,6 +2156,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List cell-local resource changes
+         * @description Returns metadata-only, cell-local changes at a fixed page watermark. The opaque cursor is bound to the credential, workspace, cell, epoch, and exact filter set. A 410 response requires a new checkpoint and full resource snapshot.
+         */
+        get: operations["listChanges"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/system/capabilities": {
         parameters: {
             query?: never;
@@ -3538,6 +3558,23 @@ export interface components {
             id: string;
             /** @constant */
             type: "auditEvent";
+        };
+        ChangeEvent: {
+            attributes: {
+                /** @enum {string} */
+                operation: "created" | "deleted" | "updated";
+                /** Format: date-time */
+                occurredAt: string;
+                region: string;
+                resourceId: string;
+                /** @enum {string} */
+                resourceType: "absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook";
+                sequence: number;
+                tombstone: boolean;
+            };
+            id: string;
+            /** @constant */
+            type: "changeEvent";
         };
         /** @description Credential-owned v2 webhook. List and get responses are secret-free and carry a strong whk1 revision. Only create may include the reveal-only initial signing secret. */
         Webhook: {
@@ -11903,6 +11940,63 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listChanges: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+                /** @description Filter by one or more change operations. Repeat the query parameter for multiple values. */
+                operations?: ("created" | "deleted" | "updated")[];
+                /** @description Filter by one or more public resource types. Repeat the query parameter for multiple values. */
+                resourceTypes?: ("absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook")[];
+                /** @description Create an empty checkpoint at the latest committed cell sequence. Cannot be combined with cursor. Use this before a full resource snapshot, then poll with the returned cursor. */
+                startAtLatest?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A fixed-watermark change page and the checkpoint for the next poll. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ChangeEvent"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                /** @description Credential-bound checkpoint for the next poll. It is present even when this page is empty. */
+                                nextCursor: string;
+                                /** @description True when this page reaches its fixed watermark. False pages are always full. */
+                                caughtUp: boolean;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description The cursor is outside retained history or cell continuity cannot be proven. A full resynchronization is required. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

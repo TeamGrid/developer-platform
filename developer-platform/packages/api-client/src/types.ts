@@ -59,6 +59,15 @@ export type TagCreate = components['schemas']['TagCreate']
 export type TagUpdate = components['schemas']['TagUpdate']
 export type Lookup = List | Service | Tag
 export type AuditEvent = components['schemas']['AuditEvent']
+export type ChangeEvent = components['schemas']['ChangeEvent']
+export type ChangeOperation = ChangeEvent['attributes']['operation']
+export type ChangeResourceType = ChangeEvent['attributes']['resourceType']
+/**
+ * An opaque, credential- and cell-bound change-feed checkpoint. Persist the
+ * value verbatim and return it only to the same regional endpoint with the
+ * same credential and filters.
+ */
+export type ChangeCheckpoint = string
 export type Webhook = components['schemas']['Webhook']
 export type WebhookCreate = components['schemas']['WebhookCreate']
 export type WebhookUpdate = components['schemas']['WebhookUpdate']
@@ -574,6 +583,17 @@ export type AuditEventListEnvelope = ListEnvelope<AuditEvent> & {
   }
 }
 
+export type ChangePageEnvelope = TransportAware & {
+  data: ChangeEvent[]
+  meta: RequestMeta & {
+    page: {
+      caughtUp: boolean
+      limit: number
+      nextCursor: ChangeCheckpoint
+    }
+  }
+}
+
 export type ListOptions = {
   cursor?: string
   limit?: number
@@ -805,6 +825,29 @@ export type AutomationRunListOptions = ListOptions & {
 
 export type AutomationRunMutationOptions = RequestOptions & {
   ifMatch: AutomationRunRevision | `"${AutomationRunRevision}"`
+}
+
+export type ChangeFilterOptions = RequestOptions & {
+  limit?: number
+  operations?: readonly ChangeOperation[]
+  resourceTypes?: readonly ChangeResourceType[]
+}
+
+export type ChangeListOptions = ChangeFilterOptions & {
+  cursor?: ChangeCheckpoint
+  startAtLatest?: boolean
+}
+
+export type ChangeCatchUpOptions = ChangeFilterOptions & {
+  cursor?: ChangeCheckpoint
+}
+
+export type ChangeFeedBootstrap<T> = {
+  /** The checkpoint taken immediately before the snapshot started. */
+  checkpoint: ChangeCheckpoint
+  /** A bounded catch-up traversal after the snapshot checkpoint. */
+  pages: AsyncIterable<ChangePageEnvelope>
+  snapshot: T
 }
 
 export type LookupListOptions = ListOptions & ArchiveFilter

@@ -74,6 +74,8 @@ teamgrid projects complete project-id \
   --idempotency-key complete-project-id-v1 --wait --output json
 teamgrid planned-work list --start 2026-07-20T00:00:00Z --end 2026-07-27T00:00:00Z \
   --user-id user-id --output json
+teamgrid changes checkpoint --resource-type task --output json
+teamgrid changes list --cursor "$CHECKPOINT" --resource-type task --all --output jsonl
 ```
 
 Use `--data @payload.json` or `--data -` for files/stdin. Destructive commands
@@ -97,9 +99,11 @@ for await (const page of client.tasks.pages({ projectId: 'project-id' })) {
 }
 ```
 
-The change feed is deliberately deferred beyond the `1.0.0-rc.1` public contract. The API,
-SDK, CLI, MCP adapter, and issuable scopes do not expose it in this release. Use signed webhooks
-for event-driven integration and bounded list reads for reconciliation.
+The stable metadata-only change feed is exposed through the API, SDK, and CLI for durable
+reconciliation. Its opaque checkpoints are bound to one credential, workspace, cell, epoch, and
+exact filter set. The MCP adapter intentionally does not expose this high-volume synchronization
+primitive. Use signed webhooks for low-latency notifications and the change feed to detect and
+reconcile missed changes.
 
 GET requests and POST requests with an idempotency key are retried for bounded transient failures.
 Tasks, projects, and project templates expose developer revisions and strong ETags. Every update,

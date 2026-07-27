@@ -1,7 +1,10 @@
 import { readFile } from 'node:fs/promises'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
-import { TeamGridClient } from '../packages/api-client/dist/index.js'
+import {
+  TEAMGRID_CHANGE_FEED_RESOURCE_TYPES,
+  TeamGridClient,
+} from '../packages/api-client/dist/index.js'
 import { createProgram } from '../packages/cli/dist/index.js'
 import { createTeamGridMcpServer } from '../packages/mcp-server/dist/index.js'
 
@@ -83,14 +86,33 @@ if (JSON.stringify(expectedOperations) !== JSON.stringify(policyOperations)) {
 }
 
 const issuedScopes = Array.isArray(scopes) ? scopes : scopes.scopes
+const changeOperation = openapi.paths['/changes']?.get
+const changeResourceTypes = changeOperation?.parameters
+  ?.find((parameter) => parameter.name === 'resourceTypes')
+  ?.schema?.items?.enum
+const changeEventResourceTypes = openapi.components?.schemas?.ChangeEvent?.properties?.attributes
+  ?.properties?.resourceType?.enum
 if (
-  openapi.paths['/changes'] !== undefined ||
-  openapi.components?.schemas?.ChangeEvent !== undefined ||
-  ledger.operationPolicy.some((operation) => operation.operationId === 'listChanges') ||
+  !Array.isArray(changeResourceTypes) ||
+  changeResourceTypes.length !== 23 ||
+  new Set(changeResourceTypes).size !== changeResourceTypes.length ||
+  JSON.stringify(changeResourceTypes) !== JSON.stringify(changeEventResourceTypes) ||
+  JSON.stringify(changeResourceTypes) !== JSON.stringify(TEAMGRID_CHANGE_FEED_RESOURCE_TYPES) ||
   !Array.isArray(issuedScopes) ||
-  issuedScopes.some((scope) => scope?.name === 'changes:read')
+  !issuedScopes.some((scope) => scope?.name === 'changes:read')
 ) {
-  fail('the 1.0 release candidate must not expose the deferred change feed or changes:read scope')
+  fail('change-feed resource types or the changes:read scope differ across release contracts')
+}
+
+const changePolicy = ledger.operationPolicy.find((operation) => operation.operationId === 'listChanges')
+if (
+  changePolicy?.sdk !== 'changes.list' ||
+  changePolicy?.cli !== 'changes list' ||
+  changePolicy?.mcp?.exposure !== 'forbidden' ||
+  'tool' in changePolicy.mcp ||
+  !/high-volume.*(?:synchronization|transport)/i.test(changePolicy.mcp.reason || '')
+) {
+  fail('listChanges must stay available through SDK/CLI and explicitly forbidden through MCP')
 }
 
 const expectedCoreOperationIds = [
@@ -289,15 +311,11 @@ if (
 }
 
 const sdk = new TeamGridClient({ fetch: async () => new Response(null, { status: 500 }), token: syntheticToken })
-if ('changes' in sdk) fail('the release-candidate SDK must not expose a change-feed client')
 for (const operation of ledger.operationPolicy) {
   if (!hasFunction(sdk, operation.sdk)) fail(`${operation.operationId} lacks SDK method ${operation.sdk}`)
 }
 
 const cliCommands = new Set(commandPaths(createProgram()))
-if (cliCommands.has('changes') || [...cliCommands].some((command) => command.startsWith('changes '))) {
-  fail('the release-candidate CLI must not expose change-feed commands')
-}
 const cliCommandMap = commandsByPath(createProgram())
 for (const operation of ledger.operationPolicy) {
   if (!cliCommands.has(operation.cli)) fail(`${operation.operationId} lacks CLI command ${operation.cli}`)
