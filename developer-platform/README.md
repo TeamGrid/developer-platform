@@ -69,8 +69,8 @@ teamgrid webhooks create \
   --output json
 teamgrid custom-field-values get project project-id field-id --output json
 teamgrid project-templates list --origin-project-id project-id --output json
-teamgrid tasks update task-id --data '{"name":"Reviewed"}' --if-match "$TASK_REVISION"
-teamgrid projects complete project-id --if-match "$PROJECT_REVISION" \
+teamgrid tasks update task-id --data '{"name":"Reviewed"}'
+teamgrid projects complete project-id \
   --idempotency-key complete-project-id-v1 --wait --output json
 teamgrid planned-work list --start 2026-07-20T00:00:00Z --end 2026-07-27T00:00:00Z \
   --user-id user-id --output json

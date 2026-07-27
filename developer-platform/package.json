@@ -17,7 +17,8 @@
     "test": "npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && vitest run",
     "typecheck:staging-e2e": "tsc -p tsconfig.staging-e2e.json",
     "pack:check": "node scripts/check-package-artifacts.mjs",
-    "verify": "npm run check && npm test && npm run build && npm run pack:check"
+    "audit:production": "node scripts/check-production-audit.mjs",
+    "verify": "npm run audit:production && npm run check && npm test && npm run build && npm run pack:check"
   },
   "packageManager": "npm@11.18.0",
   "engines": {
@@ -30,6 +31,8 @@
     "vitest": "4.1.10"
   },
   "overrides": {
+    "brace-expansion": "5.0.8",
+    "minimatch": "10.2.5",
     "js-yaml": "4.3.0"
   }
 }
