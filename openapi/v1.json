@@ -606,9 +606,132 @@
           "data": {
             "additionalProperties": false,
             "properties": {
+              "contractVersion": {
+                "const": "1.0.0-rc.1",
+                "type": "string"
+              },
+              "deprecations": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "maxLength": 128,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "message": {
+                      "maxLength": 1000,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "replacement": {
+                      "format": "uri",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "sunsetAt": {
+                      "format": "date-time",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "message",
+                    "replacement",
+                    "sunsetAt"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
               "documentation": {
                 "format": "uri",
                 "type": "string"
+              },
+              "manifestSha256": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              },
+              "region": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "const": "operational",
+                "type": "string"
+              },
+              "supportedClients": {
+                "additionalProperties": false,
+                "properties": {
+                  "cli": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "minimumVersion": {
+                        "const": "1.0.0-rc.1",
+                        "type": "string"
+                      },
+                      "supportedMajor": {
+                        "const": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "minimumVersion",
+                      "supportedMajor"
+                    ],
+                    "type": "object"
+                  },
+                  "mcp": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "minimumVersion": {
+                        "const": "1.0.0-rc.1",
+                        "type": "string"
+                      },
+                      "supportedMajor": {
+                        "const": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "minimumVersion",
+                      "supportedMajor"
+                    ],
+                    "type": "object"
+                  },
+                  "sdk": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "minimumVersion": {
+                        "const": "1.0.0-rc.1",
+                        "type": "string"
+                      },
+                      "supportedMajor": {
+                        "const": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "minimumVersion",
+                      "supportedMajor"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "cli",
+                  "mcp",
+                  "sdk"
+                ],
+                "type": "object"
               },
               "version": {
                 "const": "1",
@@ -616,7 +739,13 @@
               }
             },
             "required": [
+              "contractVersion",
+              "deprecations",
               "documentation",
+              "manifestSha256",
+              "region",
+              "status",
+              "supportedClients",
               "version"
             ],
             "type": "object"

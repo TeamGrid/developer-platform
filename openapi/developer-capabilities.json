@@ -188,7 +188,7 @@
     { "operationId": "listIntegrationInstallations", "method": "GET", "path": "/integration-installations", "scope": "integrations:read", "sdk": "integrationInstallations.list", "cli": "integration-installations list", "mcp": { "exposure": "forbidden", "reason": "Workspace integration installation metadata remains outside every MCP profile." } }
   ],
   "productCapabilities": [
-    { "id": "system.discovery", "family": "system", "classification": "public-service", "status": "partial", "wave": 0 },
+    { "id": "system.discovery", "family": "system", "classification": "public-service", "status": "released", "wave": 0 },
     { "id": "system.capabilities", "family": "system", "classification": "public-service", "status": "released", "wave": 1 },
     { "id": "workspace.read", "family": "workspace", "classification": "public-service", "status": "released", "wave": 0 },
     { "id": "workspace.settings", "family": "workspace", "classification": "admin", "status": "released", "wave": 2 },

@@ -2235,8 +2235,42 @@ export interface components {
         };
         ApiVersionEnvelope: {
             data: {
+                /** @constant */
+                contractVersion: "1.0.0-rc.1";
+                deprecations: {
+                    id: string;
+                    message: string;
+                    /** Format: uri */
+                    replacement: string | null;
+                    /** Format: date-time */
+                    sunsetAt: string | null;
+                }[];
                 /** Format: uri */
                 documentation: string;
+                manifestSha256: string;
+                region: string | null;
+                /** @constant */
+                status: "operational";
+                supportedClients: {
+                    cli: {
+                        /** @constant */
+                        minimumVersion: "1.0.0-rc.1";
+                        /** @constant */
+                        supportedMajor: 1;
+                    };
+                    mcp: {
+                        /** @constant */
+                        minimumVersion: "1.0.0-rc.1";
+                        /** @constant */
+                        supportedMajor: 1;
+                    };
+                    sdk: {
+                        /** @constant */
+                        minimumVersion: "1.0.0-rc.1";
+                        /** @constant */
+                        supportedMajor: 1;
+                    };
+                };
                 /** @constant */
                 version: "1";
             };

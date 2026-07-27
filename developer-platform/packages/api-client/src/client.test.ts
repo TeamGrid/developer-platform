@@ -145,7 +145,20 @@ describe('TeamGrid API client', () => {
     const fetch = vi.fn(async (input: RequestInfo | URL) => {
       expect(new URL(String(input)).pathname).toBe('/v1/')
       return json({
-        data: { documentation: 'https://developer.teamgridapp.com/api/v1', version: '1' },
+        data: {
+          contractVersion: '1.0.0-rc.1',
+          deprecations: [],
+          documentation: 'https://developer.teamgridapp.com/api/v1',
+          manifestSha256: 'a'.repeat(64),
+          region: 'us',
+          status: 'operational',
+          supportedClients: {
+            cli: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+            mcp: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+            sdk: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+          },
+          version: '1',
+        },
         meta: { requestId: 'request-version' },
       })
     })
@@ -153,6 +166,31 @@ describe('TeamGrid API client', () => {
     await expect(client.system.getApiVersion()).resolves.toMatchObject({
       data: { version: '1' },
       meta: { requestId: 'request-version' },
+    })
+  })
+
+  it('rejects extended or incomplete API discovery contracts', async () => {
+    const fetch = vi.fn(async () =>
+      json({
+        data: {
+          contractVersion: '1.0.0-rc.1',
+          deprecations: [],
+          documentation: 'https://developer.teamgridapp.com/api/v1',
+          manifestSha256: 'a'.repeat(64),
+          region: 'us',
+          status: 'operational',
+          supportedClients: {
+            cli: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+            mcp: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+          },
+          version: '1',
+        },
+        meta: { requestId: 'request-version' },
+      }),
+    )
+    const client = new TeamGridClient({ fetch, token })
+    await expect(client.system.getApiVersion()).rejects.toMatchObject({
+      code: 'invalid_api_response',
     })
   })
 

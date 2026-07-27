@@ -464,6 +464,13 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }
 
+function hasExactKeys(value: unknown, keys: readonly string[]): value is Record<string, unknown> {
+  if (!isObject(value)) return false
+  const actual = Object.keys(value).sort()
+  const expected = [...keys].sort()
+  return actual.length === expected.length && actual.every((key, index) => key === expected[index])
+}
+
 function isRetryableMethod(method: string, idempotencyKey?: string) {
   return method === 'GET' || (['PATCH', 'POST', 'PUT'].includes(method) && Boolean(idempotencyKey))
 }
@@ -647,13 +654,60 @@ function assertResource<T>(value: unknown, expectedTypes: string[]): ResourceEnv
 }
 
 function assertApiVersion(value: unknown): ApiVersionEnvelope {
+  const data = isObject(value) && isObject(value.data) ? value.data : null
+  const supportedClients = data && isObject(data.supportedClients) ? data.supportedClients : null
+  const clientContractIsValid = (client: unknown) =>
+    hasExactKeys(client, ['minimumVersion', 'supportedMajor']) &&
+    client.minimumVersion === '1.0.0-rc.1' &&
+    client.supportedMajor === 1
+  const deprecationIsValid = (deprecation: unknown) =>
+    hasExactKeys(deprecation, ['id', 'message', 'replacement', 'sunsetAt']) &&
+    typeof deprecation.id === 'string' &&
+    deprecation.id.length > 0 &&
+    deprecation.id.length <= 128 &&
+    typeof deprecation.message === 'string' &&
+    deprecation.message.length > 0 &&
+    deprecation.message.length <= 1_000 &&
+    (deprecation.replacement === null ||
+      (typeof deprecation.replacement === 'string' &&
+        /^https:\/\//.test(deprecation.replacement))) &&
+    (deprecation.sunsetAt === null ||
+      (typeof deprecation.sunsetAt === 'string' && !Number.isNaN(Date.parse(deprecation.sunsetAt))))
   if (
-    !isObject(value) ||
-    !isObject(value.data) ||
-    value.data.version !== '1' ||
-    typeof value.data.documentation !== 'string' ||
-    !isObject(value.meta) ||
-    typeof value.meta.requestId !== 'string'
+    !hasExactKeys(value, ['data', 'meta']) ||
+    !data ||
+    !hasExactKeys(data, [
+      'contractVersion',
+      'deprecations',
+      'documentation',
+      'manifestSha256',
+      'region',
+      'status',
+      'supportedClients',
+      'version',
+    ]) ||
+    data.contractVersion !== '1.0.0-rc.1' ||
+    !Array.isArray(data.deprecations) ||
+    !data.deprecations.every(deprecationIsValid) ||
+    typeof data.documentation !== 'string' ||
+    !/^https:\/\//.test(data.documentation) ||
+    typeof data.manifestSha256 !== 'string' ||
+    !/^[a-f0-9]{64}$/.test(data.manifestSha256) ||
+    !(
+      data.region === null ||
+      (typeof data.region === 'string' &&
+        /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/.test(data.region))
+    ) ||
+    data.status !== 'operational' ||
+    !supportedClients ||
+    !hasExactKeys(supportedClients, ['cli', 'mcp', 'sdk']) ||
+    !clientContractIsValid(supportedClients.cli) ||
+    !clientContractIsValid(supportedClients.mcp) ||
+    !clientContractIsValid(supportedClients.sdk) ||
+    data.version !== '1' ||
+    !hasExactKeys(value.meta, ['requestId']) ||
+    typeof value.meta.requestId !== 'string' ||
+    !value.meta.requestId
   ) {
     throw new TeamGridClientError('invalid_api_response', 'Expected TeamGrid API discovery data.')
   }

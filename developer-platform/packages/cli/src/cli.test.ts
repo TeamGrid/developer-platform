@@ -141,7 +141,20 @@ describe('TeamGrid CLI', () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
     const output = capture()
     const getApiVersion = vi.fn(async () => ({
-      data: { documentation: 'https://developer.teamgridapp.com/api/v1', version: '1' },
+      data: {
+        contractVersion: '1.0.0-rc.1',
+        deprecations: [],
+        documentation: 'https://developer.teamgridapp.com/api/v1',
+        manifestSha256: 'a'.repeat(64),
+        region: 'us',
+        status: 'operational',
+        supportedClients: {
+          cli: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+          mcp: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+          sdk: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+        },
+        version: '1',
+      },
       meta: { requestId: 'request-version' },
     }))
     expect(
@@ -154,7 +167,17 @@ describe('TeamGrid CLI', () => {
     ).toBe(0)
     expect(getApiVersion).toHaveBeenCalledOnce()
     expect(JSON.parse(output.value())).toEqual({
+      contractVersion: '1.0.0-rc.1',
+      deprecations: [],
       documentation: 'https://developer.teamgridapp.com/api/v1',
+      manifestSha256: 'a'.repeat(64),
+      region: 'us',
+      status: 'operational',
+      supportedClients: {
+        cli: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+        mcp: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+        sdk: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+      },
       version: '1',
     })
   })
