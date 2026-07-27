@@ -200,7 +200,7 @@
     { "id": "credentials.lifecycle", "family": "administration", "classification": "admin", "status": "partial", "wave": 1 },
     { "id": "service-accounts.lifecycle", "family": "administration", "classification": "admin", "status": "planned", "wave": 1 },
     { "id": "oauth.delegated-users", "family": "administration", "classification": "delegated", "status": "planned", "wave": 3 },
-    { "id": "projects.read", "family": "work-management", "classification": "public-service", "status": "partial", "wave": 0 },
+    { "id": "projects.read", "family": "work-management", "classification": "public-service", "status": "released", "wave": 0 },
     { "id": "projects.write", "family": "work-management", "classification": "public-service", "status": "released", "wave": 1 },
     { "id": "projects.lifecycle", "family": "work-management", "classification": "public-service", "status": "released", "wave": 1 },
     { "id": "projects.sharing", "family": "work-management", "classification": "delegated", "status": "planned", "wave": 2 },

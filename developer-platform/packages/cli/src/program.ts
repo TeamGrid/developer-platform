@@ -623,6 +623,12 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   addListOptions(projects.command('list'))
     .option('--archived <boolean>', 'return archived projects', booleanValue)
     .option('--completed <boolean>', 'filter completion', booleanValue)
+    .option('--contact-id <id>', 'filter by primary contact')
+    .option('--created-by-id <id>', 'filter by creator')
+    .option('--individual-id <id>', 'filter by individual project id')
+    .option('--list-id <id>', 'filter by project list')
+    .option('--manager-id <id>', 'filter by manager')
+    .option('--subscriber-id <id>', 'filter by subscriber')
     .action(async function action(options, command: Command) {
       const client = await loadClient(command)
       await listResources(command, options, client.projects as never)

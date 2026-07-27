@@ -1876,6 +1876,20 @@
           "attributes": {
             "additionalProperties": false,
             "properties": {
+              "actualEndAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "actualStartAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "additionalContactIds": {
                 "items": {
                   "type": "string"
@@ -1907,6 +1921,13 @@
                   "null"
                 ]
               },
+              "createdById": {
+                "maxLength": 128,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
               "description": {
                 "type": "string"
               },
@@ -1919,6 +1940,27 @@
                 "type": "string"
               },
               "dueAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "duplicateOfProjectId": {
+                "maxLength": 128,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "earliestEndAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "earliestStartAt": {
                 "format": "date-time",
                 "type": [
                   "string",
@@ -1946,6 +1988,12 @@
               "name": {
                 "type": "string"
               },
+              "order": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
               "plannedEndAt": {
                 "format": "date-time",
                 "type": [
@@ -1960,6 +2008,12 @@
                   "null"
                 ]
               },
+              "schedulingOrder": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
               "showInScheduling": {
                 "type": "boolean"
               },
@@ -1968,6 +2022,39 @@
                   "type": "string"
                 },
                 "type": "array"
+              },
+              "tasksCompleted": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "tasksOpen": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "tasksTotal": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "lastActivityAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "latestEndAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "latestStartAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "updatedAt": {
                 "format": "date-time",
@@ -1978,24 +2065,38 @@
               }
             },
             "required": [
+              "actualEndAt",
+              "actualStartAt",
               "additionalContactIds",
               "archived",
               "color",
               "completed",
               "contactId",
               "createdAt",
+              "createdById",
               "description",
               "developerRevision",
               "developerUpdatedAt",
               "dueAt",
+              "duplicateOfProjectId",
+              "earliestEndAt",
+              "earliestStartAt",
               "individualId",
               "listId",
               "managerId",
               "name",
+              "order",
               "plannedEndAt",
               "plannedStartAt",
+              "schedulingOrder",
               "showInScheduling",
               "subscriberIds",
+              "tasksCompleted",
+              "tasksOpen",
+              "tasksTotal",
+              "lastActivityAt",
+              "latestEndAt",
+              "latestStartAt",
               "updatedAt"
             ],
             "type": "object"
@@ -14027,6 +14128,60 @@
             "name": "completed",
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "description": "Filter by primary contact id.",
+            "in": "query",
+            "name": "contactId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by creator id.",
+            "in": "query",
+            "name": "createdById",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by individual project id.",
+            "in": "query",
+            "name": "individualId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by project-list id.",
+            "in": "query",
+            "name": "listId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by manager id.",
+            "in": "query",
+            "name": "managerId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by subscriber user id.",
+            "in": "query",
+            "name": "subscriberId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
             }
           }
         ],

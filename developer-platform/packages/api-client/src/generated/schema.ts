@@ -2542,6 +2542,10 @@ export interface components {
         };
         Project: {
             attributes: {
+                /** Format: date-time */
+                actualEndAt: string | null;
+                /** Format: date-time */
+                actualStartAt: string | null;
                 additionalContactIds: string[];
                 archived: boolean;
                 color: string | null;
@@ -2549,22 +2553,39 @@ export interface components {
                 contactId: string | null;
                 /** Format: date-time */
                 createdAt: string | null;
+                createdById: string | null;
                 description: string;
                 developerRevision: string;
                 /** Format: date-time */
                 developerUpdatedAt: string;
                 /** Format: date-time */
                 dueAt: string | null;
+                duplicateOfProjectId: string | null;
+                /** Format: date-time */
+                earliestEndAt: string | null;
+                /** Format: date-time */
+                earliestStartAt: string | null;
                 individualId: string | null;
                 listId: string | null;
                 managerId: string | null;
                 name: string;
+                order: number | null;
                 /** Format: date-time */
                 plannedEndAt: string | null;
                 /** Format: date-time */
                 plannedStartAt: string | null;
+                schedulingOrder: number | null;
                 showInScheduling: boolean;
                 subscriberIds: string[];
+                tasksCompleted: number;
+                tasksOpen: number;
+                tasksTotal: number;
+                /** Format: date-time */
+                lastActivityAt: string | null;
+                /** Format: date-time */
+                latestEndAt: string | null;
+                /** Format: date-time */
+                latestStartAt: string | null;
                 /** Format: date-time */
                 updatedAt: string | null;
             };
@@ -6097,6 +6118,18 @@ export interface operations {
                 archived?: boolean;
                 /** @description Filter by completion status. */
                 completed?: boolean;
+                /** @description Filter by primary contact id. */
+                contactId?: string;
+                /** @description Filter by creator id. */
+                createdById?: string;
+                /** @description Filter by individual project id. */
+                individualId?: string;
+                /** @description Filter by project-list id. */
+                listId?: string;
+                /** @description Filter by manager id. */
+                managerId?: string;
+                /** @description Filter by subscriber user id. */
+                subscriberId?: string;
             };
             header?: never;
             path?: never;

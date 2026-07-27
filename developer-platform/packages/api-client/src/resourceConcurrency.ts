@@ -189,49 +189,80 @@ export const projectValidator = (value: unknown): value is Project =>
   exactResource(value, 'project', anyStringPattern, (attributes) => {
     if (
       !hasExactKeys(attributes, [
+        'actualEndAt',
+        'actualStartAt',
         'additionalContactIds',
         'archived',
         'color',
         'completed',
         'contactId',
         'createdAt',
+        'createdById',
         'description',
         'developerRevision',
         'developerUpdatedAt',
         'dueAt',
+        'duplicateOfProjectId',
+        'earliestEndAt',
+        'earliestStartAt',
         'individualId',
         'listId',
         'managerId',
         'name',
+        'order',
         'plannedEndAt',
         'plannedStartAt',
+        'schedulingOrder',
         'showInScheduling',
         'subscriberIds',
+        'tasksCompleted',
+        'tasksOpen',
+        'tasksTotal',
+        'lastActivityAt',
+        'latestEndAt',
+        'latestStartAt',
         'updatedAt',
       ])
     ) {
       return false
     }
     return (
+      nullableDate(attributes.actualEndAt) &&
+      nullableDate(attributes.actualStartAt) &&
       stringArray(attributes.additionalContactIds) &&
       typeof attributes.archived === 'boolean' &&
       nullableString(attributes.color) &&
       typeof attributes.completed === 'boolean' &&
       nullableId(attributes.contactId) &&
       nullableDate(attributes.createdAt) &&
+      nullableId(attributes.createdById) &&
       typeof attributes.description === 'string' &&
       typeof attributes.developerRevision === 'string' &&
       developerRevisionPattern.test(attributes.developerRevision) &&
       canonicalDate(attributes.developerUpdatedAt) &&
       nullableDate(attributes.dueAt) &&
+      nullableId(attributes.duplicateOfProjectId) &&
+      nullableDate(attributes.earliestEndAt) &&
+      nullableDate(attributes.earliestStartAt) &&
       nullableId(attributes.individualId) &&
       nullableId(attributes.listId) &&
       nullableId(attributes.managerId) &&
       typeof attributes.name === 'string' &&
+      finiteNumberOrNull(attributes.order) &&
       nullableDate(attributes.plannedEndAt) &&
       nullableDate(attributes.plannedStartAt) &&
+      finiteNumberOrNull(attributes.schedulingOrder) &&
       typeof attributes.showInScheduling === 'boolean' &&
       stringArray(attributes.subscriberIds) &&
+      Number.isSafeInteger(attributes.tasksCompleted) &&
+      (attributes.tasksCompleted as number) >= 0 &&
+      Number.isSafeInteger(attributes.tasksOpen) &&
+      (attributes.tasksOpen as number) >= 0 &&
+      Number.isSafeInteger(attributes.tasksTotal) &&
+      (attributes.tasksTotal as number) >= 0 &&
+      nullableDate(attributes.lastActivityAt) &&
+      nullableDate(attributes.latestEndAt) &&
+      nullableDate(attributes.latestStartAt) &&
       nullableDate(attributes.updatedAt)
     )
   })

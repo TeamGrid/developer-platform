@@ -560,6 +560,12 @@ export type ArchiveFilter = {
 export type ProjectListOptions = ListOptions &
   ArchiveFilter & {
     completed?: boolean
+    contactId?: string
+    createdById?: string
+    individualId?: string
+    listId?: string
+    managerId?: string
+    subscriberId?: string
   }
 
 export type ProductListOptions = ListOptions &

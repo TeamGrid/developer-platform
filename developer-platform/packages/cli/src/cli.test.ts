@@ -691,6 +691,32 @@ describe('TeamGrid CLI', () => {
 
   it.each([
     [
+      'projects',
+      'projects',
+      [
+        '--contact-id',
+        'contact-1',
+        '--created-by-id',
+        'user-1',
+        '--individual-id',
+        'external-project-1',
+        '--list-id',
+        'list-1',
+        '--manager-id',
+        'manager-1',
+        '--subscriber-id',
+        'subscriber-1',
+      ],
+      {
+        contactId: 'contact-1',
+        createdById: 'user-1',
+        individualId: 'external-project-1',
+        listId: 'list-1',
+        managerId: 'manager-1',
+        subscriberId: 'subscriber-1',
+      },
+    ],
+    [
       'tasks',
       'tasks',
       [
