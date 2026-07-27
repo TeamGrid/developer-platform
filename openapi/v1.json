@@ -23075,6 +23075,46 @@
             "$ref": "#/components/parameters/Limit"
           },
           {
+            "description": "Filter by actor id.",
+            "in": "query",
+            "name": "actorId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by actor type.",
+            "in": "query",
+            "name": "actorType",
+            "schema": {
+              "enum": [
+                "user",
+                "serviceCredential",
+                "system"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Include audit events created at or after this time.",
+            "in": "query",
+            "name": "createdAtFrom",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Include audit events created at or before this time.",
+            "in": "query",
+            "name": "createdAtTo",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
             "description": "Filter by credential id.",
             "in": "query",
             "name": "credentialId",
@@ -23102,6 +23142,46 @@
                 "denied",
                 "failure"
               ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by request id.",
+            "in": "query",
+            "name": "requestId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by event source.",
+            "in": "query",
+            "name": "source",
+            "schema": {
+              "enum": [
+                "teamgrid-app",
+                "api-v1",
+                "system"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by target id.",
+            "in": "query",
+            "name": "targetId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by target type.",
+            "in": "query",
+            "name": "targetType",
+            "schema": {
+              "maxLength": 128,
               "type": "string"
             }
           }

@@ -1662,11 +1662,31 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   addListOptions(
     program.command('audit-events').description('list Developer Platform audit events'),
   )
+    .option('--actor-id <id>', 'filter by actor')
+    .addOption(
+      new Option('--actor-type <type>', 'filter actor type').choices([
+        'user',
+        'serviceCredential',
+        'system',
+      ]),
+    )
+    .option('--created-at-from <timestamp>', 'include events at or after this time')
+    .option('--created-at-to <timestamp>', 'include events at or before this time')
     .option('--credential-id <id>', 'filter by credential')
     .option('--event-type <type>', 'filter by event type')
     .addOption(
       new Option('--outcome <outcome>', 'filter outcome').choices(['success', 'denied', 'failure']),
     )
+    .option('--request-id <id>', 'filter by request id')
+    .addOption(
+      new Option('--source <source>', 'filter event source').choices([
+        'teamgrid-app',
+        'api-v1',
+        'system',
+      ]),
+    )
+    .option('--target-id <id>', 'filter by target id')
+    .option('--target-type <type>', 'filter by target type')
     .action(async function action(options, command: Command) {
       const client = await loadClient(command)
       await listResources(command, options, client.auditEvents as never)

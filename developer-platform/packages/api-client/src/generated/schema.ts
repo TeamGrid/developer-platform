@@ -9787,12 +9787,28 @@ export interface operations {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
+                /** @description Filter by actor id. */
+                actorId?: string;
+                /** @description Filter by actor type. */
+                actorType?: "user" | "serviceCredential" | "system";
+                /** @description Include audit events created at or after this time. */
+                createdAtFrom?: string;
+                /** @description Include audit events created at or before this time. */
+                createdAtTo?: string;
                 /** @description Filter by credential id. */
                 credentialId?: string;
                 /** @description Filter by audit event type. */
                 eventType?: string;
                 /** @description Filter by audit outcome. */
                 outcome?: "success" | "denied" | "failure";
+                /** @description Filter by request id. */
+                requestId?: string;
+                /** @description Filter by event source. */
+                source?: "teamgrid-app" | "api-v1" | "system";
+                /** @description Filter by target id. */
+                targetId?: string;
+                /** @description Filter by target type. */
+                targetType?: string;
             };
             header?: never;
             path?: never;

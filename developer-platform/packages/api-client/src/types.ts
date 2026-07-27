@@ -665,9 +665,17 @@ export type PlannedWorkListOptions = ListOptions & {
 }
 
 export type AuditEventListOptions = ListOptions & {
+  actorId?: string
+  actorType?: 'user' | 'serviceCredential' | 'system'
+  createdAtFrom?: string | Date
+  createdAtTo?: string | Date
   credentialId?: string
   eventType?: string
   outcome?: 'success' | 'denied' | 'failure'
+  requestId?: string
+  source?: 'teamgrid-app' | 'api-v1' | 'system'
+  targetId?: string
+  targetType?: string
 }
 
 export type CalendarListOptions = ListOptions &
