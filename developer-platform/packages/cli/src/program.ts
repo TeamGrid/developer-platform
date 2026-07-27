@@ -1216,6 +1216,34 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
         ).data,
       )
     })
+  const projectSharing = projects
+    .command('sharing')
+    .description('inspect and replace project sharing')
+  projectSharing.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.projects.getSharing(id)).data)
+  })
+  projectSharing
+    .command('replace <id>')
+    .requiredOption('--data <json|@file|->', 'complete project sharing entry set JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.projects.replaceSharing(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
+          )
+        ).data,
+      )
+    })
   async function runProjectLifecycle(
     action: 'archive' | 'complete' | 'reopen' | 'restore',
     id: string,

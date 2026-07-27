@@ -7,6 +7,8 @@ export type Project = components['schemas']['Project']
 export type ProjectRevision = `prj1-${string}`
 export type ProjectCreate = components['schemas']['ProjectCreate']
 export type ProjectUpdate = components['schemas']['ProjectUpdate']
+export type ProjectSharing = components['schemas']['ProjectSharing']
+export type ProjectSharingReplace = components['schemas']['ProjectSharingReplace']
 export type Product = components['schemas']['Product']
 export type ProductCreate = components['schemas']['ProductCreate']
 export type ProductUpdate = components['schemas']['ProductUpdate']
@@ -266,7 +268,22 @@ export type TaskSearchResult = SearchResultBase<'task'> & {
 
 export type SearchResult = ContactSearchResult | ProjectSearchResult | TaskSearchResult
 
-export type ExportResourceType = 'contacts' | 'projects' | 'tasks' | 'timeEntries'
+export type ExportResourceType = 'auditEvents' | 'contacts' | 'projects' | 'tasks' | 'timeEntries'
+export type AuditEventExportField =
+  | 'id'
+  | 'createdAt'
+  | 'eventType'
+  | 'outcome'
+  | 'source'
+  | 'actorType'
+  | 'actorId'
+  | 'credentialId'
+  | 'requestId'
+  | 'targetType'
+  | 'targetId'
+  | 'region'
+  | 'cellId'
+  | 'metadata'
 export type ContactExportField =
   | 'archived'
   | 'companyTitle'
@@ -305,27 +322,38 @@ export type TimeEntryExportField =
   | 'updatedAt'
   | 'userId'
 export type ExportField =
+  | AuditEventExportField
   | ContactExportField
   | ProjectExportField
   | TaskExportField
   | TimeEntryExportField
 
-type ExportCreateBase = {
+type ExportCreateCommon = {
   fileName?: string
   format?: 'csv'
-  includeArchived?: boolean
   maxRows?: number
+}
+
+type StandardExportCreateBase = ExportCreateCommon & {
+  includeArchived?: boolean
   updatedFrom?: string | Date
   updatedUntil?: string | Date
 }
 
-export type ExportCreate = ExportCreateBase &
-  (
-    | { fields?: readonly ContactExportField[]; resourceType: 'contacts' }
-    | { fields?: readonly ProjectExportField[]; resourceType: 'projects' }
-    | { fields?: readonly TaskExportField[]; resourceType: 'tasks' }
-    | { fields?: readonly TimeEntryExportField[]; resourceType: 'timeEntries' }
-  )
+export type ExportCreate =
+  | (ExportCreateCommon & {
+      createdAtFrom?: string | Date
+      createdAtTo: string | Date
+      fields?: readonly AuditEventExportField[]
+      resourceType: 'auditEvents'
+    })
+  | (StandardExportCreateBase &
+      (
+        | { fields?: readonly ContactExportField[]; resourceType: 'contacts' }
+        | { fields?: readonly ProjectExportField[]; resourceType: 'projects' }
+        | { fields?: readonly TaskExportField[]; resourceType: 'tasks' }
+        | { fields?: readonly TimeEntryExportField[]; resourceType: 'timeEntries' }
+      ))
 
 export type ExportCreation = {
   attributes: { replayed: boolean }
@@ -898,6 +926,10 @@ export type MutationOptions = {
 }
 
 export type ProjectMutationOptions = RequestOptions & {
+  ifMatch: ProjectRevision | `"${ProjectRevision}"`
+}
+
+export type ProjectSharingMutationOptions = RequestOptions & {
   ifMatch: ProjectRevision | `"${ProjectRevision}"`
 }
 

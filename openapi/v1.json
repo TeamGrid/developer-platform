@@ -2280,6 +2280,138 @@
         ],
         "type": "object"
       },
+      "ProjectSharingEntry": {
+        "additionalProperties": false,
+        "properties": {
+          "permissions": {
+            "items": {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 100,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "userId": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9.:-]+$",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "workspaceId": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9.:-]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "permissions",
+          "userId",
+          "workspaceId"
+        ],
+        "type": "object"
+      },
+      "ProjectSharing": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "availablePermissions": {
+                "items": {
+                  "maxLength": 256,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 100,
+                "type": "array",
+                "uniqueItems": true
+              },
+              "entries": {
+                "items": {
+                  "$ref": "#/components/schemas/ProjectSharingEntry"
+                },
+                "maxItems": 1000,
+                "type": "array"
+              },
+              "revision": {
+                "pattern": "^[a-f0-9]{64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "availablePermissions",
+              "entries",
+              "revision"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "projectSharing"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "ProjectSharingReplace": {
+        "additionalProperties": false,
+        "properties": {
+          "entries": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "permissions": {
+                  "items": {
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 100,
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "userId": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9.:-]+$",
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "workspaceId": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9.:-]+$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "workspaceId"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          }
+        },
+        "required": [
+          "entries"
+        ],
+        "type": "object"
+      },
       "ProjectTemplate": {
         "additionalProperties": false,
         "description": "Safe project-template metadata. The captured project, list, and task snapshot, tenant fields, actor fields, and other storage internals are never exposed.",
@@ -9144,6 +9276,7 @@
               },
               "resourceType": {
                 "enum": [
+                  "auditEvents",
                   "contacts",
                   "projects",
                   "tasks",
@@ -9273,7 +9406,69 @@
       },
       "ExportCreate": {
         "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "createdAtFrom"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "createdAtTo"
+                    ]
+                  }
+                ]
+              }
+            },
+            "if": {
+              "properties": {
+                "resourceType": {
+                  "const": "auditEvents"
+                }
+              },
+              "required": [
+                "resourceType"
+              ]
+            },
+            "then": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "includeArchived"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "updatedFrom"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "updatedUntil"
+                    ]
+                  }
+                ]
+              },
+              "required": [
+                "createdAtTo"
+              ]
+            }
+          }
+        ],
         "properties": {
+          "createdAtFrom": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdAtTo": {
+            "format": "date-time",
+            "type": "string"
+          },
           "fields": {
             "items": {
               "maxLength": 80,
@@ -9304,6 +9499,7 @@
           },
           "resourceType": {
             "enum": [
+              "auditEvents",
               "contacts",
               "projects",
               "tasks",
@@ -16197,6 +16393,177 @@
         ],
         "x-teamgrid-required-scopes": [
           "projects:write"
+        ],
+        "description": "Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.",
+        "x-teamgrid-resource-cas": "resource-cas-v1"
+      }
+    },
+    "/projects/{id}/sharing": {
+      "get": {
+        "operationId": "getProjectSharing",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProjectSharing"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The requested resource.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/ProjectETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get project sharing",
+        "tags": [
+          "Projects"
+        ],
+        "x-teamgrid-required-scopes": [
+          "projects:sharing"
+        ]
+      },
+      "put": {
+        "operationId": "replaceProjectSharing",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchProject"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectSharingReplace"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ProjectSharing"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The updated resource.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/ProjectETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Replace project sharing",
+        "tags": [
+          "Projects"
+        ],
+        "x-teamgrid-required-scopes": [
+          "projects:sharing"
         ],
         "description": "Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.",
         "x-teamgrid-resource-cas": "resource-cas-v1"

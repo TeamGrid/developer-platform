@@ -93,6 +93,22 @@ const actionIds = new Set<AutomationActionId>([
 ])
 
 const exportFields: Record<string, ReadonlySet<string>> = {
+  auditEvents: new Set([
+    'actorId',
+    'actorType',
+    'cellId',
+    'createdAt',
+    'credentialId',
+    'eventType',
+    'id',
+    'metadata',
+    'outcome',
+    'region',
+    'requestId',
+    'source',
+    'targetId',
+    'targetType',
+  ]),
   contacts: new Set([
     'archived',
     'companyTitle',

@@ -1052,6 +1052,67 @@ describe('TeamGrid CLI', () => {
     },
   )
 
+  it('reads and replaces project sharing with explicit compare-and-set input', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const getSharing = vi.fn(async () => ({
+      data: {
+        attributes: { availablePermissions: [], entries: [], revision: resourceRevision },
+        id: 'project-1',
+        type: 'projectSharing',
+      },
+    }))
+    const replaceSharing = vi.fn(async () => ({
+      data: {
+        attributes: {
+          availablePermissions: [],
+          entries: [{ permissions: [], userId: null, workspaceId: 'workspace-1' }],
+          revision: resourceRevision,
+        },
+        id: 'project-1',
+        type: 'projectSharing',
+      },
+    }))
+    const dependencies = {
+      clientFactory: () => ({ projects: { getSharing, replaceSharing } }) as never,
+      configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+      environment: { TEAMGRID_API_TOKEN: token },
+    }
+    const getOutput = capture()
+    expect(
+      await runCli(
+        ['node', 'teamgrid', '--output', 'json', 'projects', 'sharing', 'get', 'project-1'],
+        { ...dependencies, output: getOutput.stream },
+      ),
+    ).toBe(0)
+    expect(getSharing).toHaveBeenCalledWith('project-1')
+
+    const replaceOutput = capture()
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          '--output',
+          'json',
+          'projects',
+          'sharing',
+          'replace',
+          'project-1',
+          '--data',
+          '{"entries":[{"workspaceId":"workspace-1"}]}',
+          '--if-match',
+          `prj1-${resourceRevision}`,
+        ],
+        { ...dependencies, output: replaceOutput.stream },
+      ),
+    ).toBe(0)
+    expect(replaceSharing).toHaveBeenCalledWith(
+      'project-1',
+      { entries: [{ workspaceId: 'workspace-1' }] },
+      { ifMatch: `prj1-${resourceRevision}` },
+    )
+  })
+
   it.each([
     ['tasks', 'task', 'task-1'],
     ['time-entries', 'timeEntry', 'time-1'],

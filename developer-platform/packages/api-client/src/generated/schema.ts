@@ -608,6 +608,27 @@ export interface paths {
         patch: operations["updateProject"];
         trace?: never;
     };
+    "/projects/{id}/sharing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get project sharing */
+        get: operations["getProjectSharing"];
+        /**
+         * Replace project sharing
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
+        put: operations["replaceProjectSharing"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{id}/complete": {
         parameters: {
             query?: never;
@@ -2891,6 +2912,28 @@ export interface components {
             /** @constant */
             type: "project";
         };
+        ProjectSharingEntry: {
+            permissions: string[];
+            userId: string | null;
+            workspaceId: string;
+        };
+        ProjectSharing: {
+            attributes: {
+                availablePermissions: string[];
+                entries: components["schemas"]["ProjectSharingEntry"][];
+                revision: string;
+            };
+            id: string;
+            /** @constant */
+            type: "projectSharing";
+        };
+        ProjectSharingReplace: {
+            entries: {
+                permissions?: string[];
+                userId?: string | null;
+                workspaceId: string;
+            }[];
+        };
         /** @description Safe project-template metadata. The captured project, list, and task snapshot, tenant fields, actor fields, and other storage internals are never exposed. */
         ProjectTemplate: {
             attributes: {
@@ -4184,7 +4227,7 @@ export interface components {
                 /** @constant */
                 format: "csv";
                 /** @enum {string} */
-                resourceType: "contacts" | "projects" | "tasks" | "timeEntries";
+                resourceType: "auditEvents" | "contacts" | "projects" | "tasks" | "timeEntries";
                 readonly rowCount?: number;
                 /** Format: date-time */
                 readonly startedAt?: string;
@@ -4216,6 +4259,10 @@ export interface components {
             type: "exportDownloadIntent";
         };
         ExportCreate: {
+            /** Format: date-time */
+            createdAtFrom?: string;
+            /** Format: date-time */
+            createdAtTo?: string;
             fields?: string[];
             fileName?: string;
             /** @constant */
@@ -4223,12 +4270,12 @@ export interface components {
             includeArchived?: boolean;
             maxRows?: number;
             /** @enum {string} */
-            resourceType: "contacts" | "projects" | "tasks" | "timeEntries";
+            resourceType: "auditEvents" | "contacts" | "projects" | "tasks" | "timeEntries";
             /** Format: date-time */
             updatedFrom?: string;
             /** Format: date-time */
             updatedUntil?: string;
-        };
+        } & unknown;
         AutomationInputBranch: {
             flow: components["schemas"]["AutomationInputStep"][];
             key: string;
@@ -6875,6 +6922,83 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["Project"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getProjectSharing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectSharing"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    replaceProjectSharing: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectSharingReplace"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectSharing"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };

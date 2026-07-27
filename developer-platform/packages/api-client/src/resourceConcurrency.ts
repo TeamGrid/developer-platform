@@ -2,6 +2,7 @@ import { TeamGridClientError } from './errors.js'
 import type {
   Project,
   ProjectLifecycleOperation,
+  ProjectSharing,
   ProjectTemplate,
   ProjectTemplateInstantiation,
   Task,
@@ -77,7 +78,7 @@ function stringArray(value: unknown): value is string[] {
 
 function exactResource(
   value: unknown,
-  type: 'project' | 'projectTemplate' | 'task',
+  type: 'project' | 'projectSharing' | 'projectTemplate' | 'task',
   idPattern: RegExp,
   attributes: (value: unknown) => boolean,
 ) {
@@ -264,6 +265,37 @@ export const projectValidator = (value: unknown): value is Project =>
       nullableDate(attributes.latestEndAt) &&
       nullableDate(attributes.latestStartAt) &&
       nullableDate(attributes.updatedAt)
+    )
+  })
+
+export const projectSharingValidator = (value: unknown): value is ProjectSharing =>
+  exactResource(value, 'projectSharing', anyStringPattern, (attributes) => {
+    if (!hasExactKeys(attributes, ['availablePermissions', 'entries', 'revision'])) return false
+    if (
+      !stringArray(attributes.availablePermissions) ||
+      new Set(attributes.availablePermissions).size !== attributes.availablePermissions.length ||
+      attributes.availablePermissions.some(
+        (permission) => !boundedString(permission, 128, false),
+      ) ||
+      typeof attributes.revision !== 'string' ||
+      !developerRevisionPattern.test(attributes.revision) ||
+      !Array.isArray(attributes.entries) ||
+      attributes.entries.length > 1000
+    ) {
+      return false
+    }
+    const availablePermissions = attributes.availablePermissions
+    return attributes.entries.every(
+      (entry) =>
+        hasExactKeys(entry, ['permissions', 'userId', 'workspaceId']) &&
+        boundedString(entry.workspaceId, 128, false) &&
+        (entry.userId === null || boundedString(entry.userId, 128, false)) &&
+        stringArray(entry.permissions) &&
+        new Set(entry.permissions).size === entry.permissions.length &&
+        entry.permissions.every(
+          (permission) =>
+            boundedString(permission, 128, false) && availablePermissions.includes(permission),
+        ),
     )
   })
 

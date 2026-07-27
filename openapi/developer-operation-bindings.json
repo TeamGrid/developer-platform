@@ -2294,6 +2294,31 @@
     {
       "authMode": "developerCredential",
       "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getProjectSharing",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectSharing.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getProjectSharing",
+      "method": "GET",
+      "operationId": "getProjectSharing",
+      "optionalScopes": [],
+      "path": "/projects/{id}/sharing",
+      "requiredScopes": [
+        "projects:sharing"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
       "dynamicPolicyIds": [
         "commerce-sensitive-fields"
       ],
@@ -3919,6 +3944,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.replaceProjectSharing",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectSharing.replace",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "replaceProjectSharing",
+      "method": "PUT",
+      "operationId": "replaceProjectSharing",
+      "optionalScopes": [],
+      "path": "/projects/{id}/sharing",
+      "requiredScopes": [
+        "projects:sharing"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.replaceServiceAccountResourceGrants",
           "kind": "httpLocal",
           "role": "transport"
@@ -5367,7 +5417,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 203,
+    "authenticatedOperations": 205,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -5443,6 +5493,8 @@
       "developerApi.v1.products.get",
       "developerApi.v1.products.list",
       "developerApi.v1.products.update",
+      "developerApi.v1.projectSharing.get",
+      "developerApi.v1.projectSharing.replace",
       "developerApi.v1.projectStatements.archive",
       "developerApi.v1.projectStatements.create",
       "developerApi.v1.projectStatements.get",

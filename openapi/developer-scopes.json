@@ -8,6 +8,7 @@
     { "name": "projects:read", "availability": "issuable" },
     { "name": "projects:write", "availability": "issuable" },
     { "name": "projects:lifecycle", "availability": "issuable" },
+    { "name": "projects:sharing", "availability": "issuable", "sensitive": true },
     { "name": "tasks:read", "availability": "issuable" },
     { "name": "tasks:write", "availability": "issuable" },
     { "name": "time-entries:read", "availability": "issuable" },
@@ -93,6 +94,7 @@
     {
       "id": "collaboration-target-domain",
       "scopes": [
+        "audit:read",
         "contacts:read",
         "projects:read",
         "tasks:read"
@@ -160,7 +162,7 @@
         "tasks:read",
         "time-entries:read"
       ],
-      "reason": "Export creation and download require the matching resource-domain scope and analytics permission in addition to the export operation scope."
+      "reason": "Export creation and download require the matching resource-domain scope and analytics permission in addition to the export operation scope. Audit exports additionally require audit-administration access and an immutable upper snapshot boundary."
     },
     {
       "id": "automation-action-domain",

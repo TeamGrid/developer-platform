@@ -56,6 +56,7 @@ import {
   assertProjectLifecycleOperationContinuity,
   assertProjectTemplateInstantiationContinuity,
   projectLifecycleOperationValidator,
+  projectSharingValidator,
   projectTemplateInstantiationValidator,
   projectTemplateValidator,
   projectValidator,
@@ -166,6 +167,9 @@ import type {
   ProjectLifecycleWaitOptions,
   ProjectListOptions,
   ProjectMutationOptions,
+  ProjectSharing,
+  ProjectSharingMutationOptions,
+  ProjectSharingReplace,
   ProjectStatement,
   ProjectStatementCreate,
   ProjectStatementListOptions,
@@ -2213,6 +2217,7 @@ export class TeamGridClient {
           (resource) => `"prj1-${resource.attributes.developerRevision}"`,
           true,
         ),
+      getSharing: (id: string, options?: RequestOptions) => this.#projectSharing(id, options),
       list: (options: ProjectListOptions = {}) =>
         this.#strictPage('/projects', projectValidator, 'project list', options),
       pages: (options?: ProjectListOptions, pagination?: PaginationOptions) =>
@@ -2235,6 +2240,11 @@ export class TeamGridClient {
           '/v1/project-lifecycle-operations/',
           'project restore',
         ),
+      replaceSharing: (
+        id: string,
+        data: ProjectSharingReplace,
+        options: ProjectSharingMutationOptions,
+      ) => this.#replaceProjectSharing(id, data, options),
       update: (id: string, data: ProjectUpdate, options: ProjectMutationOptions) =>
         this.#mutateCoreResource(
           `/projects/${encodeURIComponent(id)}`,
@@ -3045,6 +3055,69 @@ export class TeamGridClient {
           `The TeamGrid API returned an invalid ${label} ETag.`,
         )
       }
+    }
+    return attachTransport(envelope, response.transport)
+  }
+
+  async #projectSharing(id: string, options: RequestOptions = {}) {
+    const envelope = await this.#strictResource<ProjectSharing>(
+      `/projects/${encodeURIComponent(id)}/sharing`,
+      projectSharingValidator,
+      'project sharing',
+      options,
+      200,
+      undefined,
+      (resource) => `"prj1-${resource.attributes.revision}"`,
+      true,
+    )
+    if (envelope.data.id !== id) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned project sharing for a different project.',
+      )
+    }
+    return envelope
+  }
+
+  async #replaceProjectSharing(
+    id: string,
+    data: ProjectSharingReplace,
+    options: ProjectSharingMutationOptions,
+  ) {
+    const response = await this.#request(`/projects/${encodeURIComponent(id)}/sharing`, {
+      body: data,
+      ifMatch: strongProjectEtag(options.ifMatch),
+      method: 'PUT',
+      requestId: options.requestId,
+      signal: options.signal,
+    })
+    if (response.transport.status !== 200) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned an unexpected status for project sharing replacement.',
+      )
+    }
+    const envelope = assertStrictResource(
+      response.payload,
+      projectSharingValidator,
+      'project sharing replacement',
+    )
+    if (envelope.data.id !== id) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned project sharing for a different project.',
+      )
+    }
+    assertRevisionEtag(
+      response.transport,
+      `prj1-${envelope.data.attributes.revision}`,
+      'project sharing replacement',
+    )
+    if (response.transport.headers['cache-control'] !== strongEtagCacheControl) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned unsafe project sharing cache metadata.',
+      )
     }
     return attachTransport(envelope, response.transport)
   }

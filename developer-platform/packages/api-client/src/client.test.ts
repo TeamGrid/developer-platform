@@ -101,6 +101,25 @@ function projectResource(overrides: Record<string, unknown> = {}) {
   }
 }
 
+function projectSharingResource(overrides: Record<string, unknown> = {}) {
+  return {
+    attributes: {
+      availablePermissions: ['tasks.read', 'tasks.write'],
+      entries: [
+        {
+          permissions: [],
+          userId: null,
+          workspaceId: 'workspace-1',
+        },
+      ],
+      revision: developerRevision,
+      ...overrides,
+    },
+    id: 'project-1',
+    type: 'projectSharing',
+  }
+}
+
 function projectTemplateResource(overrides: Record<string, unknown> = {}) {
   return {
     attributes: {
@@ -779,6 +798,36 @@ describe('TeamGrid API client', () => {
       expect(fetch).toHaveBeenCalledTimes(2)
     },
   )
+
+  it('reads and replaces project sharing with the project CAS contract', async () => {
+    const replacement = {
+      entries: [{ permissions: [], userId: null, workspaceId: 'workspace-1' }],
+    }
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = new URL(String(input))
+      expect(url.pathname).toBe('/v1/projects/project-1/sharing')
+      if (!init?.method || init.method === 'GET') {
+        return json({ data: projectSharingResource(), meta: { requestId: 'sharing-get' } }, 200, {
+          'cache-control': 'private, no-store, no-transform',
+          etag: projectEtag,
+        })
+      }
+      expect(init.method).toBe('PUT')
+      expect(new Headers(init.headers).get('if-match')).toBe(projectEtag)
+      expect(JSON.parse(String(init.body))).toEqual(replacement)
+      return json({ data: projectSharingResource(), meta: { requestId: 'sharing-replace' } }, 200, {
+        'cache-control': 'private, no-store, no-transform',
+        etag: projectEtag,
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    const current = await client.projects.getSharing('project-1')
+    expect(current.data.attributes.entries).toHaveLength(1)
+    await expect(
+      client.projects.replaceSharing('project-1', replacement, { ifMatch: projectEtag }),
+    ).resolves.toMatchObject({ data: projectSharingResource() })
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
 
   it.each([
     {

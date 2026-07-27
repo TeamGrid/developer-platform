@@ -127,6 +127,7 @@ const expectedCoreOperationIds = [
   'duplicateTask',
   'getProject',
   'getProjectLifecycleOperation',
+  'getProjectSharing',
   'getProjectTemplate',
   'getProjectTemplateInstantiation',
   'getTask',
@@ -137,6 +138,7 @@ const expectedCoreOperationIds = [
   'moveTask',
   'reopenProject',
   'reopenTask',
+  'replaceProjectSharing',
   'replaceTaskSubtasks',
   'restoreProject',
   'restoreProjectTemplate',
@@ -192,6 +194,7 @@ const expectedCoreCasOperationIds = [
   'moveTask',
   'reopenProject',
   'reopenTask',
+  'replaceProjectSharing',
   'replaceTaskSubtasks',
   'restoreProject',
   'restoreProjectTemplate',
@@ -219,17 +222,17 @@ const independentIfMatchOperations = allOpenApiOperations
   )
   .sort((left, right) => left.operationId.localeCompare(right.operationId))
 if (
-  coreOperations.length !== 28 ||
+  coreOperations.length !== 30 ||
   JSON.stringify(coreOperations.map((operation) => operation.operationId)) !==
     JSON.stringify(expectedCoreOperationIds) ||
-  manifest.summary?.resourceCasMutationOperations !== 17 ||
+  manifest.summary?.resourceCasMutationOperations !== 18 ||
   manifest.summary?.resourceCasOperationReads !== 2 ||
   JSON.stringify(residualCasOperations.map((operation) => operation.operationId).sort()) !==
     JSON.stringify(expectedCoreCasOperationIds) ||
   JSON.stringify(residualCasReads.map((operation) => operation.operationId).sort()) !==
     JSON.stringify(['getProjectLifecycleOperation', 'getProjectTemplateInstantiation'])
 ) {
-  fail('the release candidate must preserve 28 core operations with 17 CAS mutations and 2 qualified operation reads')
+  fail('the release candidate must preserve 30 core operations with 18 CAS mutations and 2 qualified operation reads')
 }
 const expectedAllIfMatchOperationIds = [
   ...expectedCoreCasOperationIds,
