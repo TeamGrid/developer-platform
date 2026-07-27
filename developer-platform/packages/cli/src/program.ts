@@ -879,6 +879,59 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
         ).data,
       )
     })
+  tasks
+    .command('duplicate <id>')
+    .description('duplicate a task and optionally its checklist and custom-field values')
+    .requiredOption('--data <json|@file|->', 'task duplication JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest source task revision or strong ETag')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.tasks.duplicate(id, (await readJsonObject(options.data, input)) as never, {
+            idempotencyKey: options.idempotencyKey,
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
+    })
+  tasks
+    .command('move <id>')
+    .description('move or reorder a task in an assignee, personal, or project list')
+    .requiredOption('--data <json|@file|->', 'task placement JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.tasks.move(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
+    })
+  const taskSubtasks = tasks.command('subtasks').description('manage a task checklist')
+  taskSubtasks
+    .command('replace <id>')
+    .description('atomically replace the ordered task checklist')
+    .requiredOption('--data <json|@file|->', 'checklist replacement JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.tasks.replaceSubtasks(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
+          )
+        ).data,
+      )
+    })
   archiveOptions(tasks.command('archive <id>'))
     .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
     .action(async function action(id: string, _options, command: Command) {

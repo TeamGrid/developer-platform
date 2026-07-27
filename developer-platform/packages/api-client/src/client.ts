@@ -176,9 +176,13 @@ import type {
   TagCreate,
   TagUpdate,
   TaskCreate,
+  TaskDuplicate,
+  TaskDuplicateOptions,
   TaskListOptions,
   TaskMutationOptions,
+  TaskPlacement,
   TaskPlannedWork,
+  TaskSubtasksReplace,
   TaskUpdate,
   TimeEntry,
   TimeEntryCreate,
@@ -1845,6 +1849,8 @@ export class TeamGridClient {
         ),
       create: (data: TaskCreate, options?: MutationOptions) =>
         this.#createCoreResource('/tasks', data, options, taskValidator, 'task creation', 'tsk1'),
+      duplicate: (id: string, data: TaskDuplicate, options: TaskDuplicateOptions) =>
+        this.#duplicateTask(id, data, options),
       get: (id: string, options?: RequestOptions) =>
         this.#strictResource(
           `/tasks/${encodeURIComponent(id)}`,
@@ -1860,6 +1866,28 @@ export class TeamGridClient {
         this.#strictPage('/tasks', taskValidator, 'task list', options),
       pages: (options?: TaskListOptions, pagination?: PaginationOptions) =>
         this.#strictPages('/tasks', taskValidator, 'task list', options, pagination),
+      move: (id: string, data: TaskPlacement, options: TaskMutationOptions) =>
+        this.#mutateCoreResource(
+          `/tasks/${encodeURIComponent(id)}/move`,
+          'POST',
+          data,
+          options,
+          taskValidator,
+          'task placement',
+          strongTaskEtag,
+          'tsk1',
+        ),
+      replaceSubtasks: (id: string, data: TaskSubtasksReplace, options: TaskMutationOptions) =>
+        this.#mutateCoreResource(
+          `/tasks/${encodeURIComponent(id)}/subtasks`,
+          'PUT',
+          data,
+          options,
+          taskValidator,
+          'task checklist replacement',
+          strongTaskEtag,
+          'tsk1',
+        ),
       restore: (id: string, options: TaskMutationOptions) =>
         this.#mutateCoreResource(
           `/tasks/${encodeURIComponent(id)}/restore`,
@@ -2964,9 +2992,44 @@ export class TeamGridClient {
     return attachTransport(envelope, response.transport)
   }
 
+  async #duplicateTask(id: string, data: TaskDuplicate, options: TaskDuplicateOptions) {
+    const { idempotencyKey, ifMatch, requestId, signal } = options
+    const response = await this.#request(`/tasks/${encodeURIComponent(id)}/duplicate`, {
+      body: data,
+      idempotencyKey: canonicalIdempotencyKey(idempotencyKey),
+      ifMatch: strongTaskEtag(ifMatch),
+      method: 'POST',
+      requestId,
+      signal,
+    })
+    const replayed = response.transport.headers['idempotency-replayed']
+    if (
+      (response.transport.status !== 200 && response.transport.status !== 201) ||
+      replayed !== (response.transport.status === 200 ? 'true' : 'false')
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned invalid task duplication mutation metadata.',
+      )
+    }
+    const envelope = assertStrictResource(response.payload, taskValidator, 'task duplication')
+    assertRevisionEtag(
+      response.transport,
+      `tsk1-${envelope.data.attributes.developerRevision}`,
+      'task duplication',
+    )
+    if (response.transport.headers['cache-control'] !== strongEtagCacheControl) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned invalid task duplication cache metadata.',
+      )
+    }
+    return attachTransport(envelope, response.transport)
+  }
+
   async #mutateCoreResource<T>(
     path: string,
-    method: 'PATCH' | 'POST',
+    method: 'PATCH' | 'POST' | 'PUT',
     data: unknown,
     options: RequestOptions & { ifMatch: string },
     validator: ResourceValidator<T>,

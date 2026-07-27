@@ -1476,6 +1476,32 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.duplicateTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/duplicate",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "duplicateTask",
+      "method": "POST",
+      "operationId": "duplicateTask",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/duplicate",
+      "requiredScopes": [
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.finalizeFileUploadIntent",
           "kind": "httpLocal",
           "role": "transport"
@@ -3457,6 +3483,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.moveTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/move",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "moveTask",
+      "method": "POST",
+      "operationId": "moveTask",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/move",
+      "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.removeMember",
           "kind": "httpLocal",
           "role": "transport"
@@ -3599,6 +3650,31 @@
       "path": "/tasks/{id}/planned-work",
       "requiredScopes": [
         "planned-work:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.replaceTaskSubtasks",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/subtasks/replace",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "replaceTaskSubtasks",
+      "method": "PUT",
+      "operationId": "replaceTaskSubtasks",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/subtasks",
+      "requiredScopes": [
+        "tasks:write"
       ]
     },
     {
@@ -4777,7 +4853,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 180,
+    "authenticatedOperations": 183,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -4941,10 +5017,13 @@
       "teamgrid/internal/v1/tasks/archive",
       "teamgrid/internal/v1/tasks/complete",
       "teamgrid/internal/v1/tasks/create",
+      "teamgrid/internal/v1/tasks/duplicate",
       "teamgrid/internal/v1/tasks/get",
       "teamgrid/internal/v1/tasks/list",
+      "teamgrid/internal/v1/tasks/move",
       "teamgrid/internal/v1/tasks/reopen",
       "teamgrid/internal/v1/tasks/restore",
+      "teamgrid/internal/v1/tasks/subtasks/replace",
       "teamgrid/internal/v1/tasks/timer/start",
       "teamgrid/internal/v1/tasks/timer/stop",
       "teamgrid/internal/v1/tasks/update",

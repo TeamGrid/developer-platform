@@ -102,6 +102,7 @@ const expectedCoreOperationIds = [
   'createProject',
   'createProjectTemplate',
   'createTask',
+  'duplicateTask',
   'getProject',
   'getProjectLifecycleOperation',
   'getProjectTemplate',
@@ -111,8 +112,10 @@ const expectedCoreOperationIds = [
   'listProjects',
   'listProjectTemplates',
   'listTasks',
+  'moveTask',
   'reopenProject',
   'reopenTask',
+  'replaceTaskSubtasks',
   'restoreProject',
   'restoreProjectTemplate',
   'restoreTask',
@@ -159,9 +162,12 @@ const expectedCoreCasOperationIds = [
   'archiveTask',
   'completeProject',
   'completeTask',
+  'duplicateTask',
   'instantiateProjectTemplate',
+  'moveTask',
   'reopenProject',
   'reopenTask',
+  'replaceTaskSubtasks',
   'restoreProject',
   'restoreProjectTemplate',
   'restoreTask',
@@ -188,17 +194,17 @@ const independentIfMatchOperations = allOpenApiOperations
   )
   .sort((left, right) => left.operationId.localeCompare(right.operationId))
 if (
-  coreOperations.length !== 25 ||
+  coreOperations.length !== 28 ||
   JSON.stringify(coreOperations.map((operation) => operation.operationId)) !==
     JSON.stringify(expectedCoreOperationIds) ||
-  manifest.summary?.resourceCasMutationOperations !== 14 ||
+  manifest.summary?.resourceCasMutationOperations !== 17 ||
   manifest.summary?.resourceCasOperationReads !== 2 ||
   JSON.stringify(residualCasOperations.map((operation) => operation.operationId).sort()) !==
     JSON.stringify(expectedCoreCasOperationIds) ||
   JSON.stringify(residualCasReads.map((operation) => operation.operationId).sort()) !==
     JSON.stringify(['getProjectLifecycleOperation', 'getProjectTemplateInstantiation'])
 ) {
-  fail('the release candidate must preserve 25 core operations with 14 CAS mutations and 2 qualified operation reads')
+  fail('the release candidate must preserve 28 core operations with 17 CAS mutations and 2 qualified operation reads')
 }
 const expectedAllIfMatchOperationIds = [
   ...expectedCoreCasOperationIds,
@@ -208,7 +214,7 @@ if (
   JSON.stringify(independentIfMatchOperations.map((operation) => operation.operationId)) !==
   JSON.stringify(expectedAllIfMatchOperationIds)
 ) {
-  fail('the release candidate must expose exactly the 45 qualified If-Match operations')
+  fail('the release candidate must expose exactly the 48 qualified If-Match operations')
 }
 if (manifest.contractVersion !== openapi.info.version) {
   fail('contract manifest and OpenAPI versions differ')

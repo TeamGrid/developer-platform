@@ -68,6 +68,15 @@ export type WorkspaceSettings = components['schemas']['WorkspaceSettings']
 export type WorkspaceSettingsUpdate = components['schemas']['WorkspaceSettingsUpdate']
 export type EventDefinition = components['schemas']['EventDefinition']
 export type TaskCreate = components['schemas']['TaskCreate']
+export type TaskDuplicate = Omit<
+  components['schemas']['TaskDuplicate'],
+  'copyChecklist' | 'copyCustomFieldValues'
+> & {
+  copyChecklist?: boolean
+  copyCustomFieldValues?: boolean
+}
+export type TaskPlacement = components['schemas']['TaskPlacement']
+export type TaskSubtasksReplace = components['schemas']['TaskSubtasksReplace']
 export type TaskUpdate = components['schemas']['TaskUpdate']
 export type TimeEntryCreate = components['schemas']['TimeEntryCreate']
 export type TimeEntryUpdate = components['schemas']['TimeEntryUpdate']
@@ -788,6 +797,10 @@ export type ProjectTemplateInstantiationOptions = MutationOptions & {
 }
 
 export type TaskMutationOptions = RequestOptions & {
+  ifMatch: TaskRevision | `"${TaskRevision}"`
+}
+
+export type TaskDuplicateOptions = MutationOptions & {
   ifMatch: TaskRevision | `"${TaskRevision}"`
 }
 

@@ -7130,6 +7130,136 @@
         },
         "type": "object"
       },
+      "TaskDuplicate": {
+        "additionalProperties": false,
+        "properties": {
+          "copyChecklist": {
+            "default": true,
+            "type": "boolean"
+          },
+          "copyCustomFieldValues": {
+            "default": true,
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 500,
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "TaskPlacement": {
+        "additionalProperties": false,
+        "properties": {
+          "assigneeId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "axis": {
+            "enum": [
+              "assignee",
+              "personalList",
+              "projectList"
+            ],
+            "type": "string"
+          },
+          "groupId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "listId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nextTaskId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "personalListId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "previousTaskId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "projectId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "axis"
+        ],
+        "type": "object"
+      },
+      "TaskSubtaskInput": {
+        "additionalProperties": false,
+        "properties": {
+          "completed": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "id": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "maxLength": 5000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "TaskSubtasksReplace": {
+        "additionalProperties": false,
+        "properties": {
+          "subtasks": {
+            "items": {
+              "$ref": "#/components/schemas/TaskSubtaskInput"
+            },
+            "maxItems": 500,
+            "type": "array"
+          }
+        },
+        "required": [
+          "subtasks"
+        ],
+        "type": "object"
+      },
       "TimeEntryCreate": {
         "additionalProperties": false,
         "properties": {
@@ -17087,6 +17217,357 @@
           "tasks:write"
         ],
         "description": "Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.",
+        "x-teamgrid-resource-cas": "resource-cas-v1"
+      }
+    },
+    "/tasks/{id}/duplicate": {
+      "post": {
+        "operationId": "duplicateTask",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchTask"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskDuplicate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Task"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "An idempotent replay of an existing resource.",
+            "headers": {
+              "Idempotency-Replayed": {
+                "schema": {
+                  "enum": [
+                    "true"
+                  ],
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Task"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A newly created resource.",
+            "headers": {
+              "Idempotency-Replayed": {
+                "schema": {
+                  "enum": [
+                    "false"
+                  ],
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Duplicate a task",
+        "tags": [
+          "Tasks"
+        ],
+        "x-teamgrid-required-scopes": [
+          "tasks:read",
+          "tasks:write"
+        ],
+        "description": "Creates an idempotent copy from exactly the source revision selected by If-Match. The copy remains in the same workspace context and may be moved separately.",
+        "x-teamgrid-resource-cas": "resource-cas-v1"
+      }
+    },
+    "/tasks/{id}/move": {
+      "post": {
+        "operationId": "moveTask",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchTask"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskPlacement"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Task"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The updated resource.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Move or reorder a task",
+        "tags": [
+          "Tasks"
+        ],
+        "x-teamgrid-required-scopes": [
+          "tasks:write"
+        ],
+        "description": "Atomically changes assignment and ordering within one target task container. The neighboring task ids are validated in the same workspace and container.",
+        "x-teamgrid-resource-cas": "resource-cas-v1"
+      }
+    },
+    "/tasks/{id}/subtasks": {
+      "put": {
+        "operationId": "replaceTaskSubtasks",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchTask"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskSubtasksReplace"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Task"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The updated resource.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/TaskETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Replace a task checklist",
+        "tags": [
+          "Tasks"
+        ],
+        "x-teamgrid-required-scopes": [
+          "tasks:write"
+        ],
+        "description": "Atomically replaces the ordered task checklist. Existing ids may be retained; omitted ids are generated by TeamGrid.",
         "x-teamgrid-resource-cas": "resource-cas-v1"
       }
     },

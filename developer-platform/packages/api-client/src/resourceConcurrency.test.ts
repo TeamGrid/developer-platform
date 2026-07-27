@@ -117,6 +117,64 @@ describe('core resource runtime contract', () => {
     expect(fetch).toHaveBeenCalledOnce()
   })
 
+  it('binds stable task workflows to revision and idempotency preconditions', async () => {
+    const calls: Array<{ body: unknown; headers: Headers; method: string; path: string }> = []
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const path = new URL(String(input)).pathname
+      const headers = new Headers(init?.headers)
+      calls.push({
+        body: init?.body ? JSON.parse(String(init.body)) : null,
+        headers,
+        method: String(init?.method),
+        path,
+      })
+      const duplicate = path.endsWith('/duplicate')
+      return new Response(
+        JSON.stringify({ data: task(), meta: { requestId: 'request-workflow' } }),
+        {
+          headers: {
+            'cache-control': 'private, no-store, no-transform',
+            'content-type': 'application/json',
+            etag: `"tsk1-${revision}"`,
+            ...(duplicate ? { 'idempotency-replayed': 'false' } : {}),
+          },
+          status: duplicate ? 201 : 200,
+        },
+      )
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await client.tasks.duplicate(
+      'task-1',
+      { copyChecklist: true, name: 'Task copy' },
+      { idempotencyKey: 'duplicate-task-1', ifMatch: `tsk1-${revision}` },
+    )
+    await client.tasks.move(
+      'task-1',
+      { axis: 'projectList', listId: 'list-2', projectId: 'project-2' },
+      { ifMatch: `tsk1-${revision}` },
+    )
+    await client.tasks.replaceSubtasks(
+      'task-1',
+      { subtasks: [{ completed: false, title: 'Review' }] },
+      { ifMatch: `tsk1-${revision}` },
+    )
+
+    expect(calls.map(({ method, path }) => ({ method, path }))).toEqual([
+      { method: 'POST', path: '/v1/tasks/task-1/duplicate' },
+      { method: 'POST', path: '/v1/tasks/task-1/move' },
+      { method: 'PUT', path: '/v1/tasks/task-1/subtasks' },
+    ])
+    for (const call of calls) {
+      expect(call.headers.get('if-match')).toBe(`"tsk1-${revision}"`)
+    }
+    expect(calls[0]?.headers.get('idempotency-key')).toBe('duplicate-task-1')
+    expect(calls.map((call) => call.body)).toEqual([
+      { copyChecklist: true, name: 'Task copy' },
+      { axis: 'projectList', listId: 'list-2', projectId: 'project-2' },
+      { subtasks: [{ completed: false, title: 'Review' }] },
+    ])
+  })
+
   it('enforces lifecycle terminal-state invariants without revision fields', () => {
     const pending = pendingLifecycleOperation()
     expect(projectLifecycleOperationValidator(pending)).toBe(true)
