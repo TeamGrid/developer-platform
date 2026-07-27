@@ -6980,6 +6980,13 @@
               "null"
             ]
           },
+          "contactId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "description": {
             "maxLength": 50000,
             "type": [
@@ -7106,6 +7113,13 @@
           "billable": {
             "type": [
               "boolean",
+              "null"
+            ]
+          },
+          "contactId": {
+            "maxLength": 128,
+            "type": [
+              "string",
               "null"
             ]
           },

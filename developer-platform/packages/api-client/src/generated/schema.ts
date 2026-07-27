@@ -3498,6 +3498,7 @@ export interface components {
         TaskCreate: {
             assigneeId?: string | null;
             billable?: boolean | null;
+            contactId?: string | null;
             description?: string | null;
             /** Format: date-time */
             dueAt?: string | null;
@@ -3517,6 +3518,7 @@ export interface components {
         TaskUpdate: {
             assigneeId?: string | null;
             billable?: boolean | null;
+            contactId?: string | null;
             description?: string | null;
             /** Format: date-time */
             dueAt?: string | null;
