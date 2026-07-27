@@ -232,7 +232,7 @@ if (
   JSON.stringify(residualCasReads.map((operation) => operation.operationId).sort()) !==
     JSON.stringify(['getProjectLifecycleOperation', 'getProjectTemplateInstantiation'])
 ) {
-  fail('the release candidate must preserve 30 core operations with 18 CAS mutations and 2 qualified operation reads')
+  fail('the stable contract must preserve 30 core operations with 18 CAS mutations and 2 qualified operation reads')
 }
 const expectedAllIfMatchOperationIds = [
   ...expectedCoreCasOperationIds,
@@ -242,7 +242,7 @@ if (
   JSON.stringify(independentIfMatchOperations.map((operation) => operation.operationId)) !==
   JSON.stringify(expectedAllIfMatchOperationIds)
 ) {
-  fail('the release candidate must expose the exact qualified If-Match operation set')
+  fail('the stable contract must expose the exact qualified If-Match operation set')
 }
 if (manifest.contractVersion !== openapi.info.version) {
   fail('contract manifest and OpenAPI versions differ')

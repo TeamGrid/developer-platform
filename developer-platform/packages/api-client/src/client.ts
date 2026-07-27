@@ -996,7 +996,7 @@ function assertApiVersion(value: unknown): ApiVersionEnvelope {
   const supportedClients = data && isObject(data.supportedClients) ? data.supportedClients : null
   const clientContractIsValid = (client: unknown) =>
     hasExactKeys(client, ['minimumVersion', 'supportedMajor']) &&
-    client.minimumVersion === '1.0.0-rc.1' &&
+    client.minimumVersion === '1.0.0' &&
     client.supportedMajor === 1
   const deprecationIsValid = (deprecation: unknown) =>
     hasExactKeys(deprecation, ['id', 'message', 'replacement', 'sunsetAt']) &&
@@ -1024,7 +1024,7 @@ function assertApiVersion(value: unknown): ApiVersionEnvelope {
       'supportedClients',
       'version',
     ]) ||
-    data.contractVersion !== '1.0.0-rc.1' ||
+    data.contractVersion !== '1.0.0' ||
     !Array.isArray(data.deprecations) ||
     !data.deprecations.every(deprecationIsValid) ||
     typeof data.documentation !== 'string' ||

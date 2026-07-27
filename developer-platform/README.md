@@ -16,18 +16,18 @@ none imports Meteor runtime code.
 
 All three packages support and are qualified on Node.js 22.14 through Node.js 24.
 
-The current prerelease is available from npm through the explicit `next`
+The stable 1.0 release is available from npm through the default `latest`
 channel:
 
 ```sh
-npm install @teamgrid/api-client@next
-npm install --global @teamgrid/cli@next
-npm install --global @teamgrid/mcp-server@next
+npm install @teamgrid/api-client@1.0.0
+npm install --global @teamgrid/cli@1.0.0
+npm install --global @teamgrid/mcp-server@1.0.0
 ```
 
-Use an exact version instead of `next` in reproducible deployments. Until the
-first stable release exists, npm also exposes the initial package version as
-`latest`; prerelease consumers should still select `next` explicitly.
+Use the exact version shown above in reproducible deployments. Unpinned
+installations resolve through `latest`; future preview releases remain isolated
+on the explicit `next` channel.
 
 ## Credential and routing model
 
@@ -190,7 +190,7 @@ each package directory, then inspect the file lists. Releases are submitted by
 the public repository's stage-only trusted publisher and require an explicit
 2FA-backed approval on npm before they become installable. Traditional npm
 publish tokens are disabled for all three packages. Published prereleases use
-the `next` dist-tag; future stable releases use `latest`.
+the `next` dist-tag; stable releases use `latest`.
 
 To release, update all three package versions, commit and tag the exact source
 as `v<version>`. The same immutable developer-platform commit and contract

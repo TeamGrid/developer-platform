@@ -288,16 +288,16 @@ describe('TeamGrid CLI', () => {
     const output = capture()
     const getApiVersion = vi.fn(async () => ({
       data: {
-        contractVersion: '1.0.0-rc.1',
+        contractVersion: '1.0.0',
         deprecations: [],
         documentation: 'https://developer.teamgridapp.com/api/v1',
         manifestSha256: 'a'.repeat(64),
         region: 'us',
         status: 'operational',
         supportedClients: {
-          cli: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
-          mcp: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
-          sdk: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+          cli: { minimumVersion: '1.0.0', supportedMajor: 1 },
+          mcp: { minimumVersion: '1.0.0', supportedMajor: 1 },
+          sdk: { minimumVersion: '1.0.0', supportedMajor: 1 },
         },
         version: '1',
       },
@@ -313,16 +313,16 @@ describe('TeamGrid CLI', () => {
     ).toBe(0)
     expect(getApiVersion).toHaveBeenCalledOnce()
     expect(JSON.parse(output.value())).toEqual({
-      contractVersion: '1.0.0-rc.1',
+      contractVersion: '1.0.0',
       deprecations: [],
       documentation: 'https://developer.teamgridapp.com/api/v1',
       manifestSha256: 'a'.repeat(64),
       region: 'us',
       status: 'operational',
       supportedClients: {
-        cli: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
-        mcp: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
-        sdk: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+        cli: { minimumVersion: '1.0.0', supportedMajor: 1 },
+        mcp: { minimumVersion: '1.0.0', supportedMajor: 1 },
+        sdk: { minimumVersion: '1.0.0', supportedMajor: 1 },
       },
       version: '1',
     })

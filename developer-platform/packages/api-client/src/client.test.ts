@@ -348,16 +348,16 @@ describe('TeamGrid API client', () => {
       expect(new URL(String(input)).pathname).toBe('/v1/')
       return json({
         data: {
-          contractVersion: '1.0.0-rc.1',
+          contractVersion: '1.0.0',
           deprecations: [],
           documentation: 'https://developer.teamgridapp.com/api/v1',
           manifestSha256: 'a'.repeat(64),
           region: 'us',
           status: 'operational',
           supportedClients: {
-            cli: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
-            mcp: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
-            sdk: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+            cli: { minimumVersion: '1.0.0', supportedMajor: 1 },
+            mcp: { minimumVersion: '1.0.0', supportedMajor: 1 },
+            sdk: { minimumVersion: '1.0.0', supportedMajor: 1 },
           },
           version: '1',
         },
@@ -375,15 +375,15 @@ describe('TeamGrid API client', () => {
     const fetch = vi.fn(async () =>
       json({
         data: {
-          contractVersion: '1.0.0-rc.1',
+          contractVersion: '1.0.0',
           deprecations: [],
           documentation: 'https://developer.teamgridapp.com/api/v1',
           manifestSha256: 'a'.repeat(64),
           region: 'us',
           status: 'operational',
           supportedClients: {
-            cli: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
-            mcp: { minimumVersion: '1.0.0-rc.1', supportedMajor: 1 },
+            cli: { minimumVersion: '1.0.0', supportedMajor: 1 },
+            mcp: { minimumVersion: '1.0.0', supportedMajor: 1 },
           },
           version: '1',
         },
@@ -465,7 +465,7 @@ describe('TeamGrid API client', () => {
       expect(headers.get('authorization')).toBe(`Bearer ${token}`)
       expect(headers.get('x-request-id')).toBe('client-request')
       expect(headers.get('x-teamgrid-client')).toBe('@teamgrid/api-client')
-      expect(headers.get('x-teamgrid-client-version')).toBe('1.0.0-rc.1')
+      expect(headers.get('x-teamgrid-client-version')).toBe('1.0.0')
       return json(taskPage(null), 200, {
         'x-ratelimit-limit': '100',
         'x-ratelimit-remaining': '99',

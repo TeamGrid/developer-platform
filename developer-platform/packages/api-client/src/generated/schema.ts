@@ -2521,7 +2521,7 @@ export interface components {
         ApiVersionEnvelope: {
             data: {
                 /** @constant */
-                contractVersion: "1.0.0-rc.1";
+                contractVersion: "1.0.0";
                 deprecations: {
                     id: string;
                     message: string;
@@ -2539,19 +2539,19 @@ export interface components {
                 supportedClients: {
                     cli: {
                         /** @constant */
-                        minimumVersion: "1.0.0-rc.1";
+                        minimumVersion: "1.0.0";
                         /** @constant */
                         supportedMajor: 1;
                     };
                     mcp: {
                         /** @constant */
-                        minimumVersion: "1.0.0-rc.1";
+                        minimumVersion: "1.0.0";
                         /** @constant */
                         supportedMajor: 1;
                     };
                     sdk: {
                         /** @constant */
-                        minimumVersion: "1.0.0-rc.1";
+                        minimumVersion: "1.0.0";
                         /** @constant */
                         supportedMajor: 1;
                     };

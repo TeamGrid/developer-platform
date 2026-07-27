@@ -643,7 +643,7 @@
             "additionalProperties": false,
             "properties": {
               "contractVersion": {
-                "const": "1.0.0-rc.1",
+                "const": "1.0.0",
                 "type": "string"
               },
               "deprecations": {
@@ -711,7 +711,7 @@
                     "additionalProperties": false,
                     "properties": {
                       "minimumVersion": {
-                        "const": "1.0.0-rc.1",
+                        "const": "1.0.0",
                         "type": "string"
                       },
                       "supportedMajor": {
@@ -729,7 +729,7 @@
                     "additionalProperties": false,
                     "properties": {
                       "minimumVersion": {
-                        "const": "1.0.0-rc.1",
+                        "const": "1.0.0",
                         "type": "string"
                       },
                       "supportedMajor": {
@@ -747,7 +747,7 @@
                     "additionalProperties": false,
                     "properties": {
                       "minimumVersion": {
-                        "const": "1.0.0-rc.1",
+                        "const": "1.0.0",
                         "type": "string"
                       },
                       "supportedMajor": {
@@ -11428,7 +11428,7 @@
   "info": {
     "description": "Stable, cell-aware TeamGrid API for service credentials and the TeamGrid CLI.",
     "title": "TeamGrid API v1",
-    "version": "1.0.0-rc.1"
+    "version": "1.0.0"
   },
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "openapi": "3.1.0",
