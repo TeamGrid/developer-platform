@@ -155,6 +155,7 @@ const expectedIndependentIfMatchOperationIds = [
   'updateGroup',
   'updateMemberRole',
   'updateRole',
+  'updateWebhook',
   'updateWorkspaceSettings',
 ]
 const expectedCoreCasOperationIds = [
@@ -215,7 +216,7 @@ if (
   JSON.stringify(independentIfMatchOperations.map((operation) => operation.operationId)) !==
   JSON.stringify(expectedAllIfMatchOperationIds)
 ) {
-  fail('the release candidate must expose exactly the 49 qualified If-Match operations')
+  fail('the release candidate must expose the exact qualified If-Match operation set')
 }
 if (manifest.contractVersion !== openapi.info.version) {
   fail('contract manifest and OpenAPI versions differ')

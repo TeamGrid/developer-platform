@@ -5220,6 +5220,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.updateWebhook",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.webhooks.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateWebhook",
+      "method": "PATCH",
+      "operationId": "updateWebhook",
+      "optionalScopes": [],
+      "path": "/webhooks/{id}",
+      "requiredScopes": [
+        "webhooks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.updateWorkspaceSettings",
           "kind": "httpLocal",
           "role": "transport"
@@ -5242,7 +5267,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 198,
+    "authenticatedOperations": 199,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -5352,6 +5377,7 @@
       "developerApi.v1.webhooks.get",
       "developerApi.v1.webhooks.list",
       "developerApi.v1.webhooks.rotateSecret",
+      "developerApi.v1.webhooks.update",
       "developerApi.v1.workspaceEntitlements.get",
       "developerApi.v1.workspaceSettings.get",
       "developerApi.v1.workspaceSettings.update",

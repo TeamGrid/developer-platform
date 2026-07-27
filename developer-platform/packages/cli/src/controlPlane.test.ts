@@ -98,6 +98,7 @@ describe('developer control-plane CLI surfaces', () => {
         'events catalog',
         'system capabilities',
         'webhooks rotate-secret',
+        'webhooks update',
         'workspace entitlements',
         'workspace-settings get',
         'workspace-settings update',
@@ -213,6 +214,76 @@ describe('developer control-plane CLI surfaces', () => {
       revision: webhookRevision,
       type: 'webhook',
     })
+  })
+
+  it('updates and reactivates webhooks with an exact revision', async () => {
+    const update = vi.fn(async () => ({
+      data: {
+        attributes: {
+          actions: ['task.created', 'task.updated'],
+          disabled: false,
+          failCount: 0,
+          lastStatus: null,
+          revision: webhookRevision,
+          url: 'https://hooks.example.test/teamgrid-v2',
+          version: 2,
+        },
+        id: 'webhook-1',
+        type: 'webhook',
+      },
+    }))
+    const result = await execute(
+      [
+        'webhooks',
+        'update',
+        'webhook-1',
+        '--data',
+        '{"actions":["task.created","task.updated"],"disabled":false,' +
+          '"url":"https://hooks.example.test/teamgrid-v2"}',
+        '--if-match',
+        webhookRevision,
+      ],
+      { webhooks: { update } },
+    )
+
+    expect(result.code).toBe(0)
+    expect(update).toHaveBeenCalledWith(
+      'webhook-1',
+      {
+        actions: ['task.created', 'task.updated'],
+        disabled: false,
+        url: 'https://hooks.example.test/teamgrid-v2',
+      },
+      { ifMatch: webhookRevision },
+    )
+    expect(JSON.parse(result.output)).toMatchObject({
+      id: 'webhook-1',
+      type: 'webhook',
+    })
+  })
+
+  it('rejects empty and unsafe webhook update data before calling the SDK', async () => {
+    const update = vi.fn()
+    const empty = await execute(
+      ['webhooks', 'update', 'webhook-1', '--data', '{}', '--if-match', webhookRevision],
+      { webhooks: { update } },
+    )
+    const unsafe = await execute(
+      [
+        'webhooks',
+        'update',
+        'webhook-1',
+        '--data',
+        '{"url":"http://hooks.example.test/teamgrid"}',
+        '--if-match',
+        webhookRevision,
+      ],
+      { webhooks: { update } },
+    )
+
+    expect(empty.code).toBe(2)
+    expect(unsafe.code).toBe(2)
+    expect(update).not.toHaveBeenCalled()
   })
 
   it('writes only the raw secret to explicitly selected stdout', async () => {

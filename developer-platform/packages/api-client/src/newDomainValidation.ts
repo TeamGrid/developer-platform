@@ -32,6 +32,7 @@ import type {
   Webhook,
   WebhookCreate,
   WebhookSecretRotation,
+  WebhookUpdate,
   WorkspaceEntitlement,
   WorkspaceSettings,
   WorkspaceSettingsUpdate,
@@ -1485,6 +1486,16 @@ export function isWebhookCreate(value: unknown): value is WebhookCreate {
     webhookActions(value.actions) &&
     value.actions.length > 0 &&
     safeWebhookUrl(value.url)
+  )
+}
+
+export function isWebhookUpdate(value: unknown): value is WebhookUpdate {
+  return (
+    hasAllowedKeys(value, ['actions', 'disabled', 'url'], []) &&
+    Object.keys(value).length > 0 &&
+    (value.actions === undefined || (webhookActions(value.actions) && value.actions.length > 0)) &&
+    (value.disabled === undefined || typeof value.disabled === 'boolean') &&
+    (value.url === undefined || safeWebhookUrl(value.url))
   )
 }
 

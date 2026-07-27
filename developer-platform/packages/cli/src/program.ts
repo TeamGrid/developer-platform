@@ -17,6 +17,7 @@ import {
   TeamGridClientError,
   type TeamGridClientOptions,
   type WebhookCreate,
+  type WebhookUpdate,
   type WorkspaceSettingsUpdate,
 } from '@teamgrid/api-client'
 import { Command, Option } from 'commander'
@@ -223,6 +224,50 @@ function webhookCreate(value: Record<string, unknown>): WebhookCreate {
     )
   }
   return { actions, url: value.url }
+}
+
+function webhookUpdate(value: Record<string, unknown>): WebhookUpdate {
+  const allowed = new Set(['actions', 'disabled', 'url'])
+  const keys = Object.keys(value)
+  const actions = value.actions
+  let url: URL | undefined
+  try {
+    url = typeof value.url === 'string' ? new URL(value.url) : undefined
+  } catch {
+    url = undefined
+  }
+  if (
+    keys.length === 0 ||
+    keys.some((key) => !allowed.has(key)) ||
+    (actions !== undefined &&
+      (!Array.isArray(actions) ||
+        actions.length < 1 ||
+        actions.length > 100 ||
+        actions.some(
+          (action) => typeof action !== 'string' || !/^[A-Za-z0-9_.:-]{1,100}$/.test(action),
+        ) ||
+        new Set(actions).size !== actions.length)) ||
+    (value.disabled !== undefined && typeof value.disabled !== 'boolean') ||
+    (value.url !== undefined &&
+      (typeof value.url !== 'string' ||
+        value.url.length > 2048 ||
+        !url ||
+        url.protocol !== 'https:' ||
+        !url.hostname ||
+        url.username ||
+        url.password ||
+        url.hash))
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Webhook update data requires one or more valid actions, disabled, or HTTPS URL fields.',
+    )
+  }
+  return {
+    ...(Array.isArray(actions) ? { actions } : {}),
+    ...(typeof value.disabled === 'boolean' ? { disabled: value.disabled } : {}),
+    ...(typeof value.url === 'string' ? { url: value.url } : {}),
+  }
 }
 
 const nativeCredentialScopePattern = /^[a-z][a-z0-9-]*(?::[a-z][a-z0-9-]*){1,2}$/
@@ -2978,6 +3023,22 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
         stdout: options.secretStdout,
       })
       if (receipt) outputData(command, receipt)
+    })
+  webhooks
+    .command('update <id>')
+    .requiredOption('--data <json|@file|->', 'webhook update JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest webhook revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      const data = webhookUpdate(await readJsonObject(options.data, input))
+      outputData(
+        command,
+        (
+          await client.webhooks.update(id, data, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
     })
   archiveOptions(webhooks.command('remove <id>')).action(async function action(
     id: string,

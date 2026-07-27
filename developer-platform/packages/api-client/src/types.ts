@@ -61,6 +61,7 @@ export type Lookup = List | Service | Tag
 export type AuditEvent = components['schemas']['AuditEvent']
 export type Webhook = components['schemas']['Webhook']
 export type WebhookCreate = components['schemas']['WebhookCreate']
+export type WebhookUpdate = components['schemas']['WebhookUpdate']
 export type WebhookDelivery = components['schemas']['WebhookDelivery']
 export type WebhookSecretRotation = components['schemas']['WebhookSecretRotation']
 export type SystemCapability = components['schemas']['SystemCapability']
@@ -829,6 +830,10 @@ export type WorkspaceSettingsMutationOptions = MutationOptions & {
 }
 
 export type WebhookSecretRotationOptions = MutationOptions & {
+  ifMatch: WebhookRevision | `"${WebhookRevision}"`
+}
+
+export type WebhookUpdateOptions = RequestOptions & {
   ifMatch: WebhookRevision | `"${WebhookRevision}"`
 }
 

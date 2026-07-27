@@ -39,6 +39,7 @@ import {
   isValidIdempotencyKey,
   isValidWebhookId,
   isWebhookCreate,
+  isWebhookUpdate,
   isWorkspaceSettingsUpdate,
   memberValidator,
   roleValidator,
@@ -211,6 +212,8 @@ import type {
   WebhookDeliveryListOptions,
   WebhookListOptions,
   WebhookSecretRotationOptions,
+  WebhookUpdate,
+  WebhookUpdateOptions,
   Workspace,
   WorkspaceSettingsMutationOptions,
   WorkspaceSettingsUpdate,
@@ -2633,6 +2636,8 @@ export class TeamGridClient {
         this.#archive(`/webhooks/${encodeURIComponent(id)}`, options),
       rotateSecret: (id: string, options: WebhookSecretRotationOptions) =>
         this.#rotateWebhookSecret(id, options),
+      update: (id: string, data: WebhookUpdate, options: WebhookUpdateOptions) =>
+        this.#updateWebhook(id, data, options),
     }
   }
 
@@ -2824,6 +2829,47 @@ export class TeamGridClient {
       envelope.data.attributes.revision,
       'webhook secret rotation',
     )
+    return attachTransport(envelope, response.transport)
+  }
+
+  async #updateWebhook(id: string, data: WebhookUpdate, options: WebhookUpdateOptions) {
+    if (!isValidWebhookId(id)) {
+      throw new TeamGridClientError('invalid_arguments', 'Webhook id is invalid.')
+    }
+    if (!isWebhookUpdate(data)) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'Webhook update requires one or more valid actions, disabled, or HTTPS URL fields.',
+      )
+    }
+    const { ifMatch, ...requestOptions } = options
+    const response = await this.#request(`/webhooks/${encodeURIComponent(id)}`, {
+      ...requestOptions,
+      body: data,
+      ifMatch: canonicalWebhookEtag(ifMatch),
+      method: 'PATCH',
+    })
+    if (
+      response.transport.status !== 200 ||
+      response.transport.headers['cache-control'] !== strongEtagCacheControl
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned unsafe webhook update metadata.',
+      )
+    }
+    const envelope = assertStrictResource(
+      response.payload,
+      webhookValidator('absent'),
+      'webhook update',
+    )
+    if (envelope.data.id !== id) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned an updated webhook with a different id.',
+      )
+    }
+    assertRevisionEtag(response.transport, envelope.data.attributes.revision, 'webhook update')
     return attachTransport(envelope, response.transport)
   }
 

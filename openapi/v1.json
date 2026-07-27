@@ -6296,6 +6296,32 @@
         ],
         "type": "object"
       },
+      "WebhookUpdate": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "actions": {
+            "items": {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "url": {
+            "format": "uri",
+            "maxLength": 2048,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ProjectCreate": {
         "additionalProperties": false,
         "properties": {
@@ -24673,6 +24699,100 @@
         ],
         "x-teamgrid-required-scopes": [
           "webhooks:read"
+        ]
+      },
+      "patch": {
+        "description": "Updates the destination, subscribed events, or enabled state of a credential-owned webhook using its latest strong revision. Setting disabled to false clears automatic delivery-failure suspension.",
+        "operationId": "updateWebhook",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchWebhook"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Webhook"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The updated webhook.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              },
+              "ETag": {
+                "$ref": "#/components/headers/WebhookETag"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update or reactivate a webhook",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-teamgrid-required-scopes": [
+          "webhooks:write"
         ]
       }
     },

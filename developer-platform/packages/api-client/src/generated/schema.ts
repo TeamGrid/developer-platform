@@ -1688,7 +1688,11 @@ export interface paths {
         delete: operations["removeWebhook"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Update or reactivate a webhook
+         * @description Updates the destination, subscribed events, or enabled state of a credential-owned webhook using its latest strong revision. Setting disabled to false clears automatic delivery-failure suspension.
+         */
+        patch: operations["updateWebhook"];
         trace?: never;
     };
     "/members": {
@@ -3596,6 +3600,12 @@ export interface components {
             actions: string[];
             /** Format: uri */
             url: string;
+        };
+        WebhookUpdate: {
+            actions?: string[];
+            disabled?: boolean;
+            /** Format: uri */
+            url?: string;
         };
         ProjectCreate: {
             additionalContactIds?: string[] | null;
@@ -10458,6 +10468,49 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateWebhook: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong webhook ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchWebhook"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebhookUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated webhook. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    ETag: components["headers"]["WebhookETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Webhook"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
