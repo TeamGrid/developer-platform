@@ -68,6 +68,16 @@ export type WorkspaceEntitlement = components['schemas']['WorkspaceEntitlement']
 export type WorkspaceSettings = components['schemas']['WorkspaceSettings']
 export type WorkspaceSettingsUpdate = components['schemas']['WorkspaceSettingsUpdate']
 export type EventDefinition = components['schemas']['EventDefinition']
+export type PersonalAccessToken = components['schemas']['PersonalAccessToken']
+export type PersonalAccessTokenCreate = components['schemas']['PersonalAccessTokenCreate']
+export type PersonalAccessTokenRotation = components['schemas']['PersonalAccessTokenRotation']
+export type ServiceAccount = components['schemas']['ServiceAccount']
+export type ServiceAccountCreate = components['schemas']['ServiceAccountCreate']
+export type ServiceAccountCredential = components['schemas']['ServiceAccountCredential']
+export type ServiceAccountCredentialCreate = components['schemas']['ServiceAccountCredentialCreate']
+export type ServiceAccountCredentialRotation =
+  components['schemas']['ServiceAccountCredentialRotation']
+export type ServiceAccountUpdate = components['schemas']['ServiceAccountUpdate']
 export type TaskCreate = components['schemas']['TaskCreate']
 export type TaskDuplicate = Omit<
   components['schemas']['TaskDuplicate'],

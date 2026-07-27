@@ -1,6 +1,7 @@
 import { TeamGridClientError } from './errors.js'
 
-const tokenPattern = /^(?:tg_sk_v1|tg_pat_v2|tg_sa_v2)_([a-z0-9-]+)_([a-z0-9-]+)_([a-f0-9]{24})_([a-f0-9]{64})$/
+const tokenPattern =
+  /^(?:tg_sk_v1|tg_pat_v2|tg_sa_v2)_([a-z0-9-]+)_([a-z0-9-]+)_([a-f0-9]{24})_([a-f0-9]{64})$/
 const locationPattern = /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/
 
 export type CredentialLocation = Readonly<{

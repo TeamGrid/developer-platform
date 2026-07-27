@@ -3,7 +3,13 @@ import type { Readable, Writable } from 'node:stream'
 import { confirm, password } from '@inquirer/prompts'
 import {
   normalizeApiBaseUrl,
+  type PersonalAccessTokenCreate,
+  type PersonalAccessTokenRotation,
   parseCredentialLocation,
+  type ServiceAccountCreate,
+  type ServiceAccountCredentialCreate,
+  type ServiceAccountCredentialRotation,
+  type ServiceAccountUpdate,
   TeamGridApiError,
   TeamGridClient,
   TeamGridClientError,
@@ -13,6 +19,7 @@ import {
 } from '@teamgrid/api-client'
 import { Command, Option } from 'commander'
 import { type CliConfig, ConfigStore, normalizeProfileName } from './config.js'
+import { revealCredentialSecret } from './credentialSecretOutput.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
 import {
   type CliExportDownload,
@@ -214,6 +221,99 @@ function webhookCreate(value: Record<string, unknown>): WebhookCreate {
     )
   }
   return { actions, url: value.url }
+}
+
+const nativeCredentialScopePattern = /^[a-z][a-z0-9-]*(?::[a-z][a-z0-9-]*){1,2}$/
+
+function isIsoDateTime(value: unknown): value is string {
+  return typeof value === 'string' && value.length <= 64 && Number.isFinite(Date.parse(value))
+}
+
+function nativeCredentialCreate(
+  value: Record<string, unknown>,
+): PersonalAccessTokenCreate | ServiceAccountCreate | ServiceAccountCredentialCreate {
+  const allowed = new Set(['description', 'expiresAt', 'name', 'scopes'])
+  const scopes = value.scopes
+  if (
+    Object.keys(value).some((key) => !allowed.has(key)) ||
+    typeof value.name !== 'string' ||
+    value.name.trim().length < 1 ||
+    value.name.length > 200 ||
+    (value.description !== undefined &&
+      (typeof value.description !== 'string' || value.description.length > 500)) ||
+    (value.expiresAt !== undefined && !isIsoDateTime(value.expiresAt)) ||
+    !Array.isArray(scopes) ||
+    scopes.length < 1 ||
+    scopes.length > 100 ||
+    scopes.some(
+      (scope) => typeof scope !== 'string' || !nativeCredentialScopePattern.test(scope),
+    ) ||
+    new Set(scopes).size !== scopes.length
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Credential data requires a bounded name and 1–100 unique public scopes.',
+    )
+  }
+  return {
+    ...(typeof value.description === 'string' ? { description: value.description } : {}),
+    ...(typeof value.expiresAt === 'string' ? { expiresAt: value.expiresAt } : {}),
+    name: value.name,
+    scopes: scopes as string[],
+  }
+}
+
+function nativeCredentialRotation(
+  value: Record<string, unknown>,
+): PersonalAccessTokenRotation | ServiceAccountCredentialRotation {
+  const allowed = new Set(['expiresAt', 'gracePeriodSeconds', 'scopes'])
+  const scopes = value.scopes
+  if (
+    Object.keys(value).some((key) => !allowed.has(key)) ||
+    (value.expiresAt !== undefined && !isIsoDateTime(value.expiresAt)) ||
+    (value.gracePeriodSeconds !== undefined &&
+      (!Number.isInteger(value.gracePeriodSeconds) ||
+        (value.gracePeriodSeconds as number) < 60 ||
+        (value.gracePeriodSeconds as number) > 86_400)) ||
+    (scopes !== undefined &&
+      (!Array.isArray(scopes) ||
+        scopes.length < 1 ||
+        scopes.length > 100 ||
+        scopes.some(
+          (scope) => typeof scope !== 'string' || !nativeCredentialScopePattern.test(scope),
+        ) ||
+        new Set(scopes).size !== scopes.length))
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Credential rotation data may contain an expiry, a 60–86400 second grace period, and 1–100 unique scopes.',
+    )
+  }
+  return {
+    ...(typeof value.expiresAt === 'string' ? { expiresAt: value.expiresAt } : {}),
+    ...(typeof value.gracePeriodSeconds === 'number'
+      ? { gracePeriodSeconds: value.gracePeriodSeconds }
+      : {}),
+    ...(Array.isArray(scopes) ? { scopes: scopes as string[] } : {}),
+  }
+}
+
+function serviceAccountUpdate(value: Record<string, unknown>): ServiceAccountUpdate {
+  const allowed = new Set(['reason', 'status'])
+  if (
+    Object.keys(value).some((key) => !allowed.has(key)) ||
+    (value.status !== 'active' && value.status !== 'disabled') ||
+    (value.reason !== undefined && (typeof value.reason !== 'string' || value.reason.length > 500))
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      "Service-account updates require status 'active' or 'disabled' and an optional bounded reason.",
+    )
+  }
+  return {
+    ...(typeof value.reason === 'string' ? { reason: value.reason } : {}),
+    status: value.status,
+  }
 }
 
 function commaSeparatedValues(
@@ -612,6 +712,216 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
         ).data,
       )
     })
+
+  const credentials = program.command('credentials').description('manage native API v1 credentials')
+  const personalCredentials = credentials
+    .command('personal')
+    .description('manage personal access tokens for the authenticated user')
+  addListOptions(personalCredentials.command('list')).action(async function action(
+    options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    await listResources(command, options, client.personalAccessTokens as never)
+  })
+  personalCredentials
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'personal access token create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .option('--secret-file <path>', 'create a new mode-0600 credential file without overwriting')
+    .option('--secret-stdout', 'write only the raw reveal-once credential to stdout')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      const data = nativeCredentialCreate(await readJsonObject(options.data, input))
+      const receipt = await revealCredentialSecret({
+        file: options.secretFile,
+        issue: async () =>
+          (
+            await client.personalAccessTokens.create(data, {
+              idempotencyKey: options.idempotencyKey,
+            })
+          ).data,
+        output,
+        stdout: options.secretStdout,
+      })
+      if (receipt) outputData(command, receipt)
+    })
+  archiveOptions(
+    personalCredentials
+      .command('rotate <id>')
+      .description('rotate and reveal a personal access token exactly once')
+      .option('--data <json|@file|->', 'optional rotation JSON')
+      .option('--idempotency-key <key>', 'stable retry key')
+      .option('--secret-file <path>', 'create a new mode-0600 credential file without overwriting')
+      .option('--secret-stdout', 'write only the raw reveal-once credential to stdout'),
+  ).action(async function action(id: string, options, command: Command) {
+    await confirmDestructive(command, 'Rotate', 'personal access token', id)
+    const client = await loadClient(command)
+    const data = nativeCredentialRotation(
+      options.data ? await readJsonObject(options.data, input) : {},
+    )
+    const receipt = await revealCredentialSecret({
+      file: options.secretFile,
+      issue: async () =>
+        (
+          await client.personalAccessTokens.rotate(id, data, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      output,
+      stdout: options.secretStdout,
+    })
+    if (receipt) outputData(command, receipt)
+  })
+  archiveOptions(personalCredentials.command('revoke <id>')).action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Revoke', 'personal access token', id)
+    const client = await loadClient(command)
+    await client.personalAccessTokens.revoke(id)
+    outputData(command, { id, revoked: true, type: 'personalAccessToken' })
+  })
+
+  const serviceAccounts = program
+    .command('service-accounts')
+    .description('manage service-account principals and credentials')
+  addListOptions(serviceAccounts.command('list')).action(async function action(
+    options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    await listResources(command, options, client.serviceAccounts as never)
+  })
+  serviceAccounts.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.serviceAccounts.get(id)).data)
+  })
+  serviceAccounts
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'service account create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .option('--secret-file <path>', 'create a new mode-0600 credential file without overwriting')
+    .option('--secret-stdout', 'write only the raw reveal-once credential to stdout')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      const data = nativeCredentialCreate(await readJsonObject(options.data, input))
+      const receipt = await revealCredentialSecret({
+        file: options.secretFile,
+        issue: async () =>
+          (
+            await client.serviceAccounts.create(data, {
+              idempotencyKey: options.idempotencyKey,
+            })
+          ).data,
+        output,
+        stdout: options.secretStdout,
+      })
+      if (receipt) outputData(command, receipt)
+    })
+  archiveOptions(
+    serviceAccounts
+      .command('update <id>')
+      .requiredOption('--data <json|@file|->', 'service account status update JSON'),
+  ).action(async function action(id: string, options, command: Command) {
+    const data = serviceAccountUpdate(await readJsonObject(options.data, input))
+    if (data.status === 'disabled') {
+      await confirmDestructive(command, 'Disable', 'service account', id)
+    }
+    const client = await loadClient(command)
+    outputData(command, (await client.serviceAccounts.update(id, data)).data)
+  })
+  archiveOptions(serviceAccounts.command('revoke <id>')).action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Revoke', 'service account', id)
+    const client = await loadClient(command)
+    await client.serviceAccounts.revoke(id)
+    outputData(command, { id, revoked: true, type: 'serviceAccount' })
+  })
+
+  const serviceAccountCredentials = serviceAccounts
+    .command('credentials')
+    .description('manage independent service-account credential families')
+  serviceAccountCredentials
+    .command('create <serviceAccountId>')
+    .requiredOption('--data <json|@file|->', 'service credential create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .option('--secret-file <path>', 'create a new mode-0600 credential file without overwriting')
+    .option('--secret-stdout', 'write only the raw reveal-once credential to stdout')
+    .action(async function action(serviceAccountId: string, options, command: Command) {
+      const client = await loadClient(command)
+      const data = nativeCredentialCreate(await readJsonObject(options.data, input))
+      const receipt = await revealCredentialSecret({
+        file: options.secretFile,
+        issue: async () =>
+          (
+            await client.serviceAccounts.createCredential(serviceAccountId, data, {
+              idempotencyKey: options.idempotencyKey,
+            })
+          ).data,
+        output,
+        stdout: options.secretStdout,
+      })
+      if (receipt) outputData(command, receipt)
+    })
+  archiveOptions(
+    serviceAccountCredentials
+      .command('rotate <serviceAccountId> <credentialId>')
+      .description('rotate and reveal a service-account credential exactly once')
+      .option('--data <json|@file|->', 'optional rotation JSON')
+      .option('--idempotency-key <key>', 'stable retry key')
+      .option('--secret-file <path>', 'create a new mode-0600 credential file without overwriting')
+      .option('--secret-stdout', 'write only the raw reveal-once credential to stdout'),
+  ).action(async function action(
+    serviceAccountId: string,
+    credentialId: string,
+    options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Rotate', 'service-account credential', credentialId)
+    const client = await loadClient(command)
+    const data = nativeCredentialRotation(
+      options.data ? await readJsonObject(options.data, input) : {},
+    )
+    const receipt = await revealCredentialSecret({
+      file: options.secretFile,
+      issue: async () =>
+        (
+          await client.serviceAccounts.rotateCredential(serviceAccountId, credentialId, data, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      output,
+      stdout: options.secretStdout,
+    })
+    if (receipt) outputData(command, receipt)
+  })
+  archiveOptions(
+    serviceAccountCredentials.command('revoke <serviceAccountId> <credentialId>'),
+  ).action(async function action(
+    serviceAccountId: string,
+    credentialId: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Revoke', 'service-account credential', credentialId)
+    const client = await loadClient(command)
+    await client.serviceAccounts.revokeCredential(serviceAccountId, credentialId)
+    outputData(command, {
+      credentialId,
+      revoked: true,
+      serviceAccountId,
+      type: 'serviceAccountCredential',
+    })
+  })
 
   const events = program.command('events').description('inspect scoped public events')
   events.command('catalog').action(async function action(_options: unknown, command: Command) {

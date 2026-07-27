@@ -1103,6 +1103,31 @@
     {
       "authMode": "developerCredential",
       "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createPersonalAccessToken",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.personalAccessTokens.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createPersonalAccessToken",
+      "method": "POST",
+      "operationId": "createPersonalAccessToken",
+      "optionalScopes": [],
+      "path": "/me/personal-access-tokens",
+      "requiredScopes": [
+        "credentials:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
       "dynamicPolicyIds": [
         "commerce-sensitive-fields"
       ],
@@ -1281,6 +1306,57 @@
       "path": "/services",
       "requiredScopes": [
         "services:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createServiceAccount",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccounts.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createServiceAccount",
+      "method": "POST",
+      "operationId": "createServiceAccount",
+      "optionalScopes": [],
+      "path": "/service-accounts",
+      "requiredScopes": [
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createServiceAccountCredential",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccountCredentials.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createServiceAccountCredential",
+      "method": "POST",
+      "operationId": "createServiceAccountCredential",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}/credentials",
+      "requiredScopes": [
+        "credentials:write",
+        "service-accounts:write"
       ]
     },
     {
@@ -2326,6 +2402,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.getServiceAccount",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccounts.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getServiceAccount",
+      "method": "GET",
+      "operationId": "getServiceAccount",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}",
+      "requiredScopes": [
+        "service-accounts:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.getSystemCapabilities",
           "kind": "httpLocal",
           "role": "transport"
@@ -3159,6 +3260,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.listPersonalAccessTokens",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.personalAccessTokens.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listPersonalAccessTokens",
+      "method": "GET",
+      "operationId": "listPersonalAccessTokens",
+      "optionalScopes": [],
+      "path": "/me/personal-access-tokens",
+      "requiredScopes": [
+        "credentials:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.listPlannedWork",
           "kind": "httpLocal",
           "role": "transport"
@@ -3334,6 +3460,31 @@
       "path": "/roles",
       "requiredScopes": [
         "roles:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listServiceAccounts",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccounts.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listServiceAccounts",
+      "method": "GET",
+      "operationId": "listServiceAccounts",
+      "optionalScopes": [],
+      "path": "/service-accounts",
+      "requiredScopes": [
+        "service-accounts:read"
       ]
     },
     {
@@ -4193,6 +4344,133 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.revokePersonalAccessToken",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.personalAccessTokens.revoke",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "revokePersonalAccessToken",
+      "method": "DELETE",
+      "operationId": "revokePersonalAccessToken",
+      "optionalScopes": [],
+      "path": "/me/personal-access-tokens/{id}",
+      "requiredScopes": [
+        "credentials:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.revokeServiceAccount",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccounts.revoke",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "revokeServiceAccount",
+      "method": "DELETE",
+      "operationId": "revokeServiceAccount",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}",
+      "requiredScopes": [
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.revokeServiceAccountCredential",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccountCredentials.revoke",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "revokeServiceAccountCredential",
+      "method": "DELETE",
+      "operationId": "revokeServiceAccountCredential",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}/credentials/{credentialId}",
+      "requiredScopes": [
+        "credentials:write",
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.rotatePersonalAccessToken",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.personalAccessTokens.rotate",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "rotatePersonalAccessToken",
+      "method": "POST",
+      "operationId": "rotatePersonalAccessToken",
+      "optionalScopes": [],
+      "path": "/me/personal-access-tokens/{id}/rotation",
+      "requiredScopes": [
+        "credentials:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.rotateServiceAccountCredential",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccountCredentials.rotate",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "rotateServiceAccountCredential",
+      "method": "POST",
+      "operationId": "rotateServiceAccountCredential",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}/credentials/{credentialId}/rotation",
+      "requiredScopes": [
+        "credentials:write",
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.rotateWebhookSecret",
           "kind": "httpLocal",
           "role": "transport"
@@ -4790,6 +5068,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.updateServiceAccount",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccounts.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateServiceAccount",
+      "method": "PATCH",
+      "operationId": "updateServiceAccount",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}",
+      "requiredScopes": [
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.updateTag",
           "kind": "httpLocal",
           "role": "transport"
@@ -4887,7 +5190,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 184,
+    "authenticatedOperations": 196,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -4945,6 +5248,10 @@
       "developerApi.v1.members.list",
       "developerApi.v1.members.remove",
       "developerApi.v1.members.updateRole",
+      "developerApi.v1.personalAccessTokens.create",
+      "developerApi.v1.personalAccessTokens.list",
+      "developerApi.v1.personalAccessTokens.revoke",
+      "developerApi.v1.personalAccessTokens.rotate",
       "developerApi.v1.plannedWork.getForTask",
       "developerApi.v1.plannedWork.list",
       "developerApi.v1.plannedWork.replaceForTask",
@@ -4979,6 +5286,14 @@
       "developerApi.v1.roles.list",
       "developerApi.v1.roles.update",
       "developerApi.v1.search.query",
+      "developerApi.v1.serviceAccountCredentials.create",
+      "developerApi.v1.serviceAccountCredentials.revoke",
+      "developerApi.v1.serviceAccountCredentials.rotate",
+      "developerApi.v1.serviceAccounts.create",
+      "developerApi.v1.serviceAccounts.get",
+      "developerApi.v1.serviceAccounts.list",
+      "developerApi.v1.serviceAccounts.revoke",
+      "developerApi.v1.serviceAccounts.update",
       "developerApi.v1.systemCapabilities.get",
       "developerApi.v1.webhooks.get",
       "developerApi.v1.webhooks.list",

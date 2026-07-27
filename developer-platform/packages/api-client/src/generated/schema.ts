@@ -2233,6 +2233,161 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/personal-access-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List personal access tokens owned by the current user */
+        get: operations["listPersonalAccessTokens"];
+        put?: never;
+        /**
+         * Create a personal access token
+         * @description Creates native v2 key material in the credential home cell. The token is returned only by this private no-store response and exact idempotent replays retained for seven days.
+         */
+        post: operations["createPersonalAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/personal-access-tokens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke a personal access token */
+        delete: operations["revokePersonalAccessToken"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/personal-access-tokens/{id}/rotation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotate a personal access token
+         * @description Issues one successor generation, places the predecessor in a bounded retiring grace period, and reveals the successor only in this no-store response or an exact idempotent replay.
+         */
+        post: operations["rotatePersonalAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service-accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List service accounts */
+        get: operations["listServiceAccounts"];
+        put?: never;
+        /**
+         * Create a service account and its initial credential
+         * @description Creates native v2 key material in the credential home cell. The token is returned only by this private no-store response and exact idempotent replays retained for seven days.
+         */
+        post: operations["createServiceAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service-accounts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a service account */
+        get: operations["getServiceAccount"];
+        put?: never;
+        post?: never;
+        /** Permanently revoke a service account */
+        delete: operations["revokeServiceAccount"];
+        options?: never;
+        head?: never;
+        /** Enable or disable a service account */
+        patch: operations["updateServiceAccount"];
+        trace?: never;
+    };
+    "/service-accounts/{id}/credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create an independent service account credential
+         * @description Creates native v2 key material in the credential home cell. The token is returned only by this private no-store response and exact idempotent replays retained for seven days.
+         */
+        post: operations["createServiceAccountCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service-accounts/{id}/credentials/{credentialId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke a service account credential */
+        delete: operations["revokeServiceAccountCredential"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service-accounts/{id}/credentials/{credentialId}/rotation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotate a service account credential
+         * @description Issues one successor generation, places the predecessor in a bounded retiring grace period, and reveals the successor only in this no-store response or an exact idempotent replay.
+         */
+        post: operations["rotateServiceAccountCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -4171,6 +4326,117 @@ export interface components {
             defaultProductivity?: number;
             defaultShowInScheduling?: boolean;
             name?: string;
+        };
+        PersonalAccessToken: {
+            attributes: {
+                /** Format: date-time */
+                createdAt: string;
+                description: string | null;
+                /** Format: date-time */
+                expiresAt: string;
+                generation: number;
+                /** Format: date-time */
+                graceEndsAt: string | null;
+                lastFour: string;
+                /** Format: date-time */
+                lastUsedAt: string | null;
+                name: string;
+                /** Format: date-time */
+                notBeforeAt: string | null;
+                principalId: string;
+                scopes: string[];
+                /** @enum {string} */
+                status: "active" | "expired" | "retiring" | "revoked";
+                /** @description Reveal-once token returned only by an idempotent create or rotation response. */
+                readonly token?: string;
+            };
+            id: string;
+            /** @constant */
+            type: "personalAccessToken";
+        };
+        PersonalAccessTokenCreate: {
+            description?: string;
+            /** Format: date-time */
+            expiresAt?: string;
+            name: string;
+            scopes: string[];
+        };
+        PersonalAccessTokenRotation: {
+            /** Format: date-time */
+            expiresAt?: string;
+            gracePeriodSeconds?: number;
+            scopes?: string[];
+        };
+        ServiceAccountCredential: {
+            attributes: {
+                /** Format: date-time */
+                createdAt: string;
+                description: string | null;
+                /** Format: date-time */
+                expiresAt: string;
+                generation: number;
+                /** Format: date-time */
+                graceEndsAt: string | null;
+                lastFour: string;
+                /** Format: date-time */
+                lastUsedAt: string | null;
+                name: string;
+                /** Format: date-time */
+                notBeforeAt: string | null;
+                principalId: string;
+                scopes: string[];
+                /** @enum {string} */
+                status: "active" | "expired" | "retiring" | "revoked";
+                /** @description Reveal-once token returned only by an idempotent create or rotation response. */
+                readonly token?: string;
+            };
+            id: string;
+            /** @constant */
+            type: "serviceAccountCredential";
+        };
+        ServiceAccount: {
+            attributes: {
+                /** Format: date-time */
+                createdAt: string;
+                credentials: components["schemas"]["ServiceAccountCredential"][];
+                description: string | null;
+                displayName: string;
+                permissionSet: string[];
+                revision: string;
+                scopeCeiling: string[];
+                /** @enum {string} */
+                status: "active" | "disabled" | "revoked";
+                /** Format: date-time */
+                updatedAt: string;
+            };
+            id: string;
+            /** @constant */
+            type: "serviceAccount";
+        };
+        ServiceAccountCreate: {
+            description?: string;
+            /** Format: date-time */
+            expiresAt?: string;
+            name: string;
+            scopes: string[];
+        };
+        ServiceAccountCredentialCreate: {
+            description?: string;
+            /** Format: date-time */
+            expiresAt?: string;
+            name: string;
+            scopes: string[];
+        };
+        ServiceAccountCredentialRotation: {
+            /** Format: date-time */
+            expiresAt?: string;
+            gracePeriodSeconds?: number;
+            scopes?: string[];
+        };
+        ServiceAccountUpdate: {
+            reason?: string;
+            /** @enum {string} */
+            status: "active" | "disabled";
         };
     };
     responses: {
@@ -11714,6 +11980,499 @@ export interface operations {
             409: components["responses"]["Conflict"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listPersonalAccessTokens: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonalAccessToken"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createPersonalAccessToken: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PersonalAccessTokenCreate"];
+            };
+        };
+        responses: {
+            /** @description An exact replay of a completed issuance. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonalAccessToken"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly issued native credential. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonalAccessToken"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    revokePersonalAccessToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The personal access token was permanently revoked. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    rotatePersonalAccessToken: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PersonalAccessTokenRotation"];
+            };
+        };
+        responses: {
+            /** @description An exact replay of a completed issuance. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonalAccessToken"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly issued native credential. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonalAccessToken"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listServiceAccounts: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccount"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createServiceAccount: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAccountCreate"];
+            };
+        };
+        responses: {
+            /** @description An exact replay of a completed issuance. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly issued native credential. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getServiceAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccount"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    revokeServiceAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The service account and all of its credentials were revoked. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateServiceAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAccountUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccount"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createServiceAccountCredential: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAccountCredentialCreate"];
+            };
+        };
+        responses: {
+            /** @description An exact replay of a completed issuance. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly issued native credential. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    revokeServiceAccountCredential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The service account credential was permanently revoked. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    rotateServiceAccountCredential: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAccountCredentialRotation"];
+            };
+        };
+        responses: {
+            /** @description An exact replay of a completed issuance. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly issued native credential. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

@@ -133,6 +133,9 @@ import type {
   MemberRoleUpdate,
   MutationOptions,
   PaginationOptions,
+  PersonalAccessToken,
+  PersonalAccessTokenCreate,
+  PersonalAccessTokenRotation,
   PlannedWork,
   PlannedWorkListOptions,
   PlannedWorkOperation,
@@ -172,6 +175,12 @@ import type {
   RoleUpdate,
   SearchQuery,
   Service,
+  ServiceAccount,
+  ServiceAccountCreate,
+  ServiceAccountCredential,
+  ServiceAccountCredentialCreate,
+  ServiceAccountCredentialRotation,
+  ServiceAccountUpdate,
   ServiceCreate,
   ServiceUpdate,
   Tag,
@@ -241,6 +250,7 @@ const defaultMaxResponseBytes = 8 * 1024 * 1024
 const maximumExportDownloadBytes = 50 * 1024 * 1024
 const exportContentType = 'text/csv; charset=utf-8' as const
 const strongEtagCacheControl = 'private, no-store, no-transform' as const
+const credentialSecretCacheControl = 'private, no-store' as const
 
 function isoQueryValue(value: QueryValue) {
   return value instanceof Date ? value.toISOString() : String(value)
@@ -569,6 +579,12 @@ function customFieldValueBatchPath(targetType: CustomFieldValueTargetType, resou
 }
 
 function expectedResourceTypes(path: string) {
+  if (/^\/service-accounts\/[^/]+\/credentials(?:\/|$)/.test(path)) {
+    return ['serviceAccountCredential']
+  }
+  if (/^\/me\/personal-access-tokens(?:\/|$)/.test(path)) {
+    return ['personalAccessToken']
+  }
   if (/^\/file-upload-intents\/[^/]+\/finalize$/.test(path)) return ['file']
   if (/^\/file-upload-intents\/[^/]+$/.test(path)) return ['fileUploadIntent']
   if (/^\/tasks\/[^/]+\/timer\/(?:start|stop)$/.test(path)) return ['timeEntry']
@@ -595,6 +611,7 @@ function expectedResourceTypes(path: string) {
     files: ['file', 'fileDownloadIntent'],
     'file-upload-intents': ['fileUploadIntent'],
     lists: ['list'],
+    me: ['personalAccessToken'],
     'product-groups': ['productGroup'],
     products: ['product'],
     'planned-work': ['plannedWork'],
@@ -605,6 +622,7 @@ function expectedResourceTypes(path: string) {
     'project-template-instantiations': ['projectTemplateInstantiation'],
     'project-templates': ['projectTemplate'],
     services: ['service'],
+    'service-accounts': ['serviceAccount', 'serviceAccountCredential'],
     tags: ['tag'],
     tasks: ['task'],
     'time-entries': ['timeEntry'],
@@ -677,6 +695,29 @@ function assertResource<T>(value: unknown, expectedTypes: string[]): ResourceEnv
   }
   assertResourceValue(value.data, expectedTypes)
   return value as ResourceEnvelope<T>
+}
+
+function assertCredentialMetadataIsRedacted(value: unknown) {
+  const resources =
+    isObject(value) && Array.isArray(value.data)
+      ? value.data
+      : [isObject(value) ? value.data : undefined]
+  const inspect = (resource: unknown) => {
+    if (!isObject(resource) || !isObject(resource.attributes)) return
+    if (
+      (resource.type === 'personalAccessToken' || resource.type === 'serviceAccountCredential') &&
+      Object.hasOwn(resource.attributes, 'token')
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API exposed reveal-once credential material in a metadata response.',
+      )
+    }
+    if (resource.type === 'serviceAccount' && Array.isArray(resource.attributes.credentials)) {
+      resource.attributes.credentials.forEach(inspect)
+    }
+  }
+  resources.forEach(inspect)
 }
 
 function assertCustomFieldValueBatch(
@@ -853,6 +894,7 @@ export class TeamGridClient {
   readonly lists
   readonly location
   readonly members
+  readonly personalAccessTokens
   readonly plannedWork
   readonly plannedWorkOperations
   readonly productGroups
@@ -864,6 +906,7 @@ export class TeamGridClient {
   readonly projectTemplates
   readonly roles
   readonly search
+  readonly serviceAccounts
   readonly services
   readonly system
   readonly tags
@@ -942,6 +985,77 @@ export class TeamGridClient {
         ),
       update: (data: WorkspaceSettingsUpdate, options: WorkspaceSettingsMutationOptions) =>
         this.#updateWorkspaceSettings(data, options),
+    }
+    this.personalAccessTokens = {
+      create: (data: PersonalAccessTokenCreate, options: MutationOptions = {}) =>
+        this.#nativeCredentialSecret<PersonalAccessToken>(
+          '/me/personal-access-tokens',
+          data,
+          options,
+        ),
+      list: (options?: ListOptions) =>
+        this.#redactedCredentialPage<PersonalAccessToken>('/me/personal-access-tokens', options),
+      pages: (options?: ListOptions, pagination?: PaginationOptions) =>
+        this.#redactedCredentialPages<PersonalAccessToken>(
+          '/me/personal-access-tokens',
+          options,
+          pagination,
+        ),
+      revoke: (id: string, options?: RequestOptions) =>
+        this.#archive(`/me/personal-access-tokens/${encodeURIComponent(id)}`, options),
+      rotate: (id: string, data: PersonalAccessTokenRotation = {}, options: MutationOptions = {}) =>
+        this.#nativeCredentialSecret<PersonalAccessToken>(
+          `/me/personal-access-tokens/${encodeURIComponent(id)}/rotation`,
+          data,
+          options,
+        ),
+    }
+    this.serviceAccounts = {
+      create: (data: ServiceAccountCreate, options: MutationOptions = {}) =>
+        this.#nativeCredentialSecret<ServiceAccountCredential>('/service-accounts', data, options),
+      createCredential: (
+        id: string,
+        data: ServiceAccountCredentialCreate,
+        options: MutationOptions = {},
+      ) =>
+        this.#nativeCredentialSecret<ServiceAccountCredential>(
+          `/service-accounts/${encodeURIComponent(id)}/credentials`,
+          data,
+          options,
+        ),
+      get: (id: string, options?: RequestOptions) =>
+        this.#redactedCredentialResource<ServiceAccount>(
+          `/service-accounts/${encodeURIComponent(id)}`,
+          options,
+        ),
+      list: (options?: ListOptions) =>
+        this.#redactedCredentialPage<ServiceAccount>('/service-accounts', options),
+      pages: (options?: ListOptions, pagination?: PaginationOptions) =>
+        this.#redactedCredentialPages<ServiceAccount>('/service-accounts', options, pagination),
+      revoke: (id: string, options?: RequestOptions) =>
+        this.#archive(`/service-accounts/${encodeURIComponent(id)}`, options),
+      revokeCredential: (id: string, credentialId: string, options?: RequestOptions) =>
+        this.#archive(
+          `/service-accounts/${encodeURIComponent(id)}/credentials/${encodeURIComponent(
+            credentialId,
+          )}`,
+          options,
+        ),
+      rotateCredential: (
+        id: string,
+        credentialId: string,
+        data: ServiceAccountCredentialRotation = {},
+        options: MutationOptions = {},
+      ) =>
+        this.#nativeCredentialSecret<ServiceAccountCredential>(
+          `/service-accounts/${encodeURIComponent(id)}/credentials/${encodeURIComponent(
+            credentialId,
+          )}/rotation`,
+          data,
+          options,
+        ),
+      update: (id: string, data: ServiceAccountUpdate, options?: RequestOptions) =>
+        this.#update<ServiceAccount>(`/service-accounts/${encodeURIComponent(id)}`, data, options),
     }
     this.events = {
       getCatalog: (options: RequestOptions = {}) =>
@@ -3027,6 +3141,32 @@ export class TeamGridClient {
     )
   }
 
+  async #redactedCredentialResource<T>(path: string, options?: RequestOptions) {
+    const envelope = await this.#resource<T>(path, options)
+    assertCredentialMetadataIsRedacted(envelope)
+    return envelope
+  }
+
+  async #redactedCredentialPage<T>(
+    path: string,
+    options: ListOptions & Record<string, unknown> = {},
+  ) {
+    const envelope = await this.#page<T>(path, options)
+    assertCredentialMetadataIsRedacted(envelope)
+    return envelope
+  }
+
+  async *#redactedCredentialPages<T>(
+    path: string,
+    options: ListOptions & Record<string, unknown> = {},
+    pagination: PaginationOptions = {},
+  ) {
+    for await (const page of this.#pages<T>(path, options, pagination)) {
+      assertCredentialMetadataIsRedacted(page)
+      yield page
+    }
+  }
+
   async #customFieldValueMutation(
     path: string,
     method: 'DELETE' | 'PUT',
@@ -3299,6 +3439,45 @@ export class TeamGridClient {
       assertResource<T>(response.payload, expectedResourceTypes(path)),
       response.transport,
     )
+  }
+
+  async #nativeCredentialSecret<T>(path: string, data: unknown, options: MutationOptions) {
+    const response = await this.#request(path, {
+      ...options,
+      body: data,
+      idempotencyKey: options.idempotencyKey || newRequestId(),
+      method: 'POST',
+    })
+    const replayed = response.transport.status === 200
+    if (
+      (response.transport.status !== 200 && response.transport.status !== 201) ||
+      response.transport.headers['cache-control'] !== credentialSecretCacheControl ||
+      response.transport.headers['idempotency-replayed'] !== (replayed ? 'true' : 'false')
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned unsafe credential issuance metadata.',
+      )
+    }
+    const envelope = assertResource<T>(response.payload, expectedResourceTypes(path))
+    const resource = envelope.data as {
+      attributes?: { token?: unknown }
+      type?: unknown
+    }
+    const pattern =
+      resource.type === 'personalAccessToken'
+        ? /^tg_pat_v2_[a-z0-9-]+_[a-z0-9-]+_[a-f0-9]{24}_[a-f0-9]{64}$/
+        : /^tg_sa_v2_[a-z0-9-]+_[a-z0-9-]+_[a-f0-9]{24}_[a-f0-9]{64}$/
+    if (
+      typeof resource.attributes?.token !== 'string' ||
+      !pattern.test(resource.attributes.token)
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API did not return a valid reveal-once credential.',
+      )
+    }
+    return attachTransport(envelope, response.transport)
   }
 
   async #update<T>(path: string, data: unknown, options: RequestOptions = {}) {
