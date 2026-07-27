@@ -941,6 +941,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tasks/bulk-update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Update multiple tasks safely
+         * @description Updates up to 35 tasks in input order. Every item is independently protected by its latest developer revision. The operation is not atomic: successful items remain committed when another item conflicts. Placement, assignment, lifecycle, and ordering changes use their dedicated endpoints.
+         */
+        post: operations["bulkUpdateTasks"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tasks/{id}": {
         parameters: {
             query?: never;
@@ -3926,6 +3946,53 @@ export interface components {
             serviceId?: string | null;
             subscriberIds?: string[] | null;
             tagIds?: string[] | null;
+        };
+        TaskBulkUpdateData: {
+            billable?: boolean | null;
+            contactId?: string | null;
+            description?: string | null;
+            /** Format: date-time */
+            dueAt?: string | null;
+            name?: string;
+            /** Format: date-time */
+            plannedEndAt?: string | null;
+            plannedMinutes?: number | null;
+            /** Format: date-time */
+            plannedStartAt?: string | null;
+            serviceId?: string | null;
+            subscriberIds?: string[] | null;
+            tagIds?: string[] | null;
+        };
+        TaskBulkUpdateItem: {
+            data: components["schemas"]["TaskBulkUpdateData"];
+            id: string;
+            revision: string;
+        };
+        TaskBulkUpdate: {
+            items: components["schemas"]["TaskBulkUpdateItem"][];
+        };
+        TaskBulkUpdateResult: {
+            attributes: {
+                error: components["schemas"]["ApiError"] | null;
+                /** @enum {string} */
+                status: "updated" | "conflict" | "notFound" | "forbidden" | "invalid" | "unavailable";
+                task: components["schemas"]["Task"] | null;
+            };
+            id: string;
+            /** @constant */
+            type: "taskBulkUpdateResult";
+        };
+        TaskBulkUpdateEnvelope: {
+            data: components["schemas"]["TaskBulkUpdateResult"][];
+            meta: {
+                requestId: string;
+                summary: {
+                    conflicts: number;
+                    failed: number;
+                    requested: number;
+                    updated: number;
+                };
+            };
         };
         TaskDuplicate: {
             /** @default true */
@@ -7896,6 +7963,36 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    bulkUpdateTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskBulkUpdate"];
+            };
+        };
+        responses: {
+            /** @description Ordered per-item results. Reconcile conflicts by reading the task and retrying only the intended item with its new revision. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskBulkUpdateEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

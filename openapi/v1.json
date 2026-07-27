@@ -8003,6 +8003,254 @@
         },
         "type": "object"
       },
+      "TaskBulkUpdateData": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "billable": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "contactId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "maxLength": 50000,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dueAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          "plannedEndAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "plannedMinutes": {
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "plannedStartAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serviceId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subscriberIds": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 500,
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "tagIds": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 500,
+            "type": [
+              "array",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "TaskBulkUpdateItem": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TaskBulkUpdateData"
+          },
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          },
+          "revision": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "revision",
+          "data"
+        ],
+        "type": "object"
+      },
+      "TaskBulkUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TaskBulkUpdateItem"
+            },
+            "maxItems": 35,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "type": "object"
+      },
+      "TaskBulkUpdateResult": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "error": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ApiError"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "status": {
+                "enum": [
+                  "updated",
+                  "conflict",
+                  "notFound",
+                  "forbidden",
+                  "invalid",
+                  "unavailable"
+                ],
+                "type": "string"
+              },
+              "task": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Task"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "task",
+              "error"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "const": "taskBulkUpdateResult",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object"
+      },
+      "TaskBulkUpdateEnvelope": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/TaskBulkUpdateResult"
+            },
+            "type": "array"
+          },
+          "meta": {
+            "additionalProperties": false,
+            "properties": {
+              "requestId": {
+                "type": "string"
+              },
+              "summary": {
+                "additionalProperties": false,
+                "properties": {
+                  "conflicts": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "failed": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "requested": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "updated": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "requested",
+                  "updated",
+                  "conflicts",
+                  "failed"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "requestId",
+              "summary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "type": "object"
+      },
       "TaskDuplicate": {
         "additionalProperties": false,
         "properties": {
@@ -18574,6 +18822,65 @@
         "x-teamgrid-required-scopes": [
           "tasks:write"
         ]
+      }
+    },
+    "/tasks/bulk-update": {
+      "post": {
+        "description": "Updates up to 35 tasks in input order. Every item is independently protected by its latest developer revision. The operation is not atomic: successful items remain committed when another item conflicts. Placement, assignment, lifecycle, and ordering changes use their dedicated endpoints.",
+        "operationId": "bulkUpdateTasks",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskBulkUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskBulkUpdateEnvelope"
+                }
+              }
+            },
+            "description": "Ordered per-item results. Reconcile conflicts by reading the task and retrying only the intended item with its new revision."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update multiple tasks safely",
+        "tags": [
+          "Tasks"
+        ],
+        "x-teamgrid-required-scopes": [
+          "tasks:write"
+        ],
+        "x-teamgrid-item-resource-cas": "resource-cas-v1"
       }
     },
     "/tasks/{id}": {

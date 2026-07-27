@@ -373,6 +373,56 @@ describe('TeamGrid CLI', () => {
     )
   })
 
+  it('forwards ordered task bulk updates and preserves the reconciliation summary', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const output = capture()
+    const data = {
+      items: [
+        {
+          data: { name: 'Changed' },
+          id: 'task-1',
+          revision: resourceRevision,
+        },
+      ],
+    }
+    const result = {
+      data: [
+        {
+          attributes: { error: null, status: 'updated', task: null },
+          id: 'task-1',
+          type: 'taskBulkUpdateResult',
+        },
+      ],
+      meta: {
+        requestId: 'request-bulk',
+        summary: { conflicts: 0, failed: 0, requested: 1, updated: 1 },
+      },
+    }
+    const bulkUpdate = vi.fn(async () => result)
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          '--output',
+          'json',
+          'tasks',
+          'bulk-update',
+          '--data',
+          JSON.stringify(data),
+        ],
+        {
+          clientFactory: () => ({ tasks: { bulkUpdate } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          output: output.stream,
+        },
+      ),
+    ).toBe(0)
+    expect(bulkUpdate).toHaveBeenCalledWith(data)
+    expect(JSON.parse(output.value())).toEqual(result)
+  })
+
   it('explains stale independent If-Match recovery and returns the conflict exit code', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
     const errorOutput = capture()

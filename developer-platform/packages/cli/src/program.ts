@@ -1438,6 +1438,25 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       )
     })
   tasks
+    .command('bulk-update')
+    .description('update up to 35 tasks with per-item revisions; successful items remain committed')
+    .requiredOption(
+      '--data <json|@file|->',
+      'JSON with ordered items containing id, revision, and data',
+    )
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      const result = await client.tasks.bulkUpdate(
+        (await readJsonObject(options.data, input)) as never,
+      )
+      outputData(
+        command,
+        globalOptions(command).output === 'table'
+          ? result.data
+          : { data: result.data, meta: result.meta },
+      )
+    })
+  tasks
     .command('duplicate <id>')
     .description('duplicate a task and optionally its checklist and custom-field values')
     .requiredOption('--data <json|@file|->', 'task duplication JSON')

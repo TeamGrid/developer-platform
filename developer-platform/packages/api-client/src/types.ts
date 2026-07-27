@@ -104,6 +104,8 @@ export type TaskDuplicate = Omit<
 export type TaskPlacement = components['schemas']['TaskPlacement']
 export type TaskSubtasksReplace = components['schemas']['TaskSubtasksReplace']
 export type TaskUpdate = components['schemas']['TaskUpdate']
+export type TaskBulkUpdate = components['schemas']['TaskBulkUpdate']
+export type TaskBulkUpdateResult = components['schemas']['TaskBulkUpdateResult']
 export type TimeEntryCreate = components['schemas']['TimeEntryCreate']
 export type TimeEntryBilling = components['schemas']['TimeEntryBilling']
 export type TimeEntryBillingUpdate = components['schemas']['TimeEntryBillingUpdate']
@@ -573,6 +575,9 @@ export type CustomFieldValueBatchEnvelope = TransportAware & {
   data: CustomFieldValue[]
   meta: RequestMeta
 }
+
+export type TaskBulkUpdateEnvelope = components['schemas']['TaskBulkUpdateEnvelope'] &
+  TransportAware
 
 export type ListEnvelope<T> = TransportAware & {
   data: T[]

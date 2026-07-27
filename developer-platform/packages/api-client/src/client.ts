@@ -69,6 +69,7 @@ import type {
   ActivityListOptions,
   AdministrationMutationOptions,
   AdministrationPiiOptions,
+  ApiErrorDocument,
   ApiVersionEnvelope,
   AppointmentCreate,
   AppointmentMutationOptions,
@@ -199,6 +200,9 @@ import type {
   Tag,
   TagCreate,
   TagUpdate,
+  TaskBulkUpdate,
+  TaskBulkUpdateEnvelope,
+  TaskBulkUpdateResult,
   TaskCreate,
   TaskDuplicate,
   TaskDuplicateOptions,
@@ -499,6 +503,68 @@ function hasExactKeys(value: unknown, keys: readonly string[]): value is Record<
   const actual = Object.keys(value).sort()
   const expected = [...keys].sort()
   return actual.length === expected.length && actual.every((key, index) => key === expected[index])
+}
+
+const taskBulkStatuses = new Set([
+  'conflict',
+  'forbidden',
+  'invalid',
+  'notFound',
+  'unavailable',
+  'updated',
+])
+
+function taskBulkError(value: unknown): value is ApiErrorDocument {
+  if (!isObject(value)) return false
+  const keys = Object.keys(value)
+  if (
+    !['code', 'detail', 'source', 'status', 'title'].every(
+      (key) => key === 'source' || Object.hasOwn(value, key),
+    ) ||
+    keys.some((key) => !['code', 'detail', 'source', 'status', 'title'].includes(key)) ||
+    typeof value.code !== 'string' ||
+    typeof value.detail !== 'string' ||
+    typeof value.status !== 'string' ||
+    typeof value.title !== 'string'
+  ) {
+    return false
+  }
+  return (
+    value.source === undefined ||
+    (isObject(value.source) &&
+      Object.values(value.source).every((sourceValue) => typeof sourceValue === 'string'))
+  )
+}
+
+function taskBulkResult(value: unknown, expectedId: string): value is TaskBulkUpdateResult {
+  if (
+    !hasExactKeys(value, ['attributes', 'id', 'type']) ||
+    value.id !== expectedId ||
+    value.type !== 'taskBulkUpdateResult' ||
+    !hasExactKeys(value.attributes, ['error', 'status', 'task']) ||
+    typeof value.attributes.status !== 'string' ||
+    !taskBulkStatuses.has(value.attributes.status)
+  ) {
+    return false
+  }
+  if (value.attributes.status === 'updated') {
+    return (
+      value.attributes.error === null &&
+      taskValidator(value.attributes.task) &&
+      value.attributes.task.id === expectedId
+    )
+  }
+  if (value.attributes.task !== null || !taskBulkError(value.attributes.error)) return false
+  const expectedErrorStatuses: Record<string, readonly string[]> = {
+    conflict: ['409', '412'],
+    forbidden: ['403'],
+    invalid: ['400'],
+    notFound: ['404'],
+    unavailable: ['428', '503'],
+  }
+  return Boolean(
+    expectedErrorStatuses[value.attributes.status]?.includes(value.attributes.error.status),
+  )
 }
 
 function isRetryableMethod(method: string, idempotencyKey?: string) {
@@ -2263,6 +2329,8 @@ export class TeamGridClient {
           strongTaskEtag,
           'tsk1',
         ),
+      bulkUpdate: (data: TaskBulkUpdate, options?: RequestOptions) =>
+        this.#bulkUpdateTasks(data, options),
       create: (data: TaskCreate, options?: MutationOptions) =>
         this.#createCoreResource('/tasks', data, options, taskValidator, 'task creation', 'tsk1'),
       duplicate: (id: string, data: TaskDuplicate, options: TaskDuplicateOptions) =>
@@ -3740,6 +3808,57 @@ export class TeamGridClient {
       )
     }
     return attachTransport(envelope, response.transport)
+  }
+
+  async #bulkUpdateTasks(
+    data: TaskBulkUpdate,
+    options: RequestOptions = {},
+  ): Promise<TaskBulkUpdateEnvelope> {
+    const response = await this.#request('/tasks/bulk-update', {
+      body: data,
+      method: 'POST',
+      ...options,
+    })
+    const payload = response.payload
+    if (
+      response.transport.status !== 200 ||
+      !isObject(payload) ||
+      !hasExactKeys(payload, ['data', 'meta']) ||
+      !Array.isArray(payload.data) ||
+      !isObject(payload.meta) ||
+      !hasExactKeys(payload.meta, ['requestId', 'summary']) ||
+      typeof payload.meta.requestId !== 'string' ||
+      !hasExactKeys(payload.meta.summary, ['conflicts', 'failed', 'requested', 'updated']) ||
+      !Array.isArray(data.items) ||
+      payload.data.length !== data.items.length ||
+      payload.data.some((result, index) => !taskBulkResult(result, data.items[index]?.id || ''))
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned an invalid task bulk-update response.',
+      )
+    }
+    const summary = payload.meta.summary
+    const results = payload.data as TaskBulkUpdateResult[]
+    const updated = results.filter((result) => result.attributes.status === 'updated').length
+    const conflicts = results.filter((result) => result.attributes.status === 'conflict').length
+    const failed = results.length - updated - conflicts
+    if (
+      !Number.isSafeInteger(summary.requested) ||
+      !Number.isSafeInteger(summary.updated) ||
+      !Number.isSafeInteger(summary.conflicts) ||
+      !Number.isSafeInteger(summary.failed) ||
+      summary.requested !== results.length ||
+      summary.updated !== updated ||
+      summary.conflicts !== conflicts ||
+      summary.failed !== failed
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned inconsistent task bulk-update totals.',
+      )
+    }
+    return attachTransport(payload as Omit<TaskBulkUpdateEnvelope, 'transport'>, response.transport)
   }
 
   async #archiveCoreResource(

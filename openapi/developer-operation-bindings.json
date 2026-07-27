@@ -534,6 +534,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.bulkUpdateTasks",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.tasks.bulkUpdate",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "bulkUpdateTasks",
+      "method": "POST",
+      "operationId": "bulkUpdateTasks",
+      "optionalScopes": [],
+      "path": "/tasks/bulk-update",
+      "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.cancelFileUploadIntent",
           "kind": "httpLocal",
           "role": "transport"
@@ -5342,7 +5367,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 202,
+    "authenticatedOperations": 203,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -5449,6 +5474,7 @@
       "developerApi.v1.serviceAccounts.revoke",
       "developerApi.v1.serviceAccounts.update",
       "developerApi.v1.systemCapabilities.get",
+      "developerApi.v1.tasks.bulkUpdate",
       "developerApi.v1.timeEntryBilling.get",
       "developerApi.v1.timeEntryBilling.update",
       "developerApi.v1.webhooks.get",
