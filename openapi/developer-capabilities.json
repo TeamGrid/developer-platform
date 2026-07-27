@@ -224,7 +224,7 @@
     { "id": "scheduling.availability", "family": "time-planning", "classification": "delegated", "status": "released", "wave": 2 },
     { "id": "absences.lifecycle", "family": "time-planning", "classification": "delegated", "status": "released", "wave": 2 },
     { "id": "calendar.appointments", "family": "time-planning", "classification": "delegated", "status": "released", "wave": 2 },
-    { "id": "contacts.read", "family": "crm-collaboration", "classification": "public-service", "status": "partial", "wave": 0 },
+    { "id": "contacts.read", "family": "crm-collaboration", "classification": "public-service", "status": "released", "wave": 0 },
     { "id": "contacts.write", "family": "crm-collaboration", "classification": "public-service", "status": "released", "wave": 1 },
     { "id": "contacts.groups", "family": "crm-collaboration", "classification": "public-service", "status": "released", "wave": 2 },
     { "id": "comments.lifecycle", "family": "crm-collaboration", "classification": "delegated", "status": "released", "wave": 2 },

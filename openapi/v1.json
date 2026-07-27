@@ -3237,6 +3237,95 @@
           "attributes": {
             "additionalProperties": false,
             "properties": {
+              "addresses": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "address": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "city": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "country": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "fullAddress": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "latitude": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "longitude": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "postalCode": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "state": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "street": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "streetNumber": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "city",
+                        "country",
+                        "fullAddress",
+                        "latitude",
+                        "longitude",
+                        "postalCode",
+                        "state",
+                        "street",
+                        "streetNumber"
+                      ],
+                      "type": "object"
+                    },
+                    "type": {
+                      "maxLength": 100,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "address",
+                    "type"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
               "archived": {
                 "type": "boolean"
               },
@@ -3253,11 +3342,137 @@
                   "null"
                 ]
               },
+              "companies": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "address": {
+                      "anyOf": [
+                        {
+                          "additionalProperties": false,
+                          "properties": {
+                            "city": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "country": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "fullAddress": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "latitude": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "longitude": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "postalCode": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "state": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "street": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "streetNumber": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "city",
+                            "country",
+                            "fullAddress",
+                            "latitude",
+                            "longitude",
+                            "postalCode",
+                            "state",
+                            "street",
+                            "streetNumber"
+                          ],
+                          "type": "object"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "companyId": {
+                      "maxLength": 128,
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "email": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "phone": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "position": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "address",
+                    "companyId",
+                    "email",
+                    "phone",
+                    "position"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
               "companyTitle": {
                 "type": "string"
               },
               "createdAt": {
                 "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "createdById": {
                 "type": [
                   "string",
                   "null"
@@ -3288,6 +3503,10 @@
                 },
                 "type": "array"
               },
+              "employeesCount": {
+                "minimum": 0,
+                "type": "integer"
+              },
               "firstName": {
                 "type": "string"
               },
@@ -3298,6 +3517,13 @@
                 ]
               },
               "groupId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "lastActivityAt": {
+                "format": "date-time",
                 "type": [
                   "string",
                   "null"
@@ -3337,8 +3563,54 @@
                 },
                 "type": "array"
               },
+              "projectsCompleted": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "projectsOpen": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "projectsTotal": {
+                "minimum": 0,
+                "type": "integer"
+              },
               "salutation": {
                 "type": "string"
+              },
+              "socialNetworks": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "maxLength": 100,
+                      "type": "string"
+                    },
+                    "username": {
+                      "maxLength": 1000,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "username"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 100,
+                "type": "array"
+              },
+              "tasksCompleted": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "tasksOpen": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "tasksTotal": {
+                "minimum": 0,
+                "type": "integer"
               },
               "type": {
                 "enum": [
@@ -3353,27 +3625,69 @@
                   "string",
                   "null"
                 ]
+              },
+              "updatedById": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "websites": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "maxLength": 100,
+                      "type": "string"
+                    },
+                    "url": {
+                      "maxLength": 2048,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "url"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 100,
+                "type": "array"
               }
             },
             "required": [
+              "addresses",
               "archived",
               "birthday",
               "category",
+              "companies",
               "companyTitle",
               "createdAt",
+              "createdById",
               "customerId",
               "emails",
+              "employeesCount",
               "firstName",
               "gender",
               "groupId",
+              "lastActivityAt",
               "lastName",
               "nickname",
               "notes",
               "parentContactId",
               "phoneNumbers",
+              "projectsCompleted",
+              "projectsOpen",
+              "projectsTotal",
               "salutation",
+              "socialNetworks",
+              "tasksCompleted",
+              "tasksOpen",
+              "tasksTotal",
               "type",
-              "updatedAt"
+              "updatedAt",
+              "updatedById",
+              "websites"
             ],
             "type": "object"
           },
@@ -18825,6 +19139,64 @@
             "schema": {
               "default": false,
               "type": "boolean"
+            }
+          },
+          {
+            "description": "Filter by contact category.",
+            "in": "query",
+            "name": "category",
+            "schema": {
+              "enum": [
+                "customer",
+                "supplier",
+                "team"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter people by related company id.",
+            "in": "query",
+            "name": "companyId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by creator id.",
+            "in": "query",
+            "name": "createdById",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by customer id.",
+            "in": "query",
+            "name": "customerId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by contact-group id.",
+            "in": "query",
+            "name": "groupId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Filter by parent contact id.",
+            "in": "query",
+            "name": "parentContactId",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
             }
           },
           {

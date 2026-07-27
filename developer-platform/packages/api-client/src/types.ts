@@ -619,6 +619,12 @@ export type TimeEntryListOptions = ListOptions &
 
 export type ContactListOptions = ListOptions &
   ArchiveFilter & {
+    category?: 'customer' | 'supplier' | 'team'
+    companyId?: string
+    createdById?: string
+    customerId?: string
+    groupId?: string
+    parentContactId?: string
     type?: 'person' | 'company'
   }
 

@@ -2789,21 +2789,56 @@ export interface components {
         };
         Contact: {
             attributes: {
+                addresses: {
+                    address: {
+                        city: string | null;
+                        country: string | null;
+                        fullAddress: string | null;
+                        latitude: number | null;
+                        longitude: number | null;
+                        postalCode: string | null;
+                        state: string | null;
+                        street: string | null;
+                        streetNumber: string | null;
+                    };
+                    type: string;
+                }[];
                 archived: boolean;
                 /** Format: date-time */
                 birthday: string | null;
                 category: string | null;
+                companies: {
+                    address: {
+                        city: string | null;
+                        country: string | null;
+                        fullAddress: string | null;
+                        latitude: number | null;
+                        longitude: number | null;
+                        postalCode: string | null;
+                        state: string | null;
+                        street: string | null;
+                        streetNumber: string | null;
+                    } | null;
+                    companyId: string | null;
+                    email: string | null;
+                    phone: string | null;
+                    position: string | null;
+                }[];
                 companyTitle: string;
                 /** Format: date-time */
                 createdAt: string | null;
+                createdById: string | null;
                 customerId: string | null;
                 emails: {
                     email: string;
                     type: string;
                 }[];
+                employeesCount: number;
                 firstName: string;
                 gender: string | null;
                 groupId: string | null;
+                /** Format: date-time */
+                lastActivityAt: string | null;
                 lastName: string;
                 nickname: string;
                 notes: string;
@@ -2812,11 +2847,26 @@ export interface components {
                     number: string;
                     type: string;
                 }[];
+                projectsCompleted: number;
+                projectsOpen: number;
+                projectsTotal: number;
                 salutation: string;
+                socialNetworks: {
+                    type: string;
+                    username: string;
+                }[];
+                tasksCompleted: number;
+                tasksOpen: number;
+                tasksTotal: number;
                 /** @enum {string} */
                 type: "person" | "company";
                 /** Format: date-time */
                 updatedAt: string | null;
+                updatedById: string | null;
+                websites: {
+                    type: string;
+                    url: string;
+                }[];
             };
             id: string;
             /** @constant */
@@ -8076,6 +8126,18 @@ export interface operations {
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
+                /** @description Filter by contact category. */
+                category?: "customer" | "supplier" | "team";
+                /** @description Filter people by related company id. */
+                companyId?: string;
+                /** @description Filter by creator id. */
+                createdById?: string;
+                /** @description Filter by customer id. */
+                customerId?: string;
+                /** @description Filter by contact-group id. */
+                groupId?: string;
+                /** @description Filter by parent contact id. */
+                parentContactId?: string;
                 /** @description Filter by contact type. */
                 type?: "person" | "company";
             };

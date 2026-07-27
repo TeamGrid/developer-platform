@@ -1127,6 +1127,18 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   const contacts = program.command('contacts').description('read and mutate contacts')
   addListOptions(contacts.command('list'))
     .option('--archived <boolean>', 'return archived contacts', booleanValue)
+    .addOption(
+      new Option('--category <category>', 'contact category').choices([
+        'customer',
+        'supplier',
+        'team',
+      ]),
+    )
+    .option('--company-id <id>', 'filter people by related company')
+    .option('--created-by-id <id>', 'filter by creator')
+    .option('--customer-id <id>', 'filter by customer identifier')
+    .option('--group-id <id>', 'filter by contact group')
+    .option('--parent-contact-id <id>', 'filter by parent contact')
     .addOption(new Option('--type <type>', 'contact type').choices(['person', 'company']))
     .action(async function action(options, command: Command) {
       const client = await loadClient(command)

@@ -27,6 +27,11 @@ describe('TeamGrid read-only MCP adapter', () => {
     } as never)
 
     await handlers.tasksList({ limit: 25, projectId: 'project-1' })
+    await handlers.contactsList({
+      category: 'customer',
+      companyId: 'company-1',
+      groupId: 'group-1',
+    })
     await handlers.timeEntriesList({
       billable: true,
       billed: false,
@@ -36,6 +41,11 @@ describe('TeamGrid read-only MCP adapter', () => {
     await handlers.taskGet({ id: 'task-1' })
     await handlers.searchQuery({ limit: 50, term: 'proposal', types: ['projects', 'tasks'] })
     expect(list).toHaveBeenCalledWith({ limit: 25, projectId: 'project-1' })
+    expect(list).toHaveBeenCalledWith({
+      category: 'customer',
+      companyId: 'company-1',
+      groupId: 'group-1',
+    })
     expect(list).toHaveBeenCalledWith({
       billable: true,
       billed: false,
