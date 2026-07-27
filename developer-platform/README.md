@@ -180,7 +180,7 @@ the exact repository, commit, manifest size, and manifest digest in
 working tree.
 
 The mirrored manifest also contains `developer-action-policy-registry.json`.
-It pins the App/API authorization registry version, SHA-256 identity, all 181
+It pins the App/API authorization registry version, SHA-256 identity, all 205
 action policies, and 12 principal-policy rollout families. SDK, CLI, and MCP do
 not evaluate or broaden this policy locally; every request remains subject to
 the owning App cell's authorization decision.
