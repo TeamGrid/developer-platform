@@ -220,7 +220,7 @@
     { "id": "time-entries.write", "family": "time-planning", "classification": "public-service", "status": "released", "wave": 0 },
     { "id": "time-entries.timer", "family": "time-planning", "classification": "public-service", "status": "released", "wave": 1 },
     { "id": "time-entries.billing", "family": "time-planning", "classification": "admin", "status": "planned", "wave": 2 },
-    { "id": "planned-work.lifecycle", "family": "time-planning", "classification": "public-service", "status": "partial", "wave": 2 },
+    { "id": "planned-work.lifecycle", "family": "time-planning", "classification": "public-service", "status": "released", "wave": 2 },
     { "id": "scheduling.availability", "family": "time-planning", "classification": "delegated", "status": "released", "wave": 2 },
     { "id": "absences.lifecycle", "family": "time-planning", "classification": "delegated", "status": "released", "wave": 2 },
     { "id": "calendar.appointments", "family": "time-planning", "classification": "delegated", "status": "released", "wave": 2 },
