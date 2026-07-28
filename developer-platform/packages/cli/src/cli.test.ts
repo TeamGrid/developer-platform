@@ -67,7 +67,7 @@ describe('TeamGrid CLI', () => {
     })
     const source = await readFile(path, 'utf8')
     expect(source).not.toContain(token)
-    expect((await stat(path)).mode & 0o777).toBe(0o600)
+    if (process.platform !== 'win32') expect((await stat(path)).mode & 0o777).toBe(0o600)
     expect(await store.load()).toMatchObject({ currentProfile: 'default' })
   })
 
