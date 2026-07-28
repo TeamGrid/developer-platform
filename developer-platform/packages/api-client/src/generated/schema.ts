@@ -601,8 +601,32 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Update a project */
+        /**
+         * Update a project
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         patch: operations["updateProject"];
+        trace?: never;
+    };
+    "/projects/{id}/sharing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get project sharing */
+        get: operations["getProjectSharing"];
+        /**
+         * Replace project sharing
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
+        put: operations["replaceProjectSharing"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/projects/{id}/complete": {
@@ -728,11 +752,17 @@ export interface paths {
         get: operations["getProjectTemplate"];
         put?: never;
         post?: never;
-        /** Archive a project template */
+        /**
+         * Archive a project template
+         * @description Requires exactly one latest strong resource ETag and returns the post-archive revision in the ETag header.
+         */
         delete: operations["archiveProjectTemplate"];
         options?: never;
         head?: never;
-        /** Update project-template metadata */
+        /**
+         * Update project-template metadata
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         patch: operations["updateProjectTemplate"];
         trace?: never;
     };
@@ -745,7 +775,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived project template */
+        /**
+         * Restore an archived project template
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         post: operations["restoreProjectTemplate"];
         delete?: never;
         options?: never;
@@ -929,6 +962,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tasks/bulk-update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Update multiple tasks safely
+         * @description Updates up to 35 tasks in input order. Every item is independently protected by its latest developer revision. The operation is not atomic: successful items remain committed when another item conflicts. Placement, assignment, lifecycle, and ordering changes use their dedicated endpoints.
+         */
+        post: operations["bulkUpdateTasks"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tasks/{id}": {
         parameters: {
             query?: never;
@@ -940,11 +993,17 @@ export interface paths {
         get: operations["getTask"];
         put?: never;
         post?: never;
-        /** Archive a task */
+        /**
+         * Archive a task
+         * @description Requires exactly one latest strong resource ETag and returns the post-archive revision in the ETag header.
+         */
         delete: operations["archiveTask"];
         options?: never;
         head?: never;
-        /** Update a task */
+        /**
+         * Update a task
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         patch: operations["updateTask"];
         trace?: never;
     };
@@ -957,8 +1016,71 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived task */
+        /**
+         * Restore an archived task
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         post: operations["restoreTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Duplicate a task
+         * @description Creates an idempotent copy from exactly the source revision selected by If-Match. The copy remains in the same workspace context and may be moved separately.
+         */
+        post: operations["duplicateTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move or reorder a task
+         * @description Atomically changes assignment and ordering within one target task container. The neighboring task ids are validated in the same workspace and container.
+         */
+        post: operations["moveTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tasks/{id}/subtasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Replace a task checklist
+         * @description Atomically replaces the ordered task checklist. Existing ids may be retained; omitted ids are generated by TeamGrid.
+         */
+        put: operations["replaceTaskSubtasks"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -974,7 +1096,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Complete a task */
+        /**
+         * Complete a task
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         post: operations["completeTask"];
         delete?: never;
         options?: never;
@@ -991,7 +1116,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Reopen a completed task */
+        /**
+         * Reopen a completed task
+         * @description Requires exactly one latest strong resource ETag. The cell-local App re-authenticates and atomically compares the tenant-bound revision before mutation.
+         */
         post: operations["reopenTask"];
         delete?: never;
         options?: never;
@@ -1068,6 +1196,30 @@ export interface paths {
         head?: never;
         /** Update a time entry */
         patch: operations["updateTimeEntry"];
+        trace?: never;
+    };
+    "/time-entries/{id}/billing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get time-entry billing state
+         * @description Returns the dedicated billing and lock subresource with a strong ETag. Access requires the sensitive billing scope and the TeamGrid tasks.times.lock product permission.
+         */
+        get: operations["getTimeEntryBilling"];
+        /**
+         * Update time-entry billing state
+         * @description Atomically marks a time entry billed or unbilled. The supplied strong ETag must match the current billing subresource; stale concurrent requests fail without overwriting a newer decision.
+         */
+        put: operations["updateTimeEntryBilling"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/time-entries/{id}/restore": {
@@ -1463,6 +1615,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/custom-field-values/{targetType}/{resourceId}/batch-read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Read custom-field values for one resource
+         * @description The cell-local App re-authenticates the credential and additionally requires a target-domain scope selected by targetType: contacts:read/write, projects:read/write, project-statements:read/write, or tasks:read/write. Reading a contact, project, tag, or user reference field, and validating a newly set reference, also requires the matching contacts:read, projects:read, tags:read, or users:read scope. Invalid legacy values are classified without exposing their payload. Batch reads accept 1–100 unique field ids for one resource and preserve request order.
+         */
+        post: operations["getCustomFieldValues"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/custom-field-values/{targetType}/{resourceId}/{fieldId}": {
         parameters: {
             query?: never;
@@ -1581,7 +1753,11 @@ export interface paths {
         delete: operations["removeWebhook"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Update or reactivate a webhook
+         * @description Updates the destination, subscribed events, or enabled state of a credential-owned webhook using its latest strong revision. Setting disabled to false clears automatic delivery-failure suspension.
+         */
+        patch: operations["updateWebhook"];
         trace?: never;
     };
     "/members": {
@@ -2045,6 +2221,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/changes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List cell-local resource changes
+         * @description Returns metadata-only, cell-local changes at a fixed page watermark. The opaque cursor is bound to the credential, workspace, cell, epoch, and exact filter set. A 410 response requires a new checkpoint and full resource snapshot.
+         */
+        get: operations["listChanges"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/system/capabilities": {
         parameters: {
             query?: never;
@@ -2126,6 +2322,182 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/personal-access-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List personal access tokens owned by the current user */
+        get: operations["listPersonalAccessTokens"];
+        put?: never;
+        /**
+         * Create a personal access token
+         * @description Creates native v2 key material in the credential home cell. The token is returned only by this private no-store response and exact idempotent replays retained for seven days.
+         */
+        post: operations["createPersonalAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/personal-access-tokens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke a personal access token */
+        delete: operations["revokePersonalAccessToken"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/personal-access-tokens/{id}/rotation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotate a personal access token
+         * @description Issues one successor generation, places the predecessor in a bounded retiring grace period, and reveals the successor only in this no-store response or an exact idempotent replay.
+         */
+        post: operations["rotatePersonalAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service-accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List service accounts */
+        get: operations["listServiceAccounts"];
+        put?: never;
+        /**
+         * Create a service account and its initial credential
+         * @description Creates native v2 key material in the credential home cell. The token is returned only by this private no-store response and exact idempotent replays retained for seven days.
+         */
+        post: operations["createServiceAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service-accounts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a service account */
+        get: operations["getServiceAccount"];
+        put?: never;
+        post?: never;
+        /** Permanently revoke a service account */
+        delete: operations["revokeServiceAccount"];
+        options?: never;
+        head?: never;
+        /** Enable or disable a service account */
+        patch: operations["updateServiceAccount"];
+        trace?: never;
+    };
+    "/service-accounts/{id}/credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create an independent service account credential
+         * @description Creates native v2 key material in the credential home cell. The token is returned only by this private no-store response and exact idempotent replays retained for seven days.
+         */
+        post: operations["createServiceAccountCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service-accounts/{id}/credentials/{credentialId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke a service account credential */
+        delete: operations["revokeServiceAccountCredential"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service-accounts/{id}/credentials/{credentialId}/rotation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotate a service account credential
+         * @description Issues one successor generation, places the predecessor in a bounded retiring grace period, and reveals the successor only in this no-store response or an exact idempotent replay.
+         */
+        post: operations["rotateServiceAccountCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/service-accounts/{id}/resource-grants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the complete service account resource grant set */
+        get: operations["getServiceAccountResourceGrants"];
+        /**
+         * Replace the complete service account resource grant set
+         * @description Atomically replaces the complete grant policy. Partial and stale publications fail closed.
+         */
+        put: operations["replaceServiceAccountResourceGrants"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2148,8 +2520,42 @@ export interface components {
         };
         ApiVersionEnvelope: {
             data: {
+                /** @constant */
+                contractVersion: "1.0.0";
+                deprecations: {
+                    id: string;
+                    message: string;
+                    /** Format: uri */
+                    replacement: string | null;
+                    /** Format: date-time */
+                    sunsetAt: string | null;
+                }[];
                 /** Format: uri */
                 documentation: string;
+                manifestSha256: string;
+                region: string | null;
+                /** @constant */
+                status: "operational";
+                supportedClients: {
+                    cli: {
+                        /** @constant */
+                        minimumVersion: "1.0.0";
+                        /** @constant */
+                        supportedMajor: 1;
+                    };
+                    mcp: {
+                        /** @constant */
+                        minimumVersion: "1.0.0";
+                        /** @constant */
+                        supportedMajor: 1;
+                    };
+                    sdk: {
+                        /** @constant */
+                        minimumVersion: "1.0.0";
+                        /** @constant */
+                        supportedMajor: 1;
+                    };
+                };
                 /** @constant */
                 version: "1";
             };
@@ -2455,6 +2861,10 @@ export interface components {
         };
         Project: {
             attributes: {
+                /** Format: date-time */
+                actualEndAt: string | null;
+                /** Format: date-time */
+                actualStartAt: string | null;
                 additionalContactIds: string[];
                 archived: boolean;
                 color: string | null;
@@ -2462,25 +2872,67 @@ export interface components {
                 contactId: string | null;
                 /** Format: date-time */
                 createdAt: string | null;
+                createdById: string | null;
                 description: string;
+                developerRevision: string;
+                /** Format: date-time */
+                developerUpdatedAt: string;
                 /** Format: date-time */
                 dueAt: string | null;
+                duplicateOfProjectId: string | null;
+                /** Format: date-time */
+                earliestEndAt: string | null;
+                /** Format: date-time */
+                earliestStartAt: string | null;
                 individualId: string | null;
                 listId: string | null;
                 managerId: string | null;
                 name: string;
+                order: number | null;
                 /** Format: date-time */
                 plannedEndAt: string | null;
                 /** Format: date-time */
                 plannedStartAt: string | null;
+                schedulingOrder: number | null;
                 showInScheduling: boolean;
                 subscriberIds: string[];
+                tasksCompleted: number;
+                tasksOpen: number;
+                tasksTotal: number;
+                /** Format: date-time */
+                lastActivityAt: string | null;
+                /** Format: date-time */
+                latestEndAt: string | null;
+                /** Format: date-time */
+                latestStartAt: string | null;
                 /** Format: date-time */
                 updatedAt: string | null;
             };
             id: string;
             /** @constant */
             type: "project";
+        };
+        ProjectSharingEntry: {
+            permissions: string[];
+            userId: string | null;
+            workspaceId: string;
+        };
+        ProjectSharing: {
+            attributes: {
+                availablePermissions: string[];
+                entries: components["schemas"]["ProjectSharingEntry"][];
+                revision: string;
+            };
+            id: string;
+            /** @constant */
+            type: "projectSharing";
+        };
+        ProjectSharingReplace: {
+            entries: {
+                permissions?: string[];
+                userId?: string | null;
+                workspaceId: string;
+            }[];
         };
         /** @description Safe project-template metadata. The captured project, list, and task snapshot, tenant fields, actor fields, and other storage internals are never exposed. */
         ProjectTemplate: {
@@ -2490,6 +2942,9 @@ export interface components {
                 /** Format: date-time */
                 createdAt: string | null;
                 description: string;
+                developerRevision: string;
+                /** Format: date-time */
+                developerUpdatedAt: string;
                 originProjectId: string | null;
                 /** @enum {integer|null} */
                 snapshotVersion: 1 | null;
@@ -2523,12 +2978,14 @@ export interface components {
                     tasksTotal: number;
                 };
                 projectId: string;
+                resultRevision: string | null;
+                sourceRevision: string;
                 /** @enum {string} */
                 state: "failed" | "pending" | "running" | "succeeded";
                 templateId: string;
                 /** Format: date-time */
                 updatedAt: string;
-            };
+            } & (unknown & unknown & unknown);
             id: string;
             /** @constant */
             type: "projectTemplateInstantiation";
@@ -2557,13 +3014,15 @@ export interface components {
                 readonly finishedAt?: string;
                 noOp: boolean;
                 projectId: string;
+                resultRevision: string | null;
+                sourceRevision: string;
                 /** Format: date-time */
                 readonly startedAt?: string;
                 /** @enum {string} */
                 state: "failed" | "pending" | "running" | "succeeded";
                 /** Format: date-time */
                 updatedAt: string;
-            };
+            } & (unknown & unknown & unknown);
             id: string;
             /** @constant */
             type: "projectLifecycleOperation";
@@ -2571,17 +3030,34 @@ export interface components {
         Task: {
             attributes: {
                 archived: boolean;
+                /** Format: date-time */
+                archivedAt: string | null;
                 assigneeId: string | null;
                 billable: boolean | null;
                 completed: boolean;
                 /** Format: date-time */
+                completedAt: string | null;
+                completedById: string | null;
+                commentsCount: number;
+                contactId: string | null;
+                /** Format: date-time */
                 createdAt: string | null;
+                createdById: string | null;
                 description: string;
+                developerRevision: string;
+                /** Format: date-time */
+                developerUpdatedAt: string;
+                duplicateOfTaskId: string | null;
                 /** Format: date-time */
                 dueAt: string | null;
+                filesCount: number;
                 groupId: string | null;
                 listId: string | null;
+                listOrder: number | null;
                 name: string;
+                order: number | null;
+                personalListId: string | null;
+                personalListOrder: number | null;
                 /** Format: date-time */
                 plannedEndAt: string | null;
                 plannedMinutes: number | null;
@@ -2590,7 +3066,15 @@ export interface components {
                 projectId: string | null;
                 serviceId: string | null;
                 subscriberIds: string[];
+                subtasksCount: number;
+                subtasks: {
+                    completed: boolean;
+                    id: string;
+                    order: number | null;
+                    title: string;
+                }[];
                 tagIds: string[];
+                trackingActive: boolean;
                 /** Format: date-time */
                 updatedAt: string | null;
             };
@@ -2603,9 +3087,12 @@ export interface components {
                 archived: boolean;
                 billable: boolean | null;
                 billed: boolean;
+                /** Format: date-time */
+                billedAt: string | null;
                 comment: string;
                 /** Format: date-time */
                 createdAt: string | null;
+                createdById: string | null;
                 durationMinutes: number | null;
                 /** Format: date-time */
                 endAt: string | null;
@@ -2613,13 +3100,27 @@ export interface components {
                 /** Format: date-time */
                 startAt: string | null;
                 taskId: string;
+                trackingActive: boolean;
                 /** Format: date-time */
                 updatedAt: string | null;
+                updatedById: string | null;
                 userId: string;
             };
             id: string;
             /** @constant */
             type: "timeEntry";
+        };
+        /** @description Conflict-safe billing and lock state for a time entry. TeamGrid currently has no separate approval state: billed means locked, and unbilled means editable subject to normal permissions. */
+        TimeEntryBilling: {
+            attributes: {
+                billed: boolean;
+                /** Format: date-time */
+                billedAt: string | null;
+                revision: string;
+            };
+            id: string;
+            /** @constant */
+            type: "timeEntryBilling";
         };
         CallNote: {
             attributes: {
@@ -2641,21 +3142,56 @@ export interface components {
         };
         Contact: {
             attributes: {
+                addresses: {
+                    address: {
+                        city: string | null;
+                        country: string | null;
+                        fullAddress: string | null;
+                        latitude: number | null;
+                        longitude: number | null;
+                        postalCode: string | null;
+                        state: string | null;
+                        street: string | null;
+                        streetNumber: string | null;
+                    };
+                    type: string;
+                }[];
                 archived: boolean;
                 /** Format: date-time */
                 birthday: string | null;
                 category: string | null;
+                companies: {
+                    address: {
+                        city: string | null;
+                        country: string | null;
+                        fullAddress: string | null;
+                        latitude: number | null;
+                        longitude: number | null;
+                        postalCode: string | null;
+                        state: string | null;
+                        street: string | null;
+                        streetNumber: string | null;
+                    } | null;
+                    companyId: string | null;
+                    email: string | null;
+                    phone: string | null;
+                    position: string | null;
+                }[];
                 companyTitle: string;
                 /** Format: date-time */
                 createdAt: string | null;
+                createdById: string | null;
                 customerId: string | null;
                 emails: {
                     email: string;
                     type: string;
                 }[];
+                employeesCount: number;
                 firstName: string;
                 gender: string | null;
                 groupId: string | null;
+                /** Format: date-time */
+                lastActivityAt: string | null;
                 lastName: string;
                 nickname: string;
                 notes: string;
@@ -2664,11 +3200,26 @@ export interface components {
                     number: string;
                     type: string;
                 }[];
+                projectsCompleted: number;
+                projectsOpen: number;
+                projectsTotal: number;
                 salutation: string;
+                socialNetworks: {
+                    type: string;
+                    username: string;
+                }[];
+                tasksCompleted: number;
+                tasksOpen: number;
+                tasksTotal: number;
                 /** @enum {string} */
                 type: "person" | "company";
                 /** Format: date-time */
                 updatedAt: string | null;
+                updatedById: string | null;
+                websites: {
+                    type: string;
+                    url: string;
+                }[];
             };
             id: string;
             /** @constant */
@@ -2983,6 +3534,9 @@ export interface components {
             /** @constant */
             type: "customFieldValue";
         };
+        CustomFieldValueBatchRead: {
+            fieldIds: string[];
+        };
         CustomFieldValueSet: {
             value: components["schemas"]["CustomFieldValueValue"];
         };
@@ -3104,6 +3658,23 @@ export interface components {
             /** @constant */
             type: "auditEvent";
         };
+        ChangeEvent: {
+            attributes: {
+                /** @enum {string} */
+                operation: "created" | "deleted" | "updated";
+                /** Format: date-time */
+                occurredAt: string;
+                region: string;
+                resourceId: string;
+                /** @enum {string} */
+                resourceType: "absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook";
+                sequence: number;
+                tombstone: boolean;
+            };
+            id: string;
+            /** @constant */
+            type: "changeEvent";
+        };
         /** @description Credential-owned v2 webhook. List and get responses are secret-free and carry a strong whk1 revision. Only create may include the reveal-only initial signing secret. */
         Webhook: {
             attributes: {
@@ -3165,6 +3736,12 @@ export interface components {
             actions: string[];
             /** Format: uri */
             url: string;
+        };
+        WebhookUpdate: {
+            actions?: string[];
+            disabled?: boolean;
+            /** Format: uri */
+            url?: string;
         };
         ProjectCreate: {
             additionalContactIds?: string[] | null;
@@ -3376,6 +3953,7 @@ export interface components {
         TaskCreate: {
             assigneeId?: string | null;
             billable?: boolean | null;
+            contactId?: string | null;
             description?: string | null;
             /** Format: date-time */
             dueAt?: string | null;
@@ -3395,6 +3973,7 @@ export interface components {
         TaskUpdate: {
             assigneeId?: string | null;
             billable?: boolean | null;
+            contactId?: string | null;
             description?: string | null;
             /** Format: date-time */
             dueAt?: string | null;
@@ -3410,6 +3989,79 @@ export interface components {
             serviceId?: string | null;
             subscriberIds?: string[] | null;
             tagIds?: string[] | null;
+        };
+        TaskBulkUpdateData: {
+            billable?: boolean | null;
+            contactId?: string | null;
+            description?: string | null;
+            /** Format: date-time */
+            dueAt?: string | null;
+            name?: string;
+            /** Format: date-time */
+            plannedEndAt?: string | null;
+            plannedMinutes?: number | null;
+            /** Format: date-time */
+            plannedStartAt?: string | null;
+            serviceId?: string | null;
+            subscriberIds?: string[] | null;
+            tagIds?: string[] | null;
+        };
+        TaskBulkUpdateItem: {
+            data: components["schemas"]["TaskBulkUpdateData"];
+            id: string;
+            revision: string;
+        };
+        TaskBulkUpdate: {
+            items: components["schemas"]["TaskBulkUpdateItem"][];
+        };
+        TaskBulkUpdateResult: {
+            attributes: {
+                error: components["schemas"]["ApiError"] | null;
+                /** @enum {string} */
+                status: "updated" | "conflict" | "notFound" | "forbidden" | "invalid" | "unavailable";
+                task: components["schemas"]["Task"] | null;
+            };
+            id: string;
+            /** @constant */
+            type: "taskBulkUpdateResult";
+        };
+        TaskBulkUpdateEnvelope: {
+            data: components["schemas"]["TaskBulkUpdateResult"][];
+            meta: {
+                requestId: string;
+                summary: {
+                    conflicts: number;
+                    failed: number;
+                    requested: number;
+                    updated: number;
+                };
+            };
+        };
+        TaskDuplicate: {
+            /** @default true */
+            copyChecklist: boolean;
+            /** @default true */
+            copyCustomFieldValues: boolean;
+            name?: string | null;
+        };
+        TaskPlacement: {
+            assigneeId?: string | null;
+            /** @enum {string} */
+            axis: "assignee" | "personalList" | "projectList";
+            groupId?: string | null;
+            listId?: string | null;
+            nextTaskId?: string | null;
+            personalListId?: string | null;
+            previousTaskId?: string | null;
+            projectId?: string | null;
+        };
+        TaskSubtaskInput: {
+            completed?: boolean | null;
+            id?: string | null;
+            title: string;
+        };
+        TaskSubtasksReplace: {
+            subtasks: components["schemas"]["TaskSubtaskInput"][];
         };
         TimeEntryCreate: {
             billable?: boolean | null;
@@ -3430,6 +4082,10 @@ export interface components {
             serviceId?: string | null;
             /** Format: date-time */
             startAt?: string | null;
+        };
+        TimeEntryBillingUpdate: {
+            /** @description true locks the time entry as billed; false unlocks it. */
+            billed: boolean;
         };
         TimerAction: {
             /** Format: date-time */
@@ -3571,7 +4227,7 @@ export interface components {
                 /** @constant */
                 format: "csv";
                 /** @enum {string} */
-                resourceType: "contacts" | "projects" | "tasks" | "timeEntries";
+                resourceType: "auditEvents" | "contacts" | "projects" | "tasks" | "timeEntries";
                 readonly rowCount?: number;
                 /** Format: date-time */
                 readonly startedAt?: string;
@@ -3603,6 +4259,10 @@ export interface components {
             type: "exportDownloadIntent";
         };
         ExportCreate: {
+            /** Format: date-time */
+            createdAtFrom?: string;
+            /** Format: date-time */
+            createdAtTo?: string;
             fields?: string[];
             fileName?: string;
             /** @constant */
@@ -3610,12 +4270,12 @@ export interface components {
             includeArchived?: boolean;
             maxRows?: number;
             /** @enum {string} */
-            resourceType: "contacts" | "projects" | "tasks" | "timeEntries";
+            resourceType: "auditEvents" | "contacts" | "projects" | "tasks" | "timeEntries";
             /** Format: date-time */
             updatedFrom?: string;
             /** Format: date-time */
             updatedUntil?: string;
-        };
+        } & unknown;
         AutomationInputBranch: {
             flow: components["schemas"]["AutomationInputStep"][];
             key: string;
@@ -3889,6 +4549,153 @@ export interface components {
             defaultShowInScheduling?: boolean;
             name?: string;
         };
+        PersonalAccessToken: {
+            attributes: {
+                /** Format: date-time */
+                createdAt: string;
+                description: string | null;
+                /** Format: date-time */
+                expiresAt: string;
+                generation: number;
+                /** Format: date-time */
+                graceEndsAt: string | null;
+                lastFour: string;
+                /** Format: date-time */
+                lastUsedAt: string | null;
+                name: string;
+                /** Format: date-time */
+                notBeforeAt: string | null;
+                principalId: string;
+                scopes: string[];
+                /** @enum {string} */
+                status: "active" | "expired" | "retiring" | "revoked";
+                /** @description Reveal-once token returned only by an idempotent create or rotation response. */
+                readonly token?: string;
+            };
+            id: string;
+            /** @constant */
+            type: "personalAccessToken";
+        };
+        PersonalAccessTokenCreate: {
+            description?: string;
+            /** Format: date-time */
+            expiresAt?: string;
+            name: string;
+            scopes: string[];
+        };
+        PersonalAccessTokenRotation: {
+            /** Format: date-time */
+            expiresAt?: string;
+            gracePeriodSeconds?: number;
+            scopes?: string[];
+        };
+        ServiceAccountCredential: {
+            attributes: {
+                /** Format: date-time */
+                createdAt: string;
+                description: string | null;
+                /** Format: date-time */
+                expiresAt: string;
+                generation: number;
+                /** Format: date-time */
+                graceEndsAt: string | null;
+                lastFour: string;
+                /** Format: date-time */
+                lastUsedAt: string | null;
+                name: string;
+                /** Format: date-time */
+                notBeforeAt: string | null;
+                principalId: string;
+                scopes: string[];
+                /** @enum {string} */
+                status: "active" | "expired" | "retiring" | "revoked";
+                /** @description Reveal-once token returned only by an idempotent create or rotation response. */
+                readonly token?: string;
+            };
+            id: string;
+            /** @constant */
+            type: "serviceAccountCredential";
+        };
+        ServiceAccount: {
+            attributes: {
+                /** Format: date-time */
+                createdAt: string;
+                credentials: components["schemas"]["ServiceAccountCredential"][];
+                description: string | null;
+                displayName: string;
+                permissionSet: string[];
+                revision: string;
+                scopeCeiling: string[];
+                /** @enum {string} */
+                status: "active" | "disabled" | "revoked";
+                /** Format: date-time */
+                updatedAt: string;
+            };
+            id: string;
+            /** @constant */
+            type: "serviceAccount";
+        };
+        ServiceAccountCreate: {
+            description?: string;
+            /** Format: date-time */
+            expiresAt?: string;
+            name: string;
+            scopes: string[];
+        };
+        ServiceAccountCredentialCreate: {
+            description?: string;
+            /** Format: date-time */
+            expiresAt?: string;
+            name: string;
+            scopes: string[];
+        };
+        ServiceAccountCredentialRotation: {
+            /** Format: date-time */
+            expiresAt?: string;
+            gracePeriodSeconds?: number;
+            scopes?: string[];
+        };
+        ServiceAccountUpdate: {
+            reason?: string;
+            /** @enum {string} */
+            status: "active" | "disabled";
+        };
+        ResourceGrant: {
+            anchorId: string | null;
+            /** @enum {string} */
+            anchorType: "workspace" | "project" | "memberGroup" | "contactGroup" | "user" | "ownRecords";
+            capabilities: string[];
+            /** Format: date-time */
+            expiresAt: string | null;
+            id: string;
+            /** @enum {string} */
+            inheritance: "domainDescendants" | "none";
+            resourceKey: string;
+        };
+        ResourceGrantInput: {
+            anchorId?: string;
+            /** @enum {string} */
+            anchorType: "workspace" | "project" | "memberGroup" | "contactGroup" | "user" | "ownRecords";
+            capabilities: string[];
+            /** Format: date-time */
+            expiresAt?: string;
+            /** @enum {string} */
+            inheritance: "domainDescendants" | "none";
+            resourceKey: string;
+        };
+        ServiceAccountResourceGrantSet: {
+            attributes: {
+                grants: components["schemas"]["ResourceGrant"][];
+                policyVersion: number;
+                revision: string;
+            };
+            id: string;
+            /** @constant */
+            type: "serviceAccountResourceGrantSet";
+        };
+        ServiceAccountResourceGrantSetReplace: {
+            grants: components["schemas"]["ResourceGrantInput"][];
+        };
     };
     responses: {
         /** @description The cell-local application returned an invalid response. */
@@ -4006,6 +4813,14 @@ export interface components {
         IfMatchAbsence: string;
         /** @description Exactly one latest strong appointment ETag. Wildcards, weak validators, and lists are rejected. */
         IfMatchAppointment: string;
+        /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+        IfMatchProject: string;
+        /** @description Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+        IfMatchProjectTemplate: string;
+        /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+        IfMatchTask: string;
+        /** @description Exactly one latest strong time-entry billing ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+        IfMatchTimeEntryBilling: string;
         /** @description Exactly one latest strong comment ETag. Wildcards, weak validators, and lists are rejected. */
         IfMatchComment: string;
         /** @description Exactly one latest strong document ETag. Wildcards, weak validators, and lists are rejected. */
@@ -4032,6 +4847,8 @@ export interface components {
         /** @description Exactly one latest strong workspace settings ETag. Wildcards, weak validators, and lists are rejected. */
         IfMatchWorkspaceSettings: string;
         WebhookLimit: number;
+        /** @description Exactly one latest strong service-account grant-policy ETag. */
+        IfMatchResourceGrantSet: string;
     };
     requestBodies: never;
     headers: {
@@ -4049,6 +4866,14 @@ export interface components {
         CustomFieldValueETag: string;
         /** @description Strong schedule revision required verbatim in If-Match before replacement. */
         PlannedWorkETag: string;
+        /** @description Strong project revision returned by reads and synchronous mutations. */
+        ProjectETag: string;
+        /** @description Strong project-template revision returned by reads and mutations. */
+        ProjectTemplateETag: string;
+        /** @description Strong task revision returned by reads and mutations. */
+        TaskETag: string;
+        /** @description Strong revision of the time entry billing subresource. */
+        TimeEntryBillingETag: string;
         /** @description Prevents shared caching and representation transformations so the strong revision validator remains byte-for-byte usable for conditional requests. */
         StrongETagCacheControl: "private, no-store, no-transform";
         /** @description Strong member-administration resource revision. */
@@ -4061,6 +4886,8 @@ export interface components {
         WebhookETag: string;
         /** @description Strong revision of the complete public workspace settings allowlist. */
         WorkspaceSettingsETag: string;
+        /** @description Strong revision for the complete service-account grant policy. */
+        ResourceGrantSetETag: string;
     };
     pathItems: never;
 }
@@ -5935,6 +6762,18 @@ export interface operations {
                 archived?: boolean;
                 /** @description Filter by completion status. */
                 completed?: boolean;
+                /** @description Filter by primary contact id. */
+                contactId?: string;
+                /** @description Filter by creator id. */
+                createdById?: string;
+                /** @description Filter by individual project id. */
+                individualId?: string;
+                /** @description Filter by project-list id. */
+                listId?: string;
+                /** @description Filter by manager id. */
+                managerId?: string;
+                /** @description Filter by subscriber user id. */
+                subscriberId?: string;
             };
             header?: never;
             path?: never;
@@ -5987,6 +6826,8 @@ export interface operations {
             200: {
                 headers: {
                     "Idempotency-Replayed"?: "true";
+                    ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6000,6 +6841,8 @@ export interface operations {
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6032,6 +6875,8 @@ export interface operations {
             /** @description The requested resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6052,7 +6897,10 @@ export interface operations {
     updateProject: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -6067,6 +6915,8 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6081,6 +6931,85 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getProjectSharing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectSharing"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    replaceProjectSharing: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectSharingReplace"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ProjectETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectSharing"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6090,6 +7019,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
                 /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -6121,6 +7052,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6130,6 +7063,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
                 /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -6161,6 +7096,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6170,6 +7107,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
                 /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -6201,6 +7140,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6210,6 +7151,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Exactly one latest strong project ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProject"];
                 /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -6241,6 +7184,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6273,6 +7218,15 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            /** @description The operation predates resource revision tracking and can no longer be polled. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6345,6 +7299,8 @@ export interface operations {
             200: {
                 headers: {
                     "Idempotency-Replayed"?: "true";
+                    ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6358,6 +7314,8 @@ export interface operations {
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6390,6 +7348,8 @@ export interface operations {
             /** @description The requested resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6411,7 +7371,10 @@ export interface operations {
     archiveProjectTemplate: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProjectTemplate"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -6422,6 +7385,8 @@ export interface operations {
             /** @description The project template was archived, or that state was already present. */
             204: {
                 headers: {
+                    ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content?: never;
@@ -6431,6 +7396,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6439,7 +7406,10 @@ export interface operations {
     updateProjectTemplate: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProjectTemplate"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -6454,6 +7424,8 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6468,6 +7440,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6476,7 +7450,10 @@ export interface operations {
     restoreProjectTemplate: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProjectTemplate"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -6487,6 +7464,8 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["ProjectTemplateETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -6501,6 +7480,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6510,6 +7491,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Exactly one latest strong project-template ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchProjectTemplate"];
                 /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -6545,6 +7528,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6577,6 +7562,15 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            /** @description The operation predates resource revision tracking and can no longer be polled. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -6995,8 +7989,22 @@ export interface operations {
                 assigneeId?: string;
                 /** @description Filter by completion status. */
                 completed?: boolean;
+                /** @description Filter by related contact id. */
+                contactId?: string;
+                /** @description Filter by assigned group id. */
+                groupId?: string;
+                /** @description Filter by project task-list id. */
+                listId?: string;
+                /** @description Filter by personal-list id. */
+                personalListId?: string;
                 /** @description Filter by project id. */
                 projectId?: string;
+                /** @description Filter by service id. */
+                serviceId?: string;
+                /** @description Filter by subscriber user id. */
+                subscriberId?: string;
+                /** @description Filter by tag id. */
+                tagId?: string;
             };
             header?: never;
             path?: never;
@@ -7049,6 +8057,8 @@ export interface operations {
             200: {
                 headers: {
                     "Idempotency-Replayed"?: "true";
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7062,6 +8072,8 @@ export interface operations {
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7075,6 +8087,36 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    bulkUpdateTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskBulkUpdate"];
+            };
+        };
+        responses: {
+            /** @description Ordered per-item results. Reconcile conflicts by reading the task and retrying only the intended item with its new revision. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskBulkUpdateEnvelope"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7094,6 +8136,8 @@ export interface operations {
             /** @description The requested resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7114,7 +8158,10 @@ export interface operations {
     archiveTask: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -7125,6 +8172,8 @@ export interface operations {
             /** @description The resource was archived. */
             204: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content?: never;
@@ -7134,6 +8183,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7142,7 +8193,10 @@ export interface operations {
     updateTask: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -7157,6 +8211,8 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7171,6 +8227,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7179,7 +8237,10 @@ export interface operations {
     restoreTask: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -7190,6 +8251,8 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7204,6 +8267,158 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    duplicateTask: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskDuplicate"];
+            };
+        };
+        responses: {
+            /** @description An idempotent replay of an existing resource. */
+            200: {
+                headers: {
+                    "Idempotency-Replayed"?: "true";
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Task"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly created resource. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Task"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    moveTask: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskPlacement"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Task"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    replaceTaskSubtasks: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskSubtasksReplace"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Task"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7212,7 +8427,10 @@ export interface operations {
     completeTask: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -7223,6 +8441,8 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7237,6 +8457,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7245,7 +8467,10 @@ export interface operations {
     reopenTask: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Exactly one latest strong task ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTask"];
+            };
             path: {
                 id: components["parameters"]["ResourceId"];
             };
@@ -7256,6 +8481,8 @@ export interface operations {
             /** @description The updated resource. */
             200: {
                 headers: {
+                    ETag: components["headers"]["TaskETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -7270,6 +8497,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -7357,8 +8586,16 @@ export interface operations {
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
+                /** @description Filter by billable status. */
+                billable?: boolean;
+                /** @description Filter by billed and therefore locked status. */
+                billed?: boolean;
+                /** @description Filter by creator id. */
+                createdById?: string;
                 /** @description Include entries starting at or after this time. */
                 from?: string;
+                /** @description Filter by service id. */
+                serviceId?: string;
                 /** @description Include entries starting at or before this time. */
                 to?: string;
                 /** @description Filter by task id. */
@@ -7544,6 +8781,83 @@ export interface operations {
             503: components["responses"]["ServiceUnavailable"];
         };
     };
+    getTimeEntryBilling: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    ETag: components["headers"]["TimeEntryBillingETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TimeEntryBilling"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateTimeEntryBilling: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong time-entry billing ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTimeEntryBilling"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TimeEntryBillingUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    ETag: components["headers"]["TimeEntryBillingETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TimeEntryBilling"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     restoreTimeEntry: {
         parameters: {
             query?: never;
@@ -7585,6 +8899,18 @@ export interface operations {
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
+                /** @description Filter by contact category. */
+                category?: "customer" | "supplier" | "team";
+                /** @description Filter people by related company id. */
+                companyId?: string;
+                /** @description Filter by creator id. */
+                createdById?: string;
+                /** @description Filter by customer id. */
+                customerId?: string;
+                /** @description Filter by contact-group id. */
+                groupId?: string;
+                /** @description Filter by parent contact id. */
+                parentContactId?: string;
                 /** @description Filter by contact type. */
                 type?: "person" | "company";
             };
@@ -9069,6 +10395,44 @@ export interface operations {
             503: components["responses"]["ServiceUnavailable"];
         };
     };
+    getCustomFieldValues: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                targetType: components["parameters"]["CustomFieldValueTargetType"];
+                resourceId: components["parameters"]["CustomFieldValueResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomFieldValueBatchRead"];
+            };
+        };
+        responses: {
+            /** @description Current value states in the same order as fieldIds. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CustomFieldValue"][];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     getCustomFieldValue: {
         parameters: {
             query?: never;
@@ -9200,12 +10564,28 @@ export interface operations {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
+                /** @description Filter by actor id. */
+                actorId?: string;
+                /** @description Filter by actor type. */
+                actorType?: "user" | "serviceCredential" | "system";
+                /** @description Include audit events created at or after this time. */
+                createdAtFrom?: string;
+                /** @description Include audit events created at or before this time. */
+                createdAtTo?: string;
                 /** @description Filter by credential id. */
                 credentialId?: string;
                 /** @description Filter by audit event type. */
                 eventType?: string;
                 /** @description Filter by audit outcome. */
                 outcome?: "success" | "denied" | "failure";
+                /** @description Filter by request id. */
+                requestId?: string;
+                /** @description Filter by event source. */
+                source?: "teamgrid-app" | "api-v1" | "system";
+                /** @description Filter by target id. */
+                targetId?: string;
+                /** @description Filter by target type. */
+                targetType?: string;
             };
             header?: never;
             path?: never;
@@ -9227,6 +10607,8 @@ export interface operations {
                                 nextCursor: string | null;
                             };
                             requestId: string;
+                            /** @description Configured cell-local audit retention in days. */
+                            retentionDays: number;
                         };
                     };
                 };
@@ -9465,6 +10847,49 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateWebhook: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong webhook ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchWebhook"];
+            };
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebhookUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated webhook. */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    ETag: components["headers"]["WebhookETag"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["Webhook"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -10862,6 +12287,63 @@ export interface operations {
             503: components["responses"]["ServiceUnavailable"];
         };
     };
+    listChanges: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+                /** @description Filter by one or more change operations. Repeat the query parameter for multiple values. */
+                operations?: ("created" | "deleted" | "updated")[];
+                /** @description Filter by one or more public resource types. Repeat the query parameter for multiple values. */
+                resourceTypes?: ("absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook")[];
+                /** @description Create an empty checkpoint at the latest committed cell sequence. Cannot be combined with cursor. Use this before a full resource snapshot, then poll with the returned cursor. */
+                startAtLatest?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A fixed-watermark change page and the checkpoint for the next poll. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ChangeEvent"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                /** @description Credential-bound checkpoint for the next poll. It is present even when this page is empty. */
+                                nextCursor: string;
+                                /** @description True when this page reaches its fixed watermark. False pages are always full. */
+                                caughtUp: boolean;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description The cursor is outside retained history or cell continuity cannot be proven. A full resynchronization is required. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     getSystemCapabilities: {
         parameters: {
             query?: never;
@@ -11046,6 +12528,572 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listPersonalAccessTokens: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonalAccessToken"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createPersonalAccessToken: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PersonalAccessTokenCreate"];
+            };
+        };
+        responses: {
+            /** @description An exact replay of a completed issuance. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonalAccessToken"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly issued native credential. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonalAccessToken"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    revokePersonalAccessToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The personal access token was permanently revoked. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    rotatePersonalAccessToken: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PersonalAccessTokenRotation"];
+            };
+        };
+        responses: {
+            /** @description An exact replay of a completed issuance. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonalAccessToken"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly issued native credential. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["PersonalAccessToken"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listServiceAccounts: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A stable cursor page. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccount"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createServiceAccount: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAccountCreate"];
+            };
+        };
+        responses: {
+            /** @description An exact replay of a completed issuance. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly issued native credential. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getServiceAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The requested resource. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccount"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    revokeServiceAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The service account and all of its credentials were revoked. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateServiceAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAccountUpdate"];
+            };
+        };
+        responses: {
+            /** @description The updated resource. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccount"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createServiceAccountCredential: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAccountCredentialCreate"];
+            };
+        };
+        responses: {
+            /** @description An exact replay of a completed issuance. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly issued native credential. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    revokeServiceAccountCredential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The service account credential was permanently revoked. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    rotateServiceAccountCredential: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAccountCredentialRotation"];
+            };
+        };
+        responses: {
+            /** @description An exact replay of a completed issuance. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly issued native credential. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountCredential"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getServiceAccountResourceGrants: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The complete, bounded resource grant policy. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ResourceGrantSetETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountResourceGrantSet"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    replaceServiceAccountResourceGrants: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong service-account grant-policy ETag. */
+                "If-Match": components["parameters"]["IfMatchResourceGrantSet"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceAccountResourceGrantSetReplace"];
+            };
+        };
+        responses: {
+            /** @description The complete replacement policy was published atomically. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["ResourceGrantSetETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ServiceAccountResourceGrantSet"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];

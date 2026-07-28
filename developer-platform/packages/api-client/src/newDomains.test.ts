@@ -690,6 +690,43 @@ describe('final TeamGrid SDK domains', () => {
     expect(JSON.stringify(download)).not.toContain(intentToken)
   })
 
+  it('supports immutable bounded audit-event exports through the existing export lifecycle', async () => {
+    const specification = {
+      createdAtFrom: '2026-07-01T00:00:00.000Z',
+      createdAtTo: '2026-07-27T00:00:00.000Z',
+      fields: ['id', 'createdAt', 'eventType', 'outcome', 'requestId'] as const,
+      resourceType: 'auditEvents' as const,
+    }
+    const fetch = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        expect(JSON.parse(String(init.body))).toEqual(specification)
+        return resource(
+          { attributes: { replayed: false }, id: 'export-audit', type: 'export' },
+          201,
+        )
+      }
+      return resource({
+        attributes: {
+          createdAt: date,
+          fields: specification.fields,
+          fileName: 'teamgrid-audit-events.csv',
+          format: 'csv',
+          resourceType: 'auditEvents',
+          state: 'running',
+        },
+        id: 'export-audit',
+        type: 'export',
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    await expect(client.exports.create(specification)).resolves.toMatchObject({
+      data: { id: 'export-audit' },
+    })
+    await expect(client.exports.get('export-audit')).resolves.toMatchObject({
+      data: { attributes: { resourceType: 'auditEvents' } },
+    })
+  })
+
   it('refuses export redirects, unsafe headers, and responses above the caller ceiling', async () => {
     const redirected = new TeamGridClient({
       fetch: vi.fn(

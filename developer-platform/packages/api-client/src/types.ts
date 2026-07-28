@@ -4,8 +4,11 @@ export type Workspace = components['schemas']['Workspace']
 export type ApiVersion = components['schemas']['ApiVersionEnvelope']['data']
 export type ApiVersionEnvelope = components['schemas']['ApiVersionEnvelope'] & TransportAware
 export type Project = components['schemas']['Project']
+export type ProjectRevision = `prj1-${string}`
 export type ProjectCreate = components['schemas']['ProjectCreate']
 export type ProjectUpdate = components['schemas']['ProjectUpdate']
+export type ProjectSharing = components['schemas']['ProjectSharing']
+export type ProjectSharingReplace = components['schemas']['ProjectSharingReplace']
 export type Product = components['schemas']['Product']
 export type ProductCreate = components['schemas']['ProductCreate']
 export type ProductUpdate = components['schemas']['ProductUpdate']
@@ -16,6 +19,7 @@ export type ProjectStatement = components['schemas']['ProjectStatement']
 export type ProjectStatementCreate = components['schemas']['ProjectStatementCreate']
 export type ProjectStatementUpdate = components['schemas']['ProjectStatementUpdate']
 export type Task = components['schemas']['Task']
+export type TaskRevision = `tsk1-${string}`
 export type TimeEntry = components['schemas']['TimeEntry']
 export type Contact = components['schemas']['Contact']
 export type ContactCreate = components['schemas']['ContactCreate']
@@ -29,11 +33,13 @@ export type CustomFieldDefinition = components['schemas']['CustomFieldDefinition
 export type CustomFieldDefinitionCreate = components['schemas']['CustomFieldDefinitionCreate']
 export type CustomFieldDefinitionUpdate = components['schemas']['CustomFieldDefinitionUpdate']
 export type CustomFieldValue = components['schemas']['CustomFieldValue']
+export type CustomFieldValueBatchRead = components['schemas']['CustomFieldValueBatchRead']
 export type CustomFieldValueMutation = components['schemas']['CustomFieldValueMutation']
 export type CustomFieldValueSet = components['schemas']['CustomFieldValueSet']
 export type CustomFieldValueTargetType = CustomFieldValue['attributes']['targetType']
 export type CustomFieldValueRevision = CustomFieldValue['attributes']['revision']
 export type ProjectTemplate = components['schemas']['ProjectTemplate']
+export type ProjectTemplateRevision = `tpl1-${string}`
 export type ProjectTemplateCreate = components['schemas']['ProjectTemplateCreate']
 export type ProjectTemplateUpdate = components['schemas']['ProjectTemplateUpdate']
 export type ProjectTemplateInstantiate = components['schemas']['ProjectTemplateInstantiate']
@@ -55,8 +61,18 @@ export type TagCreate = components['schemas']['TagCreate']
 export type TagUpdate = components['schemas']['TagUpdate']
 export type Lookup = List | Service | Tag
 export type AuditEvent = components['schemas']['AuditEvent']
+export type ChangeEvent = components['schemas']['ChangeEvent']
+export type ChangeOperation = ChangeEvent['attributes']['operation']
+export type ChangeResourceType = ChangeEvent['attributes']['resourceType']
+/**
+ * An opaque, credential- and cell-bound change-feed checkpoint. Persist the
+ * value verbatim and return it only to the same regional endpoint with the
+ * same credential and filters.
+ */
+export type ChangeCheckpoint = string
 export type Webhook = components['schemas']['Webhook']
 export type WebhookCreate = components['schemas']['WebhookCreate']
+export type WebhookUpdate = components['schemas']['WebhookUpdate']
 export type WebhookDelivery = components['schemas']['WebhookDelivery']
 export type WebhookSecretRotation = components['schemas']['WebhookSecretRotation']
 export type SystemCapability = components['schemas']['SystemCapability']
@@ -64,9 +80,37 @@ export type WorkspaceEntitlement = components['schemas']['WorkspaceEntitlement']
 export type WorkspaceSettings = components['schemas']['WorkspaceSettings']
 export type WorkspaceSettingsUpdate = components['schemas']['WorkspaceSettingsUpdate']
 export type EventDefinition = components['schemas']['EventDefinition']
+export type PersonalAccessToken = components['schemas']['PersonalAccessToken']
+export type PersonalAccessTokenCreate = components['schemas']['PersonalAccessTokenCreate']
+export type PersonalAccessTokenRotation = components['schemas']['PersonalAccessTokenRotation']
+export type ServiceAccount = components['schemas']['ServiceAccount']
+export type ServiceAccountCreate = components['schemas']['ServiceAccountCreate']
+export type ServiceAccountCredential = components['schemas']['ServiceAccountCredential']
+export type ServiceAccountCredentialCreate = components['schemas']['ServiceAccountCredentialCreate']
+export type ServiceAccountCredentialRotation =
+  components['schemas']['ServiceAccountCredentialRotation']
+export type ServiceAccountUpdate = components['schemas']['ServiceAccountUpdate']
+export type ResourceGrant = components['schemas']['ResourceGrant']
+export type ResourceGrantInput = components['schemas']['ResourceGrantInput']
+export type ServiceAccountResourceGrantSet = components['schemas']['ServiceAccountResourceGrantSet']
+export type ServiceAccountResourceGrantSetReplace =
+  components['schemas']['ServiceAccountResourceGrantSetReplace']
 export type TaskCreate = components['schemas']['TaskCreate']
+export type TaskDuplicate = Omit<
+  components['schemas']['TaskDuplicate'],
+  'copyChecklist' | 'copyCustomFieldValues'
+> & {
+  copyChecklist?: boolean
+  copyCustomFieldValues?: boolean
+}
+export type TaskPlacement = components['schemas']['TaskPlacement']
+export type TaskSubtasksReplace = components['schemas']['TaskSubtasksReplace']
 export type TaskUpdate = components['schemas']['TaskUpdate']
+export type TaskBulkUpdate = components['schemas']['TaskBulkUpdate']
+export type TaskBulkUpdateResult = components['schemas']['TaskBulkUpdateResult']
 export type TimeEntryCreate = components['schemas']['TimeEntryCreate']
+export type TimeEntryBilling = components['schemas']['TimeEntryBilling']
+export type TimeEntryBillingUpdate = components['schemas']['TimeEntryBillingUpdate']
 export type TimeEntryUpdate = components['schemas']['TimeEntryUpdate']
 export type TimerAction = components['schemas']['TimerAction']
 export type ProjectLifecycleOperation = components['schemas']['ProjectLifecycleOperation']
@@ -224,7 +268,22 @@ export type TaskSearchResult = SearchResultBase<'task'> & {
 
 export type SearchResult = ContactSearchResult | ProjectSearchResult | TaskSearchResult
 
-export type ExportResourceType = 'contacts' | 'projects' | 'tasks' | 'timeEntries'
+export type ExportResourceType = 'auditEvents' | 'contacts' | 'projects' | 'tasks' | 'timeEntries'
+export type AuditEventExportField =
+  | 'id'
+  | 'createdAt'
+  | 'eventType'
+  | 'outcome'
+  | 'source'
+  | 'actorType'
+  | 'actorId'
+  | 'credentialId'
+  | 'requestId'
+  | 'targetType'
+  | 'targetId'
+  | 'region'
+  | 'cellId'
+  | 'metadata'
 export type ContactExportField =
   | 'archived'
   | 'companyTitle'
@@ -263,27 +322,38 @@ export type TimeEntryExportField =
   | 'updatedAt'
   | 'userId'
 export type ExportField =
+  | AuditEventExportField
   | ContactExportField
   | ProjectExportField
   | TaskExportField
   | TimeEntryExportField
 
-type ExportCreateBase = {
+type ExportCreateCommon = {
   fileName?: string
   format?: 'csv'
-  includeArchived?: boolean
   maxRows?: number
+}
+
+type StandardExportCreateBase = ExportCreateCommon & {
+  includeArchived?: boolean
   updatedFrom?: string | Date
   updatedUntil?: string | Date
 }
 
-export type ExportCreate = ExportCreateBase &
-  (
-    | { fields?: readonly ContactExportField[]; resourceType: 'contacts' }
-    | { fields?: readonly ProjectExportField[]; resourceType: 'projects' }
-    | { fields?: readonly TaskExportField[]; resourceType: 'tasks' }
-    | { fields?: readonly TimeEntryExportField[]; resourceType: 'timeEntries' }
-  )
+export type ExportCreate =
+  | (ExportCreateCommon & {
+      createdAtFrom?: string | Date
+      createdAtTo: string | Date
+      fields?: readonly AuditEventExportField[]
+      resourceType: 'auditEvents'
+    })
+  | (StandardExportCreateBase &
+      (
+        | { fields?: readonly ContactExportField[]; resourceType: 'contacts' }
+        | { fields?: readonly ProjectExportField[]; resourceType: 'projects' }
+        | { fields?: readonly TaskExportField[]; resourceType: 'tasks' }
+        | { fields?: readonly TimeEntryExportField[]; resourceType: 'timeEntries' }
+      ))
 
 export type ExportCreation = {
   attributes: { replayed: boolean }
@@ -529,9 +599,34 @@ export type ResourceEnvelope<T> = TransportAware & {
   meta: RequestMeta
 }
 
+export type CustomFieldValueBatchEnvelope = TransportAware & {
+  data: CustomFieldValue[]
+  meta: RequestMeta
+}
+
+export type TaskBulkUpdateEnvelope = components['schemas']['TaskBulkUpdateEnvelope'] &
+  TransportAware
+
 export type ListEnvelope<T> = TransportAware & {
   data: T[]
   meta: PageMeta
+}
+
+export type AuditEventListEnvelope = ListEnvelope<AuditEvent> & {
+  meta: PageMeta & {
+    retentionDays: number
+  }
+}
+
+export type ChangePageEnvelope = TransportAware & {
+  data: ChangeEvent[]
+  meta: RequestMeta & {
+    page: {
+      caughtUp: boolean
+      limit: number
+      nextCursor: ChangeCheckpoint
+    }
+  }
 }
 
 export type ListOptions = {
@@ -548,6 +643,12 @@ export type ArchiveFilter = {
 export type ProjectListOptions = ListOptions &
   ArchiveFilter & {
     completed?: boolean
+    contactId?: string
+    createdById?: string
+    individualId?: string
+    listId?: string
+    managerId?: string
+    subscriberId?: string
   }
 
 export type ProductListOptions = ListOptions &
@@ -577,19 +678,40 @@ export type TaskListOptions = ListOptions &
   ArchiveFilter & {
     assigneeId?: string
     completed?: boolean
+    contactId?: string
+    groupId?: string
+    listId?: string
+    personalListId?: string
     projectId?: string
+    serviceId?: string
+    subscriberId?: string
+    tagId?: string
   }
 
 export type TimeEntryListOptions = ListOptions &
   ArchiveFilter & {
+    billable?: boolean
+    billed?: boolean
+    createdById?: string
     from?: string | Date
+    serviceId?: string
     taskId?: string
     to?: string | Date
     userId?: string
   }
 
+export type TimeEntryBillingMutationOptions = RequestOptions & {
+  ifMatch: string
+}
+
 export type ContactListOptions = ListOptions &
   ArchiveFilter & {
+    category?: 'customer' | 'supplier' | 'team'
+    companyId?: string
+    createdById?: string
+    customerId?: string
+    groupId?: string
+    parentContactId?: string
     type?: 'person' | 'company'
   }
 
@@ -630,9 +752,17 @@ export type PlannedWorkListOptions = ListOptions & {
 }
 
 export type AuditEventListOptions = ListOptions & {
+  actorId?: string
+  actorType?: 'user' | 'serviceCredential' | 'system'
+  createdAtFrom?: string | Date
+  createdAtTo?: string | Date
   credentialId?: string
   eventType?: string
   outcome?: 'success' | 'denied' | 'failure'
+  requestId?: string
+  source?: 'teamgrid-app' | 'api-v1' | 'system'
+  targetId?: string
+  targetType?: string
 }
 
 export type CalendarListOptions = ListOptions &
@@ -736,6 +866,29 @@ export type AutomationRunMutationOptions = RequestOptions & {
   ifMatch: AutomationRunRevision | `"${AutomationRunRevision}"`
 }
 
+export type ChangeFilterOptions = RequestOptions & {
+  limit?: number
+  operations?: readonly ChangeOperation[]
+  resourceTypes?: readonly ChangeResourceType[]
+}
+
+export type ChangeListOptions = ChangeFilterOptions & {
+  cursor?: ChangeCheckpoint
+  startAtLatest?: boolean
+}
+
+export type ChangeCatchUpOptions = ChangeFilterOptions & {
+  cursor?: ChangeCheckpoint
+}
+
+export type ChangeFeedBootstrap<T> = {
+  /** The checkpoint taken immediately before the snapshot started. */
+  checkpoint: ChangeCheckpoint
+  /** A bounded catch-up traversal after the snapshot checkpoint. */
+  pages: AsyncIterable<ChangePageEnvelope>
+  snapshot: T
+}
+
 export type LookupListOptions = ListOptions & ArchiveFilter
 
 export type ListLookupListOptions = LookupListOptions & {
@@ -762,10 +915,42 @@ export type WebhookSecretRotationOptions = MutationOptions & {
   ifMatch: WebhookRevision | `"${WebhookRevision}"`
 }
 
+export type WebhookUpdateOptions = RequestOptions & {
+  ifMatch: WebhookRevision | `"${WebhookRevision}"`
+}
+
 export type MutationOptions = {
   idempotencyKey?: string
   requestId?: string
   signal?: AbortSignal
+}
+
+export type ProjectMutationOptions = RequestOptions & {
+  ifMatch: ProjectRevision | `"${ProjectRevision}"`
+}
+
+export type ProjectSharingMutationOptions = RequestOptions & {
+  ifMatch: ProjectRevision | `"${ProjectRevision}"`
+}
+
+export type ProjectLifecycleMutationOptions = MutationOptions & {
+  ifMatch: ProjectRevision | `"${ProjectRevision}"`
+}
+
+export type ProjectTemplateMutationOptions = RequestOptions & {
+  ifMatch: ProjectTemplateRevision | `"${ProjectTemplateRevision}"`
+}
+
+export type ProjectTemplateInstantiationOptions = MutationOptions & {
+  ifMatch: ProjectTemplateRevision | `"${ProjectTemplateRevision}"`
+}
+
+export type TaskMutationOptions = RequestOptions & {
+  ifMatch: TaskRevision | `"${TaskRevision}"`
+}
+
+export type TaskDuplicateOptions = MutationOptions & {
+  ifMatch: TaskRevision | `"${TaskRevision}"`
 }
 
 /**

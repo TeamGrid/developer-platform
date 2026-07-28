@@ -534,6 +534,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.bulkUpdateTasks",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.tasks.bulkUpdate",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "bulkUpdateTasks",
+      "method": "POST",
+      "operationId": "bulkUpdateTasks",
+      "optionalScopes": [],
+      "path": "/tasks/bulk-update",
+      "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.cancelFileUploadIntent",
           "kind": "httpLocal",
           "role": "transport"
@@ -1103,6 +1128,31 @@
     {
       "authMode": "developerCredential",
       "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createPersonalAccessToken",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.personalAccessTokens.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createPersonalAccessToken",
+      "method": "POST",
+      "operationId": "createPersonalAccessToken",
+      "optionalScopes": [],
+      "path": "/me/personal-access-tokens",
+      "requiredScopes": [
+        "credentials:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
       "dynamicPolicyIds": [
         "commerce-sensitive-fields"
       ],
@@ -1281,6 +1331,57 @@
       "path": "/services",
       "requiredScopes": [
         "services:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createServiceAccount",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccounts.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createServiceAccount",
+      "method": "POST",
+      "operationId": "createServiceAccount",
+      "optionalScopes": [],
+      "path": "/service-accounts",
+      "requiredScopes": [
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.createServiceAccountCredential",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccountCredentials.create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createServiceAccountCredential",
+      "method": "POST",
+      "operationId": "createServiceAccountCredential",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}/credentials",
+      "requiredScopes": [
+        "credentials:write",
+        "service-accounts:write"
       ]
     },
     {
@@ -1468,6 +1569,32 @@
       "path": "/exports/{id}/download",
       "requiredScopes": [
         "exports:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.duplicateTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/duplicate",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "duplicateTask",
+      "method": "POST",
+      "operationId": "duplicateTask",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/duplicate",
+      "requiredScopes": [
+        "tasks:read",
+        "tasks:write"
       ]
     },
     {
@@ -1782,6 +1909,40 @@
       "operationId": "getCustomFieldValue",
       "optionalScopes": [],
       "path": "/custom-field-values/{targetType}/{resourceId}/{fieldId}",
+      "requiredScopes": [
+        "custom-field-values:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "project-statements:read",
+        "tags:read",
+        "tasks:read",
+        "users:read"
+      ],
+      "dynamicPolicyIds": [
+        "custom-field-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.getCustomFieldValues",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.customFieldValues.getMany",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getCustomFieldValues",
+      "method": "POST",
+      "operationId": "getCustomFieldValues",
+      "optionalScopes": [],
+      "path": "/custom-field-values/{targetType}/{resourceId}/batch-read",
       "requiredScopes": [
         "custom-field-values:read"
       ]
@@ -2133,6 +2294,31 @@
     {
       "authMode": "developerCredential",
       "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getProjectSharing",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectSharing.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getProjectSharing",
+      "method": "GET",
+      "operationId": "getProjectSharing",
+      "optionalScopes": [],
+      "path": "/projects/{id}/sharing",
+      "requiredScopes": [
+        "projects:sharing"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
       "dynamicPolicyIds": [
         "commerce-sensitive-fields"
       ],
@@ -2266,6 +2452,57 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.getServiceAccount",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccounts.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getServiceAccount",
+      "method": "GET",
+      "operationId": "getServiceAccount",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}",
+      "requiredScopes": [
+        "service-accounts:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getServiceAccountResourceGrants",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccountResourceGrants.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getServiceAccountResourceGrants",
+      "method": "GET",
+      "operationId": "getServiceAccountResourceGrants",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}/resource-grants",
+      "requiredScopes": [
+        "resource-grants:read",
+        "service-accounts:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.getSystemCapabilities",
           "kind": "httpLocal",
           "role": "transport"
@@ -2383,6 +2620,31 @@
       "path": "/time-entries/{id}",
       "requiredScopes": [
         "time-entries:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getTimeEntryBilling",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.timeEntryBilling.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getTimeEntryBilling",
+      "method": "GET",
+      "operationId": "getTimeEntryBilling",
+      "optionalScopes": [],
+      "path": "/time-entries/{id}/billing",
+      "requiredScopes": [
+        "time-entries:billing"
       ]
     },
     {
@@ -2806,6 +3068,31 @@
     },
     {
       "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listChanges",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/changes/list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listChanges",
+      "method": "GET",
+      "operationId": "listChanges",
+      "optionalScopes": [],
+      "path": "/changes",
+      "requiredScopes": [
+        "changes:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
       "conditionalScopes": [
         "contacts:read",
         "projects:read",
@@ -3099,6 +3386,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.listPersonalAccessTokens",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.personalAccessTokens.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listPersonalAccessTokens",
+      "method": "GET",
+      "operationId": "listPersonalAccessTokens",
+      "optionalScopes": [],
+      "path": "/me/personal-access-tokens",
+      "requiredScopes": [
+        "credentials:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.listPlannedWork",
           "kind": "httpLocal",
           "role": "transport"
@@ -3282,6 +3594,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.listServiceAccounts",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccounts.list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listServiceAccounts",
+      "method": "GET",
+      "operationId": "listServiceAccounts",
+      "optionalScopes": [],
+      "path": "/service-accounts",
+      "requiredScopes": [
+        "service-accounts:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.listServices",
           "kind": "httpLocal",
           "role": "transport"
@@ -3457,6 +3794,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.moveTask",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/move",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "moveTask",
+      "method": "POST",
+      "operationId": "moveTask",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/move",
+      "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.removeMember",
           "kind": "httpLocal",
           "role": "transport"
@@ -3582,6 +3944,57 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.replaceProjectSharing",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.projectSharing.replace",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "replaceProjectSharing",
+      "method": "PUT",
+      "operationId": "replaceProjectSharing",
+      "optionalScopes": [],
+      "path": "/projects/{id}/sharing",
+      "requiredScopes": [
+        "projects:sharing"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.replaceServiceAccountResourceGrants",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccountResourceGrants.replace",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "replaceServiceAccountResourceGrants",
+      "method": "PUT",
+      "operationId": "replaceServiceAccountResourceGrants",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}/resource-grants",
+      "requiredScopes": [
+        "resource-grants:write",
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.replaceTaskPlannedWork",
           "kind": "httpLocal",
           "role": "transport"
@@ -3599,6 +4012,31 @@
       "path": "/tasks/{id}/planned-work",
       "requiredScopes": [
         "planned-work:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.replaceTaskSubtasks",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/tasks/subtasks/replace",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "replaceTaskSubtasks",
+      "method": "PUT",
+      "operationId": "replaceTaskSubtasks",
+      "optionalScopes": [],
+      "path": "/tasks/{id}/subtasks",
+      "requiredScopes": [
+        "tasks:write"
       ]
     },
     {
@@ -4075,6 +4513,133 @@
       "path": "/time-entries/{id}/restore",
       "requiredScopes": [
         "time-entries:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.revokePersonalAccessToken",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.personalAccessTokens.revoke",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "revokePersonalAccessToken",
+      "method": "DELETE",
+      "operationId": "revokePersonalAccessToken",
+      "optionalScopes": [],
+      "path": "/me/personal-access-tokens/{id}",
+      "requiredScopes": [
+        "credentials:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.revokeServiceAccount",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccounts.revoke",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "revokeServiceAccount",
+      "method": "DELETE",
+      "operationId": "revokeServiceAccount",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}",
+      "requiredScopes": [
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.revokeServiceAccountCredential",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccountCredentials.revoke",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "revokeServiceAccountCredential",
+      "method": "DELETE",
+      "operationId": "revokeServiceAccountCredential",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}/credentials/{credentialId}",
+      "requiredScopes": [
+        "credentials:write",
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.rotatePersonalAccessToken",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.personalAccessTokens.rotate",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "rotatePersonalAccessToken",
+      "method": "POST",
+      "operationId": "rotatePersonalAccessToken",
+      "optionalScopes": [],
+      "path": "/me/personal-access-tokens/{id}/rotation",
+      "requiredScopes": [
+        "credentials:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.rotateServiceAccountCredential",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccountCredentials.rotate",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "rotateServiceAccountCredential",
+      "method": "POST",
+      "operationId": "rotateServiceAccountCredential",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}/credentials/{credentialId}/rotation",
+      "requiredScopes": [
+        "credentials:write",
+        "service-accounts:write"
       ]
     },
     {
@@ -4680,6 +5245,31 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.updateServiceAccount",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.serviceAccounts.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateServiceAccount",
+      "method": "PATCH",
+      "operationId": "updateServiceAccount",
+      "optionalScopes": [],
+      "path": "/service-accounts/{id}",
+      "requiredScopes": [
+        "service-accounts:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.updateTag",
           "kind": "httpLocal",
           "role": "transport"
@@ -4755,6 +5345,56 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.updateTimeEntryBilling",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.timeEntryBilling.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateTimeEntryBilling",
+      "method": "PUT",
+      "operationId": "updateTimeEntryBilling",
+      "optionalScopes": [],
+      "path": "/time-entries/{id}/billing",
+      "requiredScopes": [
+        "time-entries:billing"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateWebhook",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.webhooks.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateWebhook",
+      "method": "PATCH",
+      "operationId": "updateWebhook",
+      "optionalScopes": [],
+      "path": "/webhooks/{id}",
+      "requiredScopes": [
+        "webhooks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.updateWorkspaceSettings",
           "kind": "httpLocal",
           "role": "transport"
@@ -4777,7 +5417,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 180,
+    "authenticatedOperations": 205,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
       "developerApi.v1.absences.archive",
@@ -4813,6 +5453,7 @@
       "developerApi.v1.comments.restore",
       "developerApi.v1.customFieldValues.clear",
       "developerApi.v1.customFieldValues.get",
+      "developerApi.v1.customFieldValues.getMany",
       "developerApi.v1.customFieldValues.set",
       "developerApi.v1.events.catalog",
       "developerApi.v1.exports.create",
@@ -4834,6 +5475,10 @@
       "developerApi.v1.members.list",
       "developerApi.v1.members.remove",
       "developerApi.v1.members.updateRole",
+      "developerApi.v1.personalAccessTokens.create",
+      "developerApi.v1.personalAccessTokens.list",
+      "developerApi.v1.personalAccessTokens.revoke",
+      "developerApi.v1.personalAccessTokens.rotate",
       "developerApi.v1.plannedWork.getForTask",
       "developerApi.v1.plannedWork.list",
       "developerApi.v1.plannedWork.replaceForTask",
@@ -4848,6 +5493,8 @@
       "developerApi.v1.products.get",
       "developerApi.v1.products.list",
       "developerApi.v1.products.update",
+      "developerApi.v1.projectSharing.get",
+      "developerApi.v1.projectSharing.replace",
       "developerApi.v1.projectStatements.archive",
       "developerApi.v1.projectStatements.create",
       "developerApi.v1.projectStatements.get",
@@ -4868,10 +5515,24 @@
       "developerApi.v1.roles.list",
       "developerApi.v1.roles.update",
       "developerApi.v1.search.query",
+      "developerApi.v1.serviceAccountCredentials.create",
+      "developerApi.v1.serviceAccountCredentials.revoke",
+      "developerApi.v1.serviceAccountCredentials.rotate",
+      "developerApi.v1.serviceAccountResourceGrants.get",
+      "developerApi.v1.serviceAccountResourceGrants.replace",
+      "developerApi.v1.serviceAccounts.create",
+      "developerApi.v1.serviceAccounts.get",
+      "developerApi.v1.serviceAccounts.list",
+      "developerApi.v1.serviceAccounts.revoke",
+      "developerApi.v1.serviceAccounts.update",
       "developerApi.v1.systemCapabilities.get",
+      "developerApi.v1.tasks.bulkUpdate",
+      "developerApi.v1.timeEntryBilling.get",
+      "developerApi.v1.timeEntryBilling.update",
       "developerApi.v1.webhooks.get",
       "developerApi.v1.webhooks.list",
       "developerApi.v1.webhooks.rotateSecret",
+      "developerApi.v1.webhooks.update",
       "developerApi.v1.workspaceEntitlements.get",
       "developerApi.v1.workspaceSettings.get",
       "developerApi.v1.workspaceSettings.update",
@@ -4880,6 +5541,7 @@
       "teamgrid/internal/v1/callNotes/get",
       "teamgrid/internal/v1/callNotes/list",
       "teamgrid/internal/v1/callNotes/restore",
+      "teamgrid/internal/v1/changes/list",
       "teamgrid/internal/v1/contactGroups/archive",
       "teamgrid/internal/v1/contactGroups/create",
       "teamgrid/internal/v1/contactGroups/get",
@@ -4941,10 +5603,13 @@
       "teamgrid/internal/v1/tasks/archive",
       "teamgrid/internal/v1/tasks/complete",
       "teamgrid/internal/v1/tasks/create",
+      "teamgrid/internal/v1/tasks/duplicate",
       "teamgrid/internal/v1/tasks/get",
       "teamgrid/internal/v1/tasks/list",
+      "teamgrid/internal/v1/tasks/move",
       "teamgrid/internal/v1/tasks/reopen",
       "teamgrid/internal/v1/tasks/restore",
+      "teamgrid/internal/v1/tasks/subtasks/replace",
       "teamgrid/internal/v1/tasks/timer/start",
       "teamgrid/internal/v1/tasks/timer/stop",
       "teamgrid/internal/v1/tasks/update",

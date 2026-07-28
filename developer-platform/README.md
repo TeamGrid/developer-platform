@@ -14,20 +14,24 @@ none imports Meteor runtime code.
 - `@teamgrid/mcp-server`: optional local stdio MCP adapter. It exposes only
   bounded read tools and delegates every request to the same API client.
 
-All three packages support and are qualified on Node.js 22.14 through Node.js 24.
+All three packages support Node.js 22.14 through Node.js 24 on Linux, macOS,
+and Windows. CI qualifies both Node boundaries on all three operating systems.
+Persistent CLI profiles use macOS Keychain or Linux Secret Service. On Windows,
+use the process-scoped `TEAMGRID_API_TOKEN`; Stable 1.0 does not persist secrets
+through an unqualified third-party credential helper.
 
-The current prerelease is available from npm through the explicit `next`
+The stable 1.0 release is available from npm through the default `latest`
 channel:
 
 ```sh
-npm install @teamgrid/api-client@next
-npm install --global @teamgrid/cli@next
-npm install --global @teamgrid/mcp-server@next
+npm install @teamgrid/api-client@1.0.0
+npm install --global @teamgrid/cli@1.0.0
+npm install --global @teamgrid/mcp-server@1.0.0
 ```
 
-Use an exact version instead of `next` in reproducible deployments. Until the
-first stable release exists, npm also exposes the initial package version as
-`latest`; prerelease consumers should still select `next` explicitly.
+Use the exact version shown above in reproducible deployments. Unpinned
+installations resolve through `latest`; future preview releases remain isolated
+on the explicit `next` channel.
 
 ## Credential and routing model
 
@@ -36,9 +40,14 @@ Developer. A credential is shown once. The CLI stores it in macOS Keychain or
 Linux Secret Service; the non-secret profile file contains only region, cell,
 credential id, optional base URL, and timestamps.
 
-Credential creation appears only for workspaces in the controlled Developer
-Platform beta and while server-side issuance is enabled. Existing credentials
-remain revocable during a rollout pause.
+On Windows, provide `TEAMGRID_API_TOKEN` to the process instead of running
+`teamgrid auth login`. The token is not written to disk, and routing defaults
+to the credential's signed cell hint. Set `TEAMGRID_API_BASE_URL` only for an
+approved local or staging override.
+
+Credential creation is available to authorized administrators in entitled,
+unlocked workspaces while cell-local issuance is enabled. A rollout pause
+stops creation but keeps existing credentials revocable.
 
 The credential prefix carries an untrusted region/cell routing hint. The client
 derives `https://api.<region>.teamgrid.app/v1`; the target cell still verifies
@@ -57,6 +66,8 @@ teamgrid tasks create \
   --idempotency-key launch-task-1 \
   --output json
 teamgrid time-entries list --from 2026-07-01 --to 2026-07-31 --output jsonl
+teamgrid time-entries billing get time-entry-id --output json
+teamgrid time-entries billing update time-entry-id --billed --if-match "$REVISION"
 teamgrid lists create \
   --data '{"name":"Delivery","type":"tasks","parentId":"project-id"}' \
   --idempotency-key delivery-list-1 \
@@ -69,11 +80,13 @@ teamgrid webhooks create \
   --output json
 teamgrid custom-field-values get project project-id field-id --output json
 teamgrid project-templates list --origin-project-id project-id --output json
-teamgrid tasks update task-id --data '{"name":"Reviewed"}' --if-match "$TASK_REVISION"
-teamgrid projects complete project-id --if-match "$PROJECT_REVISION" \
+teamgrid tasks update task-id --data '{"name":"Reviewed"}'
+teamgrid projects complete project-id \
   --idempotency-key complete-project-id-v1 --wait --output json
 teamgrid planned-work list --start 2026-07-20T00:00:00Z --end 2026-07-27T00:00:00Z \
   --user-id user-id --output json
+teamgrid changes checkpoint --resource-type task --output json
+teamgrid changes list --cursor "$CHECKPOINT" --resource-type task --all --output jsonl
 ```
 
 Use `--data @payload.json` or `--data -` for files/stdin. Destructive commands
@@ -97,16 +110,19 @@ for await (const page of client.tasks.pages({ projectId: 'project-id' })) {
 }
 ```
 
-The change feed is deliberately deferred beyond the `1.0.0-beta.2` public contract. The API,
-SDK, CLI, MCP adapter, and issuable scopes do not expose it in this release. Use signed webhooks
-for event-driven integration and bounded list reads for reconciliation.
+The stable metadata-only change feed is exposed through the API, SDK, and CLI for durable
+reconciliation. Its opaque checkpoints are bound to one credential, workspace, cell, epoch, and
+exact filter set. The MCP adapter intentionally does not expose this high-volume synchronization
+primitive. Use signed webhooks for low-latency notifications and the change feed to detect and
+reconcile missed changes.
 
-GET requests, POST requests with an idempotency key, and compare-and-set planned-work PUTs with an
-idempotency key are retried for bounded transient failures. Tasks, projects, and project templates
-use the static Beta 2 contract without developer revisions, strong ETags, or `If-Match` options.
-Independent compare-and-set contracts such as custom-field values and planned work remain
-unchanged. Other PUT, PATCH, and DELETE requests are not automatically retried. Errors do not
-retain or print the bearer credential.
+GET requests and POST requests with an idempotency key are retried for bounded transient failures.
+Tasks, projects, and project templates expose developer revisions and strong ETags. Every update,
+archive, restore, completion, reopen, lifecycle start, and template instantiation requires the
+latest revision through `If-Match`, preventing silent overwrites. Other PUT, PATCH, and DELETE
+requests are not automatically retried. Errors do not retain or print the bearer credential.
+Time-entry billed state has its own finance-sensitive scope and strong revision; it is available
+through API, SDK, and CLI, but intentionally absent from every read-only MCP profile.
 
 ## Webhook v2 signatures
 
@@ -125,9 +141,8 @@ verification. Legacy UI-created hooks remain version 1 during migration and do
 not receive these signature headers.
 
 Authorized workspace administrators can also create signed v2 webhooks in
-TeamGrid Settings during the controlled beta. The Settings UI presents signed
-v2 and legacy unsigned v1 hooks separately and reveals a new v2 signing secret
-only once.
+TeamGrid Settings. The Settings UI presents signed v2 and legacy unsigned v1
+hooks separately and reveals a new v2 signing secret only once.
 
 ## Optional MCP adapter
 
@@ -173,7 +188,7 @@ the exact repository, commit, manifest size, and manifest digest in
 working tree.
 
 The mirrored manifest also contains `developer-action-policy-registry.json`.
-It pins the App/API authorization registry version, SHA-256 identity, all 181
+It pins the App/API authorization registry version, SHA-256 identity, all 205
 action policies, and 12 principal-policy rollout families. SDK, CLI, and MCP do
 not evaluate or broaden this policy locally; every request remains subject to
 the owning App cell's authorization decision.
@@ -183,7 +198,7 @@ each package directory, then inspect the file lists. Releases are submitted by
 the public repository's stage-only trusted publisher and require an explicit
 2FA-backed approval on npm before they become installable. Traditional npm
 publish tokens are disabled for all three packages. Published prereleases use
-the `next` dist-tag; future stable releases use `latest`.
+the `next` dist-tag; stable releases use `latest`.
 
 To release, update all three package versions, commit and tag the exact source
 as `v<version>`. The same immutable developer-platform commit and contract

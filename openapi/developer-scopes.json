@@ -8,10 +8,12 @@
     { "name": "projects:read", "availability": "issuable" },
     { "name": "projects:write", "availability": "issuable" },
     { "name": "projects:lifecycle", "availability": "issuable" },
+    { "name": "projects:sharing", "availability": "issuable", "sensitive": true },
     { "name": "tasks:read", "availability": "issuable" },
     { "name": "tasks:write", "availability": "issuable" },
     { "name": "time-entries:read", "availability": "issuable" },
     { "name": "time-entries:write", "availability": "issuable" },
+    { "name": "time-entries:billing", "availability": "issuable", "sensitive": true },
     { "name": "contacts:read", "availability": "issuable" },
     { "name": "contacts:write", "availability": "issuable" },
     { "name": "call-notes:read", "availability": "issuable" },
@@ -76,15 +78,23 @@
     { "name": "automations:write", "availability": "issuable", "sensitive": true },
     { "name": "automations:run", "availability": "issuable", "sensitive": true },
     { "name": "integrations:read", "availability": "issuable", "sensitive": true },
+    { "name": "credentials:read", "availability": "issuable", "sensitive": true },
+    { "name": "credentials:write", "availability": "issuable", "sensitive": true },
+    { "name": "service-accounts:read", "availability": "issuable", "sensitive": true },
+    { "name": "service-accounts:write", "availability": "issuable", "sensitive": true },
+    { "name": "resource-grants:read", "availability": "issuable", "sensitive": true },
+    { "name": "resource-grants:write", "availability": "issuable", "sensitive": true },
     { "name": "webhooks:read", "availability": "issuable" },
     { "name": "webhooks:write", "availability": "issuable" },
     { "name": "audit:read", "availability": "issuable", "sensitive": true },
-    { "name": "events:read", "availability": "issuable" }
+    { "name": "events:read", "availability": "issuable" },
+    { "name": "changes:read", "availability": "issuable", "sensitive": true }
   ],
   "dynamicPolicies": [
     {
       "id": "collaboration-target-domain",
       "scopes": [
+        "audit:read",
         "contacts:read",
         "projects:read",
         "tasks:read"
@@ -152,7 +162,7 @@
         "tasks:read",
         "time-entries:read"
       ],
-      "reason": "Export creation and download require the matching resource-domain scope and analytics permission in addition to the export operation scope."
+      "reason": "Export creation and download require the matching resource-domain scope and analytics permission in addition to the export operation scope. Audit exports additionally require audit-administration access and an immutable upper snapshot boundary."
     },
     {
       "id": "automation-action-domain",

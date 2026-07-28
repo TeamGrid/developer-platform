@@ -3,16 +3,27 @@ import type { Readable, Writable } from 'node:stream'
 import { confirm, password } from '@inquirer/prompts'
 import {
   normalizeApiBaseUrl,
+  type PersonalAccessTokenCreate,
+  type PersonalAccessTokenRotation,
   parseCredentialLocation,
+  type ResourceGrantInput,
+  type ServiceAccountCreate,
+  type ServiceAccountCredentialCreate,
+  type ServiceAccountCredentialRotation,
+  type ServiceAccountResourceGrantSetReplace,
+  type ServiceAccountUpdate,
+  TEAMGRID_CHANGE_FEED_RESOURCE_TYPES,
   TeamGridApiError,
   TeamGridClient,
   TeamGridClientError,
   type TeamGridClientOptions,
   type WebhookCreate,
+  type WebhookUpdate,
   type WorkspaceSettingsUpdate,
 } from '@teamgrid/api-client'
 import { Command, Option } from 'commander'
 import { type CliConfig, ConfigStore, normalizeProfileName } from './config.js'
+import { revealCredentialSecret } from './credentialSecretOutput.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
 import {
   type CliExportDownload,
@@ -36,6 +47,11 @@ type ListCommandOptions = {
   cursor?: string
   limit?: number
   maxPages?: number
+}
+
+type ChangeCommandOptions = ListCommandOptions & {
+  operation?: string[]
+  resourceType?: string[]
 }
 
 type CliClient = TeamGridClient
@@ -216,6 +232,213 @@ function webhookCreate(value: Record<string, unknown>): WebhookCreate {
   return { actions, url: value.url }
 }
 
+function webhookUpdate(value: Record<string, unknown>): WebhookUpdate {
+  const allowed = new Set(['actions', 'disabled', 'url'])
+  const keys = Object.keys(value)
+  const actions = value.actions
+  let url: URL | undefined
+  try {
+    url = typeof value.url === 'string' ? new URL(value.url) : undefined
+  } catch {
+    url = undefined
+  }
+  if (
+    keys.length === 0 ||
+    keys.some((key) => !allowed.has(key)) ||
+    (actions !== undefined &&
+      (!Array.isArray(actions) ||
+        actions.length < 1 ||
+        actions.length > 100 ||
+        actions.some(
+          (action) => typeof action !== 'string' || !/^[A-Za-z0-9_.:-]{1,100}$/.test(action),
+        ) ||
+        new Set(actions).size !== actions.length)) ||
+    (value.disabled !== undefined && typeof value.disabled !== 'boolean') ||
+    (value.url !== undefined &&
+      (typeof value.url !== 'string' ||
+        value.url.length > 2048 ||
+        !url ||
+        url.protocol !== 'https:' ||
+        !url.hostname ||
+        url.username ||
+        url.password ||
+        url.hash))
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Webhook update data requires one or more valid actions, disabled, or HTTPS URL fields.',
+    )
+  }
+  return {
+    ...(Array.isArray(actions) ? { actions } : {}),
+    ...(typeof value.disabled === 'boolean' ? { disabled: value.disabled } : {}),
+    ...(typeof value.url === 'string' ? { url: value.url } : {}),
+  }
+}
+
+const nativeCredentialScopePattern = /^[a-z][a-z0-9-]*(?::[a-z][a-z0-9-]*){1,2}$/
+
+function isIsoDateTime(value: unknown): value is string {
+  return typeof value === 'string' && value.length <= 64 && Number.isFinite(Date.parse(value))
+}
+
+function nativeCredentialCreate(
+  value: Record<string, unknown>,
+): PersonalAccessTokenCreate | ServiceAccountCreate | ServiceAccountCredentialCreate {
+  const allowed = new Set(['description', 'expiresAt', 'name', 'scopes'])
+  const scopes = value.scopes
+  if (
+    Object.keys(value).some((key) => !allowed.has(key)) ||
+    typeof value.name !== 'string' ||
+    value.name.trim().length < 1 ||
+    value.name.length > 200 ||
+    (value.description !== undefined &&
+      (typeof value.description !== 'string' || value.description.length > 500)) ||
+    (value.expiresAt !== undefined && !isIsoDateTime(value.expiresAt)) ||
+    !Array.isArray(scopes) ||
+    scopes.length < 1 ||
+    scopes.length > 100 ||
+    scopes.some(
+      (scope) => typeof scope !== 'string' || !nativeCredentialScopePattern.test(scope),
+    ) ||
+    new Set(scopes).size !== scopes.length
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Credential data requires a bounded name and 1–100 unique public scopes.',
+    )
+  }
+  return {
+    ...(typeof value.description === 'string' ? { description: value.description } : {}),
+    ...(typeof value.expiresAt === 'string' ? { expiresAt: value.expiresAt } : {}),
+    name: value.name,
+    scopes: scopes as string[],
+  }
+}
+
+function nativeCredentialRotation(
+  value: Record<string, unknown>,
+): PersonalAccessTokenRotation | ServiceAccountCredentialRotation {
+  const allowed = new Set(['expiresAt', 'gracePeriodSeconds', 'scopes'])
+  const scopes = value.scopes
+  if (
+    Object.keys(value).some((key) => !allowed.has(key)) ||
+    (value.expiresAt !== undefined && !isIsoDateTime(value.expiresAt)) ||
+    (value.gracePeriodSeconds !== undefined &&
+      (!Number.isInteger(value.gracePeriodSeconds) ||
+        (value.gracePeriodSeconds as number) < 60 ||
+        (value.gracePeriodSeconds as number) > 86_400)) ||
+    (scopes !== undefined &&
+      (!Array.isArray(scopes) ||
+        scopes.length < 1 ||
+        scopes.length > 100 ||
+        scopes.some(
+          (scope) => typeof scope !== 'string' || !nativeCredentialScopePattern.test(scope),
+        ) ||
+        new Set(scopes).size !== scopes.length))
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Credential rotation data may contain an expiry, a 60–86400 second grace period, and 1–100 unique scopes.',
+    )
+  }
+  return {
+    ...(typeof value.expiresAt === 'string' ? { expiresAt: value.expiresAt } : {}),
+    ...(typeof value.gracePeriodSeconds === 'number'
+      ? { gracePeriodSeconds: value.gracePeriodSeconds }
+      : {}),
+    ...(Array.isArray(scopes) ? { scopes: scopes as string[] } : {}),
+  }
+}
+
+function serviceAccountUpdate(value: Record<string, unknown>): ServiceAccountUpdate {
+  const allowed = new Set(['reason', 'status'])
+  if (
+    Object.keys(value).some((key) => !allowed.has(key)) ||
+    (value.status !== 'active' && value.status !== 'disabled') ||
+    (value.reason !== undefined && (typeof value.reason !== 'string' || value.reason.length > 500))
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      "Service-account updates require status 'active' or 'disabled' and an optional bounded reason.",
+    )
+  }
+  return {
+    ...(typeof value.reason === 'string' ? { reason: value.reason } : {}),
+    status: value.status,
+  }
+}
+
+const resourceGrantAnchorTypes = new Set([
+  'workspace',
+  'project',
+  'memberGroup',
+  'contactGroup',
+  'user',
+  'ownRecords',
+])
+
+function resourceGrantSetReplacement(
+  value: Record<string, unknown>,
+): ServiceAccountResourceGrantSetReplace {
+  const grants = value.grants
+  const validGrant = (grant: unknown): grant is ResourceGrantInput => {
+    if (!grant || typeof grant !== 'object' || Array.isArray(grant)) return false
+    const item = grant as Record<string, unknown>
+    const keys = Object.keys(item)
+    const anchorType = item.anchorType
+    const inheritance = item.inheritance
+    const capabilities = item.capabilities
+    const idless = anchorType === 'workspace' || anchorType === 'ownRecords'
+    return (
+      keys.every((key) =>
+        [
+          'anchorId',
+          'anchorType',
+          'capabilities',
+          'expiresAt',
+          'inheritance',
+          'resourceKey',
+        ].includes(key),
+      ) &&
+      typeof anchorType === 'string' &&
+      resourceGrantAnchorTypes.has(anchorType) &&
+      (idless
+        ? item.anchorId === undefined
+        : typeof item.anchorId === 'string' &&
+          item.anchorId.length >= 1 &&
+          item.anchorId.length <= 128) &&
+      (inheritance === 'none' ||
+        (inheritance === 'domainDescendants' &&
+          (anchorType === 'workspace' || anchorType === 'project'))) &&
+      Array.isArray(capabilities) &&
+      capabilities.length >= 1 &&
+      capabilities.length <= 200 &&
+      capabilities.every(
+        (capability) =>
+          typeof capability === 'string' && capability.length >= 1 && capability.length <= 200,
+      ) &&
+      new Set(capabilities).size === capabilities.length &&
+      typeof item.resourceKey === 'string' &&
+      item.resourceKey.length >= 1 &&
+      item.resourceKey.length <= 64 &&
+      (item.expiresAt === undefined || isIsoDateTime(item.expiresAt))
+    )
+  }
+  if (
+    Object.keys(value).length !== 1 ||
+    !Array.isArray(grants) ||
+    grants.length > 1000 ||
+    !grants.every(validGrant)
+  ) {
+    throw new TeamGridClientError(
+      'invalid_arguments',
+      'Resource-grant replacement requires an exact set of at most 1000 valid grants.',
+    )
+  }
+  return { grants }
+}
+
 function commaSeparatedValues(
   maximum: number,
   description: string,
@@ -244,6 +467,25 @@ function commaSeparatedValues(
       )
     }
     return combined
+  }
+}
+
+function commaSeparatedChoice(
+  allowed: ReadonlySet<string>,
+  description: string,
+): (value: string, previous: string[]) => string[] {
+  return (value, previous = []) => {
+    const values = value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+    if (!values.length || values.some((item) => !allowed.has(item))) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        `${description} must contain only: ${Array.from(allowed).join(', ')}.`,
+      )
+    }
+    return Array.from(new Set([...previous, ...values]))
   }
 }
 
@@ -438,6 +680,67 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     outputData(command, resources)
   }
 
+  const changeOperations = new Set(['created', 'deleted', 'updated'])
+  const changeResourceTypes = new Set(TEAMGRID_CHANGE_FEED_RESOURCE_TYPES)
+
+  function addChangeFilterOptions(command: Command) {
+    return command
+      .option(
+        '--operation <operation>',
+        'filter operation; repeat or comma-separate',
+        commaSeparatedChoice(changeOperations, 'Operation'),
+        [],
+      )
+      .option(
+        '--resource-type <type>',
+        'filter resource type; repeat or comma-separate',
+        commaSeparatedChoice(changeResourceTypes, 'Resource type'),
+        [],
+      )
+  }
+
+  function changeFilters(options: ChangeCommandOptions) {
+    return {
+      ...(options.limit === undefined ? {} : { limit: options.limit }),
+      ...(options.operation?.length ? { operations: options.operation } : {}),
+      ...(options.resourceType?.length ? { resourceTypes: options.resourceType } : {}),
+    }
+  }
+
+  async function outputChangePage(
+    command: Command,
+    page: {
+      data: unknown[]
+      meta: { page: { caughtUp: boolean; nextCursor: string }; requestId: string }
+    },
+  ) {
+    const mode = globalOptions(command).output
+    if (mode === 'json') {
+      outputData(command, page)
+      return
+    }
+    if (mode === 'jsonl') {
+      await writeJsonLines(
+        output,
+        page.data.map((data) => ({ data, kind: 'change' })),
+      )
+      await writeJsonLines(output, [
+        {
+          caughtUp: page.meta.page.caughtUp,
+          cursor: page.meta.page.nextCursor,
+          kind: 'checkpoint',
+          requestId: page.meta.requestId,
+        },
+      ])
+      return
+    }
+    outputData(command, page.data)
+    outputData(command, {
+      caughtUp: page.meta.page.caughtUp,
+      cursor: page.meta.page.nextCursor,
+    })
+  }
+
   async function confirmDestructive(
     command: Command,
     action: string,
@@ -613,6 +916,248 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       )
     })
 
+  const credentials = program.command('credentials').description('manage native API v1 credentials')
+  const personalCredentials = credentials
+    .command('personal')
+    .description('manage personal access tokens for the authenticated user')
+  addListOptions(personalCredentials.command('list')).action(async function action(
+    options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    await listResources(command, options, client.personalAccessTokens as never)
+  })
+  personalCredentials
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'personal access token create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .option('--secret-file <path>', 'create a new mode-0600 credential file without overwriting')
+    .option('--secret-stdout', 'write only the raw reveal-once credential to stdout')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      const data = nativeCredentialCreate(await readJsonObject(options.data, input))
+      const receipt = await revealCredentialSecret({
+        file: options.secretFile,
+        issue: async () =>
+          (
+            await client.personalAccessTokens.create(data, {
+              idempotencyKey: options.idempotencyKey,
+            })
+          ).data,
+        output,
+        stdout: options.secretStdout,
+      })
+      if (receipt) outputData(command, receipt)
+    })
+  archiveOptions(
+    personalCredentials
+      .command('rotate <id>')
+      .description('rotate and reveal a personal access token exactly once')
+      .option('--data <json|@file|->', 'optional rotation JSON')
+      .option('--idempotency-key <key>', 'stable retry key')
+      .option('--secret-file <path>', 'create a new mode-0600 credential file without overwriting')
+      .option('--secret-stdout', 'write only the raw reveal-once credential to stdout'),
+  ).action(async function action(id: string, options, command: Command) {
+    await confirmDestructive(command, 'Rotate', 'personal access token', id)
+    const client = await loadClient(command)
+    const data = nativeCredentialRotation(
+      options.data ? await readJsonObject(options.data, input) : {},
+    )
+    const receipt = await revealCredentialSecret({
+      file: options.secretFile,
+      issue: async () =>
+        (
+          await client.personalAccessTokens.rotate(id, data, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      output,
+      stdout: options.secretStdout,
+    })
+    if (receipt) outputData(command, receipt)
+  })
+  archiveOptions(personalCredentials.command('revoke <id>')).action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Revoke', 'personal access token', id)
+    const client = await loadClient(command)
+    await client.personalAccessTokens.revoke(id)
+    outputData(command, { id, revoked: true, type: 'personalAccessToken' })
+  })
+
+  const serviceAccounts = program
+    .command('service-accounts')
+    .description('manage service-account principals and credentials')
+  addListOptions(serviceAccounts.command('list')).action(async function action(
+    options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    await listResources(command, options, client.serviceAccounts as never)
+  })
+  serviceAccounts.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.serviceAccounts.get(id)).data)
+  })
+  serviceAccounts
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'service account create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .option('--secret-file <path>', 'create a new mode-0600 credential file without overwriting')
+    .option('--secret-stdout', 'write only the raw reveal-once credential to stdout')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      const data = nativeCredentialCreate(await readJsonObject(options.data, input))
+      const receipt = await revealCredentialSecret({
+        file: options.secretFile,
+        issue: async () =>
+          (
+            await client.serviceAccounts.create(data, {
+              idempotencyKey: options.idempotencyKey,
+            })
+          ).data,
+        output,
+        stdout: options.secretStdout,
+      })
+      if (receipt) outputData(command, receipt)
+    })
+  archiveOptions(
+    serviceAccounts
+      .command('update <id>')
+      .requiredOption('--data <json|@file|->', 'service account status update JSON'),
+  ).action(async function action(id: string, options, command: Command) {
+    const data = serviceAccountUpdate(await readJsonObject(options.data, input))
+    if (data.status === 'disabled') {
+      await confirmDestructive(command, 'Disable', 'service account', id)
+    }
+    const client = await loadClient(command)
+    outputData(command, (await client.serviceAccounts.update(id, data)).data)
+  })
+  archiveOptions(serviceAccounts.command('revoke <id>')).action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Revoke', 'service account', id)
+    const client = await loadClient(command)
+    await client.serviceAccounts.revoke(id)
+    outputData(command, { id, revoked: true, type: 'serviceAccount' })
+  })
+
+  const serviceAccountGrants = serviceAccounts
+    .command('grants')
+    .description('inspect and replace service-account resource grants')
+  serviceAccountGrants.command('get <serviceAccountId>').action(async function action(
+    serviceAccountId: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.serviceAccounts.getResourceGrants(serviceAccountId)).data)
+  })
+  archiveOptions(
+    serviceAccountGrants
+      .command('replace <serviceAccountId>')
+      .requiredOption('--data <json|@file|->', 'complete resource-grant set JSON')
+      .requiredOption('--if-match <etag>', 'latest strong resource-grant policy ETag'),
+  ).action(async function action(serviceAccountId: string, options, command: Command) {
+    await confirmDestructive(
+      command,
+      'Replace',
+      'service-account resource grants',
+      serviceAccountId,
+    )
+    const data = resourceGrantSetReplacement(await readJsonObject(options.data, input))
+    const client = await loadClient(command)
+    outputData(
+      command,
+      (await client.serviceAccounts.replaceResourceGrants(serviceAccountId, data, options.ifMatch))
+        .data,
+    )
+  })
+
+  const serviceAccountCredentials = serviceAccounts
+    .command('credentials')
+    .description('manage independent service-account credential families')
+  serviceAccountCredentials
+    .command('create <serviceAccountId>')
+    .requiredOption('--data <json|@file|->', 'service credential create JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .option('--secret-file <path>', 'create a new mode-0600 credential file without overwriting')
+    .option('--secret-stdout', 'write only the raw reveal-once credential to stdout')
+    .action(async function action(serviceAccountId: string, options, command: Command) {
+      const client = await loadClient(command)
+      const data = nativeCredentialCreate(await readJsonObject(options.data, input))
+      const receipt = await revealCredentialSecret({
+        file: options.secretFile,
+        issue: async () =>
+          (
+            await client.serviceAccounts.createCredential(serviceAccountId, data, {
+              idempotencyKey: options.idempotencyKey,
+            })
+          ).data,
+        output,
+        stdout: options.secretStdout,
+      })
+      if (receipt) outputData(command, receipt)
+    })
+  archiveOptions(
+    serviceAccountCredentials
+      .command('rotate <serviceAccountId> <credentialId>')
+      .description('rotate and reveal a service-account credential exactly once')
+      .option('--data <json|@file|->', 'optional rotation JSON')
+      .option('--idempotency-key <key>', 'stable retry key')
+      .option('--secret-file <path>', 'create a new mode-0600 credential file without overwriting')
+      .option('--secret-stdout', 'write only the raw reveal-once credential to stdout'),
+  ).action(async function action(
+    serviceAccountId: string,
+    credentialId: string,
+    options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Rotate', 'service-account credential', credentialId)
+    const client = await loadClient(command)
+    const data = nativeCredentialRotation(
+      options.data ? await readJsonObject(options.data, input) : {},
+    )
+    const receipt = await revealCredentialSecret({
+      file: options.secretFile,
+      issue: async () =>
+        (
+          await client.serviceAccounts.rotateCredential(serviceAccountId, credentialId, data, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      output,
+      stdout: options.secretStdout,
+    })
+    if (receipt) outputData(command, receipt)
+  })
+  archiveOptions(
+    serviceAccountCredentials.command('revoke <serviceAccountId> <credentialId>'),
+  ).action(async function action(
+    serviceAccountId: string,
+    credentialId: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Revoke', 'service-account credential', credentialId)
+    const client = await loadClient(command)
+    await client.serviceAccounts.revokeCredential(serviceAccountId, credentialId)
+    outputData(command, {
+      credentialId,
+      revoked: true,
+      serviceAccountId,
+      type: 'serviceAccountCredential',
+    })
+  })
+
   const events = program.command('events').description('inspect scoped public events')
   events.command('catalog').action(async function action(_options: unknown, command: Command) {
     const client = await loadClient(command)
@@ -623,6 +1168,12 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   addListOptions(projects.command('list'))
     .option('--archived <boolean>', 'return archived projects', booleanValue)
     .option('--completed <boolean>', 'filter completion', booleanValue)
+    .option('--contact-id <id>', 'filter by primary contact')
+    .option('--created-by-id <id>', 'filter by creator')
+    .option('--individual-id <id>', 'filter by individual project id')
+    .option('--list-id <id>', 'filter by project list')
+    .option('--manager-id <id>', 'filter by manager')
+    .option('--subscriber-id <id>', 'filter by subscriber')
     .action(async function action(options, command: Command) {
       const client = await loadClient(command)
       await listResources(command, options, client.projects as never)
@@ -653,12 +1204,44 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   projects
     .command('update <id>')
     .requiredOption('--data <json|@file|->', 'project patch JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       outputData(
         command,
-        (await client.projects.update(id, (await readJsonObject(options.data, input)) as never))
-          .data,
+        (
+          await client.projects.update(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
+    })
+  const projectSharing = projects
+    .command('sharing')
+    .description('inspect and replace project sharing')
+  projectSharing.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.projects.getSharing(id)).data)
+  })
+  projectSharing
+    .command('replace <id>')
+    .requiredOption('--data <json|@file|->', 'complete project sharing entry set JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.projects.replaceSharing(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
+          )
+        ).data,
       )
     })
   async function runProjectLifecycle(
@@ -666,6 +1249,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     id: string,
     options: {
       idempotencyKey?: string
+      ifMatch: string
       maxWait?: number
       pollInterval?: number
       wait?: boolean
@@ -675,6 +1259,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const client = await loadClient(command)
     const started = await client.projects[action](id, {
       idempotencyKey: options.idempotencyKey,
+      ifMatch: options.ifMatch as never,
     })
     const result = options.wait
       ? await client.projectLifecycleOperations.wait(started.data.id, {
@@ -685,35 +1270,27 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       : started
     outputData(command, result.data)
   }
-  lifecycleOptions(projects.command('complete <id>')).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await runProjectLifecycle('complete', id, options, command)
-  })
-  lifecycleOptions(projects.command('reopen <id>')).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await runProjectLifecycle('reopen', id, options, command)
-  })
-  lifecycleOptions(projects.command('restore <id>')).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await runProjectLifecycle('restore', id, options, command)
-  })
-  lifecycleOptions(archiveOptions(projects.command('archive <id>'))).action(async function action(
-    id: string,
-    options,
-    command: Command,
-  ) {
-    await confirmDestructive(command, 'Archive', 'project', id)
-    await runProjectLifecycle('archive', id, options, command)
-  })
+  lifecycleOptions(projects.command('complete <id>'))
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      await runProjectLifecycle('complete', id, options, command)
+    })
+  lifecycleOptions(projects.command('reopen <id>'))
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      await runProjectLifecycle('reopen', id, options, command)
+    })
+  lifecycleOptions(projects.command('restore <id>'))
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      await runProjectLifecycle('restore', id, options, command)
+    })
+  lifecycleOptions(archiveOptions(projects.command('archive <id>')))
+    .requiredOption('--if-match <revision|etag>', 'latest project revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      await confirmDestructive(command, 'Archive', 'project', id)
+      await runProjectLifecycle('archive', id, options, command)
+    })
 
   const projectLifecycleOperations = program
     .command('project-lifecycle-operations')
@@ -842,6 +1419,13 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     .option('--completed <boolean>', 'filter completion', booleanValue)
     .option('--project-id <id>', 'filter by project')
     .option('--assignee-id <id>', 'filter by assignee')
+    .option('--contact-id <id>', 'filter by contact')
+    .option('--group-id <id>', 'filter by group')
+    .option('--list-id <id>', 'filter by task list')
+    .option('--personal-list-id <id>', 'filter by personal list')
+    .option('--service-id <id>', 'filter by service')
+    .option('--subscriber-id <id>', 'filter by subscriber')
+    .option('--tag-id <id>', 'filter by tag')
     .action(async function action(options, command: Command) {
       const client = await loadClient(command)
       await listResources(command, options, client.tasks as never)
@@ -869,47 +1453,119 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   tasks
     .command('update <id>')
     .requiredOption('--data <json|@file|->', 'task patch JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       outputData(
         command,
-        (await client.tasks.update(id, (await readJsonObject(options.data, input)) as never)).data,
+        (
+          await client.tasks.update(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
       )
     })
-  archiveOptions(tasks.command('archive <id>')).action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    await confirmDestructive(command, 'Archive', 'task', id)
-    const client = await loadClient(command)
-    await client.tasks.archive(id)
-    outputData(command, { archived: true, id, type: 'task' })
-  })
-  tasks.command('complete <id>').action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    const client = await loadClient(command)
-    outputData(command, (await client.tasks.complete(id)).data)
-  })
-  tasks.command('restore <id>').action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    const client = await loadClient(command)
-    outputData(command, (await client.tasks.restore(id)).data)
-  })
-  tasks.command('reopen <id>').action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    const client = await loadClient(command)
-    outputData(command, (await client.tasks.reopen(id)).data)
-  })
+  tasks
+    .command('bulk-update')
+    .description('update up to 35 tasks with per-item revisions; successful items remain committed')
+    .requiredOption(
+      '--data <json|@file|->',
+      'JSON with ordered items containing id, revision, and data',
+    )
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      const result = await client.tasks.bulkUpdate(
+        (await readJsonObject(options.data, input)) as never,
+      )
+      outputData(
+        command,
+        globalOptions(command).output === 'table'
+          ? result.data
+          : { data: result.data, meta: result.meta },
+      )
+    })
+  tasks
+    .command('duplicate <id>')
+    .description('duplicate a task and optionally its checklist and custom-field values')
+    .requiredOption('--data <json|@file|->', 'task duplication JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest source task revision or strong ETag')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.tasks.duplicate(id, (await readJsonObject(options.data, input)) as never, {
+            idempotencyKey: options.idempotencyKey,
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
+    })
+  tasks
+    .command('move <id>')
+    .description('move or reorder a task in an assignee, personal, or project list')
+    .requiredOption('--data <json|@file|->', 'task placement JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.tasks.move(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
+    })
+  const taskSubtasks = tasks.command('subtasks').description('manage a task checklist')
+  taskSubtasks
+    .command('replace <id>')
+    .description('atomically replace the ordered task checklist')
+    .requiredOption('--data <json|@file|->', 'checklist replacement JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.tasks.replaceSubtasks(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
+          )
+        ).data,
+      )
+    })
+  archiveOptions(tasks.command('archive <id>'))
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      await confirmDestructive(command, 'Archive', 'task', id)
+      const client = await loadClient(command)
+      await client.tasks.archive(id, { ifMatch: _options.ifMatch })
+      outputData(command, { archived: true, id, type: 'task' })
+    })
+  tasks
+    .command('complete <id>')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.tasks.complete(id, { ifMatch: _options.ifMatch })).data)
+    })
+  tasks
+    .command('restore <id>')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.tasks.restore(id, { ifMatch: _options.ifMatch })).data)
+    })
+  tasks
+    .command('reopen <id>')
+    .requiredOption('--if-match <revision|etag>', 'latest task revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.tasks.reopen(id, { ifMatch: _options.ifMatch })).data)
+    })
   const taskTimer = tasks.command('timer').description('start or stop task time tracking')
   taskTimer
     .command('start <id>')
@@ -950,7 +1606,11 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     .description('read and mutate time entries')
   addListOptions(times.command('list'))
     .option('--archived <boolean>', 'return archived time entries', booleanValue)
+    .option('--billable <boolean>', 'filter by billable status', booleanValue)
+    .option('--billed <boolean>', 'filter by billed status', booleanValue)
+    .option('--created-by-id <id>', 'filter by creator')
     .option('--from <date>', 'filter start date')
+    .option('--service-id <id>', 'filter by service')
     .option('--to <date>', 'filter end date')
     .option('--task-id <id>', 'filter by task')
     .option('--user-id <id>', 'filter by user')
@@ -962,6 +1622,41 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const client = await loadClient(command)
     outputData(command, (await client.timeEntries.get(id)).data)
   })
+  const timeEntryBilling = times
+    .command('billing')
+    .description('read and conflict-safely update billed state')
+  timeEntryBilling.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.timeEntries.getBilling(id)).data)
+  })
+  timeEntryBilling
+    .command('update <id>')
+    .option('--billed', 'mark the time entry as billed and locked')
+    .option('--unbilled', 'mark the time entry as unbilled and editable')
+    .requiredOption('--if-match <revision>', 'billing revision returned by the latest read')
+    .action(async function action(id: string, options, command: Command) {
+      if (Boolean(options.billed) === Boolean(options.unbilled)) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          'Choose exactly one billing state: --billed or --unbilled.',
+        )
+      }
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.timeEntries.updateBilling(
+            id,
+            { billed: Boolean(options.billed) },
+            { ifMatch: options.ifMatch },
+          )
+        ).data,
+      )
+    })
   times
     .command('create')
     .requiredOption('--data <json|@file|->', 'time-entry create JSON')
@@ -1059,6 +1754,18 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   const contacts = program.command('contacts').description('read and mutate contacts')
   addListOptions(contacts.command('list'))
     .option('--archived <boolean>', 'return archived contacts', booleanValue)
+    .addOption(
+      new Option('--category <category>', 'contact category').choices([
+        'customer',
+        'supplier',
+        'team',
+      ]),
+    )
+    .option('--company-id <id>', 'filter people by related company')
+    .option('--created-by-id <id>', 'filter by creator')
+    .option('--customer-id <id>', 'filter by customer identifier')
+    .option('--group-id <id>', 'filter by contact group')
+    .option('--parent-contact-id <id>', 'filter by parent contact')
     .addOption(new Option('--type <type>', 'contact type').choices(['person', 'company']))
     .action(async function action(options, command: Command) {
       const client = await loadClient(command)
@@ -1365,6 +2072,21 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       )
     })
   customFieldValues
+    .command('get-many <target-type> <resource-id>')
+    .requiredOption('--field-id <ids...>', 'one to 100 custom-field definition ids')
+    .action(async function action(
+      targetType: 'contact' | 'project' | 'project-journal-entry' | 'task',
+      resourceId: string,
+      options: { fieldId: string[] },
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.customFieldValues.getMany(targetType, resourceId, options.fieldId)).data,
+      )
+    })
+  customFieldValues
     .command('set <target-type> <resource-id> <field-id>')
     .requiredOption('--data <json|@file|->', 'custom-field value JSON, for example {"value":"A"}')
     .requiredOption(
@@ -1462,6 +2184,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   projectTemplates
     .command('update <id>')
     .requiredOption('--data <json|@file|->', 'project-template patch JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest project-template revision or strong ETag')
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       outputData(
@@ -1470,36 +2193,38 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
           await client.projectTemplates.update(
             id,
             (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
           )
         ).data,
       )
     })
-  archiveOptions(projectTemplates.command('archive <id>')).action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    await confirmDestructive(command, 'Archive', 'project template', id)
-    const client = await loadClient(command)
-    await client.projectTemplates.archive(id)
-    outputData(command, { archived: true, id, type: 'projectTemplate' })
-  })
-  projectTemplates.command('restore <id>').action(async function action(
-    id: string,
-    _options,
-    command: Command,
-  ) {
-    const client = await loadClient(command)
-    outputData(command, (await client.projectTemplates.restore(id)).data)
-  })
+  archiveOptions(projectTemplates.command('archive <id>'))
+    .requiredOption('--if-match <revision|etag>', 'latest project-template revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      await confirmDestructive(command, 'Archive', 'project template', id)
+      const client = await loadClient(command)
+      await client.projectTemplates.archive(id, { ifMatch: _options.ifMatch })
+      outputData(command, { archived: true, id, type: 'projectTemplate' })
+    })
+  projectTemplates
+    .command('restore <id>')
+    .requiredOption('--if-match <revision|etag>', 'latest project-template revision or strong ETag')
+    .action(async function action(id: string, _options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.projectTemplates.restore(id, { ifMatch: _options.ifMatch })).data,
+      )
+    })
   lifecycleOptions(projectTemplates.command('instantiate <id>'))
     .requiredOption('--data <json|@file|->', 'project-template instantiation JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest project-template revision or strong ETag')
     .action(async function action(id: string, options, command: Command) {
       const client = await loadClient(command)
       const accepted = await client.projectTemplates.instantiate(
         id,
         (await readJsonObject(options.data, input)) as never,
-        { idempotencyKey: options.idempotencyKey },
+        { idempotencyKey: options.idempotencyKey, ifMatch: options.ifMatch },
       )
       const result = options.wait
         ? await client.projectTemplateInstantiations.wait(accepted.data.id, {
@@ -1576,14 +2301,82 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     outputData(command, (await client.plannedWorkOperations.get(id)).data)
   })
 
+  const changes = program
+    .command('changes')
+    .description('create checkpoints and read the cell-local change feed')
+  addChangeFilterOptions(
+    changes.command('checkpoint').description('create an empty checkpoint at the latest sequence'),
+  ).action(async function action(options: ChangeCommandOptions, command: Command) {
+    const client = await loadClient(command)
+    const page = await client.changes.checkpoint(changeFilters(options) as never)
+    outputData(command, {
+      caughtUp: page.meta.page.caughtUp,
+      cursor: page.meta.page.nextCursor,
+      requestId: page.meta.requestId,
+    })
+  })
+  addChangeFilterOptions(
+    addListOptions(changes.command('list').description('read one change page')),
+  ).action(async function action(options: ChangeCommandOptions, command: Command) {
+    const client = await loadClient(command)
+    const { all, cursor, maxPages } = options
+    const filters = changeFilters(options)
+    if (!all) {
+      await outputChangePage(
+        command,
+        await client.changes.list({ ...filters, ...(cursor ? { cursor } : {}) } as never),
+      )
+      return
+    }
+
+    const mode = globalOptions(command).output
+    const data: unknown[] = []
+    let lastPage:
+      | {
+          data: unknown[]
+          meta: { page: { caughtUp: boolean; nextCursor: string }; requestId: string }
+        }
+      | undefined
+    for await (const page of client.changes.pages(
+      { ...filters, ...(cursor ? { cursor } : {}) } as never,
+      { maxPages },
+    )) {
+      lastPage = page
+      if (mode === 'jsonl') await outputChangePage(command, page)
+      else data.push(...page.data)
+    }
+    if (!lastPage || mode === 'jsonl') return
+    await outputChangePage(command, { data, meta: lastPage.meta })
+  })
+
   addListOptions(
     program.command('audit-events').description('list Developer Platform audit events'),
   )
+    .option('--actor-id <id>', 'filter by actor')
+    .addOption(
+      new Option('--actor-type <type>', 'filter actor type').choices([
+        'user',
+        'serviceCredential',
+        'system',
+      ]),
+    )
+    .option('--created-at-from <timestamp>', 'include events at or after this time')
+    .option('--created-at-to <timestamp>', 'include events at or before this time')
     .option('--credential-id <id>', 'filter by credential')
     .option('--event-type <type>', 'filter by event type')
     .addOption(
       new Option('--outcome <outcome>', 'filter outcome').choices(['success', 'denied', 'failure']),
     )
+    .option('--request-id <id>', 'filter by request id')
+    .addOption(
+      new Option('--source <source>', 'filter event source').choices([
+        'teamgrid-app',
+        'api-v1',
+        'system',
+      ]),
+    )
+    .option('--target-id <id>', 'filter by target id')
+    .option('--target-type <type>', 'filter by target type')
     .action(async function action(options, command: Command) {
       const client = await loadClient(command)
       await listResources(command, options, client.auditEvents as never)
@@ -2446,6 +3239,22 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
         stdout: options.secretStdout,
       })
       if (receipt) outputData(command, receipt)
+    })
+  webhooks
+    .command('update <id>')
+    .requiredOption('--data <json|@file|->', 'webhook update JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest webhook revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      const data = webhookUpdate(await readJsonObject(options.data, input))
+      outputData(
+        command,
+        (
+          await client.webhooks.update(id, data, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
     })
   archiveOptions(webhooks.command('remove <id>')).action(async function action(
     id: string,

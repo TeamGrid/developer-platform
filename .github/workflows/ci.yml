@@ -15,12 +15,16 @@ concurrency:
 
 jobs:
   verify:
-    name: Verify packages (Node ${{ matrix.node-version }})
-    runs-on: ubuntu-latest
+    name: Verify packages (${{ matrix.os }}, Node ${{ matrix.node-version }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
         node-version:
           - "22.14.0"
           - "24"
@@ -48,5 +52,5 @@ jobs:
         run: npm run verify
 
       - name: Audit production dependencies
-        if: matrix.node-version == '24'
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         run: npm audit --omit=dev --audit-level=high

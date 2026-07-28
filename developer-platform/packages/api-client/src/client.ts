@@ -16,6 +16,7 @@ import {
   canonicalAdministrationEtag,
   canonicalAutomationDefinitionEtag,
   canonicalAutomationRunEtag,
+  canonicalTimeEntryBillingEtag,
   canonicalWebhookEtag,
   canonicalWorkspaceSettingsEtag,
   commentValidator,
@@ -39,11 +40,13 @@ import {
   isValidIdempotencyKey,
   isValidWebhookId,
   isWebhookCreate,
+  isWebhookUpdate,
   isWorkspaceSettingsUpdate,
   memberValidator,
   roleValidator,
   searchResultValidator,
   systemCapabilityValidator,
+  timeEntryBillingValidator,
   webhookSecretRotationValidator,
   webhookValidator,
   workspaceEntitlementValidator,
@@ -53,6 +56,7 @@ import {
   assertProjectLifecycleOperationContinuity,
   assertProjectTemplateInstantiationContinuity,
   projectLifecycleOperationValidator,
+  projectSharingValidator,
   projectTemplateInstantiationValidator,
   projectTemplateValidator,
   projectValidator,
@@ -66,11 +70,13 @@ import type {
   ActivityListOptions,
   AdministrationMutationOptions,
   AdministrationPiiOptions,
+  ApiErrorDocument,
   ApiVersionEnvelope,
   AppointmentCreate,
   AppointmentMutationOptions,
   AppointmentUpdate,
   AuditEvent,
+  AuditEventListEnvelope,
   AuditEventListOptions,
   AutomationDefinitionCreate,
   AutomationDefinitionListOptions,
@@ -83,6 +89,12 @@ import type {
   CallNote,
   CallNoteCreate,
   CallNoteListOptions,
+  ChangeCatchUpOptions,
+  ChangeCheckpoint,
+  ChangeFeedBootstrap,
+  ChangeFilterOptions,
+  ChangeListOptions,
+  ChangePageEnvelope,
   CommentCreate,
   CommentListOptions,
   CommentMutationOptions,
@@ -99,6 +111,7 @@ import type {
   CustomFieldDefinitionListOptions,
   CustomFieldDefinitionUpdate,
   CustomFieldValue,
+  CustomFieldValueBatchEnvelope,
   CustomFieldValueMutation,
   CustomFieldValueMutationOptions,
   CustomFieldValueSet,
@@ -131,6 +144,9 @@ import type {
   MemberRoleUpdate,
   MutationOptions,
   PaginationOptions,
+  PersonalAccessToken,
+  PersonalAccessTokenCreate,
+  PersonalAccessTokenRotation,
   PlannedWork,
   PlannedWorkListOptions,
   PlannedWorkOperation,
@@ -146,9 +162,14 @@ import type {
   ProductListOptions,
   ProductUpdate,
   ProjectCreate,
+  ProjectLifecycleMutationOptions,
   ProjectLifecycleOperation,
   ProjectLifecycleWaitOptions,
   ProjectListOptions,
+  ProjectMutationOptions,
+  ProjectSharing,
+  ProjectSharingMutationOptions,
+  ProjectSharingReplace,
   ProjectStatement,
   ProjectStatementCreate,
   ProjectStatementListOptions,
@@ -156,26 +177,49 @@ import type {
   ProjectTemplateCreate,
   ProjectTemplateInstantiate,
   ProjectTemplateInstantiation,
+  ProjectTemplateInstantiationOptions,
   ProjectTemplateInstantiationWaitOptions,
   ProjectTemplateListOptions,
+  ProjectTemplateMutationOptions,
   ProjectTemplateUpdate,
   ProjectUpdate,
   RequestOptions,
   ResourceEnvelope,
+  ResourceGrant,
+  ResourceGrantInput,
   RoleCreate,
   RoleUpdate,
   SearchQuery,
   Service,
+  ServiceAccount,
+  ServiceAccountCreate,
+  ServiceAccountCredential,
+  ServiceAccountCredentialCreate,
+  ServiceAccountCredentialRotation,
+  ServiceAccountResourceGrantSet,
+  ServiceAccountResourceGrantSetReplace,
+  ServiceAccountUpdate,
   ServiceCreate,
   ServiceUpdate,
   Tag,
   TagCreate,
   TagUpdate,
+  TaskBulkUpdate,
+  TaskBulkUpdateEnvelope,
+  TaskBulkUpdateResult,
   TaskCreate,
+  TaskDuplicate,
+  TaskDuplicateOptions,
   TaskListOptions,
+  TaskMutationOptions,
+  TaskPlacement,
   TaskPlannedWork,
+  TaskSubtasksReplace,
   TaskUpdate,
   TimeEntry,
+  TimeEntryBilling,
+  TimeEntryBillingMutationOptions,
+  TimeEntryBillingUpdate,
   TimeEntryCreate,
   TimeEntryListOptions,
   TimeEntryUpdate,
@@ -187,6 +231,8 @@ import type {
   WebhookDeliveryListOptions,
   WebhookListOptions,
   WebhookSecretRotationOptions,
+  WebhookUpdate,
+  WebhookUpdateOptions,
   Workspace,
   WorkspaceSettingsMutationOptions,
   WorkspaceSettingsUpdate,
@@ -230,6 +276,7 @@ const defaultMaxResponseBytes = 8 * 1024 * 1024
 const maximumExportDownloadBytes = 50 * 1024 * 1024
 const exportContentType = 'text/csv; charset=utf-8' as const
 const strongEtagCacheControl = 'private, no-store, no-transform' as const
+const credentialSecretCacheControl = 'private, no-store' as const
 
 function isoQueryValue(value: QueryValue) {
   return value instanceof Date ? value.toISOString() : String(value)
@@ -295,15 +342,6 @@ function canonicalIdempotencyKey(value?: string) {
     )
   }
   return key
-}
-
-function assertNoCoreIfMatch(options: object) {
-  if (Object.hasOwn(options, 'ifMatch')) {
-    throw new TeamGridClientError(
-      'invalid_arguments',
-      'Tasks, projects, and project templates do not support ifMatch in the static Beta 2 contract.',
-    )
-  }
 }
 
 function buildCombinedSignal(signal: AbortSignal | undefined, timeoutMs: number) {
@@ -464,6 +502,75 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }
 
+function hasExactKeys(value: unknown, keys: readonly string[]): value is Record<string, unknown> {
+  if (!isObject(value)) return false
+  const actual = Object.keys(value).sort()
+  const expected = [...keys].sort()
+  return actual.length === expected.length && actual.every((key, index) => key === expected[index])
+}
+
+const taskBulkStatuses = new Set([
+  'conflict',
+  'forbidden',
+  'invalid',
+  'notFound',
+  'unavailable',
+  'updated',
+])
+
+function taskBulkError(value: unknown): value is ApiErrorDocument {
+  if (!isObject(value)) return false
+  const keys = Object.keys(value)
+  if (
+    !['code', 'detail', 'source', 'status', 'title'].every(
+      (key) => key === 'source' || Object.hasOwn(value, key),
+    ) ||
+    keys.some((key) => !['code', 'detail', 'source', 'status', 'title'].includes(key)) ||
+    typeof value.code !== 'string' ||
+    typeof value.detail !== 'string' ||
+    typeof value.status !== 'string' ||
+    typeof value.title !== 'string'
+  ) {
+    return false
+  }
+  return (
+    value.source === undefined ||
+    (isObject(value.source) &&
+      Object.values(value.source).every((sourceValue) => typeof sourceValue === 'string'))
+  )
+}
+
+function taskBulkResult(value: unknown, expectedId: string): value is TaskBulkUpdateResult {
+  if (
+    !hasExactKeys(value, ['attributes', 'id', 'type']) ||
+    value.id !== expectedId ||
+    value.type !== 'taskBulkUpdateResult' ||
+    !hasExactKeys(value.attributes, ['error', 'status', 'task']) ||
+    typeof value.attributes.status !== 'string' ||
+    !taskBulkStatuses.has(value.attributes.status)
+  ) {
+    return false
+  }
+  if (value.attributes.status === 'updated') {
+    return (
+      value.attributes.error === null &&
+      taskValidator(value.attributes.task) &&
+      value.attributes.task.id === expectedId
+    )
+  }
+  if (value.attributes.task !== null || !taskBulkError(value.attributes.error)) return false
+  const expectedErrorStatuses: Record<string, readonly string[]> = {
+    conflict: ['409', '412'],
+    forbidden: ['403'],
+    invalid: ['400'],
+    notFound: ['404'],
+    unavailable: ['428', '503'],
+  }
+  return Boolean(
+    expectedErrorStatuses[value.attributes.status]?.includes(value.attributes.error.status),
+  )
+}
+
 function isRetryableMethod(method: string, idempotencyKey?: string) {
   return method === 'GET' || (['PATCH', 'POST', 'PUT'].includes(method) && Boolean(idempotencyKey))
 }
@@ -507,6 +614,8 @@ const strongAbsenceEtag = (value: string) =>
   strongResourceEtag(value, /^ab1-[a-f0-9]{64}$/, 'Absence')
 const strongCommentEtag = (value: string) =>
   strongResourceEtag(value, /^cmt1-[a-f0-9]{64}$/, 'Comment')
+const strongResourceGrantSetEtag = (value: string) =>
+  strongResourceEtag(value, /^dgr1-[a-f0-9]{64}$/, 'Resource grant policy')
 const strongDocumentEtag = (value: string) => {
   const etag = strongResourceEtag(value, /^doc1-[A-Za-z0-9_-]+$/, 'Document')
   const encoded = etag.slice('"doc1-'.length, -1)
@@ -531,6 +640,11 @@ const strongDocumentEtag = (value: string) => {
   }
 }
 const strongFileEtag = (value: string) => strongResourceEtag(value, /^file-[1-9][0-9]*$/, 'File')
+const strongProjectEtag = (value: string) =>
+  strongResourceEtag(value, /^prj1-[a-f0-9]{64}$/, 'Project')
+const strongProjectTemplateEtag = (value: string) =>
+  strongResourceEtag(value, /^tpl1-[a-f0-9]{64}$/, 'Project template')
+const strongTaskEtag = (value: string) => strongResourceEtag(value, /^tsk1-[a-f0-9]{64}$/, 'Task')
 
 function customFieldValuePath(
   targetType: CustomFieldValueTargetType,
@@ -545,7 +659,22 @@ function customFieldValuePath(
   ].join('/')
 }
 
+function customFieldValueBatchPath(targetType: CustomFieldValueTargetType, resourceId: string) {
+  return [
+    '/custom-field-values',
+    encodeURIComponent(targetType),
+    encodeURIComponent(resourceId),
+    'batch-read',
+  ].join('/')
+}
+
 function expectedResourceTypes(path: string) {
+  if (/^\/service-accounts\/[^/]+\/credentials(?:\/|$)/.test(path)) {
+    return ['serviceAccountCredential']
+  }
+  if (/^\/me\/personal-access-tokens(?:\/|$)/.test(path)) {
+    return ['personalAccessToken']
+  }
   if (/^\/file-upload-intents\/[^/]+\/finalize$/.test(path)) return ['file']
   if (/^\/file-upload-intents\/[^/]+$/.test(path)) return ['fileUploadIntent']
   if (/^\/tasks\/[^/]+\/timer\/(?:start|stop)$/.test(path)) return ['timeEntry']
@@ -563,6 +692,7 @@ function expectedResourceTypes(path: string) {
     appointments: ['appointment'],
     'audit-events': ['auditEvent'],
     'call-notes': ['callNote'],
+    changes: ['changeEvent'],
     comments: ['comment'],
     contacts: ['contact'],
     'contact-groups': ['contactGroup'],
@@ -572,6 +702,7 @@ function expectedResourceTypes(path: string) {
     files: ['file', 'fileDownloadIntent'],
     'file-upload-intents': ['fileUploadIntent'],
     lists: ['list'],
+    me: ['personalAccessToken'],
     'product-groups': ['productGroup'],
     products: ['product'],
     'planned-work': ['plannedWork'],
@@ -582,6 +713,7 @@ function expectedResourceTypes(path: string) {
     'project-template-instantiations': ['projectTemplateInstantiation'],
     'project-templates': ['projectTemplate'],
     services: ['service'],
+    'service-accounts': ['serviceAccount', 'serviceAccountCredential'],
     tags: ['tag'],
     tasks: ['task'],
     'time-entries': ['timeEntry'],
@@ -610,6 +742,130 @@ function assertResourceValue(value: unknown, expectedTypes: string[]) {
   }
 }
 
+const resourceGrantAnchorTypes = new Set([
+  'workspace',
+  'project',
+  'memberGroup',
+  'contactGroup',
+  'user',
+  'ownRecords',
+])
+const resourceGrantInheritance = new Set(['domainDescendants', 'none'])
+
+function boundedResourceGrantString(value: unknown, maximum: number) {
+  return typeof value === 'string' && value.length >= 1 && value.length <= maximum
+}
+
+function resourceGrantCapabilities(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length >= 1 &&
+    value.length <= 200 &&
+    value.every((item) => boundedResourceGrantString(item, 200)) &&
+    new Set(value).size === value.length
+  )
+}
+
+function validResourceGrantAnchor(anchorType: unknown, anchorId: unknown, inheritance: unknown) {
+  if (
+    typeof anchorType !== 'string' ||
+    !resourceGrantAnchorTypes.has(anchorType) ||
+    typeof inheritance !== 'string' ||
+    !resourceGrantInheritance.has(inheritance)
+  ) {
+    return false
+  }
+  const idless = anchorType === 'workspace' || anchorType === 'ownRecords'
+  if (
+    idless
+      ? anchorId !== undefined && anchorId !== null
+      : !boundedResourceGrantString(anchorId, 128)
+  ) {
+    return false
+  }
+  return (
+    inheritance !== 'domainDescendants' || anchorType === 'workspace' || anchorType === 'project'
+  )
+}
+
+function resourceGrantInputValidator(value: unknown): value is ResourceGrantInput {
+  if (
+    !isObject(value) ||
+    Object.keys(value).some(
+      (key) =>
+        ![
+          'anchorId',
+          'anchorType',
+          'capabilities',
+          'expiresAt',
+          'inheritance',
+          'resourceKey',
+        ].includes(key),
+    ) ||
+    !resourceGrantCapabilities(value.capabilities) ||
+    !boundedResourceGrantString(value.resourceKey, 64) ||
+    value.anchorId === null ||
+    !validResourceGrantAnchor(value.anchorType, value.anchorId, value.inheritance) ||
+    (value.expiresAt !== undefined &&
+      (typeof value.expiresAt !== 'string' || !Number.isFinite(Date.parse(value.expiresAt))))
+  ) {
+    return false
+  }
+  return true
+}
+
+function resourceGrantValidator(value: unknown): value is ResourceGrant {
+  return (
+    hasExactKeys(value, [
+      'anchorId',
+      'anchorType',
+      'capabilities',
+      'expiresAt',
+      'id',
+      'inheritance',
+      'resourceKey',
+    ]) &&
+    boundedResourceGrantString(value.id, 128) &&
+    resourceGrantCapabilities(value.capabilities) &&
+    boundedResourceGrantString(value.resourceKey, 64) &&
+    validResourceGrantAnchor(value.anchorType, value.anchorId, value.inheritance) &&
+    (value.expiresAt === null ||
+      (typeof value.expiresAt === 'string' && Number.isFinite(Date.parse(value.expiresAt))))
+  )
+}
+
+function resourceGrantSetReplacementValidator(
+  value: unknown,
+): value is ServiceAccountResourceGrantSetReplace {
+  return (
+    hasExactKeys(value, ['grants']) &&
+    Array.isArray(value.grants) &&
+    value.grants.length <= 1000 &&
+    value.grants.every(resourceGrantInputValidator)
+  )
+}
+
+function resourceGrantSetValidator(value: unknown): value is ServiceAccountResourceGrantSet {
+  if (
+    !hasExactKeys(value, ['attributes', 'id', 'type']) ||
+    value.type !== 'serviceAccountResourceGrantSet' ||
+    typeof value.id !== 'string' ||
+    !hasExactKeys(value.attributes, ['grants', 'policyVersion', 'revision'])
+  ) {
+    return false
+  }
+  const attributes = value.attributes
+  return (
+    Array.isArray(attributes.grants) &&
+    attributes.grants.length <= 1000 &&
+    attributes.grants.every(resourceGrantValidator) &&
+    Number.isSafeInteger(attributes.policyVersion) &&
+    (attributes.policyVersion as number) >= 1 &&
+    typeof attributes.revision === 'string' &&
+    /^[a-f0-9]{64}$/.test(attributes.revision)
+  )
+}
+
 function assertPage<T>(value: unknown, expectedTypes: string[]): ListEnvelope<T> {
   if (
     !isObject(value) ||
@@ -628,6 +884,42 @@ function assertPage<T>(value: unknown, expectedTypes: string[]): ListEnvelope<T>
   return value as ListEnvelope<T>
 }
 
+function assertChangePage(value: unknown): ChangePageEnvelope {
+  const page = assertPage(value, ['changeEvent'])
+  if (
+    typeof page.meta.page.nextCursor !== 'string' ||
+    !page.meta.page.nextCursor ||
+    typeof (page.meta.page as unknown as { caughtUp?: unknown }).caughtUp !== 'boolean' ||
+    !Number.isInteger(page.meta.page.limit) ||
+    page.meta.page.limit < 1 ||
+    page.meta.page.limit > 200 ||
+    page.data.length > page.meta.page.limit ||
+    (!(page.meta.page as unknown as { caughtUp: boolean }).caughtUp &&
+      page.data.length !== page.meta.page.limit)
+  ) {
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'Expected a TeamGrid change-feed checkpoint.',
+    )
+  }
+  return page as ChangePageEnvelope
+}
+
+function assertAuditEventPage(value: ListEnvelope<AuditEvent>): AuditEventListEnvelope {
+  const retentionDays = (value.meta as { retentionDays?: unknown }).retentionDays
+  if (
+    !Number.isSafeInteger(retentionDays) ||
+    (retentionDays as number) < 30 ||
+    (retentionDays as number) > 3_650
+  ) {
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'Expected TeamGrid audit retention metadata.',
+    )
+  }
+  return value as AuditEventListEnvelope
+}
+
 function assertResource<T>(value: unknown, expectedTypes: string[]): ResourceEnvelope<T> {
   if (
     !isObject(value) ||
@@ -641,14 +933,119 @@ function assertResource<T>(value: unknown, expectedTypes: string[]): ResourceEnv
   return value as ResourceEnvelope<T>
 }
 
-function assertApiVersion(value: unknown): ApiVersionEnvelope {
+function assertCredentialMetadataIsRedacted(value: unknown) {
+  const resources =
+    isObject(value) && Array.isArray(value.data)
+      ? value.data
+      : [isObject(value) ? value.data : undefined]
+  const inspect = (resource: unknown) => {
+    if (!isObject(resource) || !isObject(resource.attributes)) return
+    if (
+      (resource.type === 'personalAccessToken' || resource.type === 'serviceAccountCredential') &&
+      Object.hasOwn(resource.attributes, 'token')
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API exposed reveal-once credential material in a metadata response.',
+      )
+    }
+    if (resource.type === 'serviceAccount' && Array.isArray(resource.attributes.credentials)) {
+      resource.attributes.credentials.forEach(inspect)
+    }
+  }
+  resources.forEach(inspect)
+}
+
+function assertCustomFieldValueBatch(
+  value: unknown,
+  fieldIds: readonly string[],
+): CustomFieldValueBatchEnvelope {
   if (
-    !isObject(value) ||
-    !isObject(value.data) ||
-    value.data.version !== '1' ||
-    typeof value.data.documentation !== 'string' ||
-    !isObject(value.meta) ||
+    !hasExactKeys(value, ['data', 'meta']) ||
+    !Array.isArray(value.data) ||
+    value.data.length !== fieldIds.length ||
+    !hasExactKeys(value.meta, ['requestId']) ||
     typeof value.meta.requestId !== 'string'
+  ) {
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'Expected an order-preserving TeamGrid custom-field-value batch envelope.',
+    )
+  }
+  const publicIds = new Set<string>()
+  value.data.forEach((resource, index) => {
+    assertResourceValue(resource, ['customFieldValue'])
+    if (
+      !isObject(resource) ||
+      !isObject(resource.attributes) ||
+      resource.attributes.fieldId !== fieldIds[index] ||
+      publicIds.has(resource.id as string)
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'Custom-field-value batch results must be unique and preserve requested field order.',
+      )
+    }
+    publicIds.add(resource.id as string)
+  })
+  return value as CustomFieldValueBatchEnvelope
+}
+
+function assertApiVersion(value: unknown): ApiVersionEnvelope {
+  const data = isObject(value) && isObject(value.data) ? value.data : null
+  const supportedClients = data && isObject(data.supportedClients) ? data.supportedClients : null
+  const clientContractIsValid = (client: unknown) =>
+    hasExactKeys(client, ['minimumVersion', 'supportedMajor']) &&
+    client.minimumVersion === '1.0.0' &&
+    client.supportedMajor === 1
+  const deprecationIsValid = (deprecation: unknown) =>
+    hasExactKeys(deprecation, ['id', 'message', 'replacement', 'sunsetAt']) &&
+    typeof deprecation.id === 'string' &&
+    deprecation.id.length > 0 &&
+    deprecation.id.length <= 128 &&
+    typeof deprecation.message === 'string' &&
+    deprecation.message.length > 0 &&
+    deprecation.message.length <= 1_000 &&
+    (deprecation.replacement === null ||
+      (typeof deprecation.replacement === 'string' &&
+        /^https:\/\//.test(deprecation.replacement))) &&
+    (deprecation.sunsetAt === null ||
+      (typeof deprecation.sunsetAt === 'string' && !Number.isNaN(Date.parse(deprecation.sunsetAt))))
+  if (
+    !hasExactKeys(value, ['data', 'meta']) ||
+    !data ||
+    !hasExactKeys(data, [
+      'contractVersion',
+      'deprecations',
+      'documentation',
+      'manifestSha256',
+      'region',
+      'status',
+      'supportedClients',
+      'version',
+    ]) ||
+    data.contractVersion !== '1.0.0' ||
+    !Array.isArray(data.deprecations) ||
+    !data.deprecations.every(deprecationIsValid) ||
+    typeof data.documentation !== 'string' ||
+    !/^https:\/\//.test(data.documentation) ||
+    typeof data.manifestSha256 !== 'string' ||
+    !/^[a-f0-9]{64}$/.test(data.manifestSha256) ||
+    !(
+      data.region === null ||
+      (typeof data.region === 'string' &&
+        /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/.test(data.region))
+    ) ||
+    data.status !== 'operational' ||
+    !supportedClients ||
+    !hasExactKeys(supportedClients, ['cli', 'mcp', 'sdk']) ||
+    !clientContractIsValid(supportedClients.cli) ||
+    !clientContractIsValid(supportedClients.mcp) ||
+    !clientContractIsValid(supportedClients.sdk) ||
+    data.version !== '1' ||
+    !hasExactKeys(value.meta, ['requestId']) ||
+    typeof value.meta.requestId !== 'string' ||
+    !value.meta.requestId
   ) {
     throw new TeamGridClientError('invalid_api_response', 'Expected TeamGrid API discovery data.')
   }
@@ -717,6 +1114,7 @@ export class TeamGridClient {
   readonly availability
   readonly auditEvents
   readonly callNotes
+  readonly changes
   readonly comments
   readonly contacts
   readonly contactGroups
@@ -733,6 +1131,7 @@ export class TeamGridClient {
   readonly lists
   readonly location
   readonly members
+  readonly personalAccessTokens
   readonly plannedWork
   readonly plannedWorkOperations
   readonly productGroups
@@ -744,6 +1143,7 @@ export class TeamGridClient {
   readonly projectTemplates
   readonly roles
   readonly search
+  readonly serviceAccounts
   readonly services
   readonly system
   readonly tags
@@ -822,6 +1222,85 @@ export class TeamGridClient {
         ),
       update: (data: WorkspaceSettingsUpdate, options: WorkspaceSettingsMutationOptions) =>
         this.#updateWorkspaceSettings(data, options),
+    }
+    this.personalAccessTokens = {
+      create: (data: PersonalAccessTokenCreate, options: MutationOptions = {}) =>
+        this.#nativeCredentialSecret<PersonalAccessToken>(
+          '/me/personal-access-tokens',
+          data,
+          options,
+        ),
+      list: (options?: ListOptions) =>
+        this.#redactedCredentialPage<PersonalAccessToken>('/me/personal-access-tokens', options),
+      pages: (options?: ListOptions, pagination?: PaginationOptions) =>
+        this.#redactedCredentialPages<PersonalAccessToken>(
+          '/me/personal-access-tokens',
+          options,
+          pagination,
+        ),
+      revoke: (id: string, options?: RequestOptions) =>
+        this.#archive(`/me/personal-access-tokens/${encodeURIComponent(id)}`, options),
+      rotate: (id: string, data: PersonalAccessTokenRotation = {}, options: MutationOptions = {}) =>
+        this.#nativeCredentialSecret<PersonalAccessToken>(
+          `/me/personal-access-tokens/${encodeURIComponent(id)}/rotation`,
+          data,
+          options,
+        ),
+    }
+    this.serviceAccounts = {
+      create: (data: ServiceAccountCreate, options: MutationOptions = {}) =>
+        this.#nativeCredentialSecret<ServiceAccountCredential>('/service-accounts', data, options),
+      createCredential: (
+        id: string,
+        data: ServiceAccountCredentialCreate,
+        options: MutationOptions = {},
+      ) =>
+        this.#nativeCredentialSecret<ServiceAccountCredential>(
+          `/service-accounts/${encodeURIComponent(id)}/credentials`,
+          data,
+          options,
+        ),
+      get: (id: string, options?: RequestOptions) =>
+        this.#redactedCredentialResource<ServiceAccount>(
+          `/service-accounts/${encodeURIComponent(id)}`,
+          options,
+        ),
+      getResourceGrants: (id: string, options?: RequestOptions) =>
+        this.#resourceGrantSet(id, options),
+      list: (options?: ListOptions) =>
+        this.#redactedCredentialPage<ServiceAccount>('/service-accounts', options),
+      pages: (options?: ListOptions, pagination?: PaginationOptions) =>
+        this.#redactedCredentialPages<ServiceAccount>('/service-accounts', options, pagination),
+      revoke: (id: string, options?: RequestOptions) =>
+        this.#archive(`/service-accounts/${encodeURIComponent(id)}`, options),
+      revokeCredential: (id: string, credentialId: string, options?: RequestOptions) =>
+        this.#archive(
+          `/service-accounts/${encodeURIComponent(id)}/credentials/${encodeURIComponent(
+            credentialId,
+          )}`,
+          options,
+        ),
+      rotateCredential: (
+        id: string,
+        credentialId: string,
+        data: ServiceAccountCredentialRotation = {},
+        options: MutationOptions = {},
+      ) =>
+        this.#nativeCredentialSecret<ServiceAccountCredential>(
+          `/service-accounts/${encodeURIComponent(id)}/credentials/${encodeURIComponent(
+            credentialId,
+          )}/rotation`,
+          data,
+          options,
+        ),
+      replaceResourceGrants: (
+        id: string,
+        data: ServiceAccountResourceGrantSetReplace,
+        ifMatch: string,
+        options?: RequestOptions,
+      ) => this.#replaceResourceGrantSet(id, data, ifMatch, options),
+      update: (id: string, data: ServiceAccountUpdate, options?: RequestOptions) =>
+        this.#update<ServiceAccount>(`/service-accounts/${encodeURIComponent(id)}`, data, options),
     }
     this.events = {
       getCatalog: (options: RequestOptions = {}) =>
@@ -1666,6 +2145,18 @@ export class TeamGridClient {
           options,
         ),
     }
+    this.changes = {
+      checkpoint: (options?: ChangeFilterOptions) =>
+        this.#changePage({ ...options, startAtLatest: true }),
+      list: (options?: ChangeListOptions) => this.#changePage(options),
+      pages: (options?: ChangeCatchUpOptions, pagination?: PaginationOptions) =>
+        this.#changePages(options, pagination),
+      snapshotThenCatchUp: <T>(
+        snapshot: (checkpoint: ChangeCheckpoint) => Promise<T>,
+        options?: ChangeFilterOptions,
+        pagination?: PaginationOptions,
+      ) => this.#snapshotThenCatchUp(snapshot, options, pagination),
+    }
     this.plannedWork = {
       getForTask: (id: string, options?: RequestOptions) =>
         this.#resource<TaskPlannedWork>(`/tasks/${encodeURIComponent(id)}/planned-work`, options),
@@ -1688,7 +2179,7 @@ export class TeamGridClient {
         this.#waitForPlannedWorkOperation(id, options),
     }
     this.projects = {
-      archive: (id: string, options: MutationOptions = {}) =>
+      archive: (id: string, options: ProjectLifecycleMutationOptions) =>
         this.#createCoreOperation(
           `/projects/${encodeURIComponent(id)}/archive`,
           undefined,
@@ -1697,7 +2188,7 @@ export class TeamGridClient {
           '/v1/project-lifecycle-operations/',
           'project archive',
         ),
-      complete: (id: string, options: MutationOptions = {}) =>
+      complete: (id: string, options: ProjectLifecycleMutationOptions) =>
         this.#createCoreOperation(
           `/projects/${encodeURIComponent(id)}/complete`,
           undefined,
@@ -1707,19 +2198,31 @@ export class TeamGridClient {
           'project completion',
         ),
       create: (data: ProjectCreate, options?: MutationOptions) =>
-        this.#createCoreResource('/projects', data, options, projectValidator, 'project creation'),
+        this.#createCoreResource(
+          '/projects',
+          data,
+          options,
+          projectValidator,
+          'project creation',
+          'prj1',
+        ),
       get: (id: string, options?: RequestOptions) =>
         this.#strictResource(
           `/projects/${encodeURIComponent(id)}`,
           projectValidator,
           'project',
           options,
+          200,
+          undefined,
+          (resource) => `"prj1-${resource.attributes.developerRevision}"`,
+          true,
         ),
+      getSharing: (id: string, options?: RequestOptions) => this.#projectSharing(id, options),
       list: (options: ProjectListOptions = {}) =>
         this.#strictPage('/projects', projectValidator, 'project list', options),
       pages: (options?: ProjectListOptions, pagination?: PaginationOptions) =>
         this.#strictPages('/projects', projectValidator, 'project list', options, pagination),
-      reopen: (id: string, options: MutationOptions = {}) =>
+      reopen: (id: string, options: ProjectLifecycleMutationOptions) =>
         this.#createCoreOperation(
           `/projects/${encodeURIComponent(id)}/reopen`,
           undefined,
@@ -1728,7 +2231,7 @@ export class TeamGridClient {
           '/v1/project-lifecycle-operations/',
           'project reopen',
         ),
-      restore: (id: string, options: MutationOptions = {}) =>
+      restore: (id: string, options: ProjectLifecycleMutationOptions) =>
         this.#createCoreOperation(
           `/projects/${encodeURIComponent(id)}/restore`,
           undefined,
@@ -1737,7 +2240,12 @@ export class TeamGridClient {
           '/v1/project-lifecycle-operations/',
           'project restore',
         ),
-      update: (id: string, data: ProjectUpdate, options: RequestOptions = {}) =>
+      replaceSharing: (
+        id: string,
+        data: ProjectSharingReplace,
+        options: ProjectSharingMutationOptions,
+      ) => this.#replaceProjectSharing(id, data, options),
+      update: (id: string, data: ProjectUpdate, options: ProjectMutationOptions) =>
         this.#mutateCoreResource(
           `/projects/${encodeURIComponent(id)}`,
           'PATCH',
@@ -1745,6 +2253,8 @@ export class TeamGridClient {
           options,
           projectValidator,
           'project update',
+          strongProjectEtag,
+          'prj1',
         ),
     }
     this.projectLifecycleOperations = {
@@ -1811,9 +2321,14 @@ export class TeamGridClient {
         ),
     }
     this.tasks = {
-      archive: (id: string, options: RequestOptions = {}) =>
-        this.#archiveCoreResource(`/tasks/${encodeURIComponent(id)}`, options, 'task archive'),
-      complete: (id: string, options: RequestOptions = {}) =>
+      archive: (id: string, options: TaskMutationOptions) =>
+        this.#archiveCoreResource(
+          `/tasks/${encodeURIComponent(id)}`,
+          options,
+          'task archive',
+          strongTaskEtag,
+        ),
+      complete: (id: string, options: TaskMutationOptions) =>
         this.#mutateCoreResource(
           `/tasks/${encodeURIComponent(id)}/complete`,
           'POST',
@@ -1821,16 +2336,53 @@ export class TeamGridClient {
           options,
           taskValidator,
           'task completion',
+          strongTaskEtag,
+          'tsk1',
         ),
+      bulkUpdate: (data: TaskBulkUpdate, options?: RequestOptions) =>
+        this.#bulkUpdateTasks(data, options),
       create: (data: TaskCreate, options?: MutationOptions) =>
-        this.#createCoreResource('/tasks', data, options, taskValidator, 'task creation'),
+        this.#createCoreResource('/tasks', data, options, taskValidator, 'task creation', 'tsk1'),
+      duplicate: (id: string, data: TaskDuplicate, options: TaskDuplicateOptions) =>
+        this.#duplicateTask(id, data, options),
       get: (id: string, options?: RequestOptions) =>
-        this.#strictResource(`/tasks/${encodeURIComponent(id)}`, taskValidator, 'task', options),
+        this.#strictResource(
+          `/tasks/${encodeURIComponent(id)}`,
+          taskValidator,
+          'task',
+          options,
+          200,
+          undefined,
+          (resource) => `"tsk1-${resource.attributes.developerRevision}"`,
+          true,
+        ),
       list: (options: TaskListOptions = {}) =>
         this.#strictPage('/tasks', taskValidator, 'task list', options),
       pages: (options?: TaskListOptions, pagination?: PaginationOptions) =>
         this.#strictPages('/tasks', taskValidator, 'task list', options, pagination),
-      restore: (id: string, options: RequestOptions = {}) =>
+      move: (id: string, data: TaskPlacement, options: TaskMutationOptions) =>
+        this.#mutateCoreResource(
+          `/tasks/${encodeURIComponent(id)}/move`,
+          'POST',
+          data,
+          options,
+          taskValidator,
+          'task placement',
+          strongTaskEtag,
+          'tsk1',
+        ),
+      replaceSubtasks: (id: string, data: TaskSubtasksReplace, options: TaskMutationOptions) =>
+        this.#mutateCoreResource(
+          `/tasks/${encodeURIComponent(id)}/subtasks`,
+          'PUT',
+          data,
+          options,
+          taskValidator,
+          'task checklist replacement',
+          strongTaskEtag,
+          'tsk1',
+        ),
+      restore: (id: string, options: TaskMutationOptions) =>
         this.#mutateCoreResource(
           `/tasks/${encodeURIComponent(id)}/restore`,
           'POST',
@@ -1838,8 +2390,10 @@ export class TeamGridClient {
           options,
           taskValidator,
           'task restore',
+          strongTaskEtag,
+          'tsk1',
         ),
-      reopen: (id: string, options: RequestOptions = {}) =>
+      reopen: (id: string, options: TaskMutationOptions) =>
         this.#mutateCoreResource(
           `/tasks/${encodeURIComponent(id)}/reopen`,
           'POST',
@@ -1847,12 +2401,14 @@ export class TeamGridClient {
           options,
           taskValidator,
           'task reopen',
+          strongTaskEtag,
+          'tsk1',
         ),
       startTimer: (id: string, data: TimerAction, options?: RequestOptions) =>
         this.#action<TimeEntry>(`/tasks/${encodeURIComponent(id)}/timer/start`, data, options),
       stopTimer: (id: string, data: TimerAction, options?: RequestOptions) =>
         this.#action<TimeEntry>(`/tasks/${encodeURIComponent(id)}/timer/stop`, data, options),
-      update: (id: string, data: TaskUpdate, options: RequestOptions = {}) =>
+      update: (id: string, data: TaskUpdate, options: TaskMutationOptions) =>
         this.#mutateCoreResource(
           `/tasks/${encodeURIComponent(id)}`,
           'PATCH',
@@ -1860,6 +2416,8 @@ export class TeamGridClient {
           options,
           taskValidator,
           'task update',
+          strongTaskEtag,
+          'tsk1',
         ),
     }
     this.timeEntries = {
@@ -1870,6 +2428,8 @@ export class TeamGridClient {
       get: (id: string, options?: RequestOptions) =>
         this.#resource<TimeEntry>(`/time-entries/${encodeURIComponent(id)}`, options),
       list: (options?: TimeEntryListOptions) => this.#page<TimeEntry>('/time-entries', options),
+      getBilling: (id: string, options?: RequestOptions) =>
+        this.#timeEntryBilling(`/time-entries/${encodeURIComponent(id)}/billing`, id, options),
       pages: (options?: TimeEntryListOptions, pagination?: PaginationOptions) =>
         this.#pages<TimeEntry>('/time-entries', options, pagination),
       restore: (id: string, options?: RequestOptions) =>
@@ -1880,6 +2440,30 @@ export class TeamGridClient {
         ),
       update: (id: string, data: TimeEntryUpdate, options?: RequestOptions) =>
         this.#update<TimeEntry>(`/time-entries/${encodeURIComponent(id)}`, data, options),
+      updateBilling: (
+        id: string,
+        data: TimeEntryBillingUpdate,
+        options: TimeEntryBillingMutationOptions,
+      ) => {
+        if (
+          !data ||
+          typeof data !== 'object' ||
+          Array.isArray(data) ||
+          Object.keys(data).length !== 1 ||
+          typeof data.billed !== 'boolean'
+        ) {
+          throw new TeamGridClientError(
+            'invalid_arguments',
+            'Time-entry billing update must contain exactly one boolean billed field.',
+          )
+        }
+        return this.#timeEntryBilling(`/time-entries/${encodeURIComponent(id)}/billing`, id, {
+          ...options,
+          body: data,
+          ifMatch: canonicalTimeEntryBillingEtag(options.ifMatch),
+          method: 'PUT',
+        })
+      },
     }
     this.callNotes = {
       archive: (id: string, options?: RequestOptions) =>
@@ -1975,6 +2559,33 @@ export class TeamGridClient {
           customFieldValuePath(targetType, resourceId, fieldId),
           options,
         ),
+      getMany: async (
+        targetType: CustomFieldValueTargetType,
+        resourceId: string,
+        fieldIds: string[],
+        options?: RequestOptions,
+      ) => {
+        if (
+          fieldIds.length < 1 ||
+          fieldIds.length > 100 ||
+          new Set(fieldIds).size !== fieldIds.length ||
+          fieldIds.some((fieldId) => !/^[A-Za-z0-9]{1,128}$/.test(fieldId))
+        ) {
+          throw new TeamGridClientError(
+            'invalid_arguments',
+            'fieldIds must contain between 1 and 100 unique canonical field ids.',
+          )
+        }
+        const response = await this.#request(customFieldValueBatchPath(targetType, resourceId), {
+          ...options,
+          body: { fieldIds },
+          method: 'POST',
+        })
+        return attachTransport(
+          assertCustomFieldValueBatch(response.payload, fieldIds),
+          response.transport,
+        )
+      },
       set: (
         targetType: CustomFieldValueTargetType,
         resourceId: string,
@@ -1990,11 +2601,12 @@ export class TeamGridClient {
         ),
     }
     this.projectTemplates = {
-      archive: (id: string, options: RequestOptions = {}) =>
+      archive: (id: string, options: ProjectTemplateMutationOptions) =>
         this.#archiveCoreResource(
           `/project-templates/${encodeURIComponent(id)}`,
           options,
           'project-template archive',
+          strongProjectTemplateEtag,
         ),
       create: (data: ProjectTemplateCreate, options?: MutationOptions) =>
         this.#createCoreResource(
@@ -2003,6 +2615,7 @@ export class TeamGridClient {
           options,
           projectTemplateValidator,
           'project-template creation',
+          'tpl1',
         ),
       get: (id: string, options?: RequestOptions) =>
         this.#strictResource(
@@ -2010,8 +2623,16 @@ export class TeamGridClient {
           projectTemplateValidator,
           'project template',
           options,
+          200,
+          undefined,
+          (resource) => `"tpl1-${resource.attributes.developerRevision}"`,
+          true,
         ),
-      instantiate: (id: string, data: ProjectTemplateInstantiate, options: MutationOptions = {}) =>
+      instantiate: (
+        id: string,
+        data: ProjectTemplateInstantiate,
+        options: ProjectTemplateInstantiationOptions,
+      ) =>
         this.#createCoreOperation(
           `/project-templates/${encodeURIComponent(id)}/instantiate`,
           data,
@@ -2035,7 +2656,7 @@ export class TeamGridClient {
           options,
           pagination,
         ),
-      restore: (id: string, options: RequestOptions = {}) =>
+      restore: (id: string, options: ProjectTemplateMutationOptions) =>
         this.#mutateCoreResource(
           `/project-templates/${encodeURIComponent(id)}/restore`,
           'POST',
@@ -2043,8 +2664,10 @@ export class TeamGridClient {
           options,
           projectTemplateValidator,
           'project-template restore',
+          strongProjectTemplateEtag,
+          'tpl1',
         ),
-      update: (id: string, data: ProjectTemplateUpdate, options: RequestOptions = {}) =>
+      update: (id: string, data: ProjectTemplateUpdate, options: ProjectTemplateMutationOptions) =>
         this.#mutateCoreResource(
           `/project-templates/${encodeURIComponent(id)}`,
           'PATCH',
@@ -2052,6 +2675,8 @@ export class TeamGridClient {
           options,
           projectTemplateValidator,
           'project-template update',
+          strongProjectTemplateEtag,
+          'tpl1',
         ),
     }
     this.projectTemplateInstantiations = {
@@ -2117,7 +2742,8 @@ export class TeamGridClient {
         this.#update<Tag>(`/tags/${encodeURIComponent(id)}`, data, options),
     }
     this.auditEvents = {
-      list: (options?: AuditEventListOptions) => this.#page<AuditEvent>('/audit-events', options),
+      list: async (options?: AuditEventListOptions) =>
+        assertAuditEventPage(await this.#page<AuditEvent>('/audit-events', options)),
       pages: (options?: AuditEventListOptions, pagination?: PaginationOptions) =>
         this.#pages<AuditEvent>('/audit-events', options, pagination),
     }
@@ -2160,7 +2786,65 @@ export class TeamGridClient {
         this.#archive(`/webhooks/${encodeURIComponent(id)}`, options),
       rotateSecret: (id: string, options: WebhookSecretRotationOptions) =>
         this.#rotateWebhookSecret(id, options),
+      update: (id: string, data: WebhookUpdate, options: WebhookUpdateOptions) =>
+        this.#updateWebhook(id, data, options),
     }
+  }
+
+  async #resourceGrantSet(id: string, options: RequestOptions = {}) {
+    const envelope = await this.#strictResource(
+      `/service-accounts/${encodeURIComponent(id)}/resource-grants`,
+      resourceGrantSetValidator,
+      'service-account resource grants',
+      options,
+      200,
+      undefined,
+      (resource) => `"dgr1-${resource.attributes.revision}"`,
+      true,
+    )
+    if (envelope.data.id !== id) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned resource grants for a different service account.',
+      )
+    }
+    return envelope
+  }
+
+  async #replaceResourceGrantSet(
+    id: string,
+    data: ServiceAccountResourceGrantSetReplace,
+    ifMatch: string,
+    options: RequestOptions = {},
+  ) {
+    if (!resourceGrantSetReplacementValidator(data)) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'Resource-grant replacement requires one exact bounded grant set.',
+      )
+    }
+    const envelope = await this.#strictResource(
+      `/service-accounts/${encodeURIComponent(id)}/resource-grants`,
+      resourceGrantSetValidator,
+      'service-account resource-grant replacement',
+      {
+        ...options,
+        body: data,
+        ifMatch: strongResourceGrantSetEtag(ifMatch),
+        method: 'PUT',
+      },
+      200,
+      undefined,
+      (resource) => `"dgr1-${resource.attributes.revision}"`,
+      true,
+    )
+    if (envelope.data.id !== id) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned resource grants for a different service account.',
+      )
+    }
+    return envelope
   }
 
   async #strictOrderedResourceArray<T>(
@@ -2298,6 +2982,47 @@ export class TeamGridClient {
     return attachTransport(envelope, response.transport)
   }
 
+  async #updateWebhook(id: string, data: WebhookUpdate, options: WebhookUpdateOptions) {
+    if (!isValidWebhookId(id)) {
+      throw new TeamGridClientError('invalid_arguments', 'Webhook id is invalid.')
+    }
+    if (!isWebhookUpdate(data)) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'Webhook update requires one or more valid actions, disabled, or HTTPS URL fields.',
+      )
+    }
+    const { ifMatch, ...requestOptions } = options
+    const response = await this.#request(`/webhooks/${encodeURIComponent(id)}`, {
+      ...requestOptions,
+      body: data,
+      ifMatch: canonicalWebhookEtag(ifMatch),
+      method: 'PATCH',
+    })
+    if (
+      response.transport.status !== 200 ||
+      response.transport.headers['cache-control'] !== strongEtagCacheControl
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned unsafe webhook update metadata.',
+      )
+    }
+    const envelope = assertStrictResource(
+      response.payload,
+      webhookValidator('absent'),
+      'webhook update',
+    )
+    if (envelope.data.id !== id) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned an updated webhook with a different id.',
+      )
+    }
+    assertRevisionEtag(response.transport, envelope.data.attributes.revision, 'webhook update')
+    return attachTransport(envelope, response.transport)
+  }
+
   async #strictResource<T>(
     path: string,
     validator: (value: unknown) => value is T,
@@ -2306,6 +3031,7 @@ export class TeamGridClient {
     expectedStatus = 200,
     revision?: (resource: T) => string,
     expectedEtag?: (resource: T) => string | null,
+    requireStrongCache = false,
   ) {
     const response = await this.#request(path, options)
     if (response.transport.status !== expectedStatus) {
@@ -2318,7 +3044,12 @@ export class TeamGridClient {
     if (revision) assertRevisionEtag(response.transport, revision(envelope.data), label)
     if (expectedEtag) {
       const expected = expectedEtag(envelope.data)
-      if (!expected || response.transport.headers.etag !== expected) {
+      if (
+        !expected ||
+        response.transport.headers.etag !== expected ||
+        (requireStrongCache &&
+          response.transport.headers['cache-control'] !== strongEtagCacheControl)
+      ) {
         throw new TeamGridClientError(
           'invalid_api_response',
           `The TeamGrid API returned an invalid ${label} ETag.`,
@@ -2326,6 +3057,90 @@ export class TeamGridClient {
       }
     }
     return attachTransport(envelope, response.transport)
+  }
+
+  async #projectSharing(id: string, options: RequestOptions = {}) {
+    const envelope = await this.#strictResource<ProjectSharing>(
+      `/projects/${encodeURIComponent(id)}/sharing`,
+      projectSharingValidator,
+      'project sharing',
+      options,
+      200,
+      undefined,
+      (resource) => `"prj1-${resource.attributes.revision}"`,
+      true,
+    )
+    if (envelope.data.id !== id) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned project sharing for a different project.',
+      )
+    }
+    return envelope
+  }
+
+  async #replaceProjectSharing(
+    id: string,
+    data: ProjectSharingReplace,
+    options: ProjectSharingMutationOptions,
+  ) {
+    const response = await this.#request(`/projects/${encodeURIComponent(id)}/sharing`, {
+      body: data,
+      ifMatch: strongProjectEtag(options.ifMatch),
+      method: 'PUT',
+      requestId: options.requestId,
+      signal: options.signal,
+    })
+    if (response.transport.status !== 200) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned an unexpected status for project sharing replacement.',
+      )
+    }
+    const envelope = assertStrictResource(
+      response.payload,
+      projectSharingValidator,
+      'project sharing replacement',
+    )
+    if (envelope.data.id !== id) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned project sharing for a different project.',
+      )
+    }
+    assertRevisionEtag(
+      response.transport,
+      `prj1-${envelope.data.attributes.revision}`,
+      'project sharing replacement',
+    )
+    if (response.transport.headers['cache-control'] !== strongEtagCacheControl) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned unsafe project sharing cache metadata.',
+      )
+    }
+    return attachTransport(envelope, response.transport)
+  }
+
+  async #timeEntryBilling(path: string, expectedId: string, options: InternalRequestOptions = {}) {
+    const envelope = await this.#strictResource<TimeEntryBilling>(
+      path,
+      timeEntryBillingValidator,
+      'time-entry billing',
+      options,
+      200,
+      (resource) => resource.attributes.revision,
+    )
+    if (
+      envelope.data.id !== expectedId ||
+      envelope.transport.headers['cache-control'] !== strongEtagCacheControl
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned mismatched or unsafe time-entry billing metadata.',
+      )
+    }
+    return envelope
   }
 
   async #strictOperationResource<T extends { id: string }>(
@@ -2800,6 +3615,42 @@ export class TeamGridClient {
     )
   }
 
+  async #changePage(options: ChangeListOptions = {}) {
+    const { requestId, signal, ...query } = options
+    const response = await this.#request('/changes', {
+      query: query as Query,
+      requestId,
+      signal,
+    })
+    return attachTransport(assertChangePage(response.payload), response.transport)
+  }
+
+  async #redactedCredentialResource<T>(path: string, options?: RequestOptions) {
+    const envelope = await this.#resource<T>(path, options)
+    assertCredentialMetadataIsRedacted(envelope)
+    return envelope
+  }
+
+  async #redactedCredentialPage<T>(
+    path: string,
+    options: ListOptions & Record<string, unknown> = {},
+  ) {
+    const envelope = await this.#page<T>(path, options)
+    assertCredentialMetadataIsRedacted(envelope)
+    return envelope
+  }
+
+  async *#redactedCredentialPages<T>(
+    path: string,
+    options: ListOptions & Record<string, unknown> = {},
+    pagination: PaginationOptions = {},
+  ) {
+    for await (const page of this.#pages<T>(path, options, pagination)) {
+      assertCredentialMetadataIsRedacted(page)
+      yield page
+    }
+  }
+
   async #customFieldValueMutation(
     path: string,
     method: 'DELETE' | 'PUT',
@@ -2836,6 +3687,58 @@ export class TeamGridClient {
       assertResource<PlannedWorkOperation>(response.payload, ['plannedWorkOperation']),
       response.transport,
     )
+  }
+
+  async *#changePages(
+    options: ChangeCatchUpOptions = {},
+    pagination: PaginationOptions = {},
+  ): AsyncIterable<ChangePageEnvelope> {
+    let cursor = options.cursor
+    const seen = new Set<string>(cursor ? [cursor] : [])
+    const maxPages = Math.max(1, Math.min(Math.trunc(pagination.maxPages ?? 10_000), 10_000))
+    for (let pageIndex = 0; pageIndex < maxPages; pageIndex += 1) {
+      const page = await this.#changePage({
+        ...options,
+        cursor,
+        signal: pagination.signal || options.signal,
+      })
+      yield page
+      if (page.meta.page.caughtUp) return
+      const nextCursor = page.meta.page.nextCursor
+      if (seen.has(nextCursor)) {
+        throw new TeamGridClientError(
+          'pagination_cycle',
+          'The TeamGrid API returned a repeated change-feed cursor.',
+        )
+      }
+      seen.add(nextCursor)
+      cursor = nextCursor
+    }
+    throw new TeamGridClientError(
+      'pagination_limit',
+      `Change-feed catch-up exceeded the configured ${maxPages}-page safety limit.`,
+    )
+  }
+
+  async #snapshotThenCatchUp<T>(
+    snapshot: (checkpoint: ChangeCheckpoint) => Promise<T>,
+    options: ChangeFilterOptions = {},
+    pagination: PaginationOptions = {},
+  ): Promise<ChangeFeedBootstrap<T>> {
+    const checkpointPage = await this.#changePage({ ...options, startAtLatest: true })
+    if (checkpointPage.data.length !== 0 || !checkpointPage.meta.page.caughtUp) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'Expected an empty TeamGrid change-feed checkpoint page.',
+      )
+    }
+    const checkpoint = checkpointPage.meta.page.nextCursor
+    const snapshotValue = await snapshot(checkpoint)
+    return {
+      checkpoint,
+      pages: this.#changePages({ ...options, cursor: checkpoint }, pagination),
+      snapshot: snapshotValue,
+    }
   }
 
   async *#pages<T>(
@@ -2876,6 +3779,7 @@ export class TeamGridClient {
     options: MutationOptions | undefined,
     validator: ResourceValidator<T>,
     label: string,
+    etagPrefix: 'prj1' | 'tpl1' | 'tsk1',
   ) {
     const mutationOptions = options || {}
     const response = await this.#request(path, {
@@ -2895,21 +3799,67 @@ export class TeamGridClient {
       )
     }
     const envelope = assertStrictResource(response.payload, validator, label)
+    const revision = (envelope.data as { attributes: { developerRevision: string } }).attributes
+      .developerRevision
+    assertRevisionEtag(response.transport, `${etagPrefix}-${revision}`, label)
+    if (response.transport.headers['cache-control'] !== strongEtagCacheControl) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned invalid ${label} cache metadata.`,
+      )
+    }
+    return attachTransport(envelope, response.transport)
+  }
+
+  async #duplicateTask(id: string, data: TaskDuplicate, options: TaskDuplicateOptions) {
+    const { idempotencyKey, ifMatch, requestId, signal } = options
+    const response = await this.#request(`/tasks/${encodeURIComponent(id)}/duplicate`, {
+      body: data,
+      idempotencyKey: canonicalIdempotencyKey(idempotencyKey),
+      ifMatch: strongTaskEtag(ifMatch),
+      method: 'POST',
+      requestId,
+      signal,
+    })
+    const replayed = response.transport.headers['idempotency-replayed']
+    if (
+      (response.transport.status !== 200 && response.transport.status !== 201) ||
+      replayed !== (response.transport.status === 200 ? 'true' : 'false')
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned invalid task duplication mutation metadata.',
+      )
+    }
+    const envelope = assertStrictResource(response.payload, taskValidator, 'task duplication')
+    assertRevisionEtag(
+      response.transport,
+      `tsk1-${envelope.data.attributes.developerRevision}`,
+      'task duplication',
+    )
+    if (response.transport.headers['cache-control'] !== strongEtagCacheControl) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned invalid task duplication cache metadata.',
+      )
+    }
     return attachTransport(envelope, response.transport)
   }
 
   async #mutateCoreResource<T>(
     path: string,
-    method: 'PATCH' | 'POST',
+    method: 'PATCH' | 'POST' | 'PUT',
     data: unknown,
-    options: RequestOptions,
+    options: RequestOptions & { ifMatch: string },
     validator: ResourceValidator<T>,
     label: string,
+    canonicalEtag: (value: string) => string,
+    etagPrefix: 'prj1' | 'tpl1' | 'tsk1',
   ) {
-    assertNoCoreIfMatch(options)
-    const { requestId, signal } = options
+    const { ifMatch, requestId, signal } = options
     const response = await this.#request(path, {
       ...(data === undefined ? {} : { body: data }),
+      ifMatch: canonicalEtag(ifMatch),
       method,
       requestId,
       signal,
@@ -2921,35 +3871,115 @@ export class TeamGridClient {
       )
     }
     const envelope = assertStrictResource(response.payload, validator, label)
+    const revision = (envelope.data as { attributes: { developerRevision: string } }).attributes
+      .developerRevision
+    assertRevisionEtag(response.transport, `${etagPrefix}-${revision}`, label)
+    if (response.transport.headers['cache-control'] !== strongEtagCacheControl) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned invalid ${label} cache metadata.`,
+      )
+    }
     return attachTransport(envelope, response.transport)
   }
 
-  async #archiveCoreResource(path: string, options: RequestOptions, label: string) {
-    assertNoCoreIfMatch(options)
-    const { requestId, signal } = options
-    const response = await this.#request(path, { method: 'DELETE', requestId, signal })
+  async #bulkUpdateTasks(
+    data: TaskBulkUpdate,
+    options: RequestOptions = {},
+  ): Promise<TaskBulkUpdateEnvelope> {
+    const response = await this.#request('/tasks/bulk-update', {
+      body: data,
+      method: 'POST',
+      ...options,
+    })
+    const payload = response.payload
+    if (
+      response.transport.status !== 200 ||
+      !isObject(payload) ||
+      !hasExactKeys(payload, ['data', 'meta']) ||
+      !Array.isArray(payload.data) ||
+      !isObject(payload.meta) ||
+      !hasExactKeys(payload.meta, ['requestId', 'summary']) ||
+      typeof payload.meta.requestId !== 'string' ||
+      !hasExactKeys(payload.meta.summary, ['conflicts', 'failed', 'requested', 'updated']) ||
+      !Array.isArray(data.items) ||
+      payload.data.length !== data.items.length ||
+      payload.data.some((result, index) => !taskBulkResult(result, data.items[index]?.id || ''))
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned an invalid task bulk-update response.',
+      )
+    }
+    const summary = payload.meta.summary
+    const results = payload.data as TaskBulkUpdateResult[]
+    const updated = results.filter((result) => result.attributes.status === 'updated').length
+    const conflicts = results.filter((result) => result.attributes.status === 'conflict').length
+    const failed = results.length - updated - conflicts
+    if (
+      !Number.isSafeInteger(summary.requested) ||
+      !Number.isSafeInteger(summary.updated) ||
+      !Number.isSafeInteger(summary.conflicts) ||
+      !Number.isSafeInteger(summary.failed) ||
+      summary.requested !== results.length ||
+      summary.updated !== updated ||
+      summary.conflicts !== conflicts ||
+      summary.failed !== failed
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned inconsistent task bulk-update totals.',
+      )
+    }
+    return attachTransport(payload as Omit<TaskBulkUpdateEnvelope, 'transport'>, response.transport)
+  }
+
+  async #archiveCoreResource(
+    path: string,
+    options: RequestOptions & { ifMatch: string },
+    label: string,
+    canonicalEtag: (value: string) => string,
+  ) {
+    const { ifMatch, requestId, signal } = options
+    const response = await this.#request(path, {
+      ifMatch: canonicalEtag(ifMatch),
+      method: 'DELETE',
+      requestId,
+      signal,
+    })
     if (response.transport.status !== 204 || response.payload !== undefined) {
       throw new TeamGridClientError(
         'invalid_api_response',
         `The TeamGrid API returned an invalid empty ${label} response.`,
       )
     }
+    const responseEtag = response.transport.headers.etag
+    if (!responseEtag || response.transport.headers['cache-control'] !== strongEtagCacheControl) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned invalid ${label} revision metadata.`,
+      )
+    }
+    canonicalEtag(responseEtag)
     return response.transport
   }
 
   async #createCoreOperation<T extends ProjectLifecycleOperation | ProjectTemplateInstantiation>(
     path: string,
     data: unknown,
-    options: MutationOptions,
+    options: ProjectLifecycleMutationOptions | ProjectTemplateInstantiationOptions,
     validator: ResourceValidator<T>,
     operationRoot: string,
     label: string,
   ) {
-    assertNoCoreIfMatch(options)
-    const { idempotencyKey, requestId, signal } = options
+    const { idempotencyKey, ifMatch, requestId, signal } = options
+    const projectOperation = path.startsWith('/projects/')
+    const canonicalEtag = projectOperation ? strongProjectEtag : strongProjectTemplateEtag
+    const etagPrefix = projectOperation ? 'prj1' : 'tpl1'
     const response = await this.#request(path, {
       ...(data === undefined ? {} : { body: data }),
       idempotencyKey: canonicalIdempotencyKey(idempotencyKey),
+      ifMatch: canonicalEtag(ifMatch),
       method: 'POST',
       requestId,
       signal,
@@ -2962,6 +3992,17 @@ export class TeamGridClient {
       )
     }
     const envelope = assertStrictResource(response.payload, validator, label)
+    assertRevisionEtag(
+      response.transport,
+      `${etagPrefix}-${envelope.data.attributes.sourceRevision}`,
+      label,
+    )
+    if (response.transport.headers['cache-control'] !== strongEtagCacheControl) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        `The TeamGrid API returned invalid ${label} cache metadata.`,
+      )
+    }
     if (
       response.transport.headers.location !==
       `${operationRoot}${encodeURIComponent(envelope.data.id)}`
@@ -2985,6 +4026,45 @@ export class TeamGridClient {
       assertResource<T>(response.payload, expectedResourceTypes(path)),
       response.transport,
     )
+  }
+
+  async #nativeCredentialSecret<T>(path: string, data: unknown, options: MutationOptions) {
+    const response = await this.#request(path, {
+      ...options,
+      body: data,
+      idempotencyKey: options.idempotencyKey || newRequestId(),
+      method: 'POST',
+    })
+    const replayed = response.transport.status === 200
+    if (
+      (response.transport.status !== 200 && response.transport.status !== 201) ||
+      response.transport.headers['cache-control'] !== credentialSecretCacheControl ||
+      response.transport.headers['idempotency-replayed'] !== (replayed ? 'true' : 'false')
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned unsafe credential issuance metadata.',
+      )
+    }
+    const envelope = assertResource<T>(response.payload, expectedResourceTypes(path))
+    const resource = envelope.data as {
+      attributes?: { token?: unknown }
+      type?: unknown
+    }
+    const pattern =
+      resource.type === 'personalAccessToken'
+        ? /^tg_pat_v2_[a-z0-9-]+_[a-z0-9-]+_[a-f0-9]{24}_[a-f0-9]{64}$/
+        : /^tg_sa_v2_[a-z0-9-]+_[a-z0-9-]+_[a-f0-9]{24}_[a-f0-9]{64}$/
+    if (
+      typeof resource.attributes?.token !== 'string' ||
+      !pattern.test(resource.attributes.token)
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API did not return a valid reveal-once credential.',
+      )
+    }
+    return attachTransport(envelope, response.transport)
   }
 
   async #update<T>(path: string, data: unknown, options: RequestOptions = {}) {

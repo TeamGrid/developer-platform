@@ -2,7 +2,11 @@ import { chmod, mkdtemp, readFile, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { PassThrough } from 'node:stream'
-import { TeamGridApiError, TeamGridClientError } from '@teamgrid/api-client'
+import {
+  TEAMGRID_CHANGE_FEED_RESOURCE_TYPES,
+  TeamGridApiError,
+  TeamGridClientError,
+} from '@teamgrid/api-client'
 import { describe, expect, it, vi } from 'vitest'
 import { ConfigStore } from './config.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
@@ -63,7 +67,7 @@ describe('TeamGrid CLI', () => {
     })
     const source = await readFile(path, 'utf8')
     expect(source).not.toContain(token)
-    expect((await stat(path)).mode & 0o777).toBe(0o600)
+    if (process.platform !== 'win32') expect((await stat(path)).mode & 0o777).toBe(0o600)
     expect(await store.load()).toMatchObject({ currentProfile: 'default' })
   })
 
@@ -117,7 +121,7 @@ describe('TeamGrid CLI', () => {
     expect(output.value().trim()).toBe(packageManifest.version)
   })
 
-  it('does not advertise or accept deferred change-feed commands in beta.2', async () => {
+  it('advertises the stable change-feed commands', async () => {
     const helpOutput = capture()
     expect(
       await runCli(['node', 'teamgrid', '--help'], {
@@ -125,23 +129,178 @@ describe('TeamGrid CLI', () => {
         output: helpOutput.stream,
       }),
     ).toBe(0)
-    expect(helpOutput.value()).not.toMatch(/^\s+changes\b/m)
+    expect(helpOutput.value()).toMatch(/^\s+changes\b/m)
+  })
 
+  it('creates a script-safe change checkpoint with repeatable and CSV filters', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const output = capture()
+    const checkpoint = vi.fn(async () => ({
+      data: [],
+      meta: {
+        page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-1' },
+        requestId: 'request-checkpoint',
+      },
+    }))
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          '--output',
+          'json',
+          'changes',
+          'checkpoint',
+          '--operation',
+          'created,updated',
+          '--operation',
+          'deleted',
+          '--resource-type',
+          'project,task',
+        ],
+        {
+          clientFactory: () => ({ changes: { checkpoint } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          output: output.stream,
+        },
+      ),
+    ).toBe(0)
+    expect(checkpoint).toHaveBeenCalledWith({
+      operations: ['created', 'updated', 'deleted'],
+      resourceTypes: ['project', 'task'],
+    })
+    expect(JSON.parse(output.value())).toEqual({
+      caughtUp: true,
+      cursor: 'checkpoint-1',
+      requestId: 'request-checkpoint',
+    })
+  })
+
+  it.each(TEAMGRID_CHANGE_FEED_RESOURCE_TYPES)(
+    'accepts the canonical %s change-feed resource type',
+    async (resourceType) => {
+      const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+      const checkpoint = vi.fn(async () => ({
+        data: [],
+        meta: {
+          page: { caughtUp: true, limit: 50, nextCursor: 'checkpoint-1' },
+          requestId: `request-${resourceType}`,
+        },
+      }))
+      expect(
+        await runCli(
+          ['node', 'teamgrid', 'changes', 'checkpoint', '--resource-type', resourceType],
+          {
+            clientFactory: () => ({ changes: { checkpoint } }) as never,
+            configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+            environment: { TEAMGRID_API_TOKEN: token },
+            output: capture().stream,
+          },
+        ),
+      ).toBe(0)
+      expect(checkpoint).toHaveBeenCalledWith({ resourceTypes: [resourceType] })
+    },
+  )
+
+  it('reads one change page and emits an explicit JSONL checkpoint', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const output = capture()
+    const list = vi.fn(async () => ({
+      data: [
+        {
+          attributes: { operation: 'updated', resourceId: 'task-1', resourceType: 'task' },
+          id: 'change-1',
+          type: 'changeEvent',
+        },
+      ],
+      meta: {
+        page: { caughtUp: true, limit: 10, nextCursor: 'checkpoint-2' },
+        requestId: 'request-changes',
+      },
+    }))
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          '--output',
+          'jsonl',
+          'changes',
+          'list',
+          '--cursor',
+          'checkpoint-1',
+          '--limit',
+          '10',
+          '--resource-type',
+          'task',
+        ],
+        {
+          clientFactory: () => ({ changes: { list } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          output: output.stream,
+        },
+      ),
+    ).toBe(0)
+    expect(list).toHaveBeenCalledWith({
+      cursor: 'checkpoint-1',
+      limit: 10,
+      resourceTypes: ['task'],
+    })
+    expect(
+      output
+        .value()
+        .trim()
+        .split('\n')
+        .map((line) => JSON.parse(line)),
+    ).toEqual([
+      {
+        data: {
+          attributes: { operation: 'updated', resourceId: 'task-1', resourceType: 'task' },
+          id: 'change-1',
+          type: 'changeEvent',
+        },
+        kind: 'change',
+      },
+      {
+        caughtUp: true,
+        cursor: 'checkpoint-2',
+        kind: 'checkpoint',
+        requestId: 'request-changes',
+      },
+    ])
+  })
+
+  it('rejects unknown change filters locally', async () => {
     const errorOutput = capture()
     expect(
-      await runCli(['node', 'teamgrid', 'changes'], {
+      await runCli(['node', 'teamgrid', 'changes', 'list', '--operation', 'renamed'], {
         errorOutput: errorOutput.stream,
         output: capture().stream,
       }),
     ).toBe(2)
-    expect(errorOutput.value()).toContain("unknown command 'changes'")
+    expect(errorOutput.value()).toContain('created, deleted, updated')
   })
 
   it('prints API discovery data through the system client', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
     const output = capture()
     const getApiVersion = vi.fn(async () => ({
-      data: { documentation: 'https://developer.teamgridapp.com/api/v1', version: '1' },
+      data: {
+        contractVersion: '1.0.0',
+        deprecations: [],
+        documentation: 'https://developer.teamgridapp.com/api/v1',
+        manifestSha256: 'a'.repeat(64),
+        region: 'us',
+        status: 'operational',
+        supportedClients: {
+          cli: { minimumVersion: '1.0.0', supportedMajor: 1 },
+          mcp: { minimumVersion: '1.0.0', supportedMajor: 1 },
+          sdk: { minimumVersion: '1.0.0', supportedMajor: 1 },
+        },
+        version: '1',
+      },
       meta: { requestId: 'request-version' },
     }))
     expect(
@@ -154,7 +313,17 @@ describe('TeamGrid CLI', () => {
     ).toBe(0)
     expect(getApiVersion).toHaveBeenCalledOnce()
     expect(JSON.parse(output.value())).toEqual({
+      contractVersion: '1.0.0',
+      deprecations: [],
       documentation: 'https://developer.teamgridapp.com/api/v1',
+      manifestSha256: 'a'.repeat(64),
+      region: 'us',
+      status: 'operational',
+      supportedClients: {
+        cli: { minimumVersion: '1.0.0', supportedMajor: 1 },
+        mcp: { minimumVersion: '1.0.0', supportedMajor: 1 },
+        sdk: { minimumVersion: '1.0.0', supportedMajor: 1 },
+      },
       version: '1',
     })
   })
@@ -171,14 +340,24 @@ describe('TeamGrid CLI', () => {
     expect(errorOutput.value()).not.toContain('teamgrid: error:')
   })
 
-  it('executes static core mutations without --if-match', async () => {
+  it('requires and forwards --if-match for core mutations', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
     const update = vi.fn(async () => ({
       data: { attributes: { name: 'Changed' }, id: 'task-1', type: 'task' },
     }))
     expect(
       await runCli(
-        ['node', 'teamgrid', 'tasks', 'update', 'task-1', '--data', '{"name":"Changed"}'],
+        [
+          'node',
+          'teamgrid',
+          'tasks',
+          'update',
+          'task-1',
+          '--data',
+          '{"name":"Changed"}',
+          '--if-match',
+          `tsk1-${resourceRevision}`,
+        ],
         {
           clientFactory: () => ({ tasks: { update } }) as never,
           configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
@@ -187,7 +366,61 @@ describe('TeamGrid CLI', () => {
         },
       ),
     ).toBe(0)
-    expect(update).toHaveBeenCalledWith('task-1', { name: 'Changed' })
+    expect(update).toHaveBeenCalledWith(
+      'task-1',
+      { name: 'Changed' },
+      { ifMatch: `tsk1-${resourceRevision}` },
+    )
+  })
+
+  it('forwards ordered task bulk updates and preserves the reconciliation summary', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const output = capture()
+    const data = {
+      items: [
+        {
+          data: { name: 'Changed' },
+          id: 'task-1',
+          revision: resourceRevision,
+        },
+      ],
+    }
+    const result = {
+      data: [
+        {
+          attributes: { error: null, status: 'updated', task: null },
+          id: 'task-1',
+          type: 'taskBulkUpdateResult',
+        },
+      ],
+      meta: {
+        requestId: 'request-bulk',
+        summary: { conflicts: 0, failed: 0, requested: 1, updated: 1 },
+      },
+    }
+    const bulkUpdate = vi.fn(async () => result)
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          '--output',
+          'json',
+          'tasks',
+          'bulk-update',
+          '--data',
+          JSON.stringify(data),
+        ],
+        {
+          clientFactory: () => ({ tasks: { bulkUpdate } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          output: output.stream,
+        },
+      ),
+    ).toBe(0)
+    expect(bulkUpdate).toHaveBeenCalledWith(data)
+    expect(JSON.parse(output.value())).toEqual(result)
   })
 
   it('explains stale independent If-Match recovery and returns the conflict exit code', async () => {
@@ -321,6 +554,22 @@ describe('TeamGrid CLI', () => {
     expect(input).toBe(token)
   })
 
+  it('fails closed instead of persisting credentials on unsupported Windows stores', async () => {
+    const run = vi.fn()
+    const store = new SystemCredentialStore({ currentPlatform: 'win32', run })
+
+    await expect(store.get('default')).rejects.toThrow(
+      'No supported OS credential store is available.',
+    )
+    await expect(store.set('default', token)).rejects.toThrow(
+      'No supported OS credential store is available.',
+    )
+    await expect(store.delete('default')).rejects.toThrow(
+      'No supported OS credential store is available.',
+    )
+    expect(run).not.toHaveBeenCalled()
+  })
+
   it('logs in from stdin and lists resources through the shared client', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
     const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
@@ -404,9 +653,17 @@ describe('TeamGrid CLI', () => {
       resource: { attributes: { name: 'Platform' }, id: 'project-1', type: 'project' },
     },
     {
-      argv: ['projects', 'update', 'project-1', '--data', '{"color":"#123456"}'],
+      argv: [
+        'projects',
+        'update',
+        'project-1',
+        '--data',
+        '{"color":"#123456"}',
+        '--if-match',
+        `prj1-${resourceRevision}`,
+      ],
       client: 'projects' as const,
-      expectedArgs: ['project-1', { color: '#123456' }],
+      expectedArgs: ['project-1', { color: '#123456' }, { ifMatch: `prj1-${resourceRevision}` }],
       method: 'update' as const,
       resource: { attributes: { color: '#123456' }, id: 'project-1', type: 'project' },
     },
@@ -516,9 +773,72 @@ describe('TeamGrid CLI', () => {
       resource: { attributes: { archived: false }, id: 'tag-1', type: 'tag' },
     },
     {
-      argv: ['tasks', 'restore', 'task-1'],
+      argv: [
+        'tasks',
+        'duplicate',
+        'task-1',
+        '--data',
+        '{"name":"Task copy","copyChecklist":true}',
+        '--if-match',
+        `tsk1-${resourceRevision}`,
+        '--idempotency-key',
+        'duplicate-task-1',
+      ],
       client: 'tasks' as const,
-      expectedArgs: ['task-1'],
+      expectedArgs: [
+        'task-1',
+        { copyChecklist: true, name: 'Task copy' },
+        {
+          idempotencyKey: 'duplicate-task-1',
+          ifMatch: `tsk1-${resourceRevision}`,
+        },
+      ],
+      method: 'duplicate' as const,
+      resource: { attributes: { name: 'Task copy' }, id: 'task-copy', type: 'task' },
+    },
+    {
+      argv: [
+        'tasks',
+        'move',
+        'task-1',
+        '--data',
+        '{"axis":"projectList","projectId":"project-2","listId":"list-2"}',
+        '--if-match',
+        `tsk1-${resourceRevision}`,
+      ],
+      client: 'tasks' as const,
+      expectedArgs: [
+        'task-1',
+        { axis: 'projectList', listId: 'list-2', projectId: 'project-2' },
+        { ifMatch: `tsk1-${resourceRevision}` },
+      ],
+      method: 'move' as const,
+      resource: { attributes: { listId: 'list-2' }, id: 'task-1', type: 'task' },
+    },
+    {
+      argv: [
+        'tasks',
+        'subtasks',
+        'replace',
+        'task-1',
+        '--data',
+        '{"subtasks":[{"title":"Review"}]}',
+        '--if-match',
+        `tsk1-${resourceRevision}`,
+      ],
+      client: 'tasks' as const,
+      expectedArgs: [
+        'task-1',
+        { subtasks: [{ title: 'Review' }] },
+        { ifMatch: `tsk1-${resourceRevision}` },
+      ],
+      method: 'replaceSubtasks' as const,
+      resource: { attributes: { subtasks: [] }, id: 'task-1', type: 'task' },
+    },
+    {
+      argv: ['tasks', 'restore', 'task-1', '--if-match', `tsk1-${resourceRevision}`],
+      client: 'tasks' as const,
+      expectedArgs: ['task-1', { ifMatch: `tsk1-${resourceRevision}` }],
       method: 'restore' as const,
       resource: { attributes: { archived: false }, id: 'task-1', type: 'task' },
     },
@@ -534,16 +854,16 @@ describe('TeamGrid CLI', () => {
       },
     },
     {
-      argv: ['tasks', 'complete', 'task-1'],
+      argv: ['tasks', 'complete', 'task-1', '--if-match', `tsk1-${resourceRevision}`],
       client: 'tasks' as const,
-      expectedArgs: ['task-1'],
+      expectedArgs: ['task-1', { ifMatch: `tsk1-${resourceRevision}` }],
       method: 'complete' as const,
       resource: { attributes: { completed: true }, id: 'task-1', type: 'task' },
     },
     {
-      argv: ['tasks', 'reopen', 'task-1'],
+      argv: ['tasks', 'reopen', 'task-1', '--if-match', `tsk1-${resourceRevision}`],
       client: 'tasks' as const,
-      expectedArgs: ['task-1'],
+      expectedArgs: ['task-1', { ifMatch: `tsk1-${resourceRevision}` }],
       method: 'reopen' as const,
       resource: { attributes: { completed: false }, id: 'task-1', type: 'task' },
     },
@@ -605,6 +925,61 @@ describe('TeamGrid CLI', () => {
   )
 
   it.each([
+    [
+      'projects',
+      'projects',
+      [
+        '--contact-id',
+        'contact-1',
+        '--created-by-id',
+        'user-1',
+        '--individual-id',
+        'external-project-1',
+        '--list-id',
+        'list-1',
+        '--manager-id',
+        'manager-1',
+        '--subscriber-id',
+        'subscriber-1',
+      ],
+      {
+        contactId: 'contact-1',
+        createdById: 'user-1',
+        individualId: 'external-project-1',
+        listId: 'list-1',
+        managerId: 'manager-1',
+        subscriberId: 'subscriber-1',
+      },
+    ],
+    [
+      'tasks',
+      'tasks',
+      [
+        '--contact-id',
+        'contact-1',
+        '--group-id',
+        'group-1',
+        '--list-id',
+        'list-1',
+        '--personal-list-id',
+        'personal-list-1',
+        '--service-id',
+        'service-1',
+        '--subscriber-id',
+        'subscriber-1',
+        '--tag-id',
+        'tag-1',
+      ],
+      {
+        contactId: 'contact-1',
+        groupId: 'group-1',
+        listId: 'list-1',
+        personalListId: 'personal-list-1',
+        serviceId: 'service-1',
+        subscriberId: 'subscriber-1',
+        tagId: 'tag-1',
+      },
+    ],
     [
       'products',
       'products',
@@ -693,6 +1068,67 @@ describe('TeamGrid CLI', () => {
     },
   )
 
+  it('reads and replaces project sharing with explicit compare-and-set input', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const getSharing = vi.fn(async () => ({
+      data: {
+        attributes: { availablePermissions: [], entries: [], revision: resourceRevision },
+        id: 'project-1',
+        type: 'projectSharing',
+      },
+    }))
+    const replaceSharing = vi.fn(async () => ({
+      data: {
+        attributes: {
+          availablePermissions: [],
+          entries: [{ permissions: [], userId: null, workspaceId: 'workspace-1' }],
+          revision: resourceRevision,
+        },
+        id: 'project-1',
+        type: 'projectSharing',
+      },
+    }))
+    const dependencies = {
+      clientFactory: () => ({ projects: { getSharing, replaceSharing } }) as never,
+      configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+      environment: { TEAMGRID_API_TOKEN: token },
+    }
+    const getOutput = capture()
+    expect(
+      await runCli(
+        ['node', 'teamgrid', '--output', 'json', 'projects', 'sharing', 'get', 'project-1'],
+        { ...dependencies, output: getOutput.stream },
+      ),
+    ).toBe(0)
+    expect(getSharing).toHaveBeenCalledWith('project-1')
+
+    const replaceOutput = capture()
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          '--output',
+          'json',
+          'projects',
+          'sharing',
+          'replace',
+          'project-1',
+          '--data',
+          '{"entries":[{"workspaceId":"workspace-1"}]}',
+          '--if-match',
+          `prj1-${resourceRevision}`,
+        ],
+        { ...dependencies, output: replaceOutput.stream },
+      ),
+    ).toBe(0)
+    expect(replaceSharing).toHaveBeenCalledWith(
+      'project-1',
+      { entries: [{ workspaceId: 'workspace-1' }] },
+      { ifMatch: `prj1-${resourceRevision}` },
+    )
+  })
+
   it.each([
     ['tasks', 'task', 'task-1'],
     ['time-entries', 'timeEntry', 'time-1'],
@@ -705,30 +1141,56 @@ describe('TeamGrid CLI', () => {
     const errorOutput = capture()
 
     expect(
-      await runCli(['node', 'teamgrid', resource, 'archive', id], {
-        clientFactory: () =>
-          ({ [resource === 'time-entries' ? 'timeEntries' : resource]: { archive } }) as never,
-        configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
-        environment: { TEAMGRID_API_TOKEN: token },
-        errorOutput: errorOutput.stream,
-        input: new PassThrough(),
-        output: capture().stream,
-      }),
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          resource,
+          'archive',
+          id,
+          ...(resource === 'tasks' ? ['--if-match', `tsk1-${resourceRevision}`] : []),
+        ],
+        {
+          clientFactory: () =>
+            ({ [resource === 'time-entries' ? 'timeEntries' : resource]: { archive } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          errorOutput: errorOutput.stream,
+          input: new PassThrough(),
+          output: capture().stream,
+        },
+      ),
     ).toBe(2)
     expect(archive).not.toHaveBeenCalled()
     expect(errorOutput.value()).toContain('Use --yes')
 
     const output = capture()
     expect(
-      await runCli(['node', 'teamgrid', '--output', 'json', resource, 'archive', id, '--yes'], {
-        clientFactory: () =>
-          ({ [resource === 'time-entries' ? 'timeEntries' : resource]: { archive } }) as never,
-        configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
-        environment: { TEAMGRID_API_TOKEN: token },
-        output: output.stream,
-      }),
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          '--output',
+          'json',
+          resource,
+          'archive',
+          id,
+          '--yes',
+          ...(resource === 'tasks' ? ['--if-match', `tsk1-${resourceRevision}`] : []),
+        ],
+        {
+          clientFactory: () =>
+            ({ [resource === 'time-entries' ? 'timeEntries' : resource]: { archive } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          output: output.stream,
+        },
+      ),
     ).toBe(0)
-    expect(archive).toHaveBeenCalledWith(id)
+    expect(archive).toHaveBeenCalledWith(
+      id,
+      ...(resource === 'tasks' ? [{ ifMatch: `tsk1-${resourceRevision}` }] : []),
+    )
     expect(JSON.parse(output.value())).toEqual({
       archived: true,
       id,
@@ -875,6 +1337,41 @@ describe('TeamGrid CLI', () => {
     })
   })
 
+  it('batch reads bounded custom-field ids through the dedicated SDK method', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
+    const getMany = vi.fn(async () => ({
+      data: [
+        { attributes: { fieldId: 'field2' }, id: `cfv_${'2'.repeat(64)}` },
+        { attributes: { fieldId: 'field1' }, id: `cfv_${'1'.repeat(64)}` },
+      ],
+      meta: { requestId: 'custom-field-values-batch' },
+    }))
+    const output = capture()
+    expect(
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          'custom-field-values',
+          'get-many',
+          'project',
+          'project-1',
+          '--field-id',
+          'field2',
+          'field1',
+        ],
+        {
+          clientFactory: () => ({ customFieldValues: { getMany } }) as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          output: output.stream,
+        },
+      ),
+    ).toBe(0)
+    expect(getMany).toHaveBeenCalledWith('project', 'project-1', ['field2', 'field1'])
+    expect(output.value()).toContain('field2')
+  })
+
   it('filters templates and can wait for a credential-owned instantiation', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
     const list = vi.fn(async () => ({
@@ -925,6 +1422,8 @@ describe('TeamGrid CLI', () => {
           '{"name":"Customer rollout"}',
           '--idempotency-key',
           'instantiate-1',
+          '--if-match',
+          `tpl1-${resourceRevision}`,
           '--wait',
           '--poll-interval',
           '250',
@@ -937,7 +1436,7 @@ describe('TeamGrid CLI', () => {
     expect(instantiate).toHaveBeenCalledWith(
       'template-1',
       { name: 'Customer rollout' },
-      { idempotencyKey: 'instantiate-1' },
+      { idempotencyKey: 'instantiate-1', ifMatch: `tpl1-${resourceRevision}` },
     )
     expect(wait).toHaveBeenCalledWith('instantiation-1', {
       acceptedOperation: {
@@ -1096,6 +1595,8 @@ describe('TeamGrid CLI', () => {
           'project-1',
           '--idempotency-key',
           'lifecycle-1',
+          '--if-match',
+          `prj1-${resourceRevision}`,
           '--wait',
           '--poll-interval',
           '250',
@@ -1112,6 +1613,7 @@ describe('TeamGrid CLI', () => {
     ).toBe(0)
     expect(complete).toHaveBeenCalledWith('project-1', {
       idempotencyKey: 'lifecycle-1',
+      ifMatch: `prj1-${resourceRevision}`,
     })
     expect(wait).toHaveBeenCalledWith('operation-1', {
       acceptedOperation: pending,
@@ -1122,14 +1624,25 @@ describe('TeamGrid CLI', () => {
 
     const errorOutput = capture()
     expect(
-      await runCli(['node', 'teamgrid', 'projects', 'archive', 'project-1'], {
-        clientFactory: () => client as never,
-        configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
-        environment: { TEAMGRID_API_TOKEN: token },
-        errorOutput: errorOutput.stream,
-        input: new PassThrough(),
-        output: capture().stream,
-      }),
+      await runCli(
+        [
+          'node',
+          'teamgrid',
+          'projects',
+          'archive',
+          'project-1',
+          '--if-match',
+          `prj1-${resourceRevision}`,
+        ],
+        {
+          clientFactory: () => client as never,
+          configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+          environment: { TEAMGRID_API_TOKEN: token },
+          errorOutput: errorOutput.stream,
+          input: new PassThrough(),
+          output: capture().stream,
+        },
+      ),
     ).toBe(2)
     expect(archive).not.toHaveBeenCalled()
     expect(errorOutput.value()).toContain('Use --yes')

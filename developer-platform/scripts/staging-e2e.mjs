@@ -150,8 +150,10 @@ async function expectRawJsonApiError({ body, idempotencyKey, path }, expectedSta
 }
 
 async function archiveProject(id) {
+  const current = await client.projects.get(id)
   const accepted = await client.projects.archive(id, {
     idempotencyKey: `staging-e2e-cleanup-project-${id}-${runId}`,
+    ifMatch: /** @type {any} */ (current.transport.headers.etag),
   })
   const completed = await client.projectLifecycleOperations.wait(accepted.data.id, {
     maxWaitMs: 120_000,
@@ -162,11 +164,17 @@ async function archiveProject(id) {
 }
 
 async function archiveProjectTemplate(id) {
-  return client.projectTemplates.archive(id)
+  const current = await client.projectTemplates.get(id)
+  return client.projectTemplates.archive(id, {
+    ifMatch: /** @type {any} */ (current.transport.headers.etag),
+  })
 }
 
 async function archiveTask(id) {
-  return client.tasks.archive(id)
+  const current = await client.tasks.get(id)
+  return client.tasks.archive(id, {
+    ifMatch: /** @type {any} */ (current.transport.headers.etag),
+  })
 }
 
 async function startSignedWebhookReceiver() {
@@ -368,9 +376,11 @@ try {
     assert.equal(deliveredWebhook.data.attributes.failCount, 0)
   }
 
-  const updatedTask = await client.tasks.update(taskId, {
-    name: `${taskInput.name} updated`,
-  })
+  const updatedTask = await client.tasks.update(
+    taskId,
+    { name: `${taskInput.name} updated` },
+    { ifMatch: /** @type {any} */ (createdTask.transport.headers.etag) },
+  )
   assert.equal(updatedTask.data.attributes.name, `${taskInput.name} updated`)
   assert.equal((await client.tasks.get(taskId)).data.id, taskId)
 
@@ -475,6 +485,7 @@ try {
     { name: `Staging instantiated project ${runId}` },
     {
       idempotencyKey: `staging-e2e-instantiate-${runId}`,
+      ifMatch: /** @type {any} */ (projectTemplate.transport.headers.etag),
     },
   )
   const completedInstantiation = await client.projectTemplateInstantiations.wait(

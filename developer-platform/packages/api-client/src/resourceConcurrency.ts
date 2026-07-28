@@ -2,6 +2,7 @@ import { TeamGridClientError } from './errors.js'
 import type {
   Project,
   ProjectLifecycleOperation,
+  ProjectSharing,
   ProjectTemplate,
   ProjectTemplateInstantiation,
   Task,
@@ -12,6 +13,7 @@ type RecordValue = Record<string, unknown>
 const canonicalDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
 const templateIdPattern = /^[A-Za-z0-9_-]{1,128}$/
 const anyStringPattern = /^[\s\S]*$/
+const developerRevisionPattern = /^[a-f0-9]{64}$/
 
 function invalidResponse(label: string, detail: string): never {
   throw new TeamGridClientError(
@@ -76,7 +78,7 @@ function stringArray(value: unknown): value is string[] {
 
 function exactResource(
   value: unknown,
-  type: 'project' | 'projectTemplate' | 'task',
+  type: 'project' | 'projectSharing' | 'projectTemplate' | 'task',
   idPattern: RegExp,
   attributes: (value: unknown) => boolean,
 ) {
@@ -94,22 +96,39 @@ export const taskValidator = (value: unknown): value is Task =>
     if (
       !hasExactKeys(attributes, [
         'archived',
+        'archivedAt',
         'assigneeId',
         'billable',
         'completed',
+        'completedAt',
+        'completedById',
+        'commentsCount',
+        'contactId',
         'createdAt',
+        'createdById',
         'description',
+        'developerRevision',
+        'developerUpdatedAt',
+        'duplicateOfTaskId',
         'dueAt',
+        'filesCount',
         'groupId',
         'listId',
+        'listOrder',
         'name',
+        'order',
+        'personalListId',
+        'personalListOrder',
         'plannedEndAt',
         'plannedMinutes',
         'plannedStartAt',
         'projectId',
         'serviceId',
         'subscriberIds',
+        'subtasksCount',
+        'subtasks',
         'tagIds',
+        'trackingActive',
         'updatedAt',
       ])
     ) {
@@ -117,22 +136,52 @@ export const taskValidator = (value: unknown): value is Task =>
     }
     return (
       typeof attributes.archived === 'boolean' &&
+      nullableDate(attributes.archivedAt) &&
       nullableId(attributes.assigneeId) &&
       (attributes.billable === null || typeof attributes.billable === 'boolean') &&
       typeof attributes.completed === 'boolean' &&
+      nullableDate(attributes.completedAt) &&
+      nullableId(attributes.completedById) &&
+      Number.isSafeInteger(attributes.commentsCount) &&
+      (attributes.commentsCount as number) >= 0 &&
+      nullableId(attributes.contactId) &&
       nullableDate(attributes.createdAt) &&
+      nullableId(attributes.createdById) &&
       typeof attributes.description === 'string' &&
+      typeof attributes.developerRevision === 'string' &&
+      developerRevisionPattern.test(attributes.developerRevision) &&
+      canonicalDate(attributes.developerUpdatedAt) &&
+      nullableId(attributes.duplicateOfTaskId) &&
       nullableDate(attributes.dueAt) &&
+      Number.isSafeInteger(attributes.filesCount) &&
+      (attributes.filesCount as number) >= 0 &&
       nullableId(attributes.groupId) &&
       nullableId(attributes.listId) &&
+      finiteNumberOrNull(attributes.listOrder) &&
       typeof attributes.name === 'string' &&
+      finiteNumberOrNull(attributes.order) &&
+      nullableId(attributes.personalListId) &&
+      finiteNumberOrNull(attributes.personalListOrder) &&
       nullableDate(attributes.plannedEndAt) &&
       finiteNumberOrNull(attributes.plannedMinutes) &&
       nullableDate(attributes.plannedStartAt) &&
       nullableId(attributes.projectId) &&
       nullableId(attributes.serviceId) &&
       stringArray(attributes.subscriberIds) &&
+      Number.isSafeInteger(attributes.subtasksCount) &&
+      (attributes.subtasksCount as number) >= 0 &&
+      Array.isArray(attributes.subtasks) &&
+      attributes.subtasks.every(
+        (subtask) =>
+          hasExactKeys(subtask, ['completed', 'id', 'name', 'order']) &&
+          typeof subtask.completed === 'boolean' &&
+          typeof subtask.id === 'string' &&
+          typeof subtask.name === 'string' &&
+          typeof subtask.order === 'number' &&
+          Number.isFinite(subtask.order),
+      ) &&
       stringArray(attributes.tagIds) &&
+      typeof attributes.trackingActive === 'boolean' &&
       nullableDate(attributes.updatedAt)
     )
   })
@@ -141,45 +190,112 @@ export const projectValidator = (value: unknown): value is Project =>
   exactResource(value, 'project', anyStringPattern, (attributes) => {
     if (
       !hasExactKeys(attributes, [
+        'actualEndAt',
+        'actualStartAt',
         'additionalContactIds',
         'archived',
         'color',
         'completed',
         'contactId',
         'createdAt',
+        'createdById',
         'description',
+        'developerRevision',
+        'developerUpdatedAt',
         'dueAt',
+        'duplicateOfProjectId',
+        'earliestEndAt',
+        'earliestStartAt',
         'individualId',
         'listId',
         'managerId',
         'name',
+        'order',
         'plannedEndAt',
         'plannedStartAt',
+        'schedulingOrder',
         'showInScheduling',
         'subscriberIds',
+        'tasksCompleted',
+        'tasksOpen',
+        'tasksTotal',
+        'lastActivityAt',
+        'latestEndAt',
+        'latestStartAt',
         'updatedAt',
       ])
     ) {
       return false
     }
     return (
+      nullableDate(attributes.actualEndAt) &&
+      nullableDate(attributes.actualStartAt) &&
       stringArray(attributes.additionalContactIds) &&
       typeof attributes.archived === 'boolean' &&
       nullableString(attributes.color) &&
       typeof attributes.completed === 'boolean' &&
       nullableId(attributes.contactId) &&
       nullableDate(attributes.createdAt) &&
+      nullableId(attributes.createdById) &&
       typeof attributes.description === 'string' &&
+      typeof attributes.developerRevision === 'string' &&
+      developerRevisionPattern.test(attributes.developerRevision) &&
+      canonicalDate(attributes.developerUpdatedAt) &&
       nullableDate(attributes.dueAt) &&
+      nullableId(attributes.duplicateOfProjectId) &&
+      nullableDate(attributes.earliestEndAt) &&
+      nullableDate(attributes.earliestStartAt) &&
       nullableId(attributes.individualId) &&
       nullableId(attributes.listId) &&
       nullableId(attributes.managerId) &&
       typeof attributes.name === 'string' &&
+      finiteNumberOrNull(attributes.order) &&
       nullableDate(attributes.plannedEndAt) &&
       nullableDate(attributes.plannedStartAt) &&
+      finiteNumberOrNull(attributes.schedulingOrder) &&
       typeof attributes.showInScheduling === 'boolean' &&
       stringArray(attributes.subscriberIds) &&
+      Number.isSafeInteger(attributes.tasksCompleted) &&
+      (attributes.tasksCompleted as number) >= 0 &&
+      Number.isSafeInteger(attributes.tasksOpen) &&
+      (attributes.tasksOpen as number) >= 0 &&
+      Number.isSafeInteger(attributes.tasksTotal) &&
+      (attributes.tasksTotal as number) >= 0 &&
+      nullableDate(attributes.lastActivityAt) &&
+      nullableDate(attributes.latestEndAt) &&
+      nullableDate(attributes.latestStartAt) &&
       nullableDate(attributes.updatedAt)
+    )
+  })
+
+export const projectSharingValidator = (value: unknown): value is ProjectSharing =>
+  exactResource(value, 'projectSharing', anyStringPattern, (attributes) => {
+    if (!hasExactKeys(attributes, ['availablePermissions', 'entries', 'revision'])) return false
+    if (
+      !stringArray(attributes.availablePermissions) ||
+      new Set(attributes.availablePermissions).size !== attributes.availablePermissions.length ||
+      attributes.availablePermissions.some(
+        (permission) => !boundedString(permission, 128, false),
+      ) ||
+      typeof attributes.revision !== 'string' ||
+      !developerRevisionPattern.test(attributes.revision) ||
+      !Array.isArray(attributes.entries) ||
+      attributes.entries.length > 1000
+    ) {
+      return false
+    }
+    const availablePermissions = attributes.availablePermissions
+    return attributes.entries.every(
+      (entry) =>
+        hasExactKeys(entry, ['permissions', 'userId', 'workspaceId']) &&
+        boundedString(entry.workspaceId, 128, false) &&
+        (entry.userId === null || boundedString(entry.userId, 128, false)) &&
+        stringArray(entry.permissions) &&
+        new Set(entry.permissions).size === entry.permissions.length &&
+        entry.permissions.every(
+          (permission) =>
+            boundedString(permission, 128, false) && availablePermissions.includes(permission),
+        ),
     )
   })
 
@@ -191,6 +307,8 @@ export const projectTemplateValidator = (value: unknown): value is ProjectTempla
         'color',
         'createdAt',
         'description',
+        'developerRevision',
+        'developerUpdatedAt',
         'originProjectId',
         'snapshotVersion',
         'stats',
@@ -207,6 +325,9 @@ export const projectTemplateValidator = (value: unknown): value is ProjectTempla
       /^#[0-9a-f]{6}$/.test(attributes.color) &&
       nullableDate(attributes.createdAt) &&
       boundedString(attributes.description, 50_000) &&
+      typeof attributes.developerRevision === 'string' &&
+      developerRevisionPattern.test(attributes.developerRevision) &&
+      canonicalDate(attributes.developerUpdatedAt) &&
       (attributes.originProjectId === null ||
         (typeof attributes.originProjectId === 'string' &&
           boundedString(attributes.originProjectId, 128))) &&
@@ -289,11 +410,24 @@ export const projectLifecycleOperationValidator = (
         'finishedAt',
         'noOp',
         'projectId',
+        'resultRevision',
+        'sourceRevision',
         'startedAt',
         'state',
         'updatedAt',
       ],
-      ['action', 'attempts', 'checkpoints', 'createdAt', 'noOp', 'projectId', 'state', 'updatedAt'],
+      [
+        'action',
+        'attempts',
+        'checkpoints',
+        'createdAt',
+        'noOp',
+        'projectId',
+        'resultRevision',
+        'sourceRevision',
+        'state',
+        'updatedAt',
+      ],
     )
   ) {
     return false
@@ -308,6 +442,13 @@ export const projectLifecycleOperationValidator = (
     typeof attributes.noOp === 'boolean' &&
     typeof attributes.projectId === 'string' &&
     boundedString(attributes.projectId, 128, false) &&
+    (attributes.resultRevision === null ||
+      (typeof attributes.resultRevision === 'string' &&
+        developerRevisionPattern.test(attributes.resultRevision))) &&
+    typeof attributes.sourceRevision === 'string' &&
+    developerRevisionPattern.test(attributes.sourceRevision) &&
+    ((attributes.state === 'succeeded' && typeof attributes.resultRevision === 'string') ||
+      (attributes.state !== 'succeeded' && attributes.resultRevision === null)) &&
     canonicalDate(attributes.updatedAt) &&
     terminalStateIsConsistent(attributes, 5000)
   )
@@ -329,11 +470,22 @@ export const projectTemplateInstantiationValidator = (
         'finishedAt',
         'progress',
         'projectId',
+        'resultRevision',
+        'sourceRevision',
         'state',
         'templateId',
         'updatedAt',
       ],
-      ['createdAt', 'progress', 'projectId', 'state', 'templateId', 'updatedAt'],
+      [
+        'createdAt',
+        'progress',
+        'projectId',
+        'resultRevision',
+        'sourceRevision',
+        'state',
+        'templateId',
+        'updatedAt',
+      ],
     )
   ) {
     return false
@@ -357,6 +509,13 @@ export const projectTemplateInstantiationValidator = (
     Number(progress.tasksTotal) <= 5000 &&
     typeof attributes.projectId === 'string' &&
     templateIdPattern.test(attributes.projectId) &&
+    (attributes.resultRevision === null ||
+      (typeof attributes.resultRevision === 'string' &&
+        developerRevisionPattern.test(attributes.resultRevision))) &&
+    typeof attributes.sourceRevision === 'string' &&
+    developerRevisionPattern.test(attributes.sourceRevision) &&
+    ((attributes.state === 'succeeded' && typeof attributes.resultRevision === 'string') ||
+      (attributes.state !== 'succeeded' && attributes.resultRevision === null)) &&
     typeof attributes.templateId === 'string' &&
     templateIdPattern.test(attributes.templateId) &&
     canonicalDate(attributes.updatedAt) &&

@@ -64,7 +64,7 @@ function webhook(includeSecret = false) {
 }
 
 describe('developer control-plane SDK surfaces', () => {
-  it('routes all six operations with exact CAS, idempotency, and safe rotation semantics', async () => {
+  it('routes all control-plane operations with exact CAS and safe secret semantics', async () => {
     const calls = new Set<string>()
     const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = new URL(String(input))
@@ -131,6 +131,28 @@ describe('developer control-plane SDK surfaces', () => {
           'idempotency-replayed': 'false',
         })
       }
+      if (url.pathname === '/v1/webhooks/webhook-1' && method === 'PATCH') {
+        expect(headers.get('if-match')).toBe(`"${webhookRevision}"`)
+        expect(JSON.parse(String(init?.body))).toEqual({
+          actions: ['task.created', 'task.updated'],
+          disabled: false,
+        })
+        return envelope(
+          {
+            ...webhook(),
+            attributes: {
+              ...webhook().attributes,
+              actions: ['task.created', 'task.updated'],
+              revision: nextWebhookRevision,
+            },
+          },
+          200,
+          {
+            'cache-control': 'private, no-store, no-transform',
+            etag: `"${nextWebhookRevision}"`,
+          },
+        )
+      }
       throw new Error(`Unexpected request: ${method} ${url.pathname}`)
     })
     const client = new TeamGridClient({ fetch, token })
@@ -147,9 +169,15 @@ describe('developer control-plane SDK surfaces', () => {
       idempotencyKey: 'rotate-1',
       ifMatch: webhookRevision,
     })
+    const updatedWebhook = await client.webhooks.update(
+      'webhook-1',
+      { actions: ['task.created', 'task.updated'], disabled: false },
+      { ifMatch: webhookRevision },
+    )
 
     expect(updated.transport.idempotencyReplayed).toBe(false)
     expect(rotated.data.attributes.signingSecret).toBe(signingSecret)
+    expect(updatedWebhook.data.attributes.revision).toBe(nextWebhookRevision)
     expect(calls).toEqual(
       new Set([
         'GET /v1/system/capabilities',
@@ -158,8 +186,33 @@ describe('developer control-plane SDK surfaces', () => {
         'PATCH /v1/workspace/settings',
         'GET /v1/events/catalog',
         'POST /v1/webhooks/webhook-1/secret-rotation',
+        'PATCH /v1/webhooks/webhook-1',
       ]),
     )
+  })
+
+  it('rejects empty or unsafe webhook updates before transport', async () => {
+    const fetch = vi.fn()
+    const client = new TeamGridClient({ fetch, token })
+
+    await expect(
+      client.webhooks.update('webhook-1', {}, { ifMatch: webhookRevision }),
+    ).rejects.toMatchObject({ code: 'invalid_arguments' })
+    await expect(
+      client.webhooks.update(
+        'webhook-1',
+        { url: 'http://hooks.example.test/teamgrid' },
+        { ifMatch: webhookRevision },
+      ),
+    ).rejects.toMatchObject({ code: 'invalid_arguments' })
+    await expect(
+      client.webhooks.update(
+        'webhook-1',
+        { actions: ['task.updated', 'task.updated'] },
+        { ifMatch: webhookRevision },
+      ),
+    ).rejects.toMatchObject({ code: 'invalid_arguments' })
+    expect(fetch).not.toHaveBeenCalled()
   })
 
   it('accepts only an internally consistent idempotent secret replay', async () => {

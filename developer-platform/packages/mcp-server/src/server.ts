@@ -96,8 +96,14 @@ export function createReadOnlyHandlers(client: TeamGridClient) {
       client.callNotes.list(input),
     contactsList: (input: {
       archived?: boolean
+      category?: 'customer' | 'supplier' | 'team'
+      companyId?: string
+      createdById?: string
       cursor?: string
+      customerId?: string
+      groupId?: string
       limit?: number
+      parentContactId?: string
       type?: 'company' | 'person'
     }) => client.contacts.list(input),
     contactGet: (input: { id: string }) => client.contacts.get(input.id),
@@ -177,9 +183,13 @@ export function createReadOnlyHandlers(client: TeamGridClient) {
     }) => client.tasks.list(input),
     timeEntriesList: (input: {
       archived?: boolean
+      billable?: boolean
+      billed?: boolean
+      createdById?: string
       cursor?: string
       from?: string
       limit?: number
+      serviceId?: string
       taskId?: string
       to?: string
       userId?: string
@@ -338,7 +348,11 @@ export function createTeamGridMcpServer(
         .object({
           ...listInput,
           archived: z.boolean().optional(),
+          billable: z.boolean().optional(),
+          billed: z.boolean().optional(),
+          createdById: z.string().max(128).optional(),
           from: z.string().optional(),
+          serviceId: z.string().max(128).optional(),
           taskId: z.string().max(128).optional(),
           to: z.string().optional(),
           userId: z.string().max(128).optional(),
@@ -383,6 +397,12 @@ export function createTeamGridMcpServer(
         .object({
           ...listInput,
           archived: z.boolean().optional(),
+          category: z.enum(['customer', 'supplier', 'team']).optional(),
+          companyId: z.string().max(128).optional(),
+          createdById: z.string().max(128).optional(),
+          customerId: z.string().max(128).optional(),
+          groupId: z.string().max(128).optional(),
+          parentContactId: z.string().max(128).optional(),
           type: z.enum(['person', 'company']).optional(),
         })
         .strict(),

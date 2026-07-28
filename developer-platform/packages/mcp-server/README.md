@@ -27,15 +27,18 @@ reads; `governance` for webhook, service, and custom-field-definition
 reads; or `all` for the explicit 29-tool union. Project statements and webhook
 delivery history remain forbidden in every MCP profile. The adapter does not
 expose write or secret-bearing operations.
+Time-entry billing state is also forbidden in every profile because it is a
+finance-sensitive lock decision, not an interactive read tool.
 
-Project and task tools return the static Beta 2 resource shape. Core resource revisions, strong
-ETags, and compare-and-set inputs are not part of the MCP surface.
+Project and task tools include their stable developer revision. MCP remains intentionally
+read-only, so compare-and-set inputs are not part of its curated tool surface.
 
-The change feed is deferred beyond the `1.0.0-beta.2` public contract and is absent from every MCP
-profile. Per-resource
+The stable API and SDK expose a high-volume change feed, but it remains intentionally absent from
+every MCP profile because it is a synchronization primitive rather than an interactive model
+tool. Per-resource
 custom-field values, project templates and instantiation status, and planned-work schedules and
 operation status are also forbidden in every profile because they contain sensitive workflow or
 workload data. Even `all` does not register or advertise any of these operations. Custom-field
 *definition* reads remain the narrow exception in `governance`; all writes remain forbidden. The
-release gate verifies that the contract, SDK, CLI, and MCP adapter all keep the deferred surface
-absent.
+release gate verifies that the contract, SDK, and CLI expose it consistently while the MCP adapter
+keeps it forbidden.
