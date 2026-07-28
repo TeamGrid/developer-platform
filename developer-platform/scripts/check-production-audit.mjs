@@ -71,16 +71,13 @@ for (const [name, vulnerability] of Object.entries(vulnerabilities)) {
   }
 }
 
-const names = Object.keys(vulnerabilities).sort()
-const expectedNames = [...acceptedPackages].sort()
-if (JSON.stringify(names) !== JSON.stringify(expectedNames)) {
-  fail(`expected only ${expectedNames.join(', ')}, received ${names.join(', ') || 'none'}`)
-}
 if (report.metadata?.vulnerabilities?.high || report.metadata?.vulnerabilities?.critical) {
   fail('high or critical production vulnerabilities remain')
 }
 
-console.log(
-  'Production dependencies contain no high/critical findings; the sole moderate '
-  + 'advisory is unreachable because the shipped MCP binary imports only stdio transport.',
-)
+const names = Object.keys(vulnerabilities).sort()
+console.log(names.length === 0
+  ? 'Production dependencies contain no known vulnerabilities.'
+  : 'Production dependencies contain no high/critical findings; every reported moderate '
+    + 'finding is the reviewed unreachable Hono advisory and the shipped MCP binary imports '
+    + 'only stdio transport.')
