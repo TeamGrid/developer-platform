@@ -554,6 +554,22 @@ describe('TeamGrid CLI', () => {
     expect(input).toBe(token)
   })
 
+  it('fails closed instead of persisting credentials on unsupported Windows stores', async () => {
+    const run = vi.fn()
+    const store = new SystemCredentialStore({ currentPlatform: 'win32', run })
+
+    await expect(store.get('default')).rejects.toThrow(
+      'No supported OS credential store is available.',
+    )
+    await expect(store.set('default', token)).rejects.toThrow(
+      'No supported OS credential store is available.',
+    )
+    await expect(store.delete('default')).rejects.toThrow(
+      'No supported OS credential store is available.',
+    )
+    expect(run).not.toHaveBeenCalled()
+  })
+
   it('logs in from stdin and lists resources through the shared client', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
     const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
