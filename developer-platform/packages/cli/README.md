@@ -29,6 +29,11 @@ Linux Secret Service; they are never written to the profile JSON or passed to a
 credential helper as a command argument. Use JSON/JSONL for automation and
 `--yes` for destructive non-interactive operations.
 
+Node.js 22.14 through 24 is supported on Linux, macOS, and Windows. Persistent
+profiles are supported on macOS and Linux. Windows users provide
+`TEAMGRID_API_TOKEN` per process; Stable 1.0 intentionally does not persist
+tokens through an unqualified third-party credential helper.
+
 The CLI mirrors every public API operation, including project lifecycle jobs,
 products and product groups, finance-gated project statements, call notes,
 contact groups, custom-field definitions, and credential-owned webhook delivery

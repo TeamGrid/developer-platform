@@ -14,7 +14,11 @@ none imports Meteor runtime code.
 - `@teamgrid/mcp-server`: optional local stdio MCP adapter. It exposes only
   bounded read tools and delegates every request to the same API client.
 
-All three packages support and are qualified on Node.js 22.14 through Node.js 24.
+All three packages support Node.js 22.14 through Node.js 24 on Linux, macOS,
+and Windows. CI qualifies both Node boundaries on all three operating systems.
+Persistent CLI profiles use macOS Keychain or Linux Secret Service. On Windows,
+use the process-scoped `TEAMGRID_API_TOKEN`; Stable 1.0 does not persist secrets
+through an unqualified third-party credential helper.
 
 The stable 1.0 release is available from npm through the default `latest`
 channel:
@@ -36,9 +40,14 @@ Developer. A credential is shown once. The CLI stores it in macOS Keychain or
 Linux Secret Service; the non-secret profile file contains only region, cell,
 credential id, optional base URL, and timestamps.
 
-Credential creation appears only for workspaces in the controlled Developer
-Platform beta and while server-side issuance is enabled. Existing credentials
-remain revocable during a rollout pause.
+On Windows, provide `TEAMGRID_API_TOKEN` to the process instead of running
+`teamgrid auth login`. The token is not written to disk, and routing defaults
+to the credential's signed cell hint. Set `TEAMGRID_API_BASE_URL` only for an
+approved local or staging override.
+
+Credential creation is available to authorized administrators in entitled,
+unlocked workspaces while cell-local issuance is enabled. A rollout pause
+stops creation but keeps existing credentials revocable.
 
 The credential prefix carries an untrusted region/cell routing hint. The client
 derives `https://api.<region>.teamgrid.app/v1`; the target cell still verifies
@@ -132,9 +141,8 @@ verification. Legacy UI-created hooks remain version 1 during migration and do
 not receive these signature headers.
 
 Authorized workspace administrators can also create signed v2 webhooks in
-TeamGrid Settings during the controlled beta. The Settings UI presents signed
-v2 and legacy unsigned v1 hooks separately and reveals a new v2 signing secret
-only once.
+TeamGrid Settings. The Settings UI presents signed v2 and legacy unsigned v1
+hooks separately and reveals a new v2 signing secret only once.
 
 ## Optional MCP adapter
 
