@@ -104,6 +104,44 @@ describe('core resource runtime contract', () => {
     ).toBe(false)
   })
 
+  it('accepts the documented task subtask response shape', () => {
+    const current = task()
+    expect(
+      taskValidator({
+        ...current,
+        attributes: {
+          ...current.attributes,
+          subtasks: [
+            {
+              completed: false,
+              id: 'subtask-1',
+              order: null,
+              title: 'Review the release',
+            },
+          ],
+          subtasksCount: 1,
+        },
+      }),
+    ).toBe(true)
+    expect(
+      taskValidator({
+        ...current,
+        attributes: {
+          ...current.attributes,
+          subtasks: [
+            {
+              completed: false,
+              id: 'subtask-1',
+              name: 'Legacy validator field',
+              order: 1,
+            },
+          ],
+          subtasksCount: 1,
+        },
+      }),
+    ).toBe(false)
+  })
+
   it('canonicalizes and sends the required task If-Match precondition', async () => {
     const fetch = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
       expect(init?.method).toBe('PATCH')

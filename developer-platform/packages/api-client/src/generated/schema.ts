@@ -11,7 +11,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Discover API v1 */
+        /**
+         * Discover API v1
+         * @description Use this operation to discover API v1. It returns public contract, version, regional endpoint, and capability metadata without requiring a credential.
+         */
         get: operations["getApiVersion"];
         put?: never;
         post?: never;
@@ -28,7 +31,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get the authenticated workspace */
+        /**
+         * Get the authenticated workspace
+         * @description Use this operation to get the authenticated workspace. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getWorkspace"];
         put?: never;
         post?: never;
@@ -69,7 +75,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get an appointment */
+        /**
+         * Get an appointment
+         * @description Use this operation to get an appointment. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getAppointment"];
         put?: never;
         post?: never;
@@ -138,7 +147,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get an absence */
+        /**
+         * Get an absence
+         * @description Use this operation to get an absence. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getAbsence"];
         put?: never;
         post?: never;
@@ -247,7 +259,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a comment */
+        /**
+         * Get a comment
+         * @description Use this operation to get a comment. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getComment"];
         put?: never;
         post?: never;
@@ -312,7 +327,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a document */
+        /**
+         * Get a document
+         * @description Use this operation to get a document. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getDocument"];
         put?: never;
         post?: never;
@@ -377,7 +395,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get file metadata */
+        /**
+         * Get file metadata
+         * @description Use this operation to get file metadata. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Private content, destination secrets, and internal storage details are not exposed by this operation.
+         */
         get: operations["getFile"];
         put?: never;
         post?: never;
@@ -502,10 +523,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List products */
+        /**
+         * List products
+         * @description Use this operation to list products. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         get: operations["listProducts"];
         put?: never;
-        /** Create a product */
+        /**
+         * Create a product
+         * @description Use this operation to create a product. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         post: operations["createProduct"];
         delete?: never;
         options?: never;
@@ -520,15 +547,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a product */
+        /**
+         * Get a product
+         * @description Use this operation to get a product. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         get: operations["getProduct"];
         put?: never;
         post?: never;
-        /** Archive a product */
+        /**
+         * Archive a product
+         * @description Use this operation to archive a product. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         delete: operations["archiveProduct"];
         options?: never;
         head?: never;
-        /** Update a product */
+        /**
+         * Update a product
+         * @description Use this operation to update a product. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         patch: operations["updateProduct"];
         trace?: never;
     };
@@ -539,10 +575,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List product groups */
+        /**
+         * List product groups
+         * @description Use this operation to list product groups. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listProductGroups"];
         put?: never;
-        /** Create a product group */
+        /**
+         * Create a product group
+         * @description Use this operation to create a product group. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createProductGroup"];
         delete?: never;
         options?: never;
@@ -557,15 +599,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a product group */
+        /**
+         * Get a product group
+         * @description Use this operation to get a product group. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getProductGroup"];
         put?: never;
         post?: never;
-        /** Archive a product group */
+        /**
+         * Archive a product group
+         * @description Use this operation to archive a product group. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["archiveProductGroup"];
         options?: never;
         head?: never;
-        /** Update a product group */
+        /**
+         * Update a product group
+         * @description Use this operation to update a product group. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         patch: operations["updateProductGroup"];
         trace?: never;
     };
@@ -576,10 +627,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List projects */
+        /**
+         * List projects
+         * @description Use this operation to list projects. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listProjects"];
         put?: never;
-        /** Create a project */
+        /**
+         * Create a project
+         * @description Use this operation to create a project. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createProject"];
         delete?: never;
         options?: never;
@@ -594,7 +651,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a project */
+        /**
+         * Get a project
+         * @description Use this operation to get a project. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getProject"];
         put?: never;
         post?: never;
@@ -615,7 +675,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get project sharing */
+        /**
+         * Get project sharing
+         * @description Use this operation to get project sharing. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getProjectSharing"];
         /**
          * Replace project sharing
@@ -638,7 +701,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Complete a project asynchronously */
+        /**
+         * Complete a project asynchronously
+         * @description Use this operation to complete a project asynchronously. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["completeProject"];
         delete?: never;
         options?: never;
@@ -655,7 +721,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Reopen a project asynchronously */
+        /**
+         * Reopen a project asynchronously
+         * @description Use this operation to reopen a project asynchronously. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["reopenProject"];
         delete?: never;
         options?: never;
@@ -672,7 +741,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Archive a project asynchronously */
+        /**
+         * Archive a project asynchronously
+         * @description Use this operation to archive a project asynchronously. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["archiveProject"];
         delete?: never;
         options?: never;
@@ -689,7 +761,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore a project asynchronously */
+        /**
+         * Restore a project asynchronously
+         * @description Use this operation to restore a project asynchronously. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["restoreProject"];
         delete?: never;
         options?: never;
@@ -704,7 +779,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a project lifecycle operation */
+        /**
+         * Get a project lifecycle operation
+         * @description Use this operation to get a project lifecycle operation. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getProjectLifecycleOperation"];
         put?: never;
         post?: never;
@@ -897,10 +975,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List project statements */
+        /**
+         * List project statements
+         * @description Use this operation to list project statements. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         get: operations["listProjectStatements"];
         put?: never;
-        /** Create a project statement */
+        /**
+         * Create a project statement
+         * @description Use this operation to create a project statement. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         post: operations["createProjectStatement"];
         delete?: never;
         options?: never;
@@ -915,15 +999,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a project statement */
+        /**
+         * Get a project statement
+         * @description Use this operation to get a project statement. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         get: operations["getProjectStatement"];
         put?: never;
         post?: never;
-        /** Archive a project statement */
+        /**
+         * Archive a project statement
+         * @description Use this operation to archive a project statement. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         delete: operations["archiveProjectStatement"];
         options?: never;
         head?: never;
-        /** Update a project statement */
+        /**
+         * Update a project statement
+         * @description Use this operation to update a project statement. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         patch: operations["updateProjectStatement"];
         trace?: never;
     };
@@ -936,7 +1029,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore a project statement */
+        /**
+         * Restore a project statement
+         * @description Use this operation to restore a project statement. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Finance-protected fields are omitted or rejected unless the credential also has the documented finance scope.
+         */
         post: operations["restoreProjectStatement"];
         delete?: never;
         options?: never;
@@ -951,10 +1047,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List tasks */
+        /**
+         * List tasks
+         * @description Use this operation to list tasks. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listTasks"];
         put?: never;
-        /** Create a task */
+        /**
+         * Create a task
+         * @description Use this operation to create a task. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createTask"];
         delete?: never;
         options?: never;
@@ -989,7 +1091,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a task */
+        /**
+         * Get a task
+         * @description Use this operation to get a task. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getTask"];
         put?: never;
         post?: never;
@@ -1136,7 +1241,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Start task time tracking */
+        /**
+         * Start task time tracking
+         * @description Use this operation to start task time tracking. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         post: operations["startTaskTimer"];
         delete?: never;
         options?: never;
@@ -1153,7 +1261,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Stop task time tracking */
+        /**
+         * Stop task time tracking
+         * @description Use this operation to stop task time tracking. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         post: operations["stopTaskTimer"];
         delete?: never;
         options?: never;
@@ -1168,10 +1279,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List time entries */
+        /**
+         * List time entries
+         * @description Use this operation to list time entries. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listTimeEntries"];
         put?: never;
-        /** Create a time entry */
+        /**
+         * Create a time entry
+         * @description Use this operation to create a time entry. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createTimeEntry"];
         delete?: never;
         options?: never;
@@ -1186,15 +1303,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a time entry */
+        /**
+         * Get a time entry
+         * @description Use this operation to get a time entry. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getTimeEntry"];
         put?: never;
         post?: never;
-        /** Archive a time entry */
+        /**
+         * Archive a time entry
+         * @description Use this operation to archive a time entry. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["archiveTimeEntry"];
         options?: never;
         head?: never;
-        /** Update a time entry */
+        /**
+         * Update a time entry
+         * @description Use this operation to update a time entry. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         patch: operations["updateTimeEntry"];
         trace?: never;
     };
@@ -1231,7 +1357,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived time entry */
+        /**
+         * Restore an archived time entry
+         * @description Use this operation to restore an archived time entry. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         post: operations["restoreTimeEntry"];
         delete?: never;
         options?: never;
@@ -1246,10 +1375,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List contacts */
+        /**
+         * List contacts
+         * @description Use this operation to list contacts. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listContacts"];
         put?: never;
-        /** Create a contact */
+        /**
+         * Create a contact
+         * @description Use this operation to create a contact. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createContact"];
         delete?: never;
         options?: never;
@@ -1264,10 +1399,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List call notes */
+        /**
+         * List call notes
+         * @description Use this operation to list call notes. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listCallNotes"];
         put?: never;
-        /** Create a call note */
+        /**
+         * Create a call note
+         * @description Use this operation to create a call note. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createCallNote"];
         delete?: never;
         options?: never;
@@ -1282,11 +1423,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a call note */
+        /**
+         * Get a call note
+         * @description Use this operation to get a call note. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getCallNote"];
         put?: never;
         post?: never;
-        /** Archive a call note */
+        /**
+         * Archive a call note
+         * @description Use this operation to archive a call note. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["archiveCallNote"];
         options?: never;
         head?: never;
@@ -1302,7 +1449,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived call note */
+        /**
+         * Restore an archived call note
+         * @description Use this operation to restore an archived call note. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         post: operations["restoreCallNote"];
         delete?: never;
         options?: never;
@@ -1317,10 +1467,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List contact groups */
+        /**
+         * List contact groups
+         * @description Use this operation to list contact groups. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listContactGroups"];
         put?: never;
-        /** Create a contact group */
+        /**
+         * Create a contact group
+         * @description Use this operation to create a contact group. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createContactGroup"];
         delete?: never;
         options?: never;
@@ -1335,15 +1491,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a contact group */
+        /**
+         * Get a contact group
+         * @description Use this operation to get a contact group. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getContactGroup"];
         put?: never;
         post?: never;
-        /** Archive a contact group */
+        /**
+         * Archive a contact group
+         * @description Use this operation to archive a contact group. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["archiveContactGroup"];
         options?: never;
         head?: never;
-        /** Update a contact group */
+        /**
+         * Update a contact group
+         * @description Use this operation to update a contact group. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         patch: operations["updateContactGroup"];
         trace?: never;
     };
@@ -1356,7 +1521,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived contact group */
+        /**
+         * Restore an archived contact group
+         * @description Use this operation to restore an archived contact group. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         post: operations["restoreContactGroup"];
         delete?: never;
         options?: never;
@@ -1371,14 +1539,20 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a contact */
+        /**
+         * Get a contact
+         * @description Use this operation to get a contact. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getContact"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** Update a contact */
+        /**
+         * Update a contact
+         * @description Use this operation to update a contact. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         patch: operations["updateContact"];
         trace?: never;
     };
@@ -1389,7 +1563,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List workspace users */
+        /**
+         * List workspace users
+         * @description Use this operation to list workspace users. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listUsers"];
         put?: never;
         post?: never;
@@ -1406,10 +1583,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List workspace lists */
+        /**
+         * List workspace lists
+         * @description Use this operation to list workspace lists. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listLists"];
         put?: never;
-        /** Create a list */
+        /**
+         * Create a list
+         * @description Use this operation to create a list. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createList"];
         delete?: never;
         options?: never;
@@ -1424,15 +1607,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a list */
+        /**
+         * Get a list
+         * @description Use this operation to get a list. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getList"];
         put?: never;
         post?: never;
-        /** Archive a list */
+        /**
+         * Archive a list
+         * @description Use this operation to archive a list. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["archiveList"];
         options?: never;
         head?: never;
-        /** Update a list */
+        /**
+         * Update a list
+         * @description Use this operation to update a list. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         patch: operations["updateList"];
         trace?: never;
     };
@@ -1445,7 +1637,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived list */
+        /**
+         * Restore an archived list
+         * @description Use this operation to restore an archived list. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         post: operations["restoreList"];
         delete?: never;
         options?: never;
@@ -1460,10 +1655,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List services */
+        /**
+         * List services
+         * @description Use this operation to list services. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listServices"];
         put?: never;
-        /** Create a service */
+        /**
+         * Create a service
+         * @description Use this operation to create a service. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createService"];
         delete?: never;
         options?: never;
@@ -1478,15 +1679,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a service */
+        /**
+         * Get a service
+         * @description Use this operation to get a service. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getService"];
         put?: never;
         post?: never;
-        /** Archive a service */
+        /**
+         * Archive a service
+         * @description Use this operation to archive a service. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["archiveService"];
         options?: never;
         head?: never;
-        /** Update a service */
+        /**
+         * Update a service
+         * @description Use this operation to update a service. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         patch: operations["updateService"];
         trace?: never;
     };
@@ -1499,7 +1709,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived service */
+        /**
+         * Restore an archived service
+         * @description Use this operation to restore an archived service. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         post: operations["restoreService"];
         delete?: never;
         options?: never;
@@ -1514,10 +1727,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List tags */
+        /**
+         * List tags
+         * @description Use this operation to list tags. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listTags"];
         put?: never;
-        /** Create a tag */
+        /**
+         * Create a tag
+         * @description Use this operation to create a tag. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createTag"];
         delete?: never;
         options?: never;
@@ -1532,15 +1751,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a tag */
+        /**
+         * Get a tag
+         * @description Use this operation to get a tag. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getTag"];
         put?: never;
         post?: never;
-        /** Archive a tag */
+        /**
+         * Archive a tag
+         * @description Use this operation to archive a tag. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["archiveTag"];
         options?: never;
         head?: never;
-        /** Update a tag */
+        /**
+         * Update a tag
+         * @description Use this operation to update a tag. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         patch: operations["updateTag"];
         trace?: never;
     };
@@ -1553,7 +1781,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived tag */
+        /**
+         * Restore an archived tag
+         * @description Use this operation to restore an archived tag. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         post: operations["restoreTag"];
         delete?: never;
         options?: never;
@@ -1568,10 +1799,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List custom-field definitions */
+        /**
+         * List custom-field definitions
+         * @description Use this operation to list custom-field definitions. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listCustomFieldDefinitions"];
         put?: never;
-        /** Create a custom-field definition */
+        /**
+         * Create a custom-field definition
+         * @description Use this operation to create a custom-field definition. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createCustomFieldDefinition"];
         delete?: never;
         options?: never;
@@ -1586,15 +1823,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a custom-field definition */
+        /**
+         * Get a custom-field definition
+         * @description Use this operation to get a custom-field definition. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getCustomFieldDefinition"];
         put?: never;
         post?: never;
-        /** Archive a custom-field definition */
+        /**
+         * Archive a custom-field definition
+         * @description Use this operation to archive a custom-field definition. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["archiveCustomFieldDefinition"];
         options?: never;
         head?: never;
-        /** Update a custom-field definition */
+        /**
+         * Update a custom-field definition
+         * @description Use this operation to update a custom-field definition. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         patch: operations["updateCustomFieldDefinition"];
         trace?: never;
     };
@@ -1607,7 +1853,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an archived custom-field definition */
+        /**
+         * Restore an archived custom-field definition
+         * @description Use this operation to restore an archived custom-field definition. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         post: operations["restoreCustomFieldDefinition"];
         delete?: never;
         options?: never;
@@ -1670,7 +1919,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List developer audit events */
+        /**
+         * List developer audit events
+         * @description Use this operation to list developer audit events. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Returned events are privacy-reduced and never include credentials, raw secrets, or unrestricted request bodies.
+         */
         get: operations["listAuditEvents"];
         put?: never;
         post?: never;
@@ -1687,10 +1939,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List webhooks */
+        /**
+         * List webhooks
+         * @description Use this operation to list webhooks. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listWebhooks"];
         put?: never;
-        /** Create a webhook */
+        /**
+         * Create a webhook
+         * @description Use this operation to create a webhook. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createWebhook"];
         delete?: never;
         options?: never;
@@ -1745,11 +2003,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a webhook */
+        /**
+         * Get a webhook
+         * @description Use this operation to get a webhook. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getWebhook"];
         put?: never;
         post?: never;
-        /** Remove a webhook */
+        /**
+         * Remove a webhook
+         * @description Use this operation to remove a webhook. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["removeWebhook"];
         options?: never;
         head?: never;
@@ -1767,7 +2031,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List workspace members */
+        /**
+         * List workspace members
+         * @description Use this operation to list workspace members. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listMembers"];
         put?: never;
         post?: never;
@@ -1784,11 +2051,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a workspace member */
+        /**
+         * Get a workspace member
+         * @description Use this operation to get a workspace member. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getMember"];
         put?: never;
         post?: never;
-        /** Remove a workspace member */
+        /**
+         * Remove a workspace member
+         * @description Use this operation to remove a workspace member. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         delete: operations["removeMember"];
         options?: never;
         head?: never;
@@ -1808,7 +2081,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Change a member role */
+        /**
+         * Change a member role
+         * @description Use this operation to change a member role. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         patch: operations["updateMemberRole"];
         trace?: never;
     };
@@ -1819,10 +2095,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List pending invitations */
+        /**
+         * List pending invitations
+         * @description Use this operation to list pending invitations. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listInvitations"];
         put?: never;
-        /** Invite a workspace member */
+        /**
+         * Invite a workspace member
+         * @description Use this operation to invite a workspace member. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createInvitation"];
         delete?: never;
         options?: never;
@@ -1837,11 +2119,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a pending invitation */
+        /**
+         * Get a pending invitation
+         * @description Use this operation to get a pending invitation. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getInvitation"];
         put?: never;
         post?: never;
-        /** Cancel a pending invitation */
+        /**
+         * Cancel a pending invitation
+         * @description Use this operation to cancel a pending invitation. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         delete: operations["cancelInvitation"];
         options?: never;
         head?: never;
@@ -1857,7 +2145,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Resend a pending invitation */
+        /**
+         * Resend a pending invitation
+         * @description Use this operation to resend a pending invitation. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["resendInvitation"];
         delete?: never;
         options?: never;
@@ -1872,10 +2163,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List workspace roles */
+        /**
+         * List workspace roles
+         * @description Use this operation to list workspace roles. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listRoles"];
         put?: never;
-        /** Create a workspace role */
+        /**
+         * Create a workspace role
+         * @description Use this operation to create a workspace role. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createRole"];
         delete?: never;
         options?: never;
@@ -1890,15 +2187,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a workspace role */
+        /**
+         * Get a workspace role
+         * @description Use this operation to get a workspace role. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getRole"];
         put?: never;
         post?: never;
-        /** Delete a workspace role */
+        /**
+         * Delete a workspace role
+         * @description Use this operation to delete a workspace role. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         delete: operations["deleteRole"];
         options?: never;
         head?: never;
-        /** Update a workspace role */
+        /**
+         * Update a workspace role
+         * @description Use this operation to update a workspace role. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         patch: operations["updateRole"];
         trace?: never;
     };
@@ -1909,10 +2215,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List workspace groups */
+        /**
+         * List workspace groups
+         * @description Use this operation to list workspace groups. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listGroups"];
         put?: never;
-        /** Create a workspace group */
+        /**
+         * Create a workspace group
+         * @description Use this operation to create a workspace group. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createGroup"];
         delete?: never;
         options?: never;
@@ -1927,15 +2239,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a workspace group */
+        /**
+         * Get a workspace group
+         * @description Use this operation to get a workspace group. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getGroup"];
         put?: never;
         post?: never;
-        /** Delete a workspace group */
+        /**
+         * Delete a workspace group
+         * @description Use this operation to delete a workspace group. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         delete: operations["deleteGroup"];
         options?: never;
         head?: never;
-        /** Update a workspace group */
+        /**
+         * Update a workspace group
+         * @description Use this operation to update a workspace group. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         patch: operations["updateGroup"];
         trace?: never;
     };
@@ -2066,10 +2387,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List automation definitions */
+        /**
+         * List automation definitions
+         * @description Use this operation to list automation definitions. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listAutomationDefinitions"];
         put?: never;
-        /** Create an automation definition */
+        /**
+         * Create an automation definition
+         * @description Use this operation to create an automation definition. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
         post: operations["createAutomationDefinition"];
         delete?: never;
         options?: never;
@@ -2084,15 +2411,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get an automation definition */
+        /**
+         * Get an automation definition
+         * @description Use this operation to get an automation definition. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getAutomationDefinition"];
         put?: never;
         post?: never;
-        /** Archive an automation definition */
+        /**
+         * Archive an automation definition
+         * @description Use this operation to archive an automation definition. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         delete: operations["archiveAutomationDefinition"];
         options?: never;
         head?: never;
-        /** Update an automation definition */
+        /**
+         * Update an automation definition
+         * @description Use this operation to update an automation definition. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         patch: operations["updateAutomationDefinition"];
         trace?: never;
     };
@@ -2105,7 +2441,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Restore an automation definition */
+        /**
+         * Restore an automation definition
+         * @description Use this operation to restore an automation definition. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         post: operations["restoreAutomationDefinition"];
         delete?: never;
         options?: never;
@@ -2120,7 +2459,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List immutable automation definition versions */
+        /**
+         * List immutable automation definition versions
+         * @description Use this operation to list immutable automation definition versions. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listAutomationDefinitionVersions"];
         put?: never;
         post?: never;
@@ -2137,7 +2479,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List automation runs */
+        /**
+         * List automation runs
+         * @description Use this operation to list automation runs. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listAutomationRuns"];
         put?: never;
         post?: never;
@@ -2154,7 +2499,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get an automation run */
+        /**
+         * Get an automation run
+         * @description Use this operation to get an automation run. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getAutomationRun"];
         put?: never;
         post?: never;
@@ -2173,7 +2521,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Abort a running automation */
+        /**
+         * Abort a running automation
+         * @description Use this operation to abort a running automation. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
         post: operations["abortAutomationRun"];
         delete?: never;
         options?: never;
@@ -2288,7 +2639,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get public workspace settings */
+        /**
+         * Get public workspace settings
+         * @description Use this operation to get public workspace settings. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getWorkspaceSettings"];
         put?: never;
         post?: never;
@@ -2329,7 +2683,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List personal access tokens owned by the current user */
+        /**
+         * List personal access tokens owned by the current user
+         * @description Use this operation to list personal access tokens owned by the current user. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listPersonalAccessTokens"];
         put?: never;
         /**
@@ -2353,7 +2710,10 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Revoke a personal access token */
+        /**
+         * Revoke a personal access token
+         * @description Use this operation to revoke a personal access token. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["revokePersonalAccessToken"];
         options?: never;
         head?: never;
@@ -2387,7 +2747,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List service accounts */
+        /**
+         * List service accounts
+         * @description Use this operation to list service accounts. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["listServiceAccounts"];
         put?: never;
         /**
@@ -2408,15 +2771,24 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a service account */
+        /**
+         * Get a service account
+         * @description Use this operation to get a service account. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getServiceAccount"];
         put?: never;
         post?: never;
-        /** Permanently revoke a service account */
+        /**
+         * Permanently revoke a service account
+         * @description Use this operation to permanently revoke a service account. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["revokeServiceAccount"];
         options?: never;
         head?: never;
-        /** Enable or disable a service account */
+        /**
+         * Enable or disable a service account
+         * @description Use this operation to enable or disable a service account. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         patch: operations["updateServiceAccount"];
         trace?: never;
     };
@@ -2450,7 +2822,10 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Revoke a service account credential */
+        /**
+         * Revoke a service account credential
+         * @description Use this operation to revoke a service account credential. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         delete: operations["revokeServiceAccountCredential"];
         options?: never;
         head?: never;
@@ -2484,7 +2859,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get the complete service account resource grant set */
+        /**
+         * Get the complete service account resource grant set
+         * @description Use this operation to get the complete service account resource grant set. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
         get: operations["getServiceAccountResourceGrants"];
         /**
          * Replace the complete service account resource grant set
@@ -2502,1185 +2880,2389 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description Public API representation of api error. */
         ApiError: {
+            /** @description Stable machine-readable code for programmatic error or state handling. */
             code: string;
+            /** @description The detail associated with this api error. */
             detail: string;
+            /** @description The source associated with this api error. */
             source?: {
                 [key: string]: string;
             };
+            /** @description Canonical status of the resource or operation. */
             status: string;
+            /** @description Human-readable title of the resource. */
             title: string;
         };
+        /** @description Public API representation of error. */
         ErrorEnvelope: {
+            /** @description The errors associated with this error. */
             errors: components["schemas"]["ApiError"][];
+            /** @description Request metadata, including the request identifier and pagination state when applicable. */
             meta: components["schemas"]["ResponseMeta"];
         };
+        /** @description Public API representation of meta. */
         ResponseMeta: {
+            /** @description Unique identifier assigned to the API request for tracing and support. */
             requestId: string;
         };
+        /** @description Public API representation of api version. */
         ApiVersionEnvelope: {
+            /** @description Response data for the completed request. */
             data: {
-                /** @constant */
+                /**
+                 * @description The contract version associated with this api version data.
+                 * @constant
+                 */
                 contractVersion: "1.0.0";
+                /** @description The deprecations associated with this api version data. */
                 deprecations: {
+                    /** @description Stable TeamGrid identifier for this resource. */
                     id: string;
+                    /** @description Human-readable explanation intended to help diagnose the result. */
                     message: string;
-                    /** Format: uri */
+                    /**
+                     * Format: uri
+                     * @description HTTPS URL used for replacement.
+                     */
                     replacement: string | null;
-                    /** Format: date-time */
+                    /**
+                     * Format: date-time
+                     * @description ISO 8601 timestamp for sunset at.
+                     */
                     sunsetAt: string | null;
                 }[];
-                /** Format: uri */
+                /**
+                 * Format: uri
+                 * @description HTTPS URL used for documentation.
+                 */
                 documentation: string;
+                /** @description The manifest sha256 associated with this api version data. */
                 manifestSha256: string;
+                /** @description TeamGrid data region that owns and serves the workspace. */
                 region: string | null;
-                /** @constant */
+                /**
+                 * @description Canonical status of the resource or operation.
+                 * @constant
+                 */
                 status: "operational";
+                /** @description The supported clients associated with this api version data. */
                 supportedClients: {
+                    /** @description The cli associated with this api version data supported clients. */
                     cli: {
-                        /** @constant */
+                        /**
+                         * @description The minimum version associated with this api version data supported clients cli.
+                         * @constant
+                         */
                         minimumVersion: "1.0.0";
-                        /** @constant */
+                        /**
+                         * @description The supported major associated with this api version data supported clients cli.
+                         * @constant
+                         */
                         supportedMajor: 1;
                     };
+                    /** @description The mcp associated with this api version data supported clients. */
                     mcp: {
-                        /** @constant */
+                        /**
+                         * @description The minimum version associated with this api version data supported clients mcp.
+                         * @constant
+                         */
                         minimumVersion: "1.0.0";
-                        /** @constant */
+                        /**
+                         * @description The supported major associated with this api version data supported clients mcp.
+                         * @constant
+                         */
                         supportedMajor: 1;
                     };
+                    /** @description The sdk associated with this api version data supported clients. */
                     sdk: {
-                        /** @constant */
+                        /**
+                         * @description The minimum version associated with this api version data supported clients sdk.
+                         * @constant
+                         */
                         minimumVersion: "1.0.0";
-                        /** @constant */
+                        /**
+                         * @description The supported major associated with this api version data supported clients sdk.
+                         * @constant
+                         */
                         supportedMajor: 1;
                     };
                 };
-                /** @constant */
+                /**
+                 * @description The version associated with this api version data.
+                 * @constant
+                 */
                 version: "1";
             };
+            /** @description Request metadata, including the request identifier and pagination state when applicable. */
             meta: components["schemas"]["ResponseMeta"];
         };
+        /** @description Public API representation of workspace. */
         Workspace: {
+            /** @description The attributes associated with this workspace. */
             attributes: {
+                /** @description Identifier of the owning TeamGrid application cell. */
                 cellId: string;
+                /** @description ISO 4217 currency code used for monetary values. */
                 currency: string | null;
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description TeamGrid data region that owns and serves the workspace. */
                 region: string;
+                /** @description The subdomain associated with this workspace attributes. */
                 subdomain: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "workspace";
         };
+        /** @description Public API representation of appointment. */
         Appointment: {
+            /** @description The attributes associated with this appointment. */
             attributes: {
+                /** @description Whether all day applies to this appointment attributes. */
                 allDay: boolean;
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description Whether busy applies to this appointment attributes. */
                 busy: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Human-readable description of the resource. */
                 description: string | null;
+                /** @description End timestamp of the represented interval. */
                 end: {
-                    /** Format: date-time */
+                    /**
+                     * Format: date-time
+                     * @description ISO 8601 timestamp for at.
+                     */
                     at: string;
+                    /** @description The time zone associated with this appointment attributes end. */
                     timeZone: string | null;
                 };
+                /** @description The location associated with this appointment attributes. */
                 location: string | null;
-                /** @enum {string} */
+                /**
+                 * @description Canonical managed by value for this appointment attributes.
+                 * @enum {string}
+                 */
                 managedBy: "provider" | "teamgrid";
+                /** @description Whether redacted applies to this appointment attributes. */
                 redacted: boolean;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
+                /** @description Start timestamp of the represented interval. */
                 start: {
-                    /** Format: date-time */
+                    /**
+                     * Format: date-time
+                     * @description ISO 8601 timestamp for at.
+                     */
                     at: string;
+                    /** @description The time zone associated with this appointment attributes start. */
                     timeZone: string | null;
                 };
+                /** @description Human-readable title of the resource. */
                 title: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
+                /** @description Identifier of the related workspace user. */
                 userId: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical visibility value for this appointment attributes.
+                 * @enum {string}
+                 */
                 visibility: "default" | "private" | "public";
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "appointment";
         };
+        /** @description Public API representation of appointment. */
         AppointmentCreate: {
+            /** @description Whether all day applies to this appointment. */
             allDay?: boolean;
+            /** @description Whether busy applies to this appointment. */
             busy?: boolean;
+            /** @description Human-readable description of the resource. */
             description?: string;
+            /** @description End timestamp of the represented interval. */
             end: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for at.
+                 */
                 at: string;
+                /** @description The time zone associated with this appointment end. */
                 timeZone?: string;
             };
+            /** @description The location associated with this appointment. */
             location?: string;
+            /** @description Start timestamp of the represented interval. */
             start: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for at.
+                 */
                 at: string;
+                /** @description The time zone associated with this appointment start. */
                 timeZone?: string;
             };
+            /** @description Human-readable title of the resource. */
             title?: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical visibility value for this appointment.
+             * @enum {string}
+             */
             visibility?: "default" | "private" | "public";
+            /** @description Identifier of the related workspace user. */
             userId?: string;
         };
+        /** @description Public API representation of appointment. */
         AppointmentUpdate: {
+            /** @description Whether all day applies to this appointment. */
             allDay?: boolean;
+            /** @description Whether busy applies to this appointment. */
             busy?: boolean;
+            /** @description Human-readable description of the resource. */
             description?: string;
+            /** @description End timestamp of the represented interval. */
             end?: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for at.
+                 */
                 at: string;
+                /** @description The time zone associated with this appointment end. */
                 timeZone?: string;
             };
+            /** @description The location associated with this appointment. */
             location?: string;
+            /** @description Start timestamp of the represented interval. */
             start?: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for at.
+                 */
                 at: string;
+                /** @description The time zone associated with this appointment start. */
                 timeZone?: string;
             };
+            /** @description Human-readable title of the resource. */
             title?: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical visibility value for this appointment.
+             * @enum {string}
+             */
             visibility?: "default" | "private" | "public";
         };
+        /** @description Public API representation of absence. */
         Absence: {
+            /** @description The attributes associated with this absence. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was archived, or null when it is active.
+                 */
                 archivedAt: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description End timestamp of the represented interval.
+                 */
                 end: string;
+                /** @description The reason associated with this absence attributes. */
                 reason: string | null;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Start timestamp of the represented interval.
+                 */
                 start: string;
+                /** @description Identifier of the related workspace user. */
                 userId: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "absence";
         };
+        /** @description Public API representation of absence. */
         AbsenceCreate: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description End timestamp of the represented interval.
+             */
             end: string;
+            /** @description The reason associated with this absence. */
             reason?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Start timestamp of the represented interval.
+             */
             start: string;
+            /** @description Identifier of the related workspace user. */
             userId?: string;
         };
+        /** @description Public API representation of absence. */
         AbsenceUpdate: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description End timestamp of the represented interval.
+             */
             end?: string;
+            /** @description The reason associated with this absence. */
             reason?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Start timestamp of the represented interval.
+             */
             start?: string;
         };
+        /** @description Public API representation of availability. */
         Availability: {
+            /** @description The attributes associated with this availability. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description End timestamp of the represented interval.
+                 */
                 end: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Start timestamp of the represented interval.
+                 */
                 start: string;
+                /** @description The time zone associated with this availability attributes. */
                 timeZone: string;
+                /** @description The users associated with this availability attributes. */
                 users: {
+                    /** @description The intervals associated with this availability attributes users. */
                     intervals: {
-                        /** Format: date-time */
+                        /**
+                         * Format: date-time
+                         * @description End timestamp of the represented interval.
+                         */
                         end: string;
-                        /** Format: date-time */
+                        /**
+                         * Format: date-time
+                         * @description Start timestamp of the represented interval.
+                         */
                         start: string;
                     }[];
+                    /** @description Identifier of the related workspace user. */
                     userId: string;
                 }[];
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "availability";
         };
+        /** @description Public API representation of activity event. */
         ActivityEvent: {
+            /** @description The attributes associated with this activity event. */
             attributes: {
+                /** @description The actor id associated with this activity event attributes. */
                 actorId: string | null;
+                /** @description The event type associated with this activity event attributes. */
                 eventType: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for occurred at.
+                 */
                 occurredAt: string;
+                /** @description The target associated with this activity event attributes. */
                 target: {
+                    /** @description Stable TeamGrid identifier for this resource. */
                     id: string;
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical type discriminator for this resource.
+                     * @enum {string}
+                     */
                     type: "contact" | "project" | "task";
                 };
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "activityEvent";
         };
+        /** @description Public API representation of comment. */
         Comment: {
+            /** @description The attributes associated with this comment. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description The author id associated with this comment attributes. */
                 authorId: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
+                /** @description The target associated with this comment attributes. */
                 target: {
+                    /** @description Stable TeamGrid identifier for this resource. */
                     id: string;
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical type discriminator for this resource.
+                     * @enum {string}
+                     */
                     type: "contact" | "project" | "task";
                 };
+                /** @description The text associated with this comment attributes. */
                 text: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "comment";
         };
+        /** @description Public API representation of comment. */
         CommentCreate: {
+            /** @description Identifier of the target resource. */
             targetId: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical type of the target resource.
+             * @enum {string}
+             */
             targetType: "contact" | "project" | "task";
+            /** @description The text associated with this comment. */
             text: string;
         };
+        /** @description Public API representation of file. */
         File: {
+            /** @description The attributes associated with this file. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description Whether blocked applies to this file attributes. */
                 blocked: boolean;
+                /** @description The content revision associated with this file attributes. */
                 contentRevision: number | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Identifier of the user or principal that created the resource. */
                 createdBy: string | null;
+                /** @description Whether download available applies to this file attributes. */
                 downloadAvailable: boolean;
+                /** @description The links associated with this file attributes. */
                 links: {
+                    /** @description The entity id associated with this file attributes links. */
                     entityId: string;
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical entity type value for this file attributes links.
+                     * @enum {string}
+                     */
                     entityType: "comment" | "contact" | "customField" | "outcome" | "project" | "streamItem" | "task" | "team";
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical link type value for this file attributes links.
+                     * @enum {string}
+                     */
                     linkType: "attachment" | "folder" | "generated" | "manual" | "primary" | "system";
                 }[];
+                /** @description The metadata revision associated with this file attributes. */
                 metadataRevision: number | null;
+                /** @description IANA media type of the file content. */
                 mimeType: string;
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description The preview status associated with this file attributes. */
                 previewStatus: string;
+                /** @description File size in bytes. */
                 size: number;
-                /** @enum {string} */
+                /**
+                 * @description Canonical space value for this file attributes.
+                 * @enum {string}
+                 */
                 space: "contacts" | "projects" | "tasks" | "team";
+                /** @description The sync revision associated with this file attributes. */
                 syncRevision: number | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
+                /** @description Identifier of the user or principal that most recently updated the resource. */
                 updatedBy: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "file";
         };
+        /** @description Public API representation of document. */
         Document: {
+            /** @description The attributes associated with this document. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description The content associated with this document attributes. */
                 readonly content?: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Identifier of the user or principal that created the resource. */
                 createdBy: string | null;
+                /** @description Human-readable name of the resource. */
                 name: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
+                /** @description Identifier of the user or principal that most recently updated the resource. */
                 updatedBy: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "document";
         };
+        /** @description Public API representation of document. */
         DocumentCreate: {
+            /** @description The content associated with this document. */
             content: string;
+            /** @description Human-readable name of the resource. */
             name: string;
         };
+        /** @description Public API representation of document. */
         DocumentUpdate: {
+            /** @description The content associated with this document. */
             content?: string;
+            /** @description Human-readable name of the resource. */
             name?: string;
         };
+        /** @description Public API representation of file rename. */
         FileRename: {
+            /** @description Human-readable name of the resource. */
             name: string;
         };
+        /** @description Public API representation of file transfer. */
         FileTransfer: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Timestamp after which this capability or record is no longer valid.
+             */
             expiresAt: string;
+            /** @description The headers associated with this file transfer. */
             headers: {
+                /** @description The content length associated with this file transfer headers. */
                 "content-length"?: string;
+                /** @description The content type associated with this file transfer headers. */
                 "content-type"?: string;
-                /** @constant */
+                /**
+                 * @description The x amz acl associated with this file transfer headers.
+                 * @constant
+                 */
                 "x-amz-acl"?: "private";
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
+            /** @description The max size associated with this file transfer. */
             maxSize: number | null;
-            /** @enum {string} */
+            /**
+             * @description Canonical method value for this file transfer.
+             * @enum {string}
+             */
             method: "GET" | "PUT";
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description HTTPS URL associated with the resource.
+             */
             url: string;
         };
+        /** @description Public API representation of file transfer metadata. */
         FileTransferMetadata: {
+            /** @description Original or user-visible name of the file. */
             fileName: string;
+            /** @description IANA media type of the file content. */
             mimeType: string;
+            /** @description File size in bytes. */
             size: number;
         };
+        /** @description Public API representation of file download intent. */
         FileDownloadIntent: {
+            /** @description The attributes associated with this file download intent. */
             attributes: {
+                /** @description The file associated with this file download intent attributes. */
                 file: components["schemas"]["FileTransferMetadata"];
+                /** @description The transfer associated with this file download intent attributes. */
                 transfer: components["schemas"]["FileTransfer"];
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "fileDownloadIntent";
         };
+        /** @description Public API representation of file upload intent. */
         FileUploadIntent: {
+            /** @description The attributes associated with this file upload intent. */
             attributes: {
+                /** @description The file associated with this file upload intent attributes. */
                 file: components["schemas"]["FileTransferMetadata"];
+                /** @description The transfer associated with this file upload intent attributes. */
                 transfer: components["schemas"]["FileTransfer"];
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "fileUploadIntent";
         };
+        /** @description Public API representation of file upload cancellation. */
         FileUploadCancellation: {
+            /** @description The attributes associated with this file upload cancellation. */
             attributes: {
+                /** @description Whether replayed applies to this file upload cancellation attributes. */
                 replayed: boolean;
-                /** @constant */
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @constant
+                 */
                 state: "canceled";
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "fileUploadIntent";
         };
+        /** @description Public API representation of file upload intent. */
         FileUploadIntentCreate: {
+            /** @description The destination associated with this file upload intent. */
             destination: {
+                /** @description Stable TeamGrid identifier for this resource. */
                 id: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type discriminator for this resource.
+                 * @enum {string}
+                 */
                 type: "contact" | "folder" | "project" | "task" | "team";
             };
+            /** @description The file associated with this file upload intent. */
             file: components["schemas"]["FileTransferMetadata"];
         };
+        /** @description Public API representation of project. */
         Project: {
+            /** @description The attributes associated with this project. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for actual end at.
+                 */
                 actualEndAt: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for actual start at.
+                 */
                 actualStartAt: string | null;
+                /** @description Ordered set of additional contact identifiers associated with this project attributes. */
                 additionalContactIds: string[];
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description Canonical color value used to display the resource. */
                 color: string | null;
+                /** @description Whether the work item is complete. */
                 completed: boolean;
+                /** @description Identifier of the related contact. */
                 contactId: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description The created by id associated with this project attributes. */
                 createdById: string | null;
+                /** @description Human-readable description of the resource. */
                 description: string;
+                /** @description The developer revision associated with this project attributes. */
                 developerRevision: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for developer updated at.
+                 */
                 developerUpdatedAt: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for due at.
+                 */
                 dueAt: string | null;
+                /** @description The duplicate of project id associated with this project attributes. */
                 duplicateOfProjectId: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for earliest end at.
+                 */
                 earliestEndAt: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for earliest start at.
+                 */
                 earliestStartAt: string | null;
+                /** @description The individual id associated with this project attributes. */
                 individualId: string | null;
+                /** @description Identifier of the related task list. */
                 listId: string | null;
+                /** @description The manager id associated with this project attributes. */
                 managerId: string | null;
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description The order associated with this project attributes. */
                 order: number | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for planned end at.
+                 */
                 plannedEndAt: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for planned start at.
+                 */
                 plannedStartAt: string | null;
+                /** @description The scheduling order associated with this project attributes. */
                 schedulingOrder: number | null;
+                /** @description Whether show in scheduling applies to this project attributes. */
                 showInScheduling: boolean;
+                /** @description Ordered set of subscriber identifiers associated with this project attributes. */
                 subscriberIds: string[];
+                /** @description The tasks completed associated with this project attributes. */
                 tasksCompleted: number;
+                /** @description The tasks open associated with this project attributes. */
                 tasksOpen: number;
+                /** @description The tasks total associated with this project attributes. */
                 tasksTotal: number;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for last activity at.
+                 */
                 lastActivityAt: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for latest end at.
+                 */
                 latestEndAt: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for latest start at.
+                 */
                 latestStartAt: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "project";
         };
+        /** @description Public API representation of project sharing entry. */
         ProjectSharingEntry: {
+            /** @description The permissions associated with this project sharing entry. */
             permissions: string[];
+            /** @description Identifier of the related workspace user. */
             userId: string | null;
+            /** @description Identifier of the authenticated TeamGrid workspace. */
             workspaceId: string;
         };
+        /** @description Public API representation of project sharing. */
         ProjectSharing: {
+            /** @description The attributes associated with this project sharing. */
             attributes: {
+                /** @description The available permissions associated with this project sharing attributes. */
                 availablePermissions: string[];
+                /** @description The entries associated with this project sharing attributes. */
                 entries: components["schemas"]["ProjectSharingEntry"][];
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "projectSharing";
         };
+        /** @description Public API representation of project sharing replace. */
         ProjectSharingReplace: {
+            /** @description The entries associated with this project sharing replace. */
             entries: {
+                /** @description The permissions associated with this project sharing replace entries. */
                 permissions?: string[];
+                /** @description Identifier of the related workspace user. */
                 userId?: string | null;
+                /** @description Identifier of the authenticated TeamGrid workspace. */
                 workspaceId: string;
             }[];
         };
         /** @description Safe project-template metadata. The captured project, list, and task snapshot, tenant fields, actor fields, and other storage internals are never exposed. */
         ProjectTemplate: {
+            /** @description The attributes associated with this project template. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description Canonical color value used to display the resource. */
                 color: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Human-readable description of the resource. */
                 description: string;
+                /** @description The developer revision associated with this project template attributes. */
                 developerRevision: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for developer updated at.
+                 */
                 developerUpdatedAt: string;
+                /** @description The origin project id associated with this project template attributes. */
                 originProjectId: string | null;
-                /** @enum {integer|null} */
+                /**
+                 * @description Canonical snapshot version value for this project template attributes.
+                 * @enum {integer|null}
+                 */
                 snapshotVersion: 1 | null;
+                /** @description The stats associated with this project template attributes. */
                 stats: {
+                    /** @description Number of list records represented by this project template attributes stats. */
                     listCount: number;
+                    /** @description Number of task records represented by this project template attributes stats. */
                     taskCount: number;
                 } | null;
+                /** @description Human-readable title of the resource. */
                 title: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "projectTemplate";
         };
         /** @description Credential-owned asynchronous instantiation status. Checkpoints, source snapshots, generated documents, tenant routing, runner state, and retry internals are never exposed. */
         ProjectTemplateInstantiation: {
+            /** @description The attributes associated with this project template instantiation. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string;
+                /** @description Sanitized failure information when the operation did not succeed. */
                 readonly error?: {
+                    /** @description Stable machine-readable code for programmatic error or state handling. */
                     code: string;
+                    /** @description Human-readable explanation intended to help diagnose the result. */
                     message: string;
                 };
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for finished at.
+                 */
                 readonly finishedAt?: string;
+                /** @description The progress associated with this project template instantiation attributes. */
                 progress: {
+                    /** @description The lists completed associated with this project template instantiation attributes progress. */
                     listsCompleted: number;
+                    /** @description The lists total associated with this project template instantiation attributes progress. */
                     listsTotal: number;
+                    /** @description The tasks completed associated with this project template instantiation attributes progress. */
                     tasksCompleted: number;
+                    /** @description The tasks total associated with this project template instantiation attributes progress. */
                     tasksTotal: number;
                 };
+                /** @description Identifier of the related project. */
                 projectId: string;
+                /** @description The result revision associated with this project template instantiation attributes. */
                 resultRevision: string | null;
+                /** @description Revision of the source resource accepted when the asynchronous operation was created. */
                 sourceRevision: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @enum {string}
+                 */
                 state: "failed" | "pending" | "running" | "succeeded";
+                /** @description The template id associated with this project template instantiation attributes. */
                 templateId: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string;
             } & (unknown & unknown & unknown);
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "projectTemplateInstantiation";
         };
+        /** @description Public API representation of project lifecycle operation. */
         ProjectLifecycleOperation: {
+            /** @description The attributes associated with this project lifecycle operation. */
             attributes: {
-                /** @enum {string} */
+                /**
+                 * @description Canonical action represented by this record.
+                 * @enum {string}
+                 */
                 action: "archive" | "complete" | "reopen" | "restore";
+                /** @description The attempts associated with this project lifecycle operation attributes. */
                 attempts: number;
+                /** @description The checkpoints associated with this project lifecycle operation attributes. */
                 checkpoints: {
+                    /** @description Whether assets applies to this project lifecycle operation attributes checkpoints. */
                     assets?: boolean;
+                    /** @description Whether automations applies to this project lifecycle operation attributes checkpoints. */
                     automations?: boolean;
+                    /** @description Whether final sweep applies to this project lifecycle operation attributes checkpoints. */
                     finalSweep?: boolean;
+                    /** @description Whether project applies to this project lifecycle operation attributes checkpoints. */
                     project?: boolean;
+                    /** @description The sweep after id associated with this project lifecycle operation attributes checkpoints. */
                     sweepAfterId?: string;
+                    /** @description Whether tasks applies to this project lifecycle operation attributes checkpoints. */
                     tasks?: boolean;
+                    /** @description The tasks after id associated with this project lifecycle operation attributes checkpoints. */
                     tasksAfterId?: string;
                 };
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string;
+                /** @description Sanitized failure information when the operation did not succeed. */
                 readonly error?: {
+                    /** @description Stable machine-readable code for programmatic error or state handling. */
                     code: string;
+                    /** @description Human-readable explanation intended to help diagnose the result. */
                     message: string;
                 };
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for finished at.
+                 */
                 readonly finishedAt?: string;
+                /** @description Whether no op applies to this project lifecycle operation attributes. */
                 noOp: boolean;
+                /** @description Identifier of the related project. */
                 projectId: string;
+                /** @description The result revision associated with this project lifecycle operation attributes. */
                 resultRevision: string | null;
+                /** @description Revision of the source resource accepted when the asynchronous operation was created. */
                 sourceRevision: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for started at.
+                 */
                 readonly startedAt?: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @enum {string}
+                 */
                 state: "failed" | "pending" | "running" | "succeeded";
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string;
             } & (unknown & unknown & unknown);
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "projectLifecycleOperation";
         };
+        /** @description Public API representation of task. */
         Task: {
+            /** @description The attributes associated with this task. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was archived, or null when it is active.
+                 */
                 archivedAt: string | null;
+                /** @description Identifier of the user assigned to this work item. */
                 assigneeId: string | null;
+                /** @description Whether this time or service can be billed. */
                 billable: boolean | null;
+                /** @description Whether the work item is complete. */
                 completed: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the work item was completed.
+                 */
                 completedAt: string | null;
+                /** @description The completed by id associated with this task attributes. */
                 completedById: string | null;
+                /** @description Number of comments records represented by this task attributes. */
                 commentsCount: number;
+                /** @description Identifier of the related contact. */
                 contactId: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description The created by id associated with this task attributes. */
                 createdById: string | null;
+                /** @description Human-readable description of the resource. */
                 description: string;
+                /** @description The developer revision associated with this task attributes. */
                 developerRevision: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for developer updated at.
+                 */
                 developerUpdatedAt: string;
+                /** @description The duplicate of task id associated with this task attributes. */
                 duplicateOfTaskId: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for due at.
+                 */
                 dueAt: string | null;
+                /** @description Number of files records represented by this task attributes. */
                 filesCount: number;
+                /** @description Identifier of the related workspace group. */
                 groupId: string | null;
+                /** @description Identifier of the related task list. */
                 listId: string | null;
+                /** @description The list order associated with this task attributes. */
                 listOrder: number | null;
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description The order associated with this task attributes. */
                 order: number | null;
+                /** @description The personal list id associated with this task attributes. */
                 personalListId: string | null;
+                /** @description The personal list order associated with this task attributes. */
                 personalListOrder: number | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for planned end at.
+                 */
                 plannedEndAt: string | null;
+                /** @description The planned minutes associated with this task attributes. */
                 plannedMinutes: number | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for planned start at.
+                 */
                 plannedStartAt: string | null;
+                /** @description Identifier of the related project. */
                 projectId: string | null;
+                /** @description Identifier of the related service. */
                 serviceId: string | null;
+                /** @description Ordered set of subscriber identifiers associated with this task attributes. */
                 subscriberIds: string[];
+                /** @description Number of subtasks records represented by this task attributes. */
                 subtasksCount: number;
+                /** @description The subtasks associated with this task attributes. */
                 subtasks: {
+                    /** @description Whether the work item is complete. */
                     completed: boolean;
+                    /** @description Stable TeamGrid identifier for this resource. */
                     id: string;
+                    /** @description The order associated with this task attributes subtasks. */
                     order: number | null;
+                    /** @description Human-readable title of the resource. */
                     title: string;
                 }[];
+                /** @description Ordered set of tag identifiers associated with this task attributes. */
                 tagIds: string[];
+                /** @description Whether tracking active applies to this task attributes. */
                 trackingActive: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "task";
         };
+        /** @description Public API representation of time entry. */
         TimeEntry: {
+            /** @description The attributes associated with this time entry. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description Whether this time or service can be billed. */
                 billable: boolean | null;
+                /** @description Whether billing has been finalized for this time entry. */
                 billed: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the time entry was marked as billed.
+                 */
                 billedAt: string | null;
+                /** @description The comment associated with this time entry attributes. */
                 comment: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description The created by id associated with this time entry attributes. */
                 createdById: string | null;
+                /** @description The duration minutes associated with this time entry attributes. */
                 durationMinutes: number | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for end at.
+                 */
                 endAt: string | null;
+                /** @description Identifier of the related service. */
                 serviceId: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for start at.
+                 */
                 startAt: string | null;
+                /** @description Identifier of the related task. */
                 taskId: string;
+                /** @description Whether tracking active applies to this time entry attributes. */
                 trackingActive: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
+                /** @description The updated by id associated with this time entry attributes. */
                 updatedById: string | null;
+                /** @description Identifier of the related workspace user. */
                 userId: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "timeEntry";
         };
         /** @description Conflict-safe billing and lock state for a time entry. TeamGrid currently has no separate approval state: billed means locked, and unbilled means editable subject to normal permissions. */
         TimeEntryBilling: {
+            /** @description The attributes associated with this time entry billing. */
             attributes: {
+                /** @description Whether billing has been finalized for this time entry. */
                 billed: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the time entry was marked as billed.
+                 */
                 billedAt: string | null;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "timeEntryBilling";
         };
+        /** @description Public API representation of call note. */
         CallNote: {
+            /** @description The attributes associated with this call note. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description The call id associated with this call note attributes. */
                 callId: string | null;
+                /** @description Ordered set of contact identifiers associated with this call note attributes. */
                 contactIds: string[];
+                /** @description The content associated with this call note attributes. */
                 content: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Ordered set of project identifiers associated with this call note attributes. */
                 projectIds: string[];
+                /** @description Ordered set of task identifiers associated with this call note attributes. */
                 taskIds: string[];
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
+                /** @description Ordered set of user identifiers associated with this call note attributes. */
                 userIds: string[];
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "callNote";
         };
+        /** @description Public API representation of contact. */
         Contact: {
+            /** @description The attributes associated with this contact. */
             attributes: {
+                /** @description The addresses associated with this contact attributes. */
                 addresses: {
+                    /** @description The address associated with this contact attributes addresses. */
                     address: {
+                        /** @description The city associated with this contact attributes addresses address. */
                         city: string | null;
+                        /** @description The country associated with this contact attributes addresses address. */
                         country: string | null;
+                        /** @description The full address associated with this contact attributes addresses address. */
                         fullAddress: string | null;
+                        /** @description The latitude associated with this contact attributes addresses address. */
                         latitude: number | null;
+                        /** @description The longitude associated with this contact attributes addresses address. */
                         longitude: number | null;
+                        /** @description The postal code associated with this contact attributes addresses address. */
                         postalCode: string | null;
+                        /** @description Canonical lifecycle state of the resource or operation. */
                         state: string | null;
+                        /** @description The street associated with this contact attributes addresses address. */
                         street: string | null;
+                        /** @description The street number associated with this contact attributes addresses address. */
                         streetNumber: string | null;
                     };
+                    /** @description Canonical type discriminator for this resource. */
                     type: string;
                 }[];
+                /** @description Whether this resource is archived. */
                 archived: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for birthday.
+                 */
                 birthday: string | null;
+                /** @description The category associated with this contact attributes. */
                 category: string | null;
+                /** @description The companies associated with this contact attributes. */
                 companies: {
+                    /** @description The address associated with this contact attributes companies. */
                     address: {
+                        /** @description The city associated with this contact attributes companies address. */
                         city: string | null;
+                        /** @description The country associated with this contact attributes companies address. */
                         country: string | null;
+                        /** @description The full address associated with this contact attributes companies address. */
                         fullAddress: string | null;
+                        /** @description The latitude associated with this contact attributes companies address. */
                         latitude: number | null;
+                        /** @description The longitude associated with this contact attributes companies address. */
                         longitude: number | null;
+                        /** @description The postal code associated with this contact attributes companies address. */
                         postalCode: string | null;
+                        /** @description Canonical lifecycle state of the resource or operation. */
                         state: string | null;
+                        /** @description The street associated with this contact attributes companies address. */
                         street: string | null;
+                        /** @description The street number associated with this contact attributes companies address. */
                         streetNumber: string | null;
                     } | null;
+                    /** @description The company id associated with this contact attributes companies. */
                     companyId: string | null;
+                    /** @description Email address associated with this record. */
                     email: string | null;
+                    /** @description The phone associated with this contact attributes companies. */
                     phone: string | null;
+                    /** @description The position associated with this contact attributes companies. */
                     position: string | null;
                 }[];
+                /** @description The company title associated with this contact attributes. */
                 companyTitle: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description The created by id associated with this contact attributes. */
                 createdById: string | null;
+                /** @description The customer id associated with this contact attributes. */
                 customerId: string | null;
+                /** @description The emails associated with this contact attributes. */
                 emails: {
+                    /** @description Email address associated with this record. */
                     email: string;
+                    /** @description Canonical type discriminator for this resource. */
                     type: string;
                 }[];
+                /** @description Number of employees records represented by this contact attributes. */
                 employeesCount: number;
+                /** @description The first name associated with this contact attributes. */
                 firstName: string;
+                /** @description The gender associated with this contact attributes. */
                 gender: string | null;
+                /** @description Identifier of the related workspace group. */
                 groupId: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for last activity at.
+                 */
                 lastActivityAt: string | null;
+                /** @description The last name associated with this contact attributes. */
                 lastName: string;
+                /** @description The nickname associated with this contact attributes. */
                 nickname: string;
+                /** @description The notes associated with this contact attributes. */
                 notes: string;
+                /** @description The parent contact id associated with this contact attributes. */
                 parentContactId: string | null;
+                /** @description The phone numbers associated with this contact attributes. */
                 phoneNumbers: {
+                    /** @description The number associated with this contact attributes phone numbers. */
                     number: string;
+                    /** @description Canonical type discriminator for this resource. */
                     type: string;
                 }[];
+                /** @description The projects completed associated with this contact attributes. */
                 projectsCompleted: number;
+                /** @description The projects open associated with this contact attributes. */
                 projectsOpen: number;
+                /** @description The projects total associated with this contact attributes. */
                 projectsTotal: number;
+                /** @description The salutation associated with this contact attributes. */
                 salutation: string;
+                /** @description The social networks associated with this contact attributes. */
                 socialNetworks: {
+                    /** @description Canonical type discriminator for this resource. */
                     type: string;
+                    /** @description The username associated with this contact attributes social networks. */
                     username: string;
                 }[];
+                /** @description The tasks completed associated with this contact attributes. */
                 tasksCompleted: number;
+                /** @description The tasks open associated with this contact attributes. */
                 tasksOpen: number;
+                /** @description The tasks total associated with this contact attributes. */
                 tasksTotal: number;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type discriminator for this resource.
+                 * @enum {string}
+                 */
                 type: "person" | "company";
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
+                /** @description The updated by id associated with this contact attributes. */
                 updatedById: string | null;
+                /** @description The websites associated with this contact attributes. */
                 websites: {
+                    /** @description Canonical type discriminator for this resource. */
                     type: string;
+                    /** @description HTTPS URL associated with the resource. */
                     url: string;
                 }[];
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "contact";
         };
+        /** @description Public API representation of contact group. */
         ContactGroup: {
+            /** @description The attributes associated with this contact group. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Identifier of the parent resource, or null for a root resource. */
                 parentId: string | null;
+                /** @description Human-readable title of the resource. */
                 title: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "contactGroup";
         };
         /** @description Product catalog entry. purchasePrice is finance-gated. */
         Product: {
+            /** @description The attributes associated with this product. */
             attributes: {
+                /** @description The amount associated with this product attributes. */
                 amount: number | null;
+                /** @description The annotation associated with this product attributes. */
                 annotation: string;
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description The cost center associated with this product attributes. */
                 costCenter: string[];
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Human-readable description of the resource. */
                 description: string;
+                /** @description Whether this resource is disabled for new use. */
                 disabled: boolean;
+                /** @description The finance account associated with this product attributes. */
                 financeAccount: string | null;
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description Ordered set of price group identifiers associated with this product attributes. */
                 priceGroupIds: string[];
+                /** @description Identifier of the product group that contains this product. */
                 productGroupId: string | null;
+                /** @description The product number associated with this product attributes. */
                 productNumber: string | null;
                 /** @description Internal acquisition cost. Present only with products:finance:read. */
                 readonly purchasePrice?: number | null;
+                /** @description The retail price associated with this product attributes. */
                 retailPrice: number | null;
+                /** @description The tax rate associated with this product attributes. */
                 taxRate: number | null;
+                /** @description The unit associated with this product attributes. */
                 unit: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "product";
         };
+        /** @description Public API representation of product group. */
         ProductGroup: {
+            /** @description The attributes associated with this product group. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Human-readable description of the resource. */
                 description: string;
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description Identifier of the parent resource, or null for a root resource. */
                 parentId: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "productGroup";
         };
         /** @description Budget statements and purchasePrice are finance-gated. Internal workflow, order, cart, and budget-rollup fields are never part of this public DTO. */
         ProjectStatement: {
+            /** @description The attributes associated with this project statement. */
             attributes: {
+                /** @description The amount associated with this project statement attributes. */
                 amount: number | null;
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description The comment associated with this project statement attributes. */
                 comment: string;
+                /** @description The count associated with this project statement attributes. */
                 count: number | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for date.
+                 */
                 date: string | null;
+                /** @description Human-readable description of the resource. */
                 description: string;
+                /** @description Whether is charge applies to this project statement attributes. */
                 isCharge: boolean;
+                /** @description The product id associated with this project statement attributes. */
                 productId: string | null;
+                /** @description The product number associated with this project statement attributes. */
                 productNumber: string | null;
+                /** @description Identifier of the related project. */
                 projectId: string | null;
                 /** @description Internal acquisition cost. Present only with project-statements:finance:read. */
                 readonly purchasePrice?: number | null;
+                /** @description Human-readable title of the resource. */
                 title: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type discriminator for this resource.
+                 * @enum {string}
+                 */
                 type: "budget" | "bundle" | "manual" | "product";
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "projectStatement";
         };
+        /** @description Public API representation of user. */
         User: {
+            /** @description The attributes associated with this user. */
             attributes: {
+                /** @description Whether this resource is disabled for new use. */
                 disabled: boolean;
+                /** @description The display name associated with this user attributes. */
                 displayName: string;
+                /** @description Email address associated with this record. */
                 email: string | null;
+                /** @description The first name associated with this user attributes. */
                 firstName: string;
+                /** @description The last name associated with this user attributes. */
                 lastName: string;
+                /** @description Identifier of the workspace role. */
                 roleId: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "user";
         };
+        /** @description Public API representation of list. */
         List: {
+            /** @description The attributes associated with this list. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description The order associated with this list attributes. */
                 order: number | null;
+                /** @description Identifier of the parent resource, or null for a root resource. */
                 parentId: string | null;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type discriminator for this resource.
+                 * @enum {string}
+                 */
                 type: "tasks" | "projects" | "personal";
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "list";
         };
+        /** @description Public API representation of service. */
         Service: {
+            /** @description The attributes associated with this service. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description Whether this time or service can be billed. */
                 billable: boolean;
+                /** @description The billing rate associated with this service attributes. */
                 billingRate: number | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Human-readable title of the resource. */
                 title: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "service";
         };
+        /** @description Public API representation of tag. */
         Tag: {
+            /** @description The attributes associated with this tag. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description Canonical color value used to display the resource. */
                 color: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Human-readable name of the resource. */
                 name: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
+                /** @description The usage associated with this tag attributes. */
                 usage: number;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "tag";
         };
+        /** @description Public API representation of custom field contact configuration. */
         CustomFieldContactConfiguration: {
+            /** @description Identifier of the related workspace group. */
             groupId?: string;
+            /** @description Whether multi applies to this custom field contact configuration. */
             multi?: boolean;
+            /** @description The placeholder associated with this custom field contact configuration. */
             placeholder?: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "contact";
         };
+        /** @description Public API representation of custom field date configuration. */
         CustomFieldDateConfiguration: {
+            /** @description The placeholder associated with this custom field date configuration. */
             placeholder?: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "date";
         };
+        /** @description Public API representation of custom field dropdown configuration. */
         CustomFieldDropdownConfiguration: {
+            /** @description Whether multi applies to this custom field dropdown configuration. */
             multi?: boolean;
+            /** @description The options associated with this custom field dropdown configuration. */
             options: {
+                /** @description The label associated with this custom field dropdown configuration options. */
                 label: string;
+                /** @description Canonical value represented by this field. */
                 value: string;
             }[];
+            /** @description The placeholder associated with this custom field dropdown configuration. */
             placeholder?: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "dropdown";
         };
+        /** @description Public API representation of custom field dropdown configuration. */
         CustomFieldDropdownConfigurationInput: {
+            /** @description Whether multi applies to this custom field dropdown configuration. */
             multi?: boolean;
+            /** @description The options associated with this custom field dropdown configuration. */
             options: {
+                /** @description The label associated with this custom field dropdown configuration options. */
                 label: string;
+                /** @description Canonical value represented by this field. */
                 value: string;
             }[];
+            /** @description The placeholder associated with this custom field dropdown configuration. */
             placeholder?: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "dropdown";
         };
+        /** @description Public API representation of custom field number configuration. */
         CustomFieldNumberConfiguration: {
+            /** @description Whether decimal separator applies to this custom field number configuration. */
             decimalSeparator?: boolean;
+            /** @description The max associated with this custom field number configuration. */
             max?: number;
+            /** @description The min associated with this custom field number configuration. */
             min?: number;
+            /** @description The placeholder associated with this custom field number configuration. */
             placeholder?: string;
+            /** @description Whether thousand separator applies to this custom field number configuration. */
             thousandSeparator?: boolean;
+            /** @description The unit associated with this custom field number configuration. */
             unit?: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "number";
         };
+        /** @description Public API representation of custom field project configuration. */
         CustomFieldProjectConfiguration: {
+            /** @description Whether multi applies to this custom field project configuration. */
             multi?: boolean;
+            /** @description The placeholder associated with this custom field project configuration. */
             placeholder?: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "project";
         };
+        /** @description Public API representation of custom field switcher configuration. */
         CustomFieldSwitcherConfiguration: {
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "switcher";
         };
+        /** @description Public API representation of custom field tag configuration. */
         CustomFieldTagConfiguration: {
+            /** @description Whether multi applies to this custom field tag configuration. */
             multi?: boolean;
+            /** @description The placeholder associated with this custom field tag configuration. */
             placeholder?: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "tag";
         };
+        /** @description Public API representation of custom field text configuration. */
         CustomFieldTextConfiguration: {
+            /** @description The max chars associated with this custom field text configuration. */
             maxChars?: number;
+            /** @description The placeholder associated with this custom field text configuration. */
             placeholder?: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "text";
         };
+        /** @description Public API representation of custom field textarea configuration. */
         CustomFieldTextareaConfiguration: {
+            /** @description The max chars associated with this custom field textarea configuration. */
             maxChars?: number;
+            /** @description The placeholder associated with this custom field textarea configuration. */
             placeholder?: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "textarea";
         };
+        /** @description Public API representation of custom field unsupported configuration. */
         CustomFieldUnsupportedConfiguration: {
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "unsupported";
         };
+        /** @description Public API representation of custom field user configuration. */
         CustomFieldUserConfiguration: {
+            /** @description Whether multi applies to this custom field user configuration. */
             multi?: boolean;
+            /** @description The placeholder associated with this custom field user configuration. */
             placeholder?: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "user";
         };
+        /** @description Public API representation of custom field definition configuration. */
         CustomFieldDefinitionConfiguration: components["schemas"]["CustomFieldContactConfiguration"] | components["schemas"]["CustomFieldDateConfiguration"] | components["schemas"]["CustomFieldDropdownConfiguration"] | components["schemas"]["CustomFieldNumberConfiguration"] | components["schemas"]["CustomFieldProjectConfiguration"] | components["schemas"]["CustomFieldSwitcherConfiguration"] | components["schemas"]["CustomFieldTagConfiguration"] | components["schemas"]["CustomFieldTextConfiguration"] | components["schemas"]["CustomFieldTextareaConfiguration"] | components["schemas"]["CustomFieldUserConfiguration"] | components["schemas"]["CustomFieldUnsupportedConfiguration"];
+        /** @description Public API representation of custom field definition writable configuration. */
         CustomFieldDefinitionWritableConfiguration: components["schemas"]["CustomFieldContactConfiguration"] | components["schemas"]["CustomFieldDateConfiguration"] | components["schemas"]["CustomFieldDropdownConfigurationInput"] | components["schemas"]["CustomFieldNumberConfiguration"] | components["schemas"]["CustomFieldProjectConfiguration"] | components["schemas"]["CustomFieldSwitcherConfiguration"] | components["schemas"]["CustomFieldTagConfiguration"] | components["schemas"]["CustomFieldTextConfiguration"] | components["schemas"]["CustomFieldTextareaConfiguration"] | components["schemas"]["CustomFieldUserConfiguration"];
+        /** @description Public API representation of custom field definition. */
         CustomFieldDefinition: {
+            /** @description The attributes associated with this custom field definition. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
-                /** @enum {string} */
+                /**
+                 * @description Canonical compatibility value for this custom field definition attributes.
+                 * @enum {string}
+                 */
                 compatibility: "invalid" | "readOnlyLegacy" | "unsupported" | "writable";
+                /** @description Type-specific, validated configuration for this resource. */
                 configuration: components["schemas"]["CustomFieldDefinitionConfiguration"];
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Whether default enabled applies to this custom field definition attributes. */
                 defaultEnabled: boolean;
+                /** @description Human-readable description of the resource. */
                 description: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type used to validate and interpret the custom field.
+                 * @enum {string}
+                 */
                 fieldType: "contact" | "date" | "dropdown" | "number" | "project" | "switcher" | "tag" | "text" | "textarea" | "user" | "unsupported";
+                /** @description The legacy target type associated with this custom field definition attributes. */
                 readonly legacyTargetType?: string;
+                /** @description The legacy type associated with this custom field definition attributes. */
                 readonly legacyType?: string;
+                /** @description Whether required applies to this custom field definition attributes. */
                 required: boolean;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type of the target resource.
+                 * @enum {string}
+                 */
                 targetType: "contact" | "project" | "projectJournalEntry" | "task" | "unsupported";
+                /** @description Human-readable title of the resource. */
                 title: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "customFieldDefinition";
         };
         /** @description The configuration discriminator must equal fieldType. */
         CustomFieldDefinitionCreate: {
+            /** @description Type-specific, validated configuration for this resource. */
             configuration: components["schemas"]["CustomFieldDefinitionWritableConfiguration"];
+            /** @description Whether default enabled applies to this custom field definition. */
             defaultEnabled?: boolean;
+            /** @description Human-readable description of the resource. */
             description?: string;
+            /** @description Whether required applies to this custom field definition. */
             required?: boolean;
+            /** @description Human-readable title of the resource. */
             title: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical type used to validate and interpret the custom field.
+             * @enum {string}
+             */
             fieldType: "contact" | "date" | "dropdown" | "number" | "project" | "switcher" | "tag" | "text" | "textarea" | "user";
-            /** @enum {string} */
+            /**
+             * @description Canonical type of the target resource.
+             * @enum {string}
+             */
             targetType: "contact" | "project" | "projectJournalEntry" | "task";
         };
+        /** @description Public API representation of custom field definition. */
         CustomFieldDefinitionUpdate: {
+            /** @description Type-specific, validated configuration for this resource. */
             configuration?: components["schemas"]["CustomFieldDefinitionWritableConfiguration"];
+            /** @description Whether default enabled applies to this custom field definition. */
             defaultEnabled?: boolean;
+            /** @description Human-readable description of the resource. */
             description?: string;
+            /** @description Whether required applies to this custom field definition. */
             required?: boolean;
+            /** @description Human-readable title of the resource. */
             title?: string;
         };
         /** @description Canonical value. The field definition selects the valid branch and applies tighter length, option, reference, and number constraints. Serialized input is limited to 256 KiB. */
         CustomFieldValueValue: boolean | number | string | string[];
+        /** @description Public API representation of custom field value. */
         CustomFieldValue: {
+            /** @description The attributes associated with this custom field value. */
             attributes: {
+                /** @description Identifier of the custom-field definition. */
                 fieldId: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type used to validate and interpret the custom field.
+                 * @enum {string}
+                 */
                 fieldType: "contact" | "date" | "dropdown" | "number" | "project" | "switcher" | "tag" | "text" | "textarea" | "user";
+                /** @description Identifier of the resource represented by this record. */
                 resourceId: string;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @enum {string}
+                 */
                 state: "invalid" | "set" | "unset";
-                /** @enum {string} */
+                /**
+                 * @description Canonical type of the target resource.
+                 * @enum {string}
+                 */
                 targetType: "contact" | "project" | "project-journal-entry" | "task";
+                /** @description Canonical value represented by this field. */
                 value?: components["schemas"]["CustomFieldValueValue"];
             } & unknown;
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "customFieldValue";
         };
+        /** @description Public API representation of custom field value mutation. */
         CustomFieldValueMutation: {
+            /** @description The attributes associated with this custom field value mutation. */
             attributes: {
+                /** @description Identifier of the custom-field definition. */
                 fieldId: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type used to validate and interpret the custom field.
+                 * @enum {string}
+                 */
                 fieldType: "contact" | "date" | "dropdown" | "number" | "project" | "switcher" | "tag" | "text" | "textarea" | "user";
                 /** @description Whether the mutation was an idempotent canonical no-op. */
                 readonly replayed: boolean;
+                /** @description Identifier of the resource represented by this record. */
                 resourceId: string;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @enum {string}
+                 */
                 state: "invalid" | "set" | "unset";
-                /** @enum {string} */
+                /**
+                 * @description Canonical type of the target resource.
+                 * @enum {string}
+                 */
                 targetType: "contact" | "project" | "project-journal-entry" | "task";
+                /** @description Canonical value represented by this field. */
                 value?: components["schemas"]["CustomFieldValueValue"];
             } & unknown;
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "customFieldValue";
         };
+        /** @description Public API representation of custom field value batch read. */
         CustomFieldValueBatchRead: {
+            /** @description Ordered set of field identifiers associated with this custom field value batch read. */
             fieldIds: string[];
         };
+        /** @description Public API representation of custom field value set. */
         CustomFieldValueSet: {
+            /** @description Canonical value represented by this field. */
             value: components["schemas"]["CustomFieldValueValue"];
         };
+        /** @description Public API representation of planned work. */
         PlannedWork: {
+            /** @description The attributes associated with this planned work. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for date.
+                 */
                 date: string;
+                /** @description The minutes associated with this planned work attributes. */
                 minutes: number;
+                /** @description Identifier of the related project. */
                 projectId: string;
+                /** @description Identifier of the related task. */
                 taskId: string;
+                /** @description Identifier of the related workspace user. */
                 userId: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "plannedWork";
         };
+        /** @description Public API representation of task planned work. */
         TaskPlannedWork: {
+            /** @description The attributes associated with this task planned work. */
             attributes: {
+                /** @description The items associated with this task planned work attributes. */
                 items: components["schemas"]["PlannedWork"][];
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Planned end timestamp.
+                 */
                 plannedEnd: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Planned start timestamp.
+                 */
                 plannedStart: string | null;
+                /** @description Identifier of the related project. */
                 projectId: string;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
+                /** @description Identifier of the related task. */
                 taskId: string;
+                /** @description Identifier of the related workspace user. */
                 userId: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "taskPlannedWork";
         };
+        /** @description Public API representation of planned work operation. */
         PlannedWorkOperation: {
+            /** @description The attributes associated with this planned work operation. */
             attributes: {
+                /** @description The attempts associated with this planned work operation attributes. */
                 attempts: number;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string;
+                /** @description Sanitized failure information when the operation did not succeed. */
                 readonly error?: {
+                    /** @description Stable machine-readable code for programmatic error or state handling. */
                     code: string;
+                    /** @description Human-readable explanation intended to help diagnose the result. */
                     message: string;
                 };
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for finished at.
+                 */
                 readonly finishedAt?: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Planned end timestamp.
+                 */
                 plannedEnd: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Planned start timestamp.
+                 */
                 plannedStart: string;
+                /** @description Identifier of the related project. */
                 projectId: string;
+                /** @description Revision of the source resource accepted when the asynchronous operation was created. */
                 sourceRevision: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @enum {string}
+                 */
                 state: "failed" | "pending" | "running" | "succeeded";
+                /** @description The target revision associated with this planned work operation attributes. */
                 targetRevision: string;
+                /** @description Identifier of the related task. */
                 taskId: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string;
+                /** @description Identifier of the related workspace user. */
                 userId: string;
             } & (unknown & unknown & unknown & unknown);
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "plannedWorkOperation";
         };
+        /** @description Public API representation of planned work replacement. */
         PlannedWorkReplacement: {
+            /** @description The day loads associated with this planned work replacement. */
             dayLoads: number[];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Planned end timestamp.
+             */
             plannedEnd: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Planned start timestamp.
+             */
             plannedStart: string;
         };
+        /** @description Public API representation of list. */
         ListCreate: {
+            /** @description Human-readable name of the resource. */
             name: string;
+            /** @description Identifier of the parent resource, or null for a root resource. */
             parentId?: string | null;
-            /** @enum {string} */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @enum {string}
+             */
             type: "tasks" | "projects";
         };
+        /** @description Public API representation of list. */
         ListUpdate: {
+            /** @description Human-readable name of the resource. */
             name: string;
         };
+        /** @description Public API representation of service. */
         ServiceCreate: {
+            /** @description Whether this time or service can be billed. */
             billable?: boolean;
+            /** @description The billing rate associated with this service. */
             billingRate?: number | null;
+            /** @description Human-readable title of the resource. */
             title: string;
         };
+        /** @description Public API representation of service. */
         ServiceUpdate: {
+            /** @description Whether this time or service can be billed. */
             billable?: boolean;
+            /** @description The billing rate associated with this service. */
             billingRate?: number | null;
+            /** @description Human-readable title of the resource. */
             title?: string;
         };
+        /** @description Public API representation of tag. */
         TagCreate: {
+            /** @description Canonical color value used to display the resource. */
             color?: string;
+            /** @description Human-readable name of the resource. */
             name: string;
         };
+        /** @description Public API representation of tag. */
         TagUpdate: {
+            /** @description Canonical color value used to display the resource. */
             color?: string;
+            /** @description Human-readable name of the resource. */
             name?: string;
         };
+        /** @description Public API representation of audit event. */
         AuditEvent: {
+            /** @description The attributes associated with this audit event. */
             attributes: {
+                /** @description The actor id associated with this audit event attributes. */
                 actorId: string | null;
-                /** @enum {string} */
+                /**
+                 * @description Canonical actor type value for this audit event attributes.
+                 * @enum {string}
+                 */
                 actorType: "user" | "serviceCredential" | "system";
+                /** @description Identifier of the owning TeamGrid application cell. */
                 cellId: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description The credential id associated with this audit event attributes. */
                 credentialId: string | null;
+                /** @description The event type associated with this audit event attributes. */
                 eventType: string;
+                /** @description The metadata associated with this audit event attributes. */
                 metadata: {
                     [key: string]: string | number | boolean | null;
                 };
-                /** @enum {string} */
+                /**
+                 * @description Canonical outcome value for this audit event attributes.
+                 * @enum {string}
+                 */
                 outcome: "success" | "denied" | "failure";
+                /** @description TeamGrid data region that owns and serves the workspace. */
                 region: string;
+                /** @description Unique identifier assigned to the API request for tracing and support. */
                 requestId: string | null;
-                /** @enum {string} */
+                /**
+                 * @description Canonical source value for this audit event attributes.
+                 * @enum {string}
+                 */
                 source: "teamgrid-app" | "api-v1" | "system";
+                /** @description Identifier of the target resource. */
                 targetId: string | null;
+                /** @description Canonical type of the target resource. */
                 targetType: string | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "auditEvent";
         };
+        /** @description Public API representation of change event. */
         ChangeEvent: {
+            /** @description The attributes associated with this change event. */
             attributes: {
-                /** @enum {string} */
+                /**
+                 * @description Canonical operation value for this change event attributes.
+                 * @enum {string}
+                 */
                 operation: "created" | "deleted" | "updated";
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for occurred at.
+                 */
                 occurredAt: string;
+                /** @description TeamGrid data region that owns and serves the workspace. */
                 region: string;
+                /** @description Identifier of the resource represented by this record. */
                 resourceId: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical TeamGrid resource type.
+                 * @enum {string}
+                 */
                 resourceType: "absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook";
+                /** @description The sequence associated with this change event attributes. */
                 sequence: number;
+                /** @description Whether tombstone applies to this change event attributes. */
                 tombstone: boolean;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "changeEvent";
         };
         /** @description Credential-owned v2 webhook. List and get responses are secret-free and carry a strong whk1 revision. Only create may include the reveal-only initial signing secret. */
         Webhook: {
+            /** @description The attributes associated with this webhook. */
             attributes: {
+                /** @description The actions associated with this webhook attributes. */
                 actions: string[];
+                /** @description Whether this resource is disabled for new use. */
                 disabled: boolean;
+                /** @description Number of fail records represented by this webhook attributes. */
                 failCount: number;
+                /** @description The last status associated with this webhook attributes. */
                 lastStatus: number | null;
                 /** @description Reveal-only initial signing secret returned by a no-store webhook create response. */
                 readonly signingSecret?: string;
@@ -3689,1011 +5271,2039 @@ export interface components {
                  * @description HTTPS destination without URL credentials or a fragment.
                  */
                 url: string;
-                /** @enum {integer} */
+                /**
+                 * @description Canonical version value for this webhook attributes.
+                 * @enum {integer}
+                 */
                 version: 1 | 2;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "webhook";
         };
         /** @description Credential-owned webhook delivery metadata. Destination URLs, request and response payloads, headers, bodies, secrets, tenant routing, and retention fields are never exposed. */
         WebhookDelivery: {
+            /** @description The attributes associated with this webhook delivery. */
             attributes: {
+                /** @description Number of attempt records represented by this webhook delivery attributes. */
                 attemptCount: number;
+                /** @description The attempts associated with this webhook delivery attributes. */
                 attempts: {
+                    /** @description The attempt associated with this webhook delivery attributes attempts. */
                     attempt: number;
-                    /** @enum {string|null} */
+                    /**
+                     * @description Canonical error code value for this webhook delivery attributes attempts.
+                     * @enum {string|null}
+                     */
                     errorCode: "http_error" | "transport_error" | null;
-                    /** Format: date-time */
+                    /**
+                     * Format: date-time
+                     * @description ISO 8601 timestamp for finished at.
+                     */
                     finishedAt: string | null;
-                    /** Format: date-time */
+                    /**
+                     * Format: date-time
+                     * @description ISO 8601 timestamp for started at.
+                     */
                     startedAt: string;
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical lifecycle state of the resource or operation.
+                     * @enum {string}
+                     */
                     state: "delivering" | "failed" | "retrying" | "skipped" | "succeeded";
+                    /** @description HTTP status code represented by this legacy response envelope. */
                     statusCode: number | null;
+                    /** @description The transport code associated with this webhook delivery attributes attempts. */
                     transportCode: string | null;
                 }[];
+                /** @description The collection associated with this webhook delivery attributes. */
                 collection: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the work item was completed.
+                 */
                 completedAt: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string;
+                /** @description The delivery id associated with this webhook delivery attributes. */
                 deliveryId: string;
+                /** @description Canonical TeamGrid event name. */
                 event: string;
+                /** @description Identifier of the resource represented by this record. */
                 resourceId: string | null;
-                /** @enum {string} */
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @enum {string}
+                 */
                 state: "delivering" | "failed" | "retrying" | "skipped" | "succeeded";
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string;
+                /** @description Identifier of the webhook associated with this delivery. */
                 webhookId: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "webhookDelivery";
         };
+        /** @description Public API representation of webhook. */
         WebhookCreate: {
+            /** @description The actions associated with this webhook. */
             actions: string[];
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description HTTPS URL associated with the resource.
+             */
             url: string;
         };
+        /** @description Public API representation of webhook. */
         WebhookUpdate: {
+            /** @description The actions associated with this webhook. */
             actions?: string[];
+            /** @description Whether this resource is disabled for new use. */
             disabled?: boolean;
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description HTTPS URL associated with the resource.
+             */
             url?: string;
         };
+        /** @description Public API representation of project. */
         ProjectCreate: {
+            /** @description Ordered set of additional contact identifiers associated with this project. */
             additionalContactIds?: string[] | null;
+            /** @description Canonical color value used to display the resource. */
             color?: string | null;
+            /** @description Identifier of the related contact. */
             contactId?: string | null;
+            /** @description Human-readable description of the resource. */
             description?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for due at.
+             */
             dueAt?: string | null;
+            /** @description The individual id associated with this project. */
             individualId?: string | null;
+            /** @description Identifier of the related task list. */
             listId?: string | null;
+            /** @description The manager id associated with this project. */
             managerId?: string | null;
+            /** @description Human-readable name of the resource. */
             name: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned end at.
+             */
             plannedEndAt?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned start at.
+             */
             plannedStartAt?: string | null;
+            /** @description The show in scheduling associated with this project. */
             showInScheduling?: boolean | null;
+            /** @description Ordered set of subscriber identifiers associated with this project. */
             subscriberIds?: string[] | null;
         };
+        /** @description Public API representation of project. */
         ProjectUpdate: {
+            /** @description Ordered set of additional contact identifiers associated with this project. */
             additionalContactIds?: string[] | null;
+            /** @description Canonical color value used to display the resource. */
             color?: string | null;
+            /** @description Identifier of the related contact. */
             contactId?: string | null;
+            /** @description Human-readable description of the resource. */
             description?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for due at.
+             */
             dueAt?: string | null;
+            /** @description The individual id associated with this project. */
             individualId?: string | null;
+            /** @description Identifier of the related task list. */
             listId?: string | null;
+            /** @description The manager id associated with this project. */
             managerId?: string | null;
+            /** @description Human-readable name of the resource. */
             name?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned end at.
+             */
             plannedEndAt?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned start at.
+             */
             plannedStartAt?: string | null;
+            /** @description The show in scheduling associated with this project. */
             showInScheduling?: boolean | null;
+            /** @description Ordered set of subscriber identifiers associated with this project. */
             subscriberIds?: string[] | null;
         };
+        /** @description Public API representation of project template. */
         ProjectTemplateCreate: {
+            /** @description Canonical color value used to display the resource. */
             color: string;
+            /** @description Human-readable description of the resource. */
             description?: string;
+            /** @description Identifier of the related project. */
             projectId: string;
+            /** @description Human-readable title of the resource. */
             title: string;
         };
+        /** @description Public API representation of project template. */
         ProjectTemplateUpdate: {
+            /** @description Canonical color value used to display the resource. */
             color?: string;
+            /** @description Human-readable description of the resource. */
             description?: string;
+            /** @description Human-readable title of the resource. */
             title?: string;
         };
+        /** @description Public API representation of project template instantiate. */
         ProjectTemplateInstantiate: {
+            /** @description Ordered set of additional contact identifiers associated with this project template instantiate. */
             additionalContactIds?: string[] | null;
+            /** @description Canonical color value used to display the resource. */
             color?: string | null;
+            /** @description Identifier of the related contact. */
             contactId?: string | null;
+            /** @description Human-readable description of the resource. */
             description?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for due at.
+             */
             dueAt?: string | null;
+            /** @description The individual id associated with this project template instantiate. */
             individualId?: string | null;
+            /** @description Identifier of the related task list. */
             listId?: string | null;
+            /** @description The manager id associated with this project template instantiate. */
             managerId?: string | null;
+            /** @description Human-readable name of the resource. */
             name: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned end at.
+             */
             plannedEndAt?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned start at.
+             */
             plannedStartAt?: string | null;
+            /** @description The show in scheduling associated with this project template instantiate. */
             showInScheduling?: boolean | null;
+            /** @description Ordered set of subscriber identifiers associated with this project template instantiate. */
             subscriberIds?: string[] | null;
         };
+        /** @description Public API representation of contact. */
         ContactCreate: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for birthday.
+             */
             birthday?: string | null;
-            /** @enum {string|null} */
+            /**
+             * @description Canonical category value for this contact.
+             * @enum {string|null}
+             */
             category?: "customer" | "supplier" | null;
+            /** @description The company title associated with this contact. */
             companyTitle?: string | null;
+            /** @description The customer id associated with this contact. */
             customerId?: string | null;
+            /** @description The emails associated with this contact. */
             emails?: {
+                /** @description Email address associated with this record. */
                 email: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type discriminator for this resource.
+                 * @enum {string}
+                 */
                 type: "business" | "other" | "private";
             }[] | null;
+            /** @description The first name associated with this contact. */
             firstName?: string | null;
-            /** @enum {string|null} */
+            /**
+             * @description Canonical gender value for this contact.
+             * @enum {string|null}
+             */
             gender?: "female" | "male" | null;
+            /** @description Identifier of the related workspace group. */
             groupId?: string | null;
+            /** @description The last name associated with this contact. */
             lastName?: string | null;
+            /** @description The nickname associated with this contact. */
             nickname?: string | null;
+            /** @description The notes associated with this contact. */
             notes?: string | null;
+            /** @description The parent contact id associated with this contact. */
             parentContactId?: string | null;
+            /** @description The phone numbers associated with this contact. */
             phoneNumbers?: {
+                /** @description The number associated with this contact phone numbers. */
                 number: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type discriminator for this resource.
+                 * @enum {string}
+                 */
                 type: "business" | "direct" | "fax" | "landline" | "mobile" | "other";
             }[] | null;
+            /** @description The salutation associated with this contact. */
             salutation?: string | null;
-            /** @enum {string} */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @enum {string}
+             */
             type: "company" | "person";
         };
+        /** @description Public API representation of contact. */
         ContactUpdate: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for birthday.
+             */
             birthday?: string | null;
-            /** @enum {string|null} */
+            /**
+             * @description Canonical category value for this contact.
+             * @enum {string|null}
+             */
             category?: "customer" | "supplier" | null;
+            /** @description The company title associated with this contact. */
             companyTitle?: string | null;
+            /** @description The customer id associated with this contact. */
             customerId?: string | null;
+            /** @description The emails associated with this contact. */
             emails?: {
+                /** @description Email address associated with this record. */
                 email: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type discriminator for this resource.
+                 * @enum {string}
+                 */
                 type: "business" | "other" | "private";
             }[] | null;
+            /** @description The first name associated with this contact. */
             firstName?: string | null;
-            /** @enum {string|null} */
+            /**
+             * @description Canonical gender value for this contact.
+             * @enum {string|null}
+             */
             gender?: "female" | "male" | null;
+            /** @description Identifier of the related workspace group. */
             groupId?: string | null;
+            /** @description The last name associated with this contact. */
             lastName?: string | null;
+            /** @description The nickname associated with this contact. */
             nickname?: string | null;
+            /** @description The notes associated with this contact. */
             notes?: string | null;
+            /** @description The parent contact id associated with this contact. */
             parentContactId?: string | null;
+            /** @description The phone numbers associated with this contact. */
             phoneNumbers?: {
+                /** @description The number associated with this contact phone numbers. */
                 number: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical type discriminator for this resource.
+                 * @enum {string}
+                 */
                 type: "business" | "direct" | "fax" | "landline" | "mobile" | "other";
             }[] | null;
+            /** @description The salutation associated with this contact. */
             salutation?: string | null;
         };
+        /** @description Public API representation of call note. */
         CallNoteCreate: {
+            /** @description The call id associated with this call note. */
             callId: string;
+            /** @description The content associated with this call note. */
             content: string;
         };
+        /** @description Public API representation of contact group. */
         ContactGroupCreate: {
+            /** @description Identifier of the parent resource, or null for a root resource. */
             parentId?: string | null;
+            /** @description Human-readable title of the resource. */
             title: string;
         };
+        /** @description Public API representation of contact group. */
         ContactGroupUpdate: {
+            /** @description Identifier of the parent resource, or null for a root resource. */
             parentId?: string | null;
+            /** @description Human-readable title of the resource. */
             title?: string;
         };
+        /** @description Public API representation of product. */
         ProductCreate: {
+            /** @description The amount associated with this product. */
             amount?: number | null;
+            /** @description The annotation associated with this product. */
             annotation?: string | null;
+            /** @description The cost center associated with this product. */
             costCenter?: string[] | null;
+            /** @description Human-readable description of the resource. */
             description?: string | null;
+            /** @description Whether this resource is disabled for new use. */
             disabled?: boolean | null;
+            /** @description The finance account associated with this product. */
             financeAccount?: string | null;
+            /** @description Human-readable name of the resource. */
             name: string;
+            /** @description Ordered set of price group identifiers associated with this product. */
             priceGroupIds?: string[] | null;
+            /** @description Identifier of the product group that contains this product. */
             productGroupId?: string | null;
+            /** @description The product number associated with this product. */
             productNumber?: string | null;
             /** @description Requires products:finance:write when supplied. */
             purchasePrice?: number | null;
+            /** @description The retail price associated with this product. */
             retailPrice?: number | null;
+            /** @description The tax rate associated with this product. */
             taxRate?: number | null;
+            /** @description The unit associated with this product. */
             unit?: string | null;
         };
+        /** @description Public API representation of product. */
         ProductUpdate: {
+            /** @description The amount associated with this product. */
             amount?: number | null;
+            /** @description The annotation associated with this product. */
             annotation?: string | null;
+            /** @description The cost center associated with this product. */
             costCenter?: string[] | null;
+            /** @description Human-readable description of the resource. */
             description?: string | null;
+            /** @description Whether this resource is disabled for new use. */
             disabled?: boolean | null;
+            /** @description The finance account associated with this product. */
             financeAccount?: string | null;
+            /** @description Human-readable name of the resource. */
             name?: string;
+            /** @description Ordered set of price group identifiers associated with this product. */
             priceGroupIds?: string[] | null;
+            /** @description Identifier of the product group that contains this product. */
             productGroupId?: string | null;
+            /** @description The product number associated with this product. */
             productNumber?: string | null;
             /** @description Requires products:finance:write when supplied. */
             purchasePrice?: number | null;
+            /** @description The retail price associated with this product. */
             retailPrice?: number | null;
+            /** @description The tax rate associated with this product. */
             taxRate?: number | null;
+            /** @description The unit associated with this product. */
             unit?: string | null;
         };
+        /** @description Public API representation of product group. */
         ProductGroupCreate: {
+            /** @description Human-readable description of the resource. */
             description?: string | null;
+            /** @description Human-readable name of the resource. */
             name: string;
+            /** @description Identifier of the parent resource, or null for a root resource. */
             parentId?: string | null;
         };
+        /** @description Public API representation of product group. */
         ProductGroupUpdate: {
+            /** @description Human-readable description of the resource. */
             description?: string | null;
+            /** @description Human-readable name of the resource. */
             name?: string;
+            /** @description Identifier of the parent resource, or null for a root resource. */
             parentId?: string | null;
         };
+        /** @description Public API representation of project statement. */
         ProjectStatementCreate: {
+            /** @description The amount associated with this project statement. */
             amount?: number | null;
+            /** @description The comment associated with this project statement. */
             comment?: string | null;
+            /** @description The count associated with this project statement. */
             count?: number | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for date.
+             */
             date: string;
+            /** @description Human-readable description of the resource. */
             description?: string | null;
+            /** @description Whether is charge applies to this project statement. */
             isCharge: boolean;
+            /** @description The product number associated with this project statement. */
             productNumber?: string | null;
             /** @description Requires project-statements:finance:write when supplied. */
             purchasePrice?: number | null;
+            /** @description Human-readable title of the resource. */
             title: string;
+            /** @description Identifier of the related project. */
             projectId: string;
+            /** @description The product id associated with this project statement. */
             productId?: string | null;
-            /** @enum {string} */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @enum {string}
+             */
             type: "manual" | "product";
         } & (unknown & unknown);
+        /** @description Public API representation of project statement. */
         ProjectStatementUpdate: {
+            /** @description The amount associated with this project statement. */
             amount?: number | null;
+            /** @description The comment associated with this project statement. */
             comment?: string | null;
+            /** @description The count associated with this project statement. */
             count?: number | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for date.
+             */
             date?: string;
+            /** @description Human-readable description of the resource. */
             description?: string | null;
+            /** @description Whether is charge applies to this project statement. */
             isCharge?: boolean;
+            /** @description The product number associated with this project statement. */
             productNumber?: string | null;
             /** @description Requires project-statements:finance:write when supplied. */
             purchasePrice?: number | null;
+            /** @description Human-readable title of the resource. */
             title?: string;
         };
+        /** @description Public API representation of task. */
         TaskCreate: {
+            /** @description Identifier of the user assigned to this work item. */
             assigneeId?: string | null;
+            /** @description Whether this time or service can be billed. */
             billable?: boolean | null;
+            /** @description Identifier of the related contact. */
             contactId?: string | null;
+            /** @description Human-readable description of the resource. */
             description?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for due at.
+             */
             dueAt?: string | null;
+            /** @description Identifier of the related workspace group. */
             groupId?: string | null;
+            /** @description Identifier of the related task list. */
             listId?: string | null;
+            /** @description Human-readable name of the resource. */
             name: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned end at.
+             */
             plannedEndAt?: string | null;
+            /** @description The planned minutes associated with this task. */
             plannedMinutes?: number | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned start at.
+             */
             plannedStartAt?: string | null;
+            /** @description Identifier of the related project. */
             projectId?: string | null;
+            /** @description Identifier of the related service. */
             serviceId?: string | null;
+            /** @description Ordered set of subscriber identifiers associated with this task. */
             subscriberIds?: string[] | null;
+            /** @description Ordered set of tag identifiers associated with this task. */
             tagIds?: string[] | null;
         };
+        /** @description Public API representation of task. */
         TaskUpdate: {
+            /** @description Identifier of the user assigned to this work item. */
             assigneeId?: string | null;
+            /** @description Whether this time or service can be billed. */
             billable?: boolean | null;
+            /** @description Identifier of the related contact. */
             contactId?: string | null;
+            /** @description Human-readable description of the resource. */
             description?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for due at.
+             */
             dueAt?: string | null;
+            /** @description Identifier of the related workspace group. */
             groupId?: string | null;
+            /** @description Identifier of the related task list. */
             listId?: string | null;
+            /** @description Human-readable name of the resource. */
             name?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned end at.
+             */
             plannedEndAt?: string | null;
+            /** @description The planned minutes associated with this task. */
             plannedMinutes?: number | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned start at.
+             */
             plannedStartAt?: string | null;
+            /** @description Identifier of the related project. */
             projectId?: string | null;
+            /** @description Identifier of the related service. */
             serviceId?: string | null;
+            /** @description Ordered set of subscriber identifiers associated with this task. */
             subscriberIds?: string[] | null;
+            /** @description Ordered set of tag identifiers associated with this task. */
             tagIds?: string[] | null;
         };
+        /** @description Public API representation of task bulk data. */
         TaskBulkUpdateData: {
+            /** @description Whether this time or service can be billed. */
             billable?: boolean | null;
+            /** @description Identifier of the related contact. */
             contactId?: string | null;
+            /** @description Human-readable description of the resource. */
             description?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for due at.
+             */
             dueAt?: string | null;
+            /** @description Human-readable name of the resource. */
             name?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned end at.
+             */
             plannedEndAt?: string | null;
+            /** @description The planned minutes associated with this task bulk data. */
             plannedMinutes?: number | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for planned start at.
+             */
             plannedStartAt?: string | null;
+            /** @description Identifier of the related service. */
             serviceId?: string | null;
+            /** @description Ordered set of subscriber identifiers associated with this task bulk data. */
             subscriberIds?: string[] | null;
+            /** @description Ordered set of tag identifiers associated with this task bulk data. */
             tagIds?: string[] | null;
         };
+        /** @description Public API representation of task bulk item. */
         TaskBulkUpdateItem: {
+            /** @description Response data for the completed request. */
             data: components["schemas"]["TaskBulkUpdateData"];
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
+            /** @description Strong resource revision used for optimistic concurrency control. */
             revision: string;
         };
+        /** @description Public API representation of task bulk. */
         TaskBulkUpdate: {
+            /** @description The items associated with this task bulk. */
             items: components["schemas"]["TaskBulkUpdateItem"][];
         };
+        /** @description Public API representation of task bulk result. */
         TaskBulkUpdateResult: {
+            /** @description The attributes associated with this task bulk result. */
             attributes: {
+                /** @description Sanitized failure information when the operation did not succeed. */
                 error: components["schemas"]["ApiError"] | null;
-                /** @enum {string} */
+                /**
+                 * @description Canonical status of the resource or operation.
+                 * @enum {string}
+                 */
                 status: "updated" | "conflict" | "notFound" | "forbidden" | "invalid" | "unavailable";
+                /** @description The task associated with this task bulk result attributes. */
                 task: components["schemas"]["Task"] | null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "taskBulkUpdateResult";
         };
+        /** @description Public API representation of task bulk. */
         TaskBulkUpdateEnvelope: {
+            /** @description Response data for the completed request. */
             data: components["schemas"]["TaskBulkUpdateResult"][];
+            /** @description Request metadata, including the request identifier and pagination state when applicable. */
             meta: {
+                /** @description Unique identifier assigned to the API request for tracing and support. */
                 requestId: string;
+                /** @description Short human-readable summary. */
                 summary: {
+                    /** @description The conflicts associated with this task bulk meta summary. */
                     conflicts: number;
+                    /** @description The failed associated with this task bulk meta summary. */
                     failed: number;
+                    /** @description The requested associated with this task bulk meta summary. */
                     requested: number;
+                    /** @description The updated associated with this task bulk meta summary. */
                     updated: number;
                 };
             };
         };
+        /** @description Public API representation of task duplicate. */
         TaskDuplicate: {
-            /** @default true */
+            /**
+             * @description Whether copy checklist applies to this task duplicate.
+             * @default true
+             */
             copyChecklist: boolean;
-            /** @default true */
+            /**
+             * @description Whether copy custom field values applies to this task duplicate.
+             * @default true
+             */
             copyCustomFieldValues: boolean;
+            /** @description Human-readable name of the resource. */
             name?: string | null;
         };
+        /** @description Public API representation of task placement. */
         TaskPlacement: {
+            /** @description Identifier of the user assigned to this work item. */
             assigneeId?: string | null;
-            /** @enum {string} */
+            /**
+             * @description Canonical axis value for this task placement.
+             * @enum {string}
+             */
             axis: "assignee" | "personalList" | "projectList";
+            /** @description Identifier of the related workspace group. */
             groupId?: string | null;
+            /** @description Identifier of the related task list. */
             listId?: string | null;
+            /** @description The next task id associated with this task placement. */
             nextTaskId?: string | null;
+            /** @description The personal list id associated with this task placement. */
             personalListId?: string | null;
+            /** @description The previous task id associated with this task placement. */
             previousTaskId?: string | null;
+            /** @description Identifier of the related project. */
             projectId?: string | null;
         };
+        /** @description Public API representation of task subtask. */
         TaskSubtaskInput: {
+            /** @description Whether the work item is complete. */
             completed?: boolean | null;
+            /** @description Stable TeamGrid identifier for this resource. */
             id?: string | null;
+            /** @description Human-readable title of the resource. */
             title: string;
         };
+        /** @description Public API representation of task subtasks replace. */
         TaskSubtasksReplace: {
+            /** @description The subtasks associated with this task subtasks replace. */
             subtasks: components["schemas"]["TaskSubtaskInput"][];
         };
+        /** @description Public API representation of time entry. */
         TimeEntryCreate: {
+            /** @description Whether this time or service can be billed. */
             billable?: boolean | null;
+            /** @description The comment associated with this time entry. */
             comment?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for end at.
+             */
             endAt: string;
+            /** @description Identifier of the related service. */
             serviceId?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for start at.
+             */
             startAt: string;
+            /** @description Identifier of the related task. */
             taskId: string;
+            /** @description Identifier of the related workspace user. */
             userId: string;
         };
+        /** @description Public API representation of time entry. */
         TimeEntryUpdate: {
+            /** @description Whether this time or service can be billed. */
             billable?: boolean | null;
+            /** @description The comment associated with this time entry. */
             comment?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for end at.
+             */
             endAt?: string | null;
+            /** @description Identifier of the related service. */
             serviceId?: string | null;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for start at.
+             */
             startAt?: string | null;
         };
+        /** @description Public API representation of time entry billing. */
         TimeEntryBillingUpdate: {
             /** @description true locks the time entry as billed; false unlocks it. */
             billed: boolean;
         };
+        /** @description Public API representation of timer action. */
         TimerAction: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for at.
+             */
             at?: string;
+            /** @description Identifier of the related workspace user. */
             userId: string;
         };
+        /** @description Public API representation of member. */
         Member: {
+            /** @description The attributes associated with this member. */
             attributes: {
+                /** @description Identifier of the related contact. */
                 readonly contactId?: string | null;
+                /** @description The current group id associated with this member attributes. */
                 currentGroupId: string | null;
+                /** @description Whether this resource is disabled for new use. */
                 disabled: boolean;
+                /** @description The display name associated with this member attributes. */
                 readonly displayName?: string | null;
-                /** Format: email */
+                /**
+                 * Format: email
+                 * @description Email address associated with this record.
+                 */
                 readonly email?: string | null;
+                /** @description The firstname associated with this member attributes. */
                 readonly firstname?: string | null;
+                /** @description Ordered set of group identifiers associated with this member attributes. */
                 groupIds: string[];
+                /** @description The lastname associated with this member attributes. */
                 readonly lastname?: string | null;
+                /** @description Whether owner applies to this member attributes. */
                 owner: boolean;
+                /** @description The position associated with this member attributes. */
                 readonly position?: string | null;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
+                /** @description Identifier of the workspace role. */
                 roleId: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical status of the resource or operation.
+                 * @enum {string}
+                 */
                 status: "active" | "pending";
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "member";
         };
+        /** @description Public API representation of invitation. */
         Invitation: {
+            /** @description The attributes associated with this invitation. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
-                /** Format: email */
+                /**
+                 * Format: email
+                 * @description Email address associated with this record.
+                 */
                 readonly email?: string | null;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
+                /** @description Identifier of the workspace role. */
                 roleId: string;
-                /** @constant */
+                /**
+                 * @description Canonical status of the resource or operation.
+                 * @constant
+                 */
                 status: "pending";
+                /** @description Whether workspace owner applies to this invitation attributes. */
                 workspaceOwner: boolean;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "invitation";
         };
+        /** @description Public API representation of role. */
         Role: {
+            /** @description The attributes associated with this role. */
             attributes: {
+                /** @description Whether default applies to this role attributes. */
                 default: boolean;
+                /** @description Human-readable description of the resource. */
                 description: string;
+                /** @description Number of member records represented by this role attributes. */
                 memberCount: number;
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description The permissions associated with this role attributes. */
                 permissions: string[];
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
+                /** @description Whether system applies to this role attributes. */
                 system: boolean;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "role";
         };
+        /** @description Public API representation of group. */
         Group: {
+            /** @description The attributes associated with this group. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string | null;
+                /** @description Ordered set of member identifiers associated with this group attributes. */
                 memberIds: string[];
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical visibility value for this group attributes.
+                 * @enum {string}
+                 */
                 visibility: "all" | "members" | "private";
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "group";
         };
+        /** @description Public API representation of member role. */
         MemberRoleUpdate: {
+            /** @description Identifier of the workspace role. */
             roleId: string;
         };
+        /** @description Public API representation of invitation. */
         InvitationCreate: {
-            /** Format: email */
+            /**
+             * Format: email
+             * @description Email address associated with this record.
+             */
             email: string;
+            /** @description The firstname associated with this invitation. */
             firstname: string;
+            /** @description The lastname associated with this invitation. */
             lastname: string;
+            /** @description The position associated with this invitation. */
             position?: string;
+            /** @description Identifier of the workspace role. */
             roleId?: string;
         };
+        /** @description Public API representation of role. */
         RoleCreate: {
+            /** @description Human-readable description of the resource. */
             description?: string;
+            /** @description Human-readable name of the resource. */
             name: string;
+            /** @description The permissions associated with this role. */
             permissions?: string[];
         };
+        /** @description Public API representation of role. */
         RoleUpdate: {
+            /** @description Human-readable description of the resource. */
             description?: string;
+            /** @description Human-readable name of the resource. */
             name?: string;
+            /** @description The permissions associated with this role. */
             permissions?: string[];
         };
+        /** @description Public API representation of group. */
         GroupCreate: {
+            /** @description Ordered set of member identifiers associated with this group. */
             memberIds?: string[];
+            /** @description Human-readable name of the resource. */
             name: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical visibility value for this group.
+             * @enum {string}
+             */
             visibility?: "all" | "members" | "private";
         };
+        /** @description Public API representation of group. */
         GroupUpdate: {
+            /** @description Ordered set of member identifiers associated with this group. */
             memberIds?: string[];
+            /** @description Human-readable name of the resource. */
             name?: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical visibility value for this group.
+             * @enum {string}
+             */
             visibility?: "all" | "members" | "private";
         };
+        /** @description Public API representation of search result. */
         SearchResult: {
+            /** @description The attributes associated with this search result. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
+                /** @description Whether the work item is complete. */
                 readonly completed?: boolean;
+                /** @description The number associated with this search result attributes. */
                 readonly number?: string;
+                /** @description The subtitle associated with this search result attributes. */
                 readonly subtitle?: string;
+                /** @description Human-readable title of the resource. */
                 title: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 readonly updatedAt?: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @enum {string}
+             */
             type: "contact" | "project" | "task";
         };
+        /** @description Public API representation of search request. */
         SearchRequest: {
+            /** @description Maximum number of records requested or returned for this page. */
             limit?: number;
+            /** @description The term associated with this search request. */
             term: string;
+            /** @description The types associated with this search request. */
             types: ("contacts" | "projects" | "tasks")[];
         };
+        /** @description Public API representation of export. */
         Export: {
+            /** @description The attributes associated with this export. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string;
+                /** @description The failure associated with this export attributes. */
                 readonly failure?: {
-                    /** @constant */
+                    /**
+                     * @description Stable machine-readable code for programmatic error or state handling.
+                     * @constant
+                     */
                     code: "developer-export-failed";
-                    /** @constant */
+                    /**
+                     * @description Whether retryable applies to this export attributes failure.
+                     * @constant
+                     */
                     retryable: false;
                 };
+                /** @description The fields associated with this export attributes. */
                 fields: string[];
+                /** @description Original or user-visible name of the file. */
                 fileName: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for finished at.
+                 */
                 readonly finishedAt?: string;
-                /** @constant */
+                /**
+                 * @description The format associated with this export attributes.
+                 * @constant
+                 */
                 format: "csv";
-                /** @enum {string} */
+                /**
+                 * @description Canonical TeamGrid resource type.
+                 * @enum {string}
+                 */
                 resourceType: "auditEvents" | "contacts" | "projects" | "tasks" | "timeEntries";
+                /** @description Number of row records represented by this export attributes. */
                 readonly rowCount?: number;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for started at.
+                 */
                 readonly startedAt?: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @enum {string}
+                 */
                 state: "failed" | "queued" | "retrying" | "running" | "succeeded";
+                /** @description Whether the result reached its configured row or size boundary. */
                 readonly truncated?: boolean;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "export";
         };
+        /** @description Public API representation of export creation. */
         ExportCreation: {
+            /** @description The attributes associated with this export creation. */
             attributes: {
+                /** @description Whether replayed applies to this export creation attributes. */
                 replayed: boolean;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "export";
         };
+        /** @description Public API representation of export download intent. */
         ExportDownloadIntent: {
+            /** @description The attributes associated with this export download intent. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp after which this capability or record is no longer valid.
+                 */
                 expiresAt: string;
+                /** @description Original or user-visible name of the file. */
                 fileName: string;
+                /** @description The token associated with this export download intent attributes. */
                 token: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "exportDownloadIntent";
         };
+        /** @description Public API representation of export. */
         ExportCreate: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for created at from.
+             */
             createdAtFrom?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for created at to.
+             */
             createdAtTo?: string;
+            /** @description The fields associated with this export. */
             fields?: string[];
+            /** @description Original or user-visible name of the file. */
             fileName?: string;
-            /** @constant */
+            /**
+             * @description The format associated with this export.
+             * @constant
+             */
             format?: "csv";
+            /** @description Whether include archived applies to this export. */
             includeArchived?: boolean;
+            /** @description The max rows associated with this export. */
             maxRows?: number;
-            /** @enum {string} */
+            /**
+             * @description Canonical TeamGrid resource type.
+             * @enum {string}
+             */
             resourceType: "auditEvents" | "contacts" | "projects" | "tasks" | "timeEntries";
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for updated from.
+             */
             updatedFrom?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for updated until.
+             */
             updatedUntil?: string;
         } & unknown;
+        /** @description Public API representation of automation branch. */
         AutomationInputBranch: {
+            /** @description The flow associated with this automation branch. */
             flow: components["schemas"]["AutomationInputStep"][];
+            /** @description Stable machine-readable key. */
             key: string;
         };
+        /** @description Public API representation of automation step. */
         AutomationInputStep: {
-            /** @enum {string} */
+            /**
+             * @description Canonical action id value for this automation step.
+             * @enum {string}
+             */
             actionId: "automationTask" | "condition" | "createDate" | "forEach" | "formatDate" | "listCreate" | "listEdit" | "loop" | "loopBreak" | "loopContinue" | "projectCreate" | "projectEdit" | "projectStatementCreate" | "projectStatementEdit" | "serviceCreate" | "serviceEdit" | "setAutomationStatus" | "setVariable" | "stopCurrentAutomation" | "taskCreate" | "taskEdit" | "timeentryCreate" | "timeentryEdit" | "waitFor" | "waitForCustomFieldChange" | "waitForProjectChange" | "waitForTaskChange" | "waitForTaskCompletion" | "waitUntil";
+            /** @description The branches associated with this automation step. */
             branches?: components["schemas"]["AutomationInputBranch"][];
+            /** @description The config associated with this automation step. */
             config?: {
+                /** @description Stable machine-readable key. */
                 key: string;
+                /** @description Canonical value represented by this field. */
                 value: string;
             }[];
+            /** @description The input associated with this automation step. */
             input?: {
+                /** @description Stable machine-readable key. */
                 key: string;
+                /** @description Canonical value represented by this field. */
                 value: string;
             }[];
+            /** @description The output associated with this automation step. */
             output?: {
+                /** @description Stable machine-readable key. */
                 key: string;
+                /** @description Canonical value represented by this field. */
                 value: string;
             }[];
         };
+        /** @description Public API representation of automation branch. */
         AutomationBranch: {
+            /** @description The flow associated with this automation branch. */
             flow: components["schemas"]["AutomationStep"][];
+            /** @description Stable machine-readable key. */
             key: string;
         };
+        /** @description Public API representation of automation step. */
         AutomationStep: {
+            /** @description The action id associated with this automation step. */
             actionId: string;
+            /** @description The branches associated with this automation step. */
             branches?: components["schemas"]["AutomationBranch"][];
+            /** @description The config associated with this automation step. */
             config?: {
+                /** @description Stable machine-readable key. */
                 key: string;
-                /** @constant */
+                /**
+                 * @description Whether redacted applies to this automation step config.
+                 * @constant
+                 */
                 redacted?: true;
+                /** @description Canonical value represented by this field. */
                 value?: string;
             }[];
+            /** @description The input associated with this automation step. */
             input?: {
+                /** @description Stable machine-readable key. */
                 key: string;
-                /** @constant */
+                /**
+                 * @description Whether redacted applies to this automation step.
+                 * @constant
+                 */
                 redacted?: true;
+                /** @description Canonical value represented by this field. */
                 value?: string;
             }[];
+            /** @description The output associated with this automation step. */
             output?: {
+                /** @description Stable machine-readable key. */
                 key: string;
-                /** @constant */
+                /**
+                 * @description Whether redacted applies to this automation step output.
+                 * @constant
+                 */
                 redacted?: true;
+                /** @description Canonical value represented by this field. */
                 value?: string;
             }[];
-            /** @constant */
+            /**
+             * @description Whether restricted applies to this automation step.
+             * @constant
+             */
             restricted?: true;
         };
+        /** @description Public API representation of automation action. */
         AutomationAction: {
+            /** @description The attributes associated with this automation action. */
             attributes: {
+                /** @description The branches associated with this automation action attributes. */
                 branches: {
+                    /** @description The display name associated with this automation action attributes branches. */
                     displayName?: Record<string, never> | string | null;
+                    /** @description Stable machine-readable key. */
                     key: string;
                 }[];
+                /** @description The config associated with this automation action attributes. */
                 config: Record<string, never>[];
+                /** @description Human-readable description of the resource. */
                 description: Record<string, never> | string | null;
+                /** @description The input associated with this automation action attributes. */
                 input: Record<string, never>[];
+                /** @description Human-readable name of the resource. */
                 name: Record<string, never> | string | null;
+                /** @description The output associated with this automation action attributes. */
                 output: Record<string, never>[];
+                /** @description The required scopes associated with this automation action attributes. */
                 requiredScopes: string[];
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "automationAction";
         };
+        /** @description Public API representation of automation definition. */
         AutomationDefinition: {
+            /** @description The attributes associated with this automation definition. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 readonly createdAt?: string;
+                /** @description Human-readable description of the resource. */
                 description: string;
+                /** @description Whether editable applies to this automation definition attributes. */
                 editable: boolean;
+                /** @description The flow associated with this automation definition attributes. */
                 flow: components["schemas"]["AutomationStep"][];
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description Whether replayed applies to this automation definition attributes. */
                 readonly replayed?: boolean;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
+                /** @description The trigger associated with this automation definition attributes. */
                 trigger: {
+                    /** @description Response data for the completed request. */
                     data?: {
-                        /** @enum {string} */
+                        /**
+                         * @description Canonical type discriminator for this resource.
+                         * @enum {string}
+                         */
                         type: "projects" | "tasks";
                     };
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical TeamGrid event name.
+                     * @enum {string}
+                     */
                     event?: "change" | "create";
-                    /** @constant */
+                    /**
+                     * @description Whether restricted applies to this automation definition attributes trigger.
+                     * @constant
+                     */
                     restricted?: true;
                 };
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 readonly updatedAt?: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "automationDefinition";
         };
+        /** @description Public API representation of automation definition version. */
         AutomationDefinitionVersion: {
+            /** @description The attributes associated with this automation definition version. */
             attributes: {
+                /** @description Whether this resource is archived. */
                 archived: boolean;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 readonly createdAt?: string;
+                /** @description Human-readable description of the resource. */
                 description: string;
+                /** @description Whether editable applies to this automation definition version attributes. */
                 editable: boolean;
+                /** @description The flow associated with this automation definition version attributes. */
                 flow: components["schemas"]["AutomationStep"][];
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description Whether replayed applies to this automation definition version attributes. */
                 readonly replayed?: boolean;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
+                /** @description The trigger associated with this automation definition version attributes. */
                 trigger: {
+                    /** @description Response data for the completed request. */
                     data?: {
-                        /** @enum {string} */
+                        /**
+                         * @description Canonical type discriminator for this resource.
+                         * @enum {string}
+                         */
                         type: "projects" | "tasks";
                     };
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical TeamGrid event name.
+                     * @enum {string}
+                     */
                     event?: "change" | "create";
-                    /** @constant */
+                    /**
+                     * @description Whether restricted applies to this automation definition version attributes trigger.
+                     * @constant
+                     */
                     restricted?: true;
                 };
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 readonly updatedAt?: string;
+                /** @description The definition id associated with this automation definition version attributes. */
                 definitionId: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for versioned at.
+                 */
                 versionedAt: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "automationDefinitionVersion";
         };
+        /** @description Public API representation of automation run. */
         AutomationRun: {
+            /** @description The attributes associated with this automation run. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for aborted at.
+                 */
                 readonly abortedAt?: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 readonly createdAt?: string;
+                /** @description The definition associated with this automation run attributes. */
                 definition: {
+                    /** @description Stable TeamGrid identifier for this resource. */
                     id: string;
+                    /** @description Human-readable name of the resource. */
                     name: string;
                 };
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for failed at.
+                 */
                 readonly failedAt?: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for finished at.
+                 */
                 readonly finishedAt?: string;
+                /** @description The reference associated with this automation run attributes. */
                 readonly reference?: {
+                    /** @description Stable TeamGrid identifier for this resource. */
                     id: string;
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical type discriminator for this resource.
+                     * @enum {string}
+                     */
                     type: "contact" | "project" | "task" | "user" | "workspace";
                 };
+                /** @description Whether replayed applies to this automation run attributes. */
                 readonly replayed?: boolean;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @enum {string}
+                 */
                 state: "aborted" | "failed" | "running" | "succeeded";
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 readonly updatedAt?: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "automationRun";
         };
+        /** @description Public API representation of integration installation. */
         IntegrationInstallation: {
+            /** @description The attributes associated with this integration installation. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 readonly createdAt?: string;
-                /** @enum {string} */
+                /**
+                 * @description Canonical provider value for this integration installation attributes.
+                 * @enum {string}
+                 */
                 provider: "googleCalendar" | "sipgate" | "slack";
-                /** @constant */
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @constant
+                 */
                 state: "configured";
+                /** @description The target associated with this integration installation attributes. */
                 target: {
+                    /** @description Stable TeamGrid identifier for this resource. */
                     id: string;
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical type discriminator for this resource.
+                     * @enum {string}
+                     */
                     type: "contact" | "project" | "task" | "user" | "workspace";
                 };
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 readonly updatedAt?: string;
-                /** @constant */
+                /**
+                 * @description The verification associated with this integration installation attributes.
+                 * @constant
+                 */
                 verification: "not_checked";
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "integrationInstallation";
         };
+        /** @description Public API representation of automation definition. */
         AutomationDefinitionCreate: {
+            /** @description Human-readable description of the resource. */
             description?: string;
+            /** @description The flow associated with this automation definition. */
             flow: components["schemas"]["AutomationInputStep"][];
+            /** @description Human-readable name of the resource. */
             name: string;
+            /** @description The trigger associated with this automation definition. */
             trigger: {
+                /** @description Response data for the completed request. */
                 data: {
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical type discriminator for this resource.
+                     * @enum {string}
+                     */
                     type: "projects" | "tasks";
                 };
-                /** @enum {string} */
+                /**
+                 * @description Canonical TeamGrid event name.
+                 * @enum {string}
+                 */
                 event: "change" | "create";
             };
         };
+        /** @description Public API representation of automation definition. */
         AutomationDefinitionUpdate: {
+            /** @description Human-readable description of the resource. */
             description?: string;
+            /** @description The flow associated with this automation definition. */
             flow?: components["schemas"]["AutomationInputStep"][];
+            /** @description Human-readable name of the resource. */
             name?: string;
+            /** @description The trigger associated with this automation definition. */
             trigger?: {
+                /** @description Response data for the completed request. */
                 data: {
-                    /** @enum {string} */
+                    /**
+                     * @description Canonical type discriminator for this resource.
+                     * @enum {string}
+                     */
                     type: "projects" | "tasks";
                 };
-                /** @enum {string} */
+                /**
+                 * @description Canonical TeamGrid event name.
+                 * @enum {string}
+                 */
                 event: "change" | "create";
             };
         };
+        /** @description Public API representation of event definition. */
         EventDefinition: {
+            /** @description The attributes associated with this event definition. */
             attributes: {
-                /** @constant */
+                /**
+                 * @description The channel associated with this event definition attributes.
+                 * @constant
+                 */
                 channel: "webhook";
-                /** @constant */
+                /**
+                 * @description The operation associated with this event definition attributes.
+                 * @constant
+                 */
                 operation: null;
+                /** @description The required scopes associated with this event definition attributes. */
                 requiredScopes: string[];
-                /** @constant */
+                /**
+                 * @description Canonical TeamGrid resource type.
+                 * @constant
+                 */
                 resourceType: null;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "eventDefinition";
         };
+        /** @description Public API representation of system capability. */
         SystemCapability: {
+            /** @description The attributes associated with this system capability. */
             attributes: {
+                /** @description Whether accessible applies to this system capability attributes. */
                 accessible: boolean;
+                /** @description Whether entitled applies to this system capability attributes. */
                 entitled: boolean;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "systemCapability";
         };
+        /** @description Public API representation of webhook secret rotation. */
         WebhookSecretRotation: {
+            /** @description The attributes associated with this webhook secret rotation. */
             attributes: {
+                /** @description Whether replayed applies to this webhook secret rotation attributes. */
                 replayed: boolean;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
                 /** @description Reveal-only replacement signing secret. It is returned only by this no-store response and is never persisted as plaintext. */
                 signingSecret: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "webhookSecretRotation";
         };
+        /** @description Public API representation of workspace entitlement. */
         WorkspaceEntitlement: {
+            /** @description The attributes associated with this workspace entitlement. */
             attributes: {
+                /** @description Whether accessible applies to this workspace entitlement attributes. */
                 accessible: boolean;
+                /** @description Whether enabled applies to this workspace entitlement attributes. */
                 enabled: boolean;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "workspaceEntitlement";
         };
+        /** @description Public API representation of workspace settings. */
         WorkspaceSettings: {
+            /** @description The attributes associated with this workspace settings. */
             attributes: {
-                /** @enum {string|null} */
+                /**
+                 * @description ISO 4217 currency code used for monetary values.
+                 * @enum {string|null}
+                 */
                 currency: "AUD" | "CAD" | "CHF" | "EUR" | "GBP" | "NZD" | "USD" | "ZAR" | null;
-                /** @enum {string|null} */
+                /**
+                 * @description Canonical default language value for this workspace settings attributes.
+                 * @enum {string|null}
+                 */
                 defaultLanguage: "de" | "de-XX" | "en" | null;
+                /** @description The default planned time associated with this workspace settings attributes. */
                 defaultPlannedTime: number | null;
+                /** @description The default productivity associated with this workspace settings attributes. */
                 defaultProductivity: number | null;
+                /** @description The default show in scheduling associated with this workspace settings attributes. */
                 defaultShowInScheduling: boolean | null;
+                /** @description Human-readable name of the resource. */
                 name: string;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
             };
-            /** @constant */
+            /**
+             * @description Stable TeamGrid identifier for this resource.
+             * @constant
+             */
             id: "current";
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "workspaceSettings";
         };
+        /** @description Public API representation of workspace settings. */
         WorkspaceSettingsUpdate: {
-            /** @enum {string} */
+            /**
+             * @description ISO 4217 currency code used for monetary values.
+             * @enum {string}
+             */
             currency?: "AUD" | "CAD" | "CHF" | "EUR" | "GBP" | "NZD" | "USD" | "ZAR";
-            /** @enum {string} */
+            /**
+             * @description Canonical default language value for this workspace settings.
+             * @enum {string}
+             */
             defaultLanguage?: "de" | "de-XX" | "en";
+            /** @description The default planned time associated with this workspace settings. */
             defaultPlannedTime?: number;
+            /** @description The default productivity associated with this workspace settings. */
             defaultProductivity?: number;
+            /** @description Whether default show in scheduling applies to this workspace settings. */
             defaultShowInScheduling?: boolean;
+            /** @description Human-readable name of the resource. */
             name?: string;
         };
+        /** @description Public API representation of personal access token. */
         PersonalAccessToken: {
+            /** @description The attributes associated with this personal access token. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string;
+                /** @description Human-readable description of the resource. */
                 description: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp after which this capability or record is no longer valid.
+                 */
                 expiresAt: string;
+                /** @description The generation associated with this personal access token attributes. */
                 generation: number;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for grace ends at.
+                 */
                 graceEndsAt: string | null;
+                /** @description The last four associated with this personal access token attributes. */
                 lastFour: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for last used at.
+                 */
                 lastUsedAt: string | null;
+                /** @description Human-readable name of the resource. */
                 name: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for not before at.
+                 */
                 notBeforeAt: string | null;
+                /** @description The principal id associated with this personal access token attributes. */
                 principalId: string;
+                /** @description The scopes associated with this personal access token attributes. */
                 scopes: string[];
-                /** @enum {string} */
+                /**
+                 * @description Canonical status of the resource or operation.
+                 * @enum {string}
+                 */
                 status: "active" | "expired" | "retiring" | "revoked";
                 /** @description Reveal-once token returned only by an idempotent create or rotation response. */
                 readonly token?: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "personalAccessToken";
         };
+        /** @description Public API representation of personal access token. */
         PersonalAccessTokenCreate: {
+            /** @description Human-readable description of the resource. */
             description?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Timestamp after which this capability or record is no longer valid.
+             */
             expiresAt?: string;
+            /** @description Human-readable name of the resource. */
             name: string;
+            /** @description The scopes associated with this personal access token. */
             scopes: string[];
         };
+        /** @description Public API representation of personal access token rotation. */
         PersonalAccessTokenRotation: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Timestamp after which this capability or record is no longer valid.
+             */
             expiresAt?: string;
+            /** @description The grace period seconds associated with this personal access token rotation. */
             gracePeriodSeconds?: number;
+            /** @description The scopes associated with this personal access token rotation. */
             scopes?: string[];
         };
+        /** @description Public API representation of service account credential. */
         ServiceAccountCredential: {
+            /** @description The attributes associated with this service account credential. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string;
+                /** @description Human-readable description of the resource. */
                 description: string | null;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp after which this capability or record is no longer valid.
+                 */
                 expiresAt: string;
+                /** @description The generation associated with this service account credential attributes. */
                 generation: number;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for grace ends at.
+                 */
                 graceEndsAt: string | null;
+                /** @description The last four associated with this service account credential attributes. */
                 lastFour: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for last used at.
+                 */
                 lastUsedAt: string | null;
+                /** @description Human-readable name of the resource. */
                 name: string;
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for not before at.
+                 */
                 notBeforeAt: string | null;
+                /** @description The principal id associated with this service account credential attributes. */
                 principalId: string;
+                /** @description The scopes associated with this service account credential attributes. */
                 scopes: string[];
-                /** @enum {string} */
+                /**
+                 * @description Canonical status of the resource or operation.
+                 * @enum {string}
+                 */
                 status: "active" | "expired" | "retiring" | "revoked";
                 /** @description Reveal-once token returned only by an idempotent create or rotation response. */
                 readonly token?: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "serviceAccountCredential";
         };
+        /** @description Public API representation of service account. */
         ServiceAccount: {
+            /** @description The attributes associated with this service account. */
             attributes: {
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
                 createdAt: string;
+                /** @description The credentials associated with this service account attributes. */
                 credentials: components["schemas"]["ServiceAccountCredential"][];
+                /** @description Human-readable description of the resource. */
                 description: string | null;
+                /** @description The display name associated with this service account attributes. */
                 displayName: string;
+                /** @description The permission set associated with this service account attributes. */
                 permissionSet: string[];
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
+                /** @description The scope ceiling associated with this service account attributes. */
                 scopeCeiling: string[];
-                /** @enum {string} */
+                /**
+                 * @description Canonical status of the resource or operation.
+                 * @enum {string}
+                 */
                 status: "active" | "disabled" | "revoked";
-                /** Format: date-time */
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
                 updatedAt: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "serviceAccount";
         };
+        /** @description Public API representation of service account. */
         ServiceAccountCreate: {
+            /** @description Human-readable description of the resource. */
             description?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Timestamp after which this capability or record is no longer valid.
+             */
             expiresAt?: string;
+            /** @description Human-readable name of the resource. */
             name: string;
+            /** @description The scopes associated with this service account. */
             scopes: string[];
         };
+        /** @description Public API representation of service account credential. */
         ServiceAccountCredentialCreate: {
+            /** @description Human-readable description of the resource. */
             description?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Timestamp after which this capability or record is no longer valid.
+             */
             expiresAt?: string;
+            /** @description Human-readable name of the resource. */
             name: string;
+            /** @description The scopes associated with this service account credential. */
             scopes: string[];
         };
+        /** @description Public API representation of service account credential rotation. */
         ServiceAccountCredentialRotation: {
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Timestamp after which this capability or record is no longer valid.
+             */
             expiresAt?: string;
+            /** @description The grace period seconds associated with this service account credential rotation. */
             gracePeriodSeconds?: number;
+            /** @description The scopes associated with this service account credential rotation. */
             scopes?: string[];
         };
+        /** @description Public API representation of service account. */
         ServiceAccountUpdate: {
+            /** @description The reason associated with this service account. */
             reason?: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical status of the resource or operation.
+             * @enum {string}
+             */
             status: "active" | "disabled";
         };
+        /** @description Public API representation of resource grant. */
         ResourceGrant: {
+            /** @description The anchor id associated with this resource grant. */
             anchorId: string | null;
-            /** @enum {string} */
+            /**
+             * @description Canonical anchor type value for this resource grant.
+             * @enum {string}
+             */
             anchorType: "workspace" | "project" | "memberGroup" | "contactGroup" | "user" | "ownRecords";
+            /** @description The capabilities associated with this resource grant. */
             capabilities: string[];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Timestamp after which this capability or record is no longer valid.
+             */
             expiresAt: string | null;
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical inheritance value for this resource grant.
+             * @enum {string}
+             */
             inheritance: "domainDescendants" | "none";
+            /** @description The resource key associated with this resource grant. */
             resourceKey: string;
         };
+        /** @description Public API representation of resource grant. */
         ResourceGrantInput: {
+            /** @description The anchor id associated with this resource grant. */
             anchorId?: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical anchor type value for this resource grant.
+             * @enum {string}
+             */
             anchorType: "workspace" | "project" | "memberGroup" | "contactGroup" | "user" | "ownRecords";
+            /** @description The capabilities associated with this resource grant. */
             capabilities: string[];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Timestamp after which this capability or record is no longer valid.
+             */
             expiresAt?: string;
-            /** @enum {string} */
+            /**
+             * @description Canonical inheritance value for this resource grant.
+             * @enum {string}
+             */
             inheritance: "domainDescendants" | "none";
+            /** @description The resource key associated with this resource grant. */
             resourceKey: string;
         };
+        /** @description Public API representation of service account resource grant set. */
         ServiceAccountResourceGrantSet: {
+            /** @description The attributes associated with this service account resource grant set. */
             attributes: {
+                /** @description The grants associated with this service account resource grant set attributes. */
                 grants: components["schemas"]["ResourceGrant"][];
+                /** @description The policy version associated with this service account resource grant set attributes. */
                 policyVersion: number;
+                /** @description Strong resource revision used for optimistic concurrency control. */
                 revision: string;
             };
+            /** @description Stable TeamGrid identifier for this resource. */
             id: string;
-            /** @constant */
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
             type: "serviceAccountResourceGrantSet";
         };
+        /** @description Public API representation of service account resource grant set replace. */
         ServiceAccountResourceGrantSetReplace: {
+            /** @description The grants associated with this service account resource grant set replace. */
             grants: components["schemas"]["ResourceGrantInput"][];
         };
     };
@@ -4802,8 +7412,11 @@ export interface components {
     parameters: {
         /** @description Opaque cursor returned in meta.page.nextCursor. */
         Cursor: string;
+        /** @description Identifier of the custom-field definition whose value is being addressed. */
         CustomFieldValueFieldId: string;
+        /** @description Stable identifier of the target resource in the authenticated workspace. */
         CustomFieldValueResourceId: string;
+        /** @description Supported TeamGrid resource type that owns the custom-field value. */
         CustomFieldValueTargetType: "contact" | "project" | "project-journal-entry" | "task";
         /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
         IdempotencyKey: string;
@@ -4829,8 +7442,11 @@ export interface components {
         IfMatchFile: string;
         /** @description Exactly one strong ETag returned by the latest task planned-work GET. Wildcards, weak validators, and lists are rejected. */
         IfMatchPlannedWork: string;
+        /** @description Maximum number of records to return in this page. The response may contain fewer records. */
         Limit: number;
+        /** @description Stable identifier of the resource in the authenticated workspace. */
         ResourceId: string;
+        /** @description Stable identifier of the resource in the authenticated workspace. */
         WebhookDeliveryId: string;
         /** @description Include PII only when the credential also has members:pii:read. */
         IncludeMemberPii: boolean;
@@ -4846,6 +7462,7 @@ export interface components {
         IfMatchWebhook: string;
         /** @description Exactly one latest strong workspace settings ETag. Wildcards, weak validators, and lists are rejected. */
         IfMatchWorkspaceSettings: string;
+        /** @description Maximum number of records to return in this page. The response may contain fewer records. */
         WebhookLimit: number;
         /** @description Exactly one latest strong service-account grant-policy ETag. */
         IfMatchResourceGrantSet: string;
@@ -4908,6 +7525,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "contractVersion": "1.0.0",
+                     *         "deprecations": [
+                     *           {}
+                     *         ],
+                     *         "documentation": "https://example.com/teamgrid",
+                     *         "manifestSha256": "example",
+                     *         "region": "example",
+                     *         "status": "operational",
+                     *         "supportedClients": {
+                     *           "cli": {},
+                     *           "mcp": {},
+                     *           "sdk": {}
+                     *         },
+                     *         "version": "1"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["ApiVersionEnvelope"];
                 };
             };
@@ -4923,12 +7563,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get the authenticated workspace succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "cellId": "exampleId",
+                     *           "currency": "EUR",
+                     *           "name": "Example",
+                     *           "region": "example",
+                     *           "subdomain": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "workspace"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Workspace"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -4948,6 +7606,7 @@ export interface operations {
             query: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -4964,12 +7623,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "appointment"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Appointment"][];
                         meta: {
@@ -5000,13 +7677,29 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a TeamGrid-managed appointment. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "end": {
+                 *         "at": "2026-07-29T10:00:00Z",
+                 *         "timeZone": "Europe/Berlin"
+                 *       },
+                 *       "start": {
+                 *         "at": "2026-07-29T10:00:00Z",
+                 *         "timeZone": "Europe/Berlin"
+                 *       },
+                 *       "allDay": false,
+                 *       "busy": false,
+                 *       "description": "Example generated from the documented schema."
+                 *     }
+                 */
                 "application/json": components["schemas"]["AppointmentCreate"];
             };
         };
         responses: {
-            /** @description A newly created resource. */
+            /** @description The request to create a TeamGrid-managed appointment created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -5015,6 +7708,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "allDay": false,
+                     *           "archived": false,
+                     *           "busy": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "end": {},
+                     *           "location": "example",
+                     *           "managedBy": "provider",
+                     *           "redacted": false,
+                     *           "revision": "\"example-revision\"",
+                     *           "start": {},
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "userId": "exampleId",
+                     *           "visibility": "default"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "appointment"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Appointment"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5035,13 +7756,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get an appointment succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AppointmentETag"];
@@ -5049,6 +7771,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "allDay": false,
+                     *           "archived": false,
+                     *           "busy": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "end": {},
+                     *           "location": "example",
+                     *           "managedBy": "provider",
+                     *           "redacted": false,
+                     *           "revision": "\"example-revision\"",
+                     *           "start": {},
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "userId": "exampleId",
+                     *           "visibility": "default"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "appointment"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Appointment"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5072,13 +7822,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAppointment"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to archive a TeamGrid-managed appointment succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AppointmentETag"];
@@ -5088,6 +7839,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "allDay": false,
+                     *           "archived": false,
+                     *           "busy": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "end": {},
+                     *           "location": "example",
+                     *           "managedBy": "provider",
+                     *           "redacted": false,
+                     *           "revision": "\"example-revision\"",
+                     *           "start": {},
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "userId": "exampleId",
+                     *           "visibility": "default"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "appointment"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Appointment"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5114,17 +7893,26 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAppointment"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a TeamGrid-managed appointment. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "allDay": false,
+                 *       "busy": false,
+                 *       "description": "Example generated from the documented schema."
+                 *     }
+                 */
                 "application/json": components["schemas"]["AppointmentUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a TeamGrid-managed appointment succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AppointmentETag"];
@@ -5132,6 +7920,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "allDay": false,
+                     *           "archived": false,
+                     *           "busy": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "end": {},
+                     *           "location": "example",
+                     *           "managedBy": "provider",
+                     *           "redacted": false,
+                     *           "revision": "\"example-revision\"",
+                     *           "start": {},
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "userId": "exampleId",
+                     *           "visibility": "default"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "appointment"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Appointment"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5158,13 +7974,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAppointment"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore a TeamGrid-managed appointment succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AppointmentETag"];
@@ -5174,6 +7991,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "allDay": false,
+                     *           "archived": false,
+                     *           "busy": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "end": {},
+                     *           "location": "example",
+                     *           "managedBy": "provider",
+                     *           "redacted": false,
+                     *           "revision": "\"example-revision\"",
+                     *           "start": {},
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "userId": "exampleId",
+                     *           "visibility": "default"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "appointment"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Appointment"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5197,6 +8042,7 @@ export interface operations {
             query: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -5213,12 +8059,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "absence"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Absence"][];
                         meta: {
@@ -5249,13 +8113,22 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create an absence. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "end": "2026-07-29T10:00:00Z",
+                 *       "start": "2026-07-29T10:00:00Z",
+                 *       "reason": "example",
+                 *       "userId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["AbsenceCreate"];
             };
         };
         responses: {
-            /** @description A newly created resource. */
+            /** @description The request to create an absence created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -5264,6 +8137,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "end": "2026-07-29T10:00:00Z",
+                     *           "reason": "example",
+                     *           "revision": "\"example-revision\"",
+                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "absence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Absence"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5284,13 +8178,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get an absence succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AbsenceETag"];
@@ -5298,6 +8193,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "end": "2026-07-29T10:00:00Z",
+                     *           "reason": "example",
+                     *           "revision": "\"example-revision\"",
+                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "absence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Absence"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5321,13 +8237,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAbsence"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to archive an absence succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AbsenceETag"];
@@ -5337,6 +8254,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "end": "2026-07-29T10:00:00Z",
+                     *           "reason": "example",
+                     *           "revision": "\"example-revision\"",
+                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "absence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Absence"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5363,17 +8301,26 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAbsence"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update an absence. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "end": "2026-07-29T10:00:00Z",
+                 *       "reason": "example",
+                 *       "start": "2026-07-29T10:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["AbsenceUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update an absence succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AbsenceETag"];
@@ -5381,6 +8328,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "end": "2026-07-29T10:00:00Z",
+                     *           "reason": "example",
+                     *           "revision": "\"example-revision\"",
+                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "absence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Absence"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5407,13 +8375,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAbsence"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an absence succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AbsenceETag"];
@@ -5423,6 +8392,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "end": "2026-07-29T10:00:00Z",
+                     *           "reason": "example",
+                     *           "revision": "\"example-revision\"",
+                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "absence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Absence"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5465,6 +8455,23 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "end": "2026-07-29T10:00:00Z",
+                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "timeZone": "Europe/Berlin",
+                     *           "users": []
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "availability"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Availability"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5493,6 +8500,7 @@ export interface operations {
             query: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: number;
                 /** @description Target resource type. The matching target-domain read scope is also required. */
                 targetType: "contact" | "project" | "task";
@@ -5505,12 +8513,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "activityEvent"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ActivityEvent"][];
                         meta: {
@@ -5536,6 +8562,7 @@ export interface operations {
             query: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: number;
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -5550,12 +8577,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "comment"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Comment"][];
                         meta: {
@@ -5586,13 +8631,21 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a target comment. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "targetId": "exampleId",
+                 *       "targetType": "contact",
+                 *       "text": "example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["CommentCreate"];
             };
         };
         responses: {
-            /** @description A newly created resource. */
+            /** @description The request to create a target comment created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -5601,6 +8654,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "authorId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "\"example-revision\"",
+                     *           "target": {},
+                     *           "text": "example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "comment"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Comment"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5621,13 +8694,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a comment succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["CommentETag"];
@@ -5635,6 +8709,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "authorId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "\"example-revision\"",
+                     *           "target": {},
+                     *           "text": "example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "comment"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Comment"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5658,13 +8752,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchComment"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to archive a comment succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["CommentETag"];
@@ -5674,6 +8769,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "authorId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "\"example-revision\"",
+                     *           "target": {},
+                     *           "text": "example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "comment"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Comment"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5700,13 +8815,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchComment"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore a comment succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["CommentETag"];
@@ -5716,6 +8832,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "authorId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "\"example-revision\"",
+                     *           "target": {},
+                     *           "text": "example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "comment"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Comment"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5739,6 +8875,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -5749,12 +8886,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "document"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Document"][];
                         meta: {
@@ -5785,13 +8940,20 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a document. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "content": "example",
+                 *       "name": "Example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["DocumentCreate"];
             };
         };
         responses: {
-            /** @description A newly created resource. */
+            /** @description The request to create a document created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -5800,6 +8962,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "name": "Example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedBy": "example",
+                     *           "content": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "document"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Document"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5820,13 +9002,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a document succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["DocumentETag"];
@@ -5834,6 +9017,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "name": "Example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedBy": "example",
+                     *           "content": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "document"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Document"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5866,13 +9069,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchDocument"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to archive a document succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["DocumentETag"];
@@ -5882,6 +9086,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "name": "Example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedBy": "example",
+                     *           "content": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "document"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Document"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5908,17 +9132,25 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchDocument"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a document. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "content": "example",
+                 *       "name": "Example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["DocumentUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a document succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["DocumentETag"];
@@ -5926,6 +9158,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "name": "Example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedBy": "example",
+                     *           "content": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "document"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Document"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5952,13 +9204,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchDocument"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore a document succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["DocumentETag"];
@@ -5968,6 +9221,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "name": "Example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedBy": "example",
+                     *           "content": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "document"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Document"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -5991,6 +9264,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -6005,12 +9279,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "file"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["File"][];
                         meta: {
@@ -6039,13 +9331,14 @@ export interface operations {
             };
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get file metadata succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["FileETag"];
@@ -6053,6 +9346,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "blocked": false,
+                     *           "contentRevision": 1,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "downloadAvailable": false,
+                     *           "links": [],
+                     *           "metadataRevision": 1,
+                     *           "mimeType": "example",
+                     *           "name": "Example",
+                     *           "previewStatus": "example",
+                     *           "size": 0,
+                     *           "space": "contacts",
+                     *           "syncRevision": 1,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedBy": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "file"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["File"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6076,13 +9398,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchFile"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to archive a file succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["FileETag"];
@@ -6092,6 +9415,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "blocked": false,
+                     *           "contentRevision": 1,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "downloadAvailable": false,
+                     *           "links": [],
+                     *           "metadataRevision": 1,
+                     *           "mimeType": "example",
+                     *           "name": "Example",
+                     *           "previewStatus": "example",
+                     *           "size": 0,
+                     *           "space": "contacts",
+                     *           "syncRevision": 1,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedBy": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "file"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["File"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6118,17 +9470,24 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchFile"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to rename a file. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["FileRename"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to rename a file succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["FileETag"];
@@ -6136,6 +9495,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "blocked": false,
+                     *           "contentRevision": 1,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "downloadAvailable": false,
+                     *           "links": [],
+                     *           "metadataRevision": 1,
+                     *           "mimeType": "example",
+                     *           "name": "Example",
+                     *           "previewStatus": "example",
+                     *           "size": 0,
+                     *           "space": "contacts",
+                     *           "syncRevision": 1,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedBy": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "file"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["File"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6162,13 +9550,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchFile"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore a file succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["FileETag"];
@@ -6178,6 +9567,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "blocked": false,
+                     *           "contentRevision": 1,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "downloadAvailable": false,
+                     *           "links": [],
+                     *           "metadataRevision": 1,
+                     *           "mimeType": "example",
+                     *           "name": "Example",
+                     *           "previewStatus": "example",
+                     *           "size": 0,
+                     *           "space": "contacts",
+                     *           "syncRevision": 1,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedBy": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "file"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["File"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6201,6 +9619,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -6213,6 +9632,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "fileDownloadIntent"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["FileDownloadIntent"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6247,19 +9678,45 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to reserve and create a private file upload intent. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "destination": {
+                 *         "id": "exampleId",
+                 *         "type": "contact"
+                 *       },
+                 *       "file": {
+                 *         "fileName": "Example",
+                 *         "mimeType": "example",
+                 *         "size": 0
+                 *       }
+                 *     }
+                 */
                 "application/json": components["schemas"]["FileUploadIntentCreate"];
             };
         };
         responses: {
-            /** @description A newly created resource. */
+            /** @description The request to reserve and create a private file upload intent created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "fileUploadIntent"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["FileUploadIntent"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6298,6 +9755,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -6313,6 +9771,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "blocked": false,
+                     *           "contentRevision": 1,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "downloadAvailable": false,
+                     *           "links": [],
+                     *           "metadataRevision": 1,
+                     *           "mimeType": "example",
+                     *           "name": "Example",
+                     *           "previewStatus": "example",
+                     *           "size": 0,
+                     *           "space": "contacts",
+                     *           "syncRevision": 1,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedBy": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "file"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["File"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6343,6 +9830,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -6356,6 +9844,21 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "replayed": false,
+                     *           "state": "canceled"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "fileUploadIntent"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["FileUploadCancellation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6377,6 +9880,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -6391,12 +9895,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "product"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Product"][];
                         meta: {
@@ -6426,8 +9948,19 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a product. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "amount": 0,
+                 *       "annotation": "example",
+                 *       "costCenter": [
+                 *         "example"
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProductCreate"];
             };
         };
@@ -6439,19 +9972,79 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "amount": 0,
+                     *           "annotation": "example",
+                     *           "archived": false,
+                     *           "costCenter": [],
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "disabled": false,
+                     *           "financeAccount": "example",
+                     *           "name": "Example",
+                     *           "priceGroupIds": [],
+                     *           "productGroupId": "exampleId",
+                     *           "productNumber": "example",
+                     *           "retailPrice": 0,
+                     *           "taxRate": 0,
+                     *           "unit": "example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "purchasePrice": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "product"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Product"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a product created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "amount": 0,
+                     *           "annotation": "example",
+                     *           "archived": false,
+                     *           "costCenter": [],
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "disabled": false,
+                     *           "financeAccount": "example",
+                     *           "name": "Example",
+                     *           "priceGroupIds": [],
+                     *           "productGroupId": "exampleId",
+                     *           "productNumber": "example",
+                     *           "retailPrice": 0,
+                     *           "taxRate": 0,
+                     *           "unit": "example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "purchasePrice": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "product"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Product"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6472,18 +10065,49 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a product succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "amount": 0,
+                     *           "annotation": "example",
+                     *           "archived": false,
+                     *           "costCenter": [],
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "disabled": false,
+                     *           "financeAccount": "example",
+                     *           "name": "Example",
+                     *           "priceGroupIds": [],
+                     *           "productGroupId": "exampleId",
+                     *           "productNumber": "example",
+                     *           "retailPrice": 0,
+                     *           "taxRate": 0,
+                     *           "unit": "example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "purchasePrice": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "product"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Product"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6503,6 +10127,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -6531,22 +10156,63 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a product. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "amount": 0,
+                 *       "annotation": "example",
+                 *       "costCenter": [
+                 *         "example"
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProductUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a product succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "amount": 0,
+                     *           "annotation": "example",
+                     *           "archived": false,
+                     *           "costCenter": [],
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "disabled": false,
+                     *           "financeAccount": "example",
+                     *           "name": "Example",
+                     *           "priceGroupIds": [],
+                     *           "productGroupId": "exampleId",
+                     *           "productNumber": "example",
+                     *           "retailPrice": 0,
+                     *           "taxRate": 0,
+                     *           "unit": "example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "purchasePrice": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "product"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Product"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6568,6 +10234,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -6580,12 +10247,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "productGroup"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProductGroup"][];
                         meta: {
@@ -6615,8 +10300,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a product group. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "description": "Example generated from the documented schema.",
+                 *       "parentId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProductGroupCreate"];
             };
         };
@@ -6628,19 +10321,57 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "name": "Example",
+                     *           "parentId": "exampleId",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "productGroup"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProductGroup"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a product group created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "name": "Example",
+                     *           "parentId": "exampleId",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "productGroup"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProductGroup"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6661,18 +10392,38 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a product group succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "name": "Example",
+                     *           "parentId": "exampleId",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "productGroup"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProductGroup"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6692,6 +10443,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -6720,22 +10472,50 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a product group. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "description": "Example generated from the documented schema.",
+                 *       "name": "Example",
+                 *       "parentId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProductGroupUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a product group succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "name": "Example",
+                     *           "parentId": "exampleId",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "productGroup"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProductGroup"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6757,6 +10537,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -6781,12 +10562,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "project"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Project"][];
                         meta: {
@@ -6816,8 +10615,19 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a project. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "additionalContactIds": [
+                 *         "example"
+                 *       ],
+                 *       "color": "example",
+                 *       "contactId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProjectCreate"];
             };
         };
@@ -6831,13 +10641,59 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "actualEndAt": "2026-07-29T10:00:00Z",
+                     *           "actualStartAt": "2026-07-29T10:00:00Z",
+                     *           "additionalContactIds": [],
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "completed": false,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfProjectId": "exampleId",
+                     *           "earliestEndAt": "2026-07-29T10:00:00Z",
+                     *           "earliestStartAt": "2026-07-29T10:00:00Z",
+                     *           "individualId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "managerId": "exampleId",
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "schedulingOrder": 1,
+                     *           "showInScheduling": false,
+                     *           "subscriberIds": [],
+                     *           "tasksCompleted": 0,
+                     *           "tasksOpen": 0,
+                     *           "tasksTotal": 0,
+                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
+                     *           "latestEndAt": "2026-07-29T10:00:00Z",
+                     *           "latestStartAt": "2026-07-29T10:00:00Z",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "project"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Project"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a project created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -6846,6 +10702,52 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "actualEndAt": "2026-07-29T10:00:00Z",
+                     *           "actualStartAt": "2026-07-29T10:00:00Z",
+                     *           "additionalContactIds": [],
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "completed": false,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfProjectId": "exampleId",
+                     *           "earliestEndAt": "2026-07-29T10:00:00Z",
+                     *           "earliestStartAt": "2026-07-29T10:00:00Z",
+                     *           "individualId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "managerId": "exampleId",
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "schedulingOrder": 1,
+                     *           "showInScheduling": false,
+                     *           "subscriberIds": [],
+                     *           "tasksCompleted": 0,
+                     *           "tasksOpen": 0,
+                     *           "tasksTotal": 0,
+                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
+                     *           "latestEndAt": "2026-07-29T10:00:00Z",
+                     *           "latestStartAt": "2026-07-29T10:00:00Z",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "project"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Project"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6866,13 +10768,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a project succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectETag"];
@@ -6880,6 +10783,52 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "actualEndAt": "2026-07-29T10:00:00Z",
+                     *           "actualStartAt": "2026-07-29T10:00:00Z",
+                     *           "additionalContactIds": [],
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "completed": false,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfProjectId": "exampleId",
+                     *           "earliestEndAt": "2026-07-29T10:00:00Z",
+                     *           "earliestStartAt": "2026-07-29T10:00:00Z",
+                     *           "individualId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "managerId": "exampleId",
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "schedulingOrder": 1,
+                     *           "showInScheduling": false,
+                     *           "subscriberIds": [],
+                     *           "tasksCompleted": 0,
+                     *           "tasksOpen": 0,
+                     *           "tasksTotal": 0,
+                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
+                     *           "latestEndAt": "2026-07-29T10:00:00Z",
+                     *           "latestStartAt": "2026-07-29T10:00:00Z",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "project"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Project"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6902,17 +10851,28 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchProject"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a project. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "additionalContactIds": [
+                 *         "example"
+                 *       ],
+                 *       "color": "example",
+                 *       "contactId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProjectUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a project succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectETag"];
@@ -6920,6 +10880,52 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "actualEndAt": "2026-07-29T10:00:00Z",
+                     *           "actualStartAt": "2026-07-29T10:00:00Z",
+                     *           "additionalContactIds": [],
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "completed": false,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfProjectId": "exampleId",
+                     *           "earliestEndAt": "2026-07-29T10:00:00Z",
+                     *           "earliestStartAt": "2026-07-29T10:00:00Z",
+                     *           "individualId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "managerId": "exampleId",
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "schedulingOrder": 1,
+                     *           "showInScheduling": false,
+                     *           "subscriberIds": [],
+                     *           "tasksCompleted": 0,
+                     *           "tasksOpen": 0,
+                     *           "tasksTotal": 0,
+                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
+                     *           "latestEndAt": "2026-07-29T10:00:00Z",
+                     *           "latestStartAt": "2026-07-29T10:00:00Z",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "project"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Project"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6943,13 +10949,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get project sharing succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectETag"];
@@ -6957,6 +10964,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "availablePermissions": [],
+                     *           "entries": [],
+                     *           "revision": "\"example-revision\""
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectSharing"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectSharing"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -6979,17 +11002,30 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchProject"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to replace project sharing. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "entries": [
+                 *         {
+                 *           "workspaceId": "exampleId",
+                 *           "permissions": [],
+                 *           "userId": "exampleId"
+                 *         }
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProjectSharingReplace"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to replace project sharing succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectETag"];
@@ -6997,6 +11033,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "availablePermissions": [],
+                     *           "entries": [],
+                     *           "revision": "\"example-revision\""
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectSharing"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectSharing"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7025,6 +11077,7 @@ export interface operations {
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -7041,6 +11094,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "projectLifecycleOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectLifecycleOperation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7069,6 +11134,7 @@ export interface operations {
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -7085,6 +11151,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "projectLifecycleOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectLifecycleOperation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7113,6 +11191,7 @@ export interface operations {
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -7129,6 +11208,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "projectLifecycleOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectLifecycleOperation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7157,6 +11248,7 @@ export interface operations {
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -7173,6 +11265,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "projectLifecycleOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectLifecycleOperation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7196,18 +11300,31 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a project lifecycle operation succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "projectLifecycleOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectLifecycleOperation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7237,6 +11354,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -7253,12 +11371,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "projectTemplate"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectTemplate"][];
                         meta: {
@@ -7289,8 +11425,17 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to capture a project as a template. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "color": "example",
+                 *       "projectId": "exampleId",
+                 *       "title": "Example TeamGrid item",
+                 *       "description": "Example generated from the documented schema."
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProjectTemplateCreate"];
             };
         };
@@ -7304,13 +11449,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "originProjectId": "exampleId",
+                     *           "snapshotVersion": 1,
+                     *           "stats": {},
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectTemplate"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectTemplate"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to capture a project as a template created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -7319,6 +11488,30 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "originProjectId": "exampleId",
+                     *           "snapshotVersion": 1,
+                     *           "stats": {},
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectTemplate"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectTemplate"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7339,13 +11532,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get project-template metadata succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectTemplateETag"];
@@ -7353,6 +11547,30 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "originProjectId": "exampleId",
+                     *           "snapshotVersion": 1,
+                     *           "stats": {},
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectTemplate"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectTemplate"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7376,6 +11594,7 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchProjectTemplate"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -7411,17 +11630,26 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchProjectTemplate"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update project-template metadata. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "color": "example",
+                 *       "description": "Example generated from the documented schema.",
+                 *       "title": "Example TeamGrid item"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProjectTemplateUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update project-template metadata succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectTemplateETag"];
@@ -7429,6 +11657,30 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "originProjectId": "exampleId",
+                     *           "snapshotVersion": 1,
+                     *           "stats": {},
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectTemplate"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectTemplate"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7455,13 +11707,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchProjectTemplate"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an archived project template succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["ProjectTemplateETag"];
@@ -7469,6 +11722,30 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "originProjectId": "exampleId",
+                     *           "snapshotVersion": 1,
+                     *           "stats": {},
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectTemplate"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectTemplate"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7497,12 +11774,24 @@ export interface operations {
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to instantiate a project template asynchronously. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "additionalContactIds": [
+                 *         "example"
+                 *       ],
+                 *       "color": "example",
+                 *       "contactId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProjectTemplateInstantiate"];
             };
         };
@@ -7517,6 +11806,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "projectTemplateInstantiation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectTemplateInstantiation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7540,18 +11841,31 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a project-template instantiation operation succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "projectTemplateInstantiation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectTemplateInstantiation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7581,6 +11895,7 @@ export interface operations {
             query: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Inclusive window start. Together with end, limited to 366 days and years 2000–2100. */
                 start: string;
@@ -7599,12 +11914,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "plannedWork"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["PlannedWork"][];
                         meta: {
@@ -7631,18 +11964,31 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a planned-work replacement operation succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "plannedWorkOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["PlannedWorkOperation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7663,13 +12009,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a task planned-work schedule succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["PlannedWorkETag"];
@@ -7677,6 +12024,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "items": [],
+                     *           "plannedEnd": "2026-07-29T10:00:00Z",
+                     *           "plannedStart": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "revision": "\"example-revision\"",
+                     *           "taskId": "exampleId",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskPlannedWork"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TaskPlannedWork"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7703,12 +12070,23 @@ export interface operations {
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to replace task planned work asynchronously. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "dayLoads": [
+                 *         0
+                 *       ],
+                 *       "plannedEnd": "2026-07-29T10:00:00Z",
+                 *       "plannedStart": "2026-07-29T10:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["PlannedWorkReplacement"];
             };
         };
@@ -7723,6 +12101,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "plannedWorkOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["PlannedWorkOperation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7746,6 +12136,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -7772,12 +12163,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "projectStatement"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectStatement"][];
                         meta: {
@@ -7807,8 +12216,10 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a project statement. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /** @example {} */
                 "application/json": components["schemas"]["ProjectStatementCreate"];
             };
         };
@@ -7820,19 +12231,75 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "amount": 0,
+                     *           "archived": false,
+                     *           "comment": "example",
+                     *           "count": 0,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "date": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "isCharge": false,
+                     *           "productId": "exampleId",
+                     *           "productNumber": "example",
+                     *           "projectId": "exampleId",
+                     *           "title": "Example TeamGrid item",
+                     *           "type": "budget",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "purchasePrice": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectStatement"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectStatement"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a project statement created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "amount": 0,
+                     *           "archived": false,
+                     *           "comment": "example",
+                     *           "count": 0,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "date": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "isCharge": false,
+                     *           "productId": "exampleId",
+                     *           "productNumber": "example",
+                     *           "projectId": "exampleId",
+                     *           "title": "Example TeamGrid item",
+                     *           "type": "budget",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "purchasePrice": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectStatement"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectStatement"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7853,18 +12320,47 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a project statement succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "amount": 0,
+                     *           "archived": false,
+                     *           "comment": "example",
+                     *           "count": 0,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "date": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "isCharge": false,
+                     *           "productId": "exampleId",
+                     *           "productNumber": "example",
+                     *           "projectId": "exampleId",
+                     *           "title": "Example TeamGrid item",
+                     *           "type": "budget",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "purchasePrice": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectStatement"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectStatement"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7884,6 +12380,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -7912,22 +12409,59 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a project statement. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "amount": 0,
+                 *       "comment": "example",
+                 *       "count": 1
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProjectStatementUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a project statement succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "amount": 0,
+                     *           "archived": false,
+                     *           "comment": "example",
+                     *           "count": 0,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "date": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "isCharge": false,
+                     *           "productId": "exampleId",
+                     *           "productNumber": "example",
+                     *           "projectId": "exampleId",
+                     *           "title": "Example TeamGrid item",
+                     *           "type": "budget",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "purchasePrice": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectStatement"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectStatement"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7949,18 +12483,47 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore a project statement succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "amount": 0,
+                     *           "archived": false,
+                     *           "comment": "example",
+                     *           "count": 0,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "date": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "isCharge": false,
+                     *           "productId": "exampleId",
+                     *           "productNumber": "example",
+                     *           "projectId": "exampleId",
+                     *           "title": "Example TeamGrid item",
+                     *           "type": "budget",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "purchasePrice": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "projectStatement"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ProjectStatement"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -7982,6 +12545,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -8012,12 +12576,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "task"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"][];
                         meta: {
@@ -8047,8 +12629,17 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a task. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "assigneeId": "exampleId",
+                 *       "billable": false,
+                 *       "contactId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TaskCreate"];
             };
         };
@@ -8062,13 +12653,61 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a task created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -8077,6 +12716,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8099,8 +12786,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to update multiple tasks safely. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "items": [
+                 *         {}
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["TaskBulkUpdate"];
             };
         };
@@ -8111,6 +12806,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {}
+                     *       ],
+                     *       "meta": {
+                     *         "requestId": "exampleId",
+                     *         "summary": {
+                     *           "conflicts": 0,
+                     *           "failed": 0,
+                     *           "requested": 1,
+                     *           "updated": 0
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["TaskBulkUpdateEnvelope"];
                 };
             };
@@ -8127,13 +12838,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a task succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
@@ -8141,6 +12853,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8163,6 +12923,7 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchTask"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -8198,17 +12959,26 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchTask"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a task. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "assigneeId": "exampleId",
+                 *       "billable": false,
+                 *       "contactId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TaskUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a task succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
@@ -8216,6 +12986,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8242,13 +13060,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchTask"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an archived task succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
@@ -8256,6 +13075,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8284,12 +13151,21 @@ export interface operations {
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to duplicate a task. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "copyChecklist": true,
+                 *       "copyCustomFieldValues": true,
+                 *       "name": "Example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TaskDuplicate"];
             };
         };
@@ -8303,13 +13179,61 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to duplicate a task created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -8318,6 +13242,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8344,17 +13316,27 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchTask"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to move or reorder a task. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "axis": "assignee",
+                 *       "assigneeId": "exampleId",
+                 *       "groupId": "exampleId",
+                 *       "listId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TaskPlacement"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to move or reorder a task succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
@@ -8362,6 +13344,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8388,17 +13418,26 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchTask"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to replace a task checklist. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "subtasks": [
+                 *         {}
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["TaskSubtasksReplace"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to replace a task checklist succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
@@ -8406,6 +13445,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8432,13 +13519,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchTask"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to complete a task succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
@@ -8446,6 +13534,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8472,13 +13608,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchTask"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to reopen a completed task succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["TaskETag"];
@@ -8486,6 +13623,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "archivedAt": "2026-07-29T10:00:00Z",
+                     *           "assigneeId": "exampleId",
+                     *           "billable": false,
+                     *           "completed": false,
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "completedById": "exampleId",
+                     *           "commentsCount": 0,
+                     *           "contactId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "developerRevision": "\"example-revision\"",
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "duplicateOfTaskId": "exampleId",
+                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "filesCount": 0,
+                     *           "groupId": "exampleId",
+                     *           "listId": "exampleId",
+                     *           "listOrder": 1,
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "personalListId": "exampleId",
+                     *           "personalListOrder": 1,
+                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
+                     *           "plannedMinutes": 1,
+                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "serviceId": "exampleId",
+                     *           "subscriberIds": [],
+                     *           "subtasksCount": 0,
+                     *           "subtasks": [],
+                     *           "tagIds": [],
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "task"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Task"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8509,22 +13694,59 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to start task time tracking. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "userId": "exampleId",
+                 *       "at": "2026-07-29T10:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TimerAction"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to start task time tracking succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billed": false,
+                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "comment": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "durationMinutes": 1,
+                     *           "endAt": "2026-07-29T10:00:00Z",
+                     *           "serviceId": "exampleId",
+                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "taskId": "exampleId",
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "timeEntry"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TimeEntry"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8546,22 +13768,59 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to stop task time tracking. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "userId": "exampleId",
+                 *       "at": "2026-07-29T10:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TimerAction"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to stop task time tracking succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billed": false,
+                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "comment": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "durationMinutes": 1,
+                     *           "endAt": "2026-07-29T10:00:00Z",
+                     *           "serviceId": "exampleId",
+                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "taskId": "exampleId",
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "timeEntry"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TimeEntry"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8583,6 +13842,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -8609,12 +13869,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "timeEntry"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TimeEntry"][];
                         meta: {
@@ -8644,8 +13922,20 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a time entry. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "endAt": "2026-07-29T10:00:00Z",
+                 *       "startAt": "2026-07-29T10:00:00Z",
+                 *       "taskId": "exampleId",
+                 *       "userId": "exampleId",
+                 *       "billable": false,
+                 *       "comment": "example",
+                 *       "serviceId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TimeEntryCreate"];
             };
         };
@@ -8657,19 +13947,77 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billed": false,
+                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "comment": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "durationMinutes": 1,
+                     *           "endAt": "2026-07-29T10:00:00Z",
+                     *           "serviceId": "exampleId",
+                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "taskId": "exampleId",
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "timeEntry"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TimeEntry"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a time entry created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billed": false,
+                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "comment": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "durationMinutes": 1,
+                     *           "endAt": "2026-07-29T10:00:00Z",
+                     *           "serviceId": "exampleId",
+                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "taskId": "exampleId",
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "timeEntry"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TimeEntry"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8690,18 +14038,48 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a time entry succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billed": false,
+                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "comment": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "durationMinutes": 1,
+                     *           "endAt": "2026-07-29T10:00:00Z",
+                     *           "serviceId": "exampleId",
+                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "taskId": "exampleId",
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "timeEntry"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TimeEntry"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8721,6 +14099,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -8749,22 +14128,60 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a time entry. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "billable": false,
+                 *       "comment": "example",
+                 *       "endAt": "2026-07-29T10:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TimeEntryUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a time entry succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billed": false,
+                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "comment": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "durationMinutes": 1,
+                     *           "endAt": "2026-07-29T10:00:00Z",
+                     *           "serviceId": "exampleId",
+                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "taskId": "exampleId",
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "timeEntry"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TimeEntry"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8786,13 +14203,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get time-entry billing state succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     "Cache-Control": components["headers"]["StrongETagCacheControl"];
@@ -8800,6 +14218,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "billed": false,
+                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "\"example-revision\""
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "timeEntryBilling"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TimeEntryBilling"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8823,17 +14257,24 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchTimeEntryBilling"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update time-entry billing state. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "billed": false
+                 *     }
+                 */
                 "application/json": components["schemas"]["TimeEntryBillingUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update time-entry billing state succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     "Cache-Control": components["headers"]["StrongETagCacheControl"];
@@ -8841,6 +14282,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "billed": false,
+                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "\"example-revision\""
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "timeEntryBilling"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TimeEntryBilling"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8863,18 +14320,48 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an archived time entry succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billed": false,
+                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "comment": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "durationMinutes": 1,
+                     *           "endAt": "2026-07-29T10:00:00Z",
+                     *           "serviceId": "exampleId",
+                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "taskId": "exampleId",
+                     *           "trackingActive": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "userId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "timeEntry"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["TimeEntry"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -8896,6 +14383,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -8920,12 +14408,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "contact"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Contact"][];
                         meta: {
@@ -8955,8 +14461,17 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a contact. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "type": "company",
+                 *       "birthday": "2026-07-29T10:00:00Z",
+                 *       "category": "customer",
+                 *       "companyTitle": "Example TeamGrid item"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ContactCreate"];
             };
         };
@@ -8968,19 +14483,109 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "addresses": [],
+                     *           "archived": false,
+                     *           "birthday": "2026-07-29T10:00:00Z",
+                     *           "category": "example",
+                     *           "companies": [],
+                     *           "companyTitle": "Example TeamGrid item",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "customerId": "exampleId",
+                     *           "emails": [],
+                     *           "employeesCount": 0,
+                     *           "firstName": "Example",
+                     *           "gender": "example",
+                     *           "groupId": "exampleId",
+                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
+                     *           "lastName": "Example",
+                     *           "nickname": "Example",
+                     *           "notes": "example",
+                     *           "parentContactId": "exampleId",
+                     *           "phoneNumbers": [],
+                     *           "projectsCompleted": 0,
+                     *           "projectsOpen": 0,
+                     *           "projectsTotal": 0,
+                     *           "salutation": "example",
+                     *           "socialNetworks": [],
+                     *           "tasksCompleted": 0,
+                     *           "tasksOpen": 0,
+                     *           "tasksTotal": 0,
+                     *           "type": "person",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "websites": []
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "contact"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Contact"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a contact created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "addresses": [],
+                     *           "archived": false,
+                     *           "birthday": "2026-07-29T10:00:00Z",
+                     *           "category": "example",
+                     *           "companies": [],
+                     *           "companyTitle": "Example TeamGrid item",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "customerId": "exampleId",
+                     *           "emails": [],
+                     *           "employeesCount": 0,
+                     *           "firstName": "Example",
+                     *           "gender": "example",
+                     *           "groupId": "exampleId",
+                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
+                     *           "lastName": "Example",
+                     *           "nickname": "Example",
+                     *           "notes": "example",
+                     *           "parentContactId": "exampleId",
+                     *           "phoneNumbers": [],
+                     *           "projectsCompleted": 0,
+                     *           "projectsOpen": 0,
+                     *           "projectsTotal": 0,
+                     *           "salutation": "example",
+                     *           "socialNetworks": [],
+                     *           "tasksCompleted": 0,
+                     *           "tasksOpen": 0,
+                     *           "tasksTotal": 0,
+                     *           "type": "person",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "websites": []
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "contact"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Contact"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9001,6 +14606,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -9011,12 +14617,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "callNote"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CallNote"][];
                         meta: {
@@ -9046,8 +14670,15 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a call note. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "callId": "exampleId",
+                 *       "content": "example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["CallNoteCreate"];
             };
         };
@@ -9059,19 +14690,63 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "callId": "exampleId",
+                     *           "contactIds": [],
+                     *           "content": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "projectIds": [],
+                     *           "taskIds": [],
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "userIds": []
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "callNote"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CallNote"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a call note created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "callId": "exampleId",
+                     *           "contactIds": [],
+                     *           "content": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "projectIds": [],
+                     *           "taskIds": [],
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "userIds": []
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "callNote"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CallNote"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9092,18 +14767,41 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a call note succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "callId": "exampleId",
+                     *           "contactIds": [],
+                     *           "content": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "projectIds": [],
+                     *           "taskIds": [],
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "userIds": []
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "callNote"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CallNote"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9123,6 +14821,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -9151,18 +14850,41 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an archived call note succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "callId": "exampleId",
+                     *           "contactIds": [],
+                     *           "content": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "projectIds": [],
+                     *           "taskIds": [],
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "userIds": []
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "callNote"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CallNote"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9184,6 +14906,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -9194,12 +14917,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "contactGroup"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ContactGroup"][];
                         meta: {
@@ -9229,8 +14970,15 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a contact group. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "title": "Example TeamGrid item",
+                 *       "parentId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ContactGroupCreate"];
             };
         };
@@ -9242,19 +14990,55 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "parentId": "exampleId",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "contactGroup"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ContactGroup"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a contact group created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "parentId": "exampleId",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "contactGroup"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ContactGroup"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9275,18 +15059,37 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a contact group succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "parentId": "exampleId",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "contactGroup"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ContactGroup"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9306,6 +15109,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -9334,22 +15138,48 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a contact group. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "parentId": "exampleId",
+                 *       "title": "Example TeamGrid item"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ContactGroupUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a contact group succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "parentId": "exampleId",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "contactGroup"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ContactGroup"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9371,18 +15201,37 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an archived contact group succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "parentId": "exampleId",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "contactGroup"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ContactGroup"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9404,18 +15253,64 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a contact succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "addresses": [],
+                     *           "archived": false,
+                     *           "birthday": "2026-07-29T10:00:00Z",
+                     *           "category": "example",
+                     *           "companies": [],
+                     *           "companyTitle": "Example TeamGrid item",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "customerId": "exampleId",
+                     *           "emails": [],
+                     *           "employeesCount": 0,
+                     *           "firstName": "Example",
+                     *           "gender": "example",
+                     *           "groupId": "exampleId",
+                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
+                     *           "lastName": "Example",
+                     *           "nickname": "Example",
+                     *           "notes": "example",
+                     *           "parentContactId": "exampleId",
+                     *           "phoneNumbers": [],
+                     *           "projectsCompleted": 0,
+                     *           "projectsOpen": 0,
+                     *           "projectsTotal": 0,
+                     *           "salutation": "example",
+                     *           "socialNetworks": [],
+                     *           "tasksCompleted": 0,
+                     *           "tasksOpen": 0,
+                     *           "tasksTotal": 0,
+                     *           "type": "person",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "websites": []
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "contact"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Contact"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9435,22 +15330,76 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a contact. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "birthday": "2026-07-29T10:00:00Z",
+                 *       "category": "customer",
+                 *       "companyTitle": "Example TeamGrid item"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ContactUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a contact succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "addresses": [],
+                     *           "archived": false,
+                     *           "birthday": "2026-07-29T10:00:00Z",
+                     *           "category": "example",
+                     *           "companies": [],
+                     *           "companyTitle": "Example TeamGrid item",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdById": "exampleId",
+                     *           "customerId": "exampleId",
+                     *           "emails": [],
+                     *           "employeesCount": 0,
+                     *           "firstName": "Example",
+                     *           "gender": "example",
+                     *           "groupId": "exampleId",
+                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
+                     *           "lastName": "Example",
+                     *           "nickname": "Example",
+                     *           "notes": "example",
+                     *           "parentContactId": "exampleId",
+                     *           "phoneNumbers": [],
+                     *           "projectsCompleted": 0,
+                     *           "projectsOpen": 0,
+                     *           "projectsTotal": 0,
+                     *           "salutation": "example",
+                     *           "socialNetworks": [],
+                     *           "tasksCompleted": 0,
+                     *           "tasksOpen": 0,
+                     *           "tasksTotal": 0,
+                     *           "type": "person",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedById": "exampleId",
+                     *           "websites": []
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "contact"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Contact"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9472,6 +15421,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
             };
             header?: never;
@@ -9480,12 +15430,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "user"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["User"][];
                         meta: {
@@ -9510,6 +15478,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -9524,12 +15493,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "list"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["List"][];
                         meta: {
@@ -9559,8 +15546,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a list. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "type": "tasks",
+                 *       "parentId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ListCreate"];
             };
         };
@@ -9572,19 +15567,59 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "parentId": "exampleId",
+                     *           "type": "tasks",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "list"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["List"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a list created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "parentId": "exampleId",
+                     *           "type": "tasks",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "list"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["List"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9605,18 +15640,39 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a list succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "parentId": "exampleId",
+                     *           "type": "tasks",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "list"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["List"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9636,6 +15692,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -9664,22 +15721,49 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a list. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ListUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a list succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "parentId": "exampleId",
+                     *           "type": "tasks",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "list"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["List"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9701,18 +15785,39 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an archived list succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "order": 1,
+                     *           "parentId": "exampleId",
+                     *           "type": "tasks",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "list"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["List"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9734,6 +15839,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -9744,12 +15850,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "service"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Service"][];
                         meta: {
@@ -9779,8 +15903,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a service. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "title": "Example TeamGrid item",
+                 *       "billable": false,
+                 *       "billingRate": 0
+                 *     }
+                 */
                 "application/json": components["schemas"]["ServiceCreate"];
             };
         };
@@ -9792,19 +15924,57 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billingRate": 1,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "service"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Service"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a service created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billingRate": 1,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "service"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Service"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9825,18 +15995,38 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a service succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billingRate": 1,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "service"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Service"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9856,6 +16046,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -9884,22 +16075,50 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a service. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "billable": false,
+                 *       "billingRate": 0,
+                 *       "title": "Example TeamGrid item"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ServiceUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a service succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billingRate": 1,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "service"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Service"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9921,18 +16140,38 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an archived service succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "billable": false,
+                     *           "billingRate": 1,
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "service"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Service"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -9954,6 +16193,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -9964,12 +16204,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "tag"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Tag"][];
                         meta: {
@@ -9999,8 +16257,15 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a tag. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "color": "example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TagCreate"];
             };
         };
@@ -10012,19 +16277,57 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "usage": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "tag"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Tag"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a tag created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "usage": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "tag"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Tag"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10045,18 +16348,38 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a tag succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "usage": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "tag"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Tag"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10076,6 +16399,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -10104,22 +16428,49 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a tag. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "color": "example",
+                 *       "name": "Example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TagUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a tag succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "usage": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "tag"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Tag"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10141,18 +16492,38 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an archived tag succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "color": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "usage": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "tag"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Tag"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10174,6 +16545,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -10190,12 +16562,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "customFieldDefinition"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CustomFieldDefinition"][];
                         meta: {
@@ -10225,8 +16615,19 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a custom-field definition. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "title": "Example TeamGrid item",
+                 *       "fieldType": "contact",
+                 *       "targetType": "contact",
+                 *       "defaultEnabled": false,
+                 *       "description": "Example generated from the documented schema.",
+                 *       "required": false
+                 *     }
+                 */
                 "application/json": components["schemas"]["CustomFieldDefinitionCreate"];
             };
         };
@@ -10238,19 +16639,69 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "compatibility": "invalid",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "defaultEnabled": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "fieldType": "contact",
+                     *           "required": false,
+                     *           "targetType": "contact",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "legacyTargetType": "example",
+                     *           "legacyType": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "customFieldDefinition"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CustomFieldDefinition"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a custom-field definition created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "compatibility": "invalid",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "defaultEnabled": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "fieldType": "contact",
+                     *           "required": false,
+                     *           "targetType": "contact",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "legacyTargetType": "example",
+                     *           "legacyType": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "customFieldDefinition"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CustomFieldDefinition"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10271,18 +16722,44 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a custom-field definition succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "compatibility": "invalid",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "defaultEnabled": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "fieldType": "contact",
+                     *           "required": false,
+                     *           "targetType": "contact",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "legacyTargetType": "example",
+                     *           "legacyType": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "customFieldDefinition"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CustomFieldDefinition"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10302,6 +16779,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -10330,22 +16808,55 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a custom-field definition. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "defaultEnabled": false,
+                 *       "description": "Example generated from the documented schema."
+                 *     }
+                 */
                 "application/json": components["schemas"]["CustomFieldDefinitionUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a custom-field definition succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "compatibility": "invalid",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "defaultEnabled": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "fieldType": "contact",
+                     *           "required": false,
+                     *           "targetType": "contact",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "legacyTargetType": "example",
+                     *           "legacyType": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "customFieldDefinition"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CustomFieldDefinition"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10367,18 +16878,44 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an archived custom-field definition succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "compatibility": "invalid",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "defaultEnabled": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "fieldType": "contact",
+                     *           "required": false,
+                     *           "targetType": "contact",
+                     *           "title": "Example TeamGrid item",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "legacyTargetType": "example",
+                     *           "legacyType": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "customFieldDefinition"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CustomFieldDefinition"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10400,13 +16937,23 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Supported TeamGrid resource type that owns the custom-field value. */
                 targetType: components["parameters"]["CustomFieldValueTargetType"];
+                /** @description Stable identifier of the target resource in the authenticated workspace. */
                 resourceId: components["parameters"]["CustomFieldValueResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to read custom-field values for one resource. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "fieldIds": [
+                 *         "example"
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["CustomFieldValueBatchRead"];
             };
         };
@@ -10417,6 +16964,20 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "customFieldValue"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CustomFieldValue"][];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10438,8 +16999,11 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Supported TeamGrid resource type that owns the custom-field value. */
                 targetType: components["parameters"]["CustomFieldValueTargetType"];
+                /** @description Stable identifier of the target resource in the authenticated workspace. */
                 resourceId: components["parameters"]["CustomFieldValueResourceId"];
+                /** @description Identifier of the custom-field definition whose value is being addressed. */
                 fieldId: components["parameters"]["CustomFieldValueFieldId"];
             };
             cookie?: never;
@@ -10454,6 +17018,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "customFieldValue"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CustomFieldValue"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10478,14 +17054,23 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchCustomFieldValue"];
             };
             path: {
+                /** @description Supported TeamGrid resource type that owns the custom-field value. */
                 targetType: components["parameters"]["CustomFieldValueTargetType"];
+                /** @description Stable identifier of the target resource in the authenticated workspace. */
                 resourceId: components["parameters"]["CustomFieldValueResourceId"];
+                /** @description Identifier of the custom-field definition whose value is being addressed. */
                 fieldId: components["parameters"]["CustomFieldValueFieldId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to set a custom-field value. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "value": false
+                 *     }
+                 */
                 "application/json": components["schemas"]["CustomFieldValueSet"];
             };
         };
@@ -10498,6 +17083,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "customFieldValue"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CustomFieldValueMutation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10524,8 +17121,11 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchCustomFieldValue"];
             };
             path: {
+                /** @description Supported TeamGrid resource type that owns the custom-field value. */
                 targetType: components["parameters"]["CustomFieldValueTargetType"];
+                /** @description Stable identifier of the target resource in the authenticated workspace. */
                 resourceId: components["parameters"]["CustomFieldValueResourceId"];
+                /** @description Identifier of the custom-field definition whose value is being addressed. */
                 fieldId: components["parameters"]["CustomFieldValueFieldId"];
             };
             cookie?: never;
@@ -10540,6 +17140,18 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {},
+                     *         "id": "exampleId",
+                     *         "type": "customFieldValue"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["CustomFieldValueMutation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10563,6 +17175,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Filter by actor id. */
                 actorId?: string;
@@ -10593,12 +17206,31 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "auditEvent"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId",
+                     *         "retentionDays": 30
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AuditEvent"][];
                         meta: {
@@ -10625,6 +17257,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["WebhookLimit"];
             };
             header?: never;
@@ -10633,12 +17266,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "webhook"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Webhook"][];
                         meta: {
@@ -10668,8 +17319,17 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a webhook. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "actions": [
+                 *         "example"
+                 *       ],
+                 *       "url": "https://example.com/teamgrid"
+                 *     }
+                 */
                 "application/json": components["schemas"]["WebhookCreate"];
             };
         };
@@ -10683,13 +17343,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "actions": [],
+                     *           "disabled": false,
+                     *           "failCount": 0,
+                     *           "lastStatus": 100,
+                     *           "url": "https://example.com/teamgrid",
+                     *           "version": 1,
+                     *           "revision": "\"example-revision\"",
+                     *           "signingSecret": "store-this-example-secret-securely"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "webhook"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Webhook"];
                         meta: components["schemas"]["ResponseMeta"];
                     };
                 };
             };
-            /** @description A newly created resource. */
+            /** @description The request to create a webhook created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -10698,6 +17379,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "actions": [],
+                     *           "disabled": false,
+                     *           "failCount": 0,
+                     *           "lastStatus": 100,
+                     *           "url": "https://example.com/teamgrid",
+                     *           "version": 1,
+                     *           "revision": "\"example-revision\"",
+                     *           "signingSecret": "store-this-example-secret-securely"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "webhook"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Webhook"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10718,6 +17420,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Filter by an owned webhook id. */
                 webhookId?: string;
@@ -10732,12 +17435,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "webhookDelivery"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["WebhookDelivery"][];
                         meta: {
@@ -10763,18 +17484,43 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["WebhookDeliveryId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get webhook delivery metadata succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attemptCount": 1,
+                     *           "attempts": [],
+                     *           "collection": "example",
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "deliveryId": "exampleId",
+                     *           "event": "example",
+                     *           "resourceId": "exampleId",
+                     *           "state": "delivering",
+                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "webhookId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "webhookDelivery"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["WebhookDelivery"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10795,13 +17541,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a webhook succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["WebhookETag"];
@@ -10809,6 +17556,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "actions": [],
+                     *           "disabled": false,
+                     *           "failCount": 0,
+                     *           "lastStatus": 100,
+                     *           "url": "https://example.com/teamgrid",
+                     *           "version": 1,
+                     *           "revision": "\"example-revision\"",
+                     *           "signingSecret": "store-this-example-secret-securely"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "webhook"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Webhook"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10829,6 +17597,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -10860,12 +17629,23 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchWebhook"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update or reactivate a webhook. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "actions": [
+                 *         "example"
+                 *       ],
+                 *       "disabled": false,
+                 *       "url": "https://example.com/teamgrid"
+                 *     }
+                 */
                 "application/json": components["schemas"]["WebhookUpdate"];
             };
         };
@@ -10878,6 +17658,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "actions": [],
+                     *           "disabled": false,
+                     *           "failCount": 0,
+                     *           "lastStatus": 100,
+                     *           "url": "https://example.com/teamgrid",
+                     *           "version": 1,
+                     *           "revision": "\"example-revision\"",
+                     *           "signingSecret": "store-this-example-secret-securely"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "webhook"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Webhook"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10900,6 +17701,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: number;
                 /** @description Include PII only when the credential also has members:pii:read. */
                 includePii?: components["parameters"]["IncludeMemberPii"];
@@ -10910,12 +17712,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "member"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Member"][];
                         meta: {
@@ -10944,13 +17764,14 @@ export interface operations {
             };
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a workspace member succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
@@ -10958,6 +17779,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "currentGroupId": "exampleId",
+                     *           "disabled": false,
+                     *           "groupIds": [],
+                     *           "owner": false,
+                     *           "revision": "\"example-revision\"",
+                     *           "roleId": "exampleId",
+                     *           "status": "active",
+                     *           "contactId": "exampleId",
+                     *           "displayName": "Example",
+                     *           "email": "developer@example.com"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "member"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Member"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -10981,6 +17825,7 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAdministration"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -11014,17 +17859,24 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAdministration"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to change a member role. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "roleId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["MemberRoleUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to change a member role succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
@@ -11032,6 +17884,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "currentGroupId": "exampleId",
+                     *           "disabled": false,
+                     *           "groupIds": [],
+                     *           "owner": false,
+                     *           "revision": "\"example-revision\"",
+                     *           "roleId": "exampleId",
+                     *           "status": "active",
+                     *           "contactId": "exampleId",
+                     *           "displayName": "Example",
+                     *           "email": "developer@example.com"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "member"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Member"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11055,6 +17930,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: number;
                 /** @description Include PII only when the credential also has members:pii:read. */
                 includePii?: components["parameters"]["IncludeMemberPii"];
@@ -11065,12 +17941,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "invitation"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Invitation"][];
                         meta: {
@@ -11101,13 +17995,23 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to invite a workspace member. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "email": "developer@example.com",
+                 *       "firstname": "Example",
+                 *       "lastname": "Example",
+                 *       "position": "example",
+                 *       "roleId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["InvitationCreate"];
             };
         };
         responses: {
-            /** @description A newly created resource. */
+            /** @description The request to invite a workspace member created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -11116,6 +18020,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "\"example-revision\"",
+                     *           "roleId": "exampleId",
+                     *           "status": "pending",
+                     *           "workspaceOwner": false,
+                     *           "email": "developer@example.com"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "invitation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Invitation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11139,13 +18062,14 @@ export interface operations {
             };
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a pending invitation succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
@@ -11153,6 +18077,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "\"example-revision\"",
+                     *           "roleId": "exampleId",
+                     *           "status": "pending",
+                     *           "workspaceOwner": false,
+                     *           "email": "developer@example.com"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "invitation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Invitation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11176,6 +18119,7 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAdministration"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -11211,6 +18155,7 @@ export interface operations {
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -11242,6 +18187,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: number;
             };
             header?: never;
@@ -11250,12 +18196,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "role"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Role"][];
                         meta: {
@@ -11286,13 +18250,23 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a workspace role. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "description": "Example generated from the documented schema.",
+                 *       "permissions": [
+                 *         "example"
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["RoleCreate"];
             };
         };
         responses: {
-            /** @description A newly created resource. */
+            /** @description The request to create a workspace role created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -11301,6 +18275,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "default": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "memberCount": 0,
+                     *           "name": "Example",
+                     *           "permissions": [],
+                     *           "revision": "\"example-revision\"",
+                     *           "system": false
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "role"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Role"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11321,13 +18315,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a workspace role succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
@@ -11335,6 +18330,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "default": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "memberCount": 0,
+                     *           "name": "Example",
+                     *           "permissions": [],
+                     *           "revision": "\"example-revision\"",
+                     *           "system": false
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "role"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Role"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11358,6 +18373,7 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAdministration"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -11391,17 +18407,28 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAdministration"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a workspace role. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "description": "Example generated from the documented schema.",
+                 *       "name": "Example",
+                 *       "permissions": [
+                 *         "example"
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["RoleUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a workspace role succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
@@ -11409,6 +18436,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "default": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "memberCount": 0,
+                     *           "name": "Example",
+                     *           "permissions": [],
+                     *           "revision": "\"example-revision\"",
+                     *           "system": false
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "role"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Role"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11432,6 +18479,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: number;
             };
             header?: never;
@@ -11440,12 +18488,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "group"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Group"][];
                         meta: {
@@ -11476,13 +18542,23 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a workspace group. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "memberIds": [
+                 *         "example"
+                 *       ],
+                 *       "visibility": "all"
+                 *     }
+                 */
                 "application/json": components["schemas"]["GroupCreate"];
             };
         };
         responses: {
-            /** @description A newly created resource. */
+            /** @description The request to create a workspace group created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -11491,6 +18567,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "memberIds": [],
+                     *           "name": "Example",
+                     *           "revision": "\"example-revision\"",
+                     *           "visibility": "all"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "group"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Group"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11511,13 +18605,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a workspace group succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
@@ -11525,6 +18620,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "memberIds": [],
+                     *           "name": "Example",
+                     *           "revision": "\"example-revision\"",
+                     *           "visibility": "all"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "group"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Group"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11548,6 +18661,7 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAdministration"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -11581,17 +18695,28 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAdministration"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update a workspace group. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "memberIds": [
+                 *         "example"
+                 *       ],
+                 *       "name": "Example",
+                 *       "visibility": "all"
+                 *     }
+                 */
                 "application/json": components["schemas"]["GroupUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update a workspace group succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AdministrationETag"];
@@ -11599,6 +18724,24 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "memberIds": [],
+                     *           "name": "Example",
+                     *           "revision": "\"example-revision\"",
+                     *           "visibility": "all"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "group"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Group"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11624,8 +18767,18 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to search authorized TeamGrid resources. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "term": "example",
+                 *       "types": [
+                 *         "contacts"
+                 *       ],
+                 *       "limit": 1
+                 *     }
+                 */
                 "application/json": components["schemas"]["SearchRequest"];
             };
         };
@@ -11636,6 +18789,20 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "contact"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["SearchResult"][];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11660,8 +18827,10 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create an asynchronous export. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /** @example {} */
                 "application/json": components["schemas"]["ExportCreate"];
             };
         };
@@ -11673,6 +18842,20 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "replayed": false
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "export"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ExportCreation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11693,19 +18876,42 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get export job status succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     "Cache-Control"?: "private, no-store";
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "fields": [],
+                     *           "fileName": "Example",
+                     *           "format": "csv",
+                     *           "resourceType": "auditEvents",
+                     *           "state": "failed",
+                     *           "failure": {},
+                     *           "finishedAt": "2026-07-29T10:00:00Z",
+                     *           "rowCount": 0
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "export"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["Export"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11726,6 +18932,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -11739,6 +18946,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "fileName": "Example",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "exportDownloadIntent"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ExportDownloadIntent"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11763,6 +18986,7 @@ export interface operations {
                 "X-TeamGrid-Export-Download-Intent": components["parameters"]["ExportDownloadIntent"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -11779,6 +19003,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /** @example example */
                     "text/csv": string;
                 };
             };
@@ -11807,6 +19032,20 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "automationAction"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationAction"][];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11826,6 +19065,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: number;
                 /** @description Return archived resources instead of active resources. */
                 archived?: boolean;
@@ -11836,12 +19076,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "automationDefinition"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationDefinition"][];
                         meta: {
@@ -11872,13 +19130,29 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create an automation definition. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "flow": [
+                 *         {}
+                 *       ],
+                 *       "name": "Example",
+                 *       "trigger": {
+                 *         "data": {
+                 *           "type": "projects"
+                 *         },
+                 *         "event": "change"
+                 *       },
+                 *       "description": "Example generated from the documented schema."
+                 *     }
+                 */
                 "application/json": components["schemas"]["AutomationDefinitionCreate"];
             };
         };
         responses: {
-            /** @description A newly created resource. */
+            /** @description The request to create an automation definition created the resource. The response contains its canonical public representation and request metadata. */
             201: {
                 headers: {
                     "Idempotency-Replayed"?: "false";
@@ -11887,6 +19161,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "editable": false,
+                     *           "flow": [],
+                     *           "name": "Example",
+                     *           "revision": "\"example-revision\"",
+                     *           "trigger": {},
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "replayed": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "automationDefinition"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationDefinition"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11907,13 +19204,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get an automation definition succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AutomationDefinitionETag"];
@@ -11921,6 +19219,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "editable": false,
+                     *           "flow": [],
+                     *           "name": "Example",
+                     *           "revision": "\"example-revision\"",
+                     *           "trigger": {},
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "replayed": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "automationDefinition"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationDefinition"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11944,13 +19265,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAutomationDefinition"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to archive an automation definition succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AutomationDefinitionETag"];
@@ -11960,6 +19282,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "editable": false,
+                     *           "flow": [],
+                     *           "name": "Example",
+                     *           "revision": "\"example-revision\"",
+                     *           "trigger": {},
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "replayed": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "automationDefinition"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationDefinition"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -11986,17 +19331,28 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAutomationDefinition"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to update an automation definition. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "description": "Example generated from the documented schema.",
+                 *       "flow": [
+                 *         {}
+                 *       ],
+                 *       "name": "Example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["AutomationDefinitionUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to update an automation definition succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AutomationDefinitionETag"];
@@ -12006,6 +19362,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "editable": false,
+                     *           "flow": [],
+                     *           "name": "Example",
+                     *           "revision": "\"example-revision\"",
+                     *           "trigger": {},
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "replayed": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "automationDefinition"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationDefinition"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12032,13 +19411,14 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAutomationDefinition"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to restore an automation definition succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AutomationDefinitionETag"];
@@ -12048,6 +19428,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "description": "Example generated from the documented schema.",
+                     *           "editable": false,
+                     *           "flow": [],
+                     *           "name": "Example",
+                     *           "revision": "\"example-revision\"",
+                     *           "trigger": {},
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "replayed": false,
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "automationDefinition"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationDefinition"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12071,22 +19474,42 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: number;
             };
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "automationDefinitionVersion"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationDefinitionVersion"][];
                         meta: {
@@ -12112,6 +19535,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: number;
                 /** @description Filter by automation definition. */
                 definitionId?: string;
@@ -12128,12 +19552,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "automationRun"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationRun"][];
                         meta: {
@@ -12159,13 +19601,14 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get an automation run succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["AutomationRunETag"];
@@ -12173,6 +19616,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "definition": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "state": "aborted",
+                     *           "abortedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "failedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "automationRun"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationRun"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12196,6 +19658,7 @@ export interface operations {
                 "If-Match": components["parameters"]["IfMatchAutomationRun"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -12211,6 +19674,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "definition": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "state": "aborted",
+                     *           "abortedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "failedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "automationRun"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["AutomationRun"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12244,6 +19726,20 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "integrationInstallation"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["IntegrationInstallation"][];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12273,6 +19769,20 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "eventDefinition"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["EventDefinition"][];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12292,6 +19802,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
                 /** @description Filter by one or more change operations. Repeat the query parameter for multiple values. */
                 operations?: ("created" | "deleted" | "updated")[];
@@ -12312,6 +19823,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "changeEvent"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example",
+                     *           "caughtUp": false
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ChangeEvent"][];
                         meta: {
@@ -12359,6 +19889,20 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "systemCapability"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["SystemCapability"][];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12388,6 +19932,20 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "workspaceEntitlement"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["WorkspaceEntitlement"][];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12419,6 +19977,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "currency": "AUD",
+                     *           "defaultLanguage": "de",
+                     *           "defaultPlannedTime": 0,
+                     *           "defaultProductivity": 1,
+                     *           "defaultShowInScheduling": false,
+                     *           "name": "Example",
+                     *           "revision": "\"example-revision\""
+                     *         },
+                     *         "id": "current",
+                     *         "type": "workspaceSettings"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["WorkspaceSettings"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12445,8 +20023,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to update public workspace settings. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "currency": "AUD",
+                 *       "defaultLanguage": "de",
+                 *       "defaultPlannedTime": 0
+                 *     }
+                 */
                 "application/json": components["schemas"]["WorkspaceSettingsUpdate"];
             };
         };
@@ -12460,6 +20046,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "currency": "AUD",
+                     *           "defaultLanguage": "de",
+                     *           "defaultPlannedTime": 0,
+                     *           "defaultProductivity": 1,
+                     *           "defaultShowInScheduling": false,
+                     *           "name": "Example",
+                     *           "revision": "\"example-revision\""
+                     *         },
+                     *         "id": "current",
+                     *         "type": "workspaceSettings"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["WorkspaceSettings"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12487,6 +20093,7 @@ export interface operations {
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -12502,6 +20109,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "replayed": false,
+                     *           "revision": "\"example-revision\"",
+                     *           "signingSecret": "store-this-example-secret-securely"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "webhookSecretRotation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["WebhookSecretRotation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12517,6 +20140,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "replayed": false,
+                     *           "revision": "\"example-revision\"",
+                     *           "signingSecret": "store-this-example-secret-securely"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "webhookSecretRotation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["WebhookSecretRotation"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12540,6 +20179,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
             };
             header?: never;
@@ -12548,12 +20188,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "personalAccessToken"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["PersonalAccessToken"][];
                         meta: {
@@ -12583,8 +20241,19 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a personal access token. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "scopes": [
+                 *         "example"
+                 *       ],
+                 *       "description": "Example generated from the documented schema.",
+                 *       "expiresAt": "2026-07-29T10:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["PersonalAccessTokenCreate"];
             };
         };
@@ -12597,6 +20266,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
+                     *           "lastFour": "example",
+                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
+                     *           "principalId": "exampleId",
+                     *           "scopes": [],
+                     *           "status": "active",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "personalAccessToken"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["PersonalAccessToken"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12611,6 +20306,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
+                     *           "lastFour": "example",
+                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
+                     *           "principalId": "exampleId",
+                     *           "scopes": [],
+                     *           "status": "active",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "personalAccessToken"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["PersonalAccessToken"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12631,6 +20352,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -12664,8 +20386,18 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to rotate a personal access token. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "expiresAt": "2026-07-29T10:00:00Z",
+                 *       "gracePeriodSeconds": 60,
+                 *       "scopes": [
+                 *         "example"
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["PersonalAccessTokenRotation"];
             };
         };
@@ -12678,6 +20410,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
+                     *           "lastFour": "example",
+                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
+                     *           "principalId": "exampleId",
+                     *           "scopes": [],
+                     *           "status": "active",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "personalAccessToken"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["PersonalAccessToken"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12692,6 +20450,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
+                     *           "lastFour": "example",
+                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
+                     *           "principalId": "exampleId",
+                     *           "scopes": [],
+                     *           "status": "active",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "personalAccessToken"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["PersonalAccessToken"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12712,6 +20496,7 @@ export interface operations {
             query?: {
                 /** @description Opaque cursor returned in meta.page.nextCursor. */
                 cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
                 limit?: components["parameters"]["Limit"];
             };
             header?: never;
@@ -12720,12 +20505,30 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A stable cursor page. */
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "serviceAccount"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccount"][];
                         meta: {
@@ -12755,8 +20558,19 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create a service account and its initial credential. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "scopes": [
+                 *         "example"
+                 *       ],
+                 *       "description": "Example generated from the documented schema.",
+                 *       "expiresAt": "2026-07-29T10:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ServiceAccountCreate"];
             };
         };
@@ -12769,6 +20583,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
+                     *           "lastFour": "example",
+                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
+                     *           "principalId": "exampleId",
+                     *           "scopes": [],
+                     *           "status": "active",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "serviceAccountCredential"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccountCredential"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12783,6 +20623,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
+                     *           "lastFour": "example",
+                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
+                     *           "principalId": "exampleId",
+                     *           "scopes": [],
+                     *           "status": "active",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "serviceAccountCredential"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccountCredential"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12803,18 +20669,41 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description The requested resource. */
+            /** @description The request to get a service account succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "credentials": [],
+                     *           "description": "Example generated from the documented schema.",
+                     *           "displayName": "Example",
+                     *           "permissionSet": [],
+                     *           "revision": "\"example-revision\"",
+                     *           "scopeCeiling": [],
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "serviceAccount"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccount"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12834,6 +20723,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -12862,22 +20752,52 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
         };
+        /** @description JSON payload used to enable or disable a service account. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "status": "active",
+                 *       "reason": "example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ServiceAccountUpdate"];
             };
         };
         responses: {
-            /** @description The updated resource. */
+            /** @description The request to enable or disable a service account succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "credentials": [],
+                     *           "description": "Example generated from the documented schema.",
+                     *           "displayName": "Example",
+                     *           "permissionSet": [],
+                     *           "revision": "\"example-revision\"",
+                     *           "scopeCeiling": [],
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "serviceAccount"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccount"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12904,8 +20824,19 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to create an independent service account credential. The server validates this payload before applying any change. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Example",
+                 *       "scopes": [
+                 *         "example"
+                 *       ],
+                 *       "description": "Example generated from the documented schema.",
+                 *       "expiresAt": "2026-07-29T10:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ServiceAccountCredentialCreate"];
             };
         };
@@ -12918,6 +20849,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
+                     *           "lastFour": "example",
+                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
+                     *           "principalId": "exampleId",
+                     *           "scopes": [],
+                     *           "status": "active",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "serviceAccountCredential"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccountCredential"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12932,6 +20889,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
+                     *           "lastFour": "example",
+                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
+                     *           "principalId": "exampleId",
+                     *           "scopes": [],
+                     *           "status": "active",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "serviceAccountCredential"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccountCredential"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -12952,6 +20935,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -12985,8 +20969,18 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to rotate a service account credential. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "expiresAt": "2026-07-29T10:00:00Z",
+                 *       "gracePeriodSeconds": 60,
+                 *       "scopes": [
+                 *         "example"
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["ServiceAccountCredentialRotation"];
             };
         };
@@ -12999,6 +20993,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
+                     *           "lastFour": "example",
+                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
+                     *           "principalId": "exampleId",
+                     *           "scopes": [],
+                     *           "status": "active",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "serviceAccountCredential"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccountCredential"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -13013,6 +21033,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "description": "Example generated from the documented schema.",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
+                     *           "lastFour": "example",
+                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
+                     *           "principalId": "exampleId",
+                     *           "scopes": [],
+                     *           "status": "active",
+                     *           "token": "example"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "serviceAccountCredential"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccountCredential"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -13033,6 +21079,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
             };
             cookie?: never;
@@ -13047,6 +21094,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "grants": [],
+                     *           "policyVersion": 1,
+                     *           "revision": "\"example-revision\""
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "serviceAccountResourceGrantSet"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccountResourceGrantSet"];
                         meta: components["schemas"]["ResponseMeta"];
@@ -13071,8 +21134,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
+        /** @description JSON payload used to replace the complete service account resource grant set. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "grants": [
+                 *         {}
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["ServiceAccountResourceGrantSetReplace"];
             };
         };
@@ -13085,6 +21156,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "grants": [],
+                     *           "policyVersion": 1,
+                     *           "revision": "\"example-revision\""
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "serviceAccountResourceGrantSet"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
                     "application/json": {
                         data: components["schemas"]["ServiceAccountResourceGrantSet"];
                         meta: components["schemas"]["ResponseMeta"];
