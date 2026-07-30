@@ -66,6 +66,10 @@ function expectedStatuses(operation) {
   return [...safeNegativeStatuses]
 }
 
+function canProbeWithoutFixture(operation) {
+  return operation.risk === 'read' || /\{[^}]+\}/.test(operation.path)
+}
+
 function retryDelay(response) {
   const retryAfter = response.headers.get('retry-after')
   if (!retryAfter) return 1_000
@@ -196,6 +200,18 @@ export async function executeSafeMutationSmokeConformance({
           note: 'version_not_selected',
           operationId: operation.operationId,
           outcome: 'not_run',
+          version: operation.version,
+        }),
+      )
+      continue
+    }
+    if (!canProbeWithoutFixture(operation)) {
+      results.push(
+        evidenceResult({
+          expectedStatus: expectedStatuses(operation),
+          note: 'isolated_fixture_required',
+          operationId: operation.operationId,
+          outcome: 'blocked',
           version: operation.version,
         }),
       )

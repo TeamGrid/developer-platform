@@ -48,7 +48,7 @@ function journalPath() {
 }
 
 describe('isolated production safe mutation smoke runner', () => {
-  it('probes every selected mutation without a body and completes an empty cleanup journal', async () => {
+  it('probes only resource-addressed mutations and completes an empty cleanup journal', async () => {
     const path = journalPath()
     const requests = []
     const results = await executeSafeMutationSmokeConformance({
@@ -59,7 +59,6 @@ describe('isolated production safe mutation smoke runner', () => {
       },
       inventory: {
         operations: [
-          operation(),
           operation({
             method: 'DELETE',
             operationId: 'archiveTask',
@@ -74,14 +73,46 @@ describe('isolated production safe mutation smoke runner', () => {
       sleep: () => Promise.resolve(),
     })
 
-    expect(requests).toHaveLength(2)
+    expect(requests).toHaveLength(1)
     expect(requests.every((request) => request.options.body === undefined)).toBe(true)
-    expect(requests[1].url).toContain('/tasks/tgConformanceMissing20260730')
+    expect(requests[0].url).toContain('/tasks/tgConformanceMissing20260730')
     expect(results.every((result) => result.outcome === 'passed')).toBe(true)
     expect(JSON.parse(readFileSync(path, 'utf8'))).toMatchObject({
       resources: [],
       state: 'complete',
     })
+  })
+
+  it('blocks create and bulk mutations rather than trusting missing-body validation in production', async () => {
+    const path = journalPath()
+    let requests = 0
+    const results = await executeSafeMutationSmokeConformance({
+      config: config(path),
+      fetchImpl: async () => {
+        requests += 1
+        return new Response('{}', { status: 400 })
+      },
+      inventory: {
+        operations: [
+          operation(),
+          operation({
+            method: 'DELETE',
+            operationId: 'v0_delete_tasks',
+            path: '/tasks',
+            risk: 'destructive-mutation',
+            version: 'v0',
+          }),
+        ],
+      },
+      now: () => new Date('2026-07-30T12:00:00.000Z'),
+      sleep: () => Promise.resolve(),
+    })
+
+    expect(requests).toBe(0)
+    expect(results).toMatchObject([
+      { note: 'isolated_fixture_required', outcome: 'blocked' },
+      { note: 'isolated_fixture_required', outcome: 'blocked' },
+    ])
   })
 
   it('uses harmless required query values and requires successful fixture-free reads', async () => {
@@ -141,7 +172,16 @@ describe('isolated production safe mutation smoke runner', () => {
       executeSafeMutationSmokeConformance({
         config: config(path),
         fetchImpl: async () => new Response('{"id":"unexpected"}', { status: 201 }),
-        inventory: { operations: [operation()] },
+        inventory: {
+          operations: [
+            operation({
+              method: 'DELETE',
+              operationId: 'archiveTask',
+              path: '/tasks/{id}',
+              risk: 'destructive-mutation',
+            }),
+          ],
+        },
         now: () => new Date('2026-07-30T12:00:00.000Z'),
         sleep: () => Promise.resolve(),
       }),
@@ -158,7 +198,16 @@ describe('isolated production safe mutation smoke runner', () => {
       const [result] = await executeSafeMutationSmokeConformance({
         config: config(journalPath()),
         fetchImpl: async () => new Response('{}', { status }),
-        inventory: { operations: [operation()] },
+        inventory: {
+          operations: [
+            operation({
+              method: 'DELETE',
+              operationId: 'archiveTask',
+              path: '/tasks/{id}',
+              risk: 'destructive-mutation',
+            }),
+          ],
+        },
         now: () => new Date('2026-07-30T12:00:00.000Z'),
         sleep: () => Promise.resolve(),
       })
