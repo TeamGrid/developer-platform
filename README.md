@@ -21,9 +21,9 @@ credential handling, regional routing, and development instructions.
 Stable 1.0 is published under the default `latest` dist-tag:
 
 ```sh
-npm install @teamgrid/api-client@1.0.0
-npm install --global @teamgrid/cli@1.0.0
-npm install --global @teamgrid/mcp-server@1.0.0
+npm install @teamgrid/api-client@1.0.1
+npm install --global @teamgrid/cli@1.0.1
+npm install --global @teamgrid/mcp-server@1.0.1
 ```
 
 ## Security

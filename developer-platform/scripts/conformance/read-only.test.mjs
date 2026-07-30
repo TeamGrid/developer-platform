@@ -78,6 +78,7 @@ describe('read-only production conformance runner', () => {
     expect(requests).toHaveLength(2)
     expect(requests[0].url).toBe('https://api.de.teamgrid.app/v1/tasks?limit=1')
     expect(requests[0].options.headers.authorization).toBe('Bearer stable-secret')
+    expect(requests[0].options.redirect).toBe('manual')
     expect(requests[1].options.headers.authorization).toBeUndefined()
     expect(results).toMatchObject([
       { observedStatus: 200, operationId: 'listTasks', outcome: 'passed' },
@@ -123,6 +124,36 @@ describe('read-only production conformance runner', () => {
       attempts: 2,
       expectedStatus: [501],
       observedStatus: 501,
+      outcome: 'passed',
+    })
+  })
+
+  it('records a documented discovery redirect without following it', async () => {
+    const [result] = await executeReadOnlyConformance({
+      config: config(),
+      fetchImpl: async () =>
+        new Response(null, {
+          headers: { location: 'https://developer.teamgridapp.com' },
+          status: 302,
+        }),
+      inventory: {
+        operations: [
+          operation({
+            authenticated: false,
+            operationId: 'v0_get',
+            parameters: [],
+            path: '/',
+            responseStatuses: ['302'],
+            version: 'v0',
+          }),
+        ],
+      },
+      sleep: () => Promise.resolve(),
+    })
+
+    expect(result).toMatchObject({
+      expectedStatus: [302],
+      observedStatus: 302,
       outcome: 'passed',
     })
   })

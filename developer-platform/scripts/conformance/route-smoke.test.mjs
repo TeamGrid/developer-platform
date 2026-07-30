@@ -61,6 +61,7 @@ describe('safe production route smoke runner', () => {
 
     expect(requests).toHaveLength(1)
     expect(requests[0].url).toContain('/tasks/tgConformanceMissing20260730')
+    expect(requests[0].options.redirect).toBe('manual')
     expect(results).toMatchObject([
       { note: 'safe_negative_route_probe', observedStatus: 404, outcome: 'passed' },
       {

@@ -7,7 +7,7 @@ function expectedStatuses(operation) {
   if (operation.compatibility?.expectedUnavailable) return [501]
   return operation.responseStatuses
     .map(Number)
-    .filter((status) => status >= 200 && status < 300)
+    .filter((status) => status >= 200 && status < 400)
     .sort((left, right) => left - right)
 }
 
@@ -64,7 +64,7 @@ async function probeOperation({ config, fetchImpl, operation, sleep }) {
           'x-request-id': `${config.runId}-${operation.operationId}-${attempts}`,
         },
         method: 'GET',
-        redirect: 'error',
+        redirect: 'manual',
         signal: AbortSignal.timeout(config.requestTimeoutMs),
       })
       if (response.status === 429 && attempts < maximumAttempts) {

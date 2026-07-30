@@ -11,6 +11,7 @@
     "deprecated": false,
     "description": "",
     "method": "GET",
+    "paginated": false,
     "path": "/calendar/{token}.ics"
   },
   {
@@ -19,6 +20,7 @@
     "deprecated": true,
     "description": "Delete call note",
     "method": "DELETE",
+    "paginated": false,
     "path": "/callnotes"
   },
   {
@@ -27,6 +29,7 @@
     "deprecated": false,
     "description": "Get all call notes",
     "method": "GET",
+    "paginated": true,
     "path": "/callnotes"
   },
   {
@@ -35,6 +38,7 @@
     "deprecated": false,
     "description": "Create call note",
     "method": "POST",
+    "paginated": false,
     "path": "/callnotes"
   },
   {
@@ -43,6 +47,7 @@
     "deprecated": false,
     "description": "Delete call note",
     "method": "DELETE",
+    "paginated": false,
     "path": "/callnotes/{_id}"
   },
   {
@@ -51,6 +56,7 @@
     "deprecated": false,
     "description": "Get a call note",
     "method": "GET",
+    "paginated": false,
     "path": "/callnotes/{_id}"
   },
   {
@@ -59,6 +65,7 @@
     "deprecated": true,
     "description": "Delete contact group",
     "method": "DELETE",
+    "paginated": false,
     "path": "/contactgroups"
   },
   {
@@ -67,6 +74,7 @@
     "deprecated": false,
     "description": "Get all contact groups",
     "method": "GET",
+    "paginated": true,
     "path": "/contactgroups"
   },
   {
@@ -75,6 +83,7 @@
     "deprecated": false,
     "description": "Create contact group",
     "method": "POST",
+    "paginated": false,
     "path": "/contactgroups"
   },
   {
@@ -83,6 +92,7 @@
     "deprecated": true,
     "description": "Update contact group",
     "method": "PUT",
+    "paginated": false,
     "path": "/contactgroups"
   },
   {
@@ -91,6 +101,7 @@
     "deprecated": false,
     "description": "Delete contact group",
     "method": "DELETE",
+    "paginated": false,
     "path": "/contactgroups/{_id}"
   },
   {
@@ -99,6 +110,7 @@
     "deprecated": false,
     "description": "Get a contact group",
     "method": "GET",
+    "paginated": false,
     "path": "/contactgroups/{_id}"
   },
   {
@@ -107,6 +119,7 @@
     "deprecated": false,
     "description": "Update contact group",
     "method": "PUT",
+    "paginated": false,
     "path": "/contactgroups/{_id}"
   },
   {
@@ -115,6 +128,7 @@
     "deprecated": false,
     "description": "Get all contacts",
     "method": "GET",
+    "paginated": true,
     "path": "/contacts"
   },
   {
@@ -123,6 +137,7 @@
     "deprecated": false,
     "description": "Create contact",
     "method": "POST",
+    "paginated": false,
     "path": "/contacts"
   },
   {
@@ -131,6 +146,7 @@
     "deprecated": true,
     "description": "Update contact",
     "method": "PUT",
+    "paginated": false,
     "path": "/contacts"
   },
   {
@@ -139,6 +155,7 @@
     "deprecated": false,
     "description": "Get a contact",
     "method": "GET",
+    "paginated": false,
     "path": "/contacts/{_id}"
   },
   {
@@ -147,6 +164,7 @@
     "deprecated": false,
     "description": "Update contact",
     "method": "PUT",
+    "paginated": false,
     "path": "/contacts/{_id}"
   },
   {
@@ -155,6 +173,7 @@
     "deprecated": true,
     "description": "Delete journal entry",
     "method": "DELETE",
+    "paginated": false,
     "path": "/journalEntries"
   },
   {
@@ -163,6 +182,7 @@
     "deprecated": false,
     "description": "Get all journal entries",
     "method": "GET",
+    "paginated": true,
     "path": "/journalEntries"
   },
   {
@@ -171,6 +191,7 @@
     "deprecated": false,
     "description": "Create journal entry",
     "method": "POST",
+    "paginated": false,
     "path": "/journalEntries"
   },
   {
@@ -179,6 +200,7 @@
     "deprecated": true,
     "description": "Update journal entry",
     "method": "PUT",
+    "paginated": false,
     "path": "/journalEntries"
   },
   {
@@ -187,6 +209,7 @@
     "deprecated": false,
     "description": "Delete journal entry",
     "method": "DELETE",
+    "paginated": false,
     "path": "/journalEntries/{_id}"
   },
   {
@@ -195,6 +218,7 @@
     "deprecated": false,
     "description": "Get a journal entry",
     "method": "GET",
+    "paginated": false,
     "path": "/journalEntries/{_id}"
   },
   {
@@ -203,6 +227,7 @@
     "deprecated": false,
     "description": "Update journal entry",
     "method": "PUT",
+    "paginated": false,
     "path": "/journalEntries/{_id}"
   },
   {
@@ -211,6 +236,7 @@
     "deprecated": true,
     "description": "Delete list",
     "method": "DELETE",
+    "paginated": false,
     "path": "/lists"
   },
   {
@@ -219,6 +245,7 @@
     "deprecated": false,
     "description": "Get all lists",
     "method": "GET",
+    "paginated": true,
     "path": "/lists"
   },
   {
@@ -227,6 +254,7 @@
     "deprecated": false,
     "description": "Create list",
     "method": "POST",
+    "paginated": false,
     "path": "/lists"
   },
   {
@@ -235,6 +263,7 @@
     "deprecated": true,
     "description": "Update list",
     "method": "PUT",
+    "paginated": false,
     "path": "/lists"
   },
   {
@@ -243,6 +272,7 @@
     "deprecated": false,
     "description": "Delete list",
     "method": "DELETE",
+    "paginated": false,
     "path": "/lists/{_id}"
   },
   {
@@ -251,6 +281,7 @@
     "deprecated": false,
     "description": "Get a list",
     "method": "GET",
+    "paginated": false,
     "path": "/lists/{_id}"
   },
   {
@@ -259,6 +290,7 @@
     "deprecated": false,
     "description": "Update list",
     "method": "PUT",
+    "paginated": false,
     "path": "/lists/{_id}"
   },
   {
@@ -267,6 +299,7 @@
     "deprecated": true,
     "description": "Delete product group",
     "method": "DELETE",
+    "paginated": false,
     "path": "/productgroups"
   },
   {
@@ -275,6 +308,7 @@
     "deprecated": false,
     "description": "Get all product groups",
     "method": "GET",
+    "paginated": true,
     "path": "/productgroups"
   },
   {
@@ -283,6 +317,7 @@
     "deprecated": false,
     "description": "Create product group",
     "method": "POST",
+    "paginated": false,
     "path": "/productgroups"
   },
   {
@@ -291,6 +326,7 @@
     "deprecated": true,
     "description": "Update product group",
     "method": "PUT",
+    "paginated": false,
     "path": "/productgroups"
   },
   {
@@ -299,6 +335,7 @@
     "deprecated": false,
     "description": "Delete product group",
     "method": "DELETE",
+    "paginated": false,
     "path": "/productgroups/{_id}"
   },
   {
@@ -307,6 +344,7 @@
     "deprecated": false,
     "description": "Get a product group",
     "method": "GET",
+    "paginated": false,
     "path": "/productgroups/{_id}"
   },
   {
@@ -315,6 +353,7 @@
     "deprecated": false,
     "description": "Update product group",
     "method": "PUT",
+    "paginated": false,
     "path": "/productgroups/{_id}"
   },
   {
@@ -323,6 +362,7 @@
     "deprecated": true,
     "description": "Delete product",
     "method": "DELETE",
+    "paginated": false,
     "path": "/products"
   },
   {
@@ -331,6 +371,7 @@
     "deprecated": false,
     "description": "Get all products",
     "method": "GET",
+    "paginated": true,
     "path": "/products"
   },
   {
@@ -339,6 +380,7 @@
     "deprecated": false,
     "description": "Create product",
     "method": "POST",
+    "paginated": false,
     "path": "/products"
   },
   {
@@ -347,6 +389,7 @@
     "deprecated": true,
     "description": "Update product",
     "method": "PUT",
+    "paginated": false,
     "path": "/products"
   },
   {
@@ -355,6 +398,7 @@
     "deprecated": false,
     "description": "Delete product",
     "method": "DELETE",
+    "paginated": false,
     "path": "/products/{_id}"
   },
   {
@@ -363,6 +407,7 @@
     "deprecated": false,
     "description": "Get a product",
     "method": "GET",
+    "paginated": false,
     "path": "/products/{_id}"
   },
   {
@@ -371,6 +416,7 @@
     "deprecated": false,
     "description": "Update product",
     "method": "PUT",
+    "paginated": false,
     "path": "/products/{_id}"
   },
   {
@@ -379,6 +425,7 @@
     "deprecated": false,
     "description": "Get all projects",
     "method": "GET",
+    "paginated": true,
     "path": "/projects"
   },
   {
@@ -387,6 +434,7 @@
     "deprecated": false,
     "description": "Create project",
     "method": "POST",
+    "paginated": false,
     "path": "/projects"
   },
   {
@@ -395,6 +443,7 @@
     "deprecated": true,
     "description": "Update project",
     "method": "PUT",
+    "paginated": false,
     "path": "/projects"
   },
   {
@@ -403,6 +452,7 @@
     "deprecated": false,
     "description": "Get a project",
     "method": "GET",
+    "paginated": false,
     "path": "/projects/{_id}"
   },
   {
@@ -411,6 +461,7 @@
     "deprecated": false,
     "description": "Update project",
     "method": "PUT",
+    "paginated": false,
     "path": "/projects/{_id}"
   },
   {
@@ -419,6 +470,7 @@
     "deprecated": true,
     "description": "Delete project template",
     "method": "DELETE",
+    "paginated": false,
     "path": "/projectTemplates"
   },
   {
@@ -427,6 +479,7 @@
     "deprecated": false,
     "description": "Get all project templates",
     "method": "GET",
+    "paginated": true,
     "path": "/projectTemplates"
   },
   {
@@ -435,6 +488,7 @@
     "deprecated": false,
     "description": "Create project template",
     "method": "POST",
+    "paginated": false,
     "path": "/projectTemplates"
   },
   {
@@ -443,6 +497,7 @@
     "deprecated": true,
     "description": "Update project template",
     "method": "PUT",
+    "paginated": false,
     "path": "/projectTemplates"
   },
   {
@@ -451,6 +506,7 @@
     "deprecated": false,
     "description": "Delete project template",
     "method": "DELETE",
+    "paginated": false,
     "path": "/projectTemplates/{_id}"
   },
   {
@@ -459,6 +515,7 @@
     "deprecated": false,
     "description": "Get a project template",
     "method": "GET",
+    "paginated": false,
     "path": "/projectTemplates/{_id}"
   },
   {
@@ -467,6 +524,7 @@
     "deprecated": false,
     "description": "Update project template",
     "method": "PUT",
+    "paginated": false,
     "path": "/projectTemplates/{_id}"
   },
   {
@@ -475,6 +533,7 @@
     "deprecated": false,
     "description": "Get all scheduled work",
     "method": "GET",
+    "paginated": true,
     "path": "/scheduledWork"
   },
   {
@@ -483,6 +542,7 @@
     "deprecated": false,
     "description": "Get all services",
     "method": "GET",
+    "paginated": true,
     "path": "/services"
   },
   {
@@ -491,6 +551,7 @@
     "deprecated": false,
     "description": "Get a service",
     "method": "GET",
+    "paginated": false,
     "path": "/services/{_id}"
   },
   {
@@ -499,6 +560,7 @@
     "deprecated": false,
     "description": "Get all tags",
     "method": "GET",
+    "paginated": true,
     "path": "/tags"
   },
   {
@@ -507,6 +569,7 @@
     "deprecated": false,
     "description": "Get a tag",
     "method": "GET",
+    "paginated": false,
     "path": "/tags/{_id}"
   },
   {
@@ -515,6 +578,7 @@
     "deprecated": true,
     "description": "Delete task",
     "method": "DELETE",
+    "paginated": false,
     "path": "/tasks"
   },
   {
@@ -523,6 +587,7 @@
     "deprecated": false,
     "description": "Get all tasks",
     "method": "GET",
+    "paginated": true,
     "path": "/tasks"
   },
   {
@@ -531,6 +596,7 @@
     "deprecated": false,
     "description": "Create task",
     "method": "POST",
+    "paginated": false,
     "path": "/tasks"
   },
   {
@@ -539,6 +605,7 @@
     "deprecated": true,
     "description": "Update task",
     "method": "PUT",
+    "paginated": false,
     "path": "/tasks"
   },
   {
@@ -547,6 +614,7 @@
     "deprecated": false,
     "description": "Delete task",
     "method": "DELETE",
+    "paginated": false,
     "path": "/tasks/{_id}"
   },
   {
@@ -555,6 +623,7 @@
     "deprecated": false,
     "description": "Get a task",
     "method": "GET",
+    "paginated": false,
     "path": "/tasks/{_id}"
   },
   {
@@ -563,6 +632,7 @@
     "deprecated": false,
     "description": "Update task",
     "method": "PUT",
+    "paginated": false,
     "path": "/tasks/{_id}"
   },
   {
@@ -571,6 +641,7 @@
     "deprecated": false,
     "description": "Starts time tracking for a task",
     "method": "POST",
+    "paginated": false,
     "path": "/tasks/{_id}/startTracking"
   },
   {
@@ -579,6 +650,7 @@
     "deprecated": false,
     "description": "Stops time tracking for a task",
     "method": "POST",
+    "paginated": false,
     "path": "/tasks/{_id}/stopTracking"
   },
   {
@@ -587,6 +659,7 @@
     "deprecated": false,
     "description": "Get team",
     "method": "GET",
+    "paginated": false,
     "path": "/teams"
   },
   {
@@ -595,6 +668,7 @@
     "deprecated": true,
     "description": "Delete time entry",
     "method": "DELETE",
+    "paginated": false,
     "path": "/times"
   },
   {
@@ -603,6 +677,7 @@
     "deprecated": false,
     "description": "Get all time entries",
     "method": "GET",
+    "paginated": true,
     "path": "/times"
   },
   {
@@ -611,6 +686,7 @@
     "deprecated": false,
     "description": "Create time entry",
     "method": "POST",
+    "paginated": false,
     "path": "/times"
   },
   {
@@ -619,6 +695,7 @@
     "deprecated": true,
     "description": "Update time entry",
     "method": "PUT",
+    "paginated": false,
     "path": "/times"
   },
   {
@@ -627,6 +704,7 @@
     "deprecated": false,
     "description": "Delete time entry",
     "method": "DELETE",
+    "paginated": false,
     "path": "/times/{_id}"
   },
   {
@@ -635,6 +713,7 @@
     "deprecated": false,
     "description": "Get a time entry",
     "method": "GET",
+    "paginated": false,
     "path": "/times/{_id}"
   },
   {
@@ -643,6 +722,7 @@
     "deprecated": false,
     "description": "Update time entry",
     "method": "PUT",
+    "paginated": false,
     "path": "/times/{_id}"
   },
   {
@@ -651,6 +731,7 @@
     "deprecated": false,
     "description": "Get users",
     "method": "GET",
+    "paginated": true,
     "path": "/users"
   },
   {
@@ -659,6 +740,7 @@
     "deprecated": true,
     "description": "Delete webhook",
     "method": "DELETE",
+    "paginated": false,
     "path": "/webhooks"
   },
   {
@@ -667,6 +749,7 @@
     "deprecated": false,
     "description": "Get all webhooks",
     "method": "GET",
+    "paginated": true,
     "path": "/webhooks"
   },
   {
@@ -675,6 +758,7 @@
     "deprecated": false,
     "description": "Create a webhook",
     "method": "POST",
+    "paginated": false,
     "path": "/webhooks"
   },
   {
@@ -683,6 +767,7 @@
     "deprecated": false,
     "description": "Delete webhook",
     "method": "DELETE",
+    "paginated": false,
     "path": "/webhooks/{_id}"
   },
   {
@@ -691,6 +776,7 @@
     "deprecated": false,
     "description": "Get webhook",
     "method": "GET",
+    "paginated": false,
     "path": "/webhooks/{_id}"
   }
 ]
