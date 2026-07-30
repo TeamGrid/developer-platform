@@ -180,6 +180,66 @@ npm run verify
 tests (including an in-memory MCP negotiation), and builds all publishable
 packages.
 
+### Production conformance
+
+Production conformance is deliberately separate from CI and from the staging mutation smoke. Start
+with the offline plan:
+
+```sh
+npm run conformance:plan
+```
+
+The plan reads the immutable contract set and produces a deterministic inventory of all 87 V0 and
+206 V1 operations. It joins V1 with every SDK method, CLI command, MCP exposure decision, scope,
+execution binding, CAS precondition, and idempotency requirement. V0 compatibility statuses and the
+V0-to-V1 migration map remain explicit, so a documented unavailable route is not confused with an
+unexpected regression. Planning never loads a credential or contacts TeamGrid.
+
+The read-only phase performs only parameter-free GET requests, uses `limit=1` where supported, runs
+sequentially below the shared pre-auth limit, and retries at most two `429` responses. Operations
+that need an id, required filter, body, or mutation are recorded as blocked rather than guessed. A
+V1 run additionally proves all 206 SDK and CLI bindings, the exact 29-tool MCP allowlist, and one
+live workspace request through SDK, CLI, and MCP:
+
+```sh
+TEAMGRID_CONFORMANCE_ALLOW_PRODUCTION=true \
+TEAMGRID_CONFORMANCE_EVIDENCE_PATH=../conformance-evidence/read-only.json \
+TEAMGRID_CONFORMANCE_REGION=de \
+TEAMGRID_CONFORMANCE_V0_BASE_URL=https://api.teamgrid.app \
+TEAMGRID_CONFORMANCE_V0_PROFILE=conformance-v0 \
+TEAMGRID_CONFORMANCE_V1_BASE_URL=https://api.de.teamgrid.app/v1 \
+TEAMGRID_CONFORMANCE_V1_PROFILE=default \
+npm run conformance:read-only
+```
+
+Profiles refer to the OS credential store used by the CLI; their secret values are never written to
+the profile file, command line, stdout, or evidence. Process-scoped
+`TEAMGRID_CONFORMANCE_V0_TOKEN` and `TEAMGRID_CONFORMANCE_V1_TOKEN` remain available for ephemeral
+CI environments. `TEAMGRID_CONFORMANCE_VERSIONS=v0` or `v1` can intentionally isolate one contract;
+the omitted contract is then recorded as not run.
+
+Store a dedicated conformance credential through the hidden interactive prompt when no CLI profile
+secret exists. The token is validated before it is handed directly to macOS Keychain or Linux
+Secret Service:
+
+```sh
+npm run conformance:credential -- store --version v0 --profile conformance-v0
+npm run conformance:credential -- store --version v1 --profile default
+npm run conformance:credential -- status --version v1 --profile default
+```
+
+Live mode accepts only the canonical HTTPS production endpoints, requires an explicit production
+unlock and evidence path, rejects reused V0/V1 credentials, limits timeouts and pacing, and writes
+redacted evidence atomically with mode `0600`. It stores status, latency, request id, and fixed error
+classifications, never response bodies, exception stacks, URLs with query values, or bearer tokens.
+
+Mutation certification stays locked until every recipe uses resources created under an explicit
+`codex-conformance-*` namespace. Certification additionally requires
+`TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS=true` and a unique
+`TEAMGRID_CONFORMANCE_CLEANUP_JOURNAL_PATH`. Every resource must be added to that mode-`0600`
+journal immediately after creation and reconciled in reverse dependency order. A crash leaves the
+journal recoverable and blocks a new run; incomplete cleanup can never produce passing evidence.
+
 Canonical contract updates use `npm run sync:contracts --
 /path/to/teamgrid-api <full-api-commit-sha>`. The command reads every artifact
 from that immutable Git object, verifies the API-owned manifest, and records

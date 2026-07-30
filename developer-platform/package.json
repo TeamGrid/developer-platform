@@ -9,6 +9,9 @@
   "scripts": {
     "build": "npm run generate:types && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server",
     "check": "node scripts/check-contract-manifest.mjs && npm run generate:types && git diff --exit-code -- packages/api-client/src/generated/schema.ts && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server && npm run typecheck -w @teamgrid/api-client && npm run typecheck -w @teamgrid/cli && npm run typecheck -w @teamgrid/mcp-server && npm run typecheck:staging-e2e && npm run contract:surfaces && node scripts/check-client-version.mjs && biome check packages scripts",
+    "conformance:credential": "npm run build && node scripts/conformance/credential.mjs",
+    "conformance:plan": "node scripts/conformance/run.mjs --mode plan",
+    "conformance:read-only": "npm run build && node scripts/conformance/run.mjs --mode read-only",
     "contract:surfaces": "node scripts/check-operation-surfaces.mjs",
     "e2e:staging": "node scripts/staging-e2e.mjs",
     "e2e:staging:load": "node scripts/staging-load.mjs",
@@ -26,6 +29,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.5",
+    "@inquirer/prompts": "8.5.2",
     "openapi-typescript": "7.13.0",
     "typescript": "5.9.3",
     "vitest": "4.1.10"
