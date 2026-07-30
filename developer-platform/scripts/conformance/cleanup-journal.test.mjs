@@ -7,6 +7,7 @@ import {
   assertJournalPathReady,
   cleanupResourcesInReverseOrder,
   createCleanupJournal,
+  finalizeCleanupJournal,
   readCleanupJournal,
   recordCleanupResult,
   registerCleanupResource,
@@ -76,6 +77,30 @@ describe('crash-safe mutation cleanup journal', () => {
     })
     expect(() => assertCleanupComplete(failed)).toThrow('incomplete')
     expect(assertCleanupComplete(recovered)).toBe(true)
+  })
+
+  it('can finish a run that proved every mutation was rejected before creating a resource', () => {
+    const completed = finalizeCleanupJournal(journal(), {
+      completedAt: '2026-07-30T12:00:03.000Z',
+    })
+
+    expect(completed).toMatchObject({
+      resources: [],
+      state: 'complete',
+      updatedAt: '2026-07-30T12:00:03.000Z',
+    })
+    expect(assertCleanupComplete(completed)).toBe(true)
+  })
+
+  it('refuses to finish while a registered resource still needs cleanup', () => {
+    const pending = registerCleanupResource(journal(), {
+      cleanupOperationId: 'archiveTask',
+      createdByOperationId: 'createTask',
+      resourceId: 'task-1',
+      resourceType: 'task',
+    })
+
+    expect(() => finalizeCleanupJournal(pending)).toThrow('unreconciled')
   })
 
   it('persists only opaque cleanup metadata with restrictive permissions', () => {

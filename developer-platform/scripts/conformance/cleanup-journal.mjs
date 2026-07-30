@@ -141,6 +141,18 @@ export function assertCleanupComplete(journal) {
   return true
 }
 
+export function finalizeCleanupJournal(journal, { completedAt = new Date().toISOString() } = {}) {
+  assertJournal(journal)
+  if (journal.resources.some((resource) => resource.state !== 'cleaned')) {
+    throw new Error('Conformance cleanup cannot finish with unreconciled resources.')
+  }
+  return {
+    ...journal,
+    state: 'complete',
+    updatedAt: completedAt,
+  }
+}
+
 export function writeCleanupJournal(path, journal, { secrets = [] } = {}) {
   assertJournal(journal)
   const payload = `${JSON.stringify(journal, null, 2)}\n`

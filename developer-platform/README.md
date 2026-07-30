@@ -233,6 +233,30 @@ unlock and evidence path, rejects reused V0/V1 credentials, limits timeouts and 
 redacted evidence atomically with mode `0600`. It stores status, latency, request id, and fixed error
 classifications, never response bodies, exception stacks, URLs with query values, or bearer tokens.
 
+The safe mutation smoke extends that live coverage to every selected route, including mutation
+methods, without supplying a request body or a real resource identifier. A mutation must be rejected
+with a bounded client, permission, missing-resource, conflict, or precondition status; any `2xx`,
+authentication failure, persistent rate limit, or server error fails the run. It writes a unique
+mode-`0600` recovery journal before the first request and deliberately leaves it unfinished if an
+unexpected mutation succeeds:
+
+```sh
+TEAMGRID_CONFORMANCE_ALLOW_PRODUCTION=true \
+TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS=true \
+TEAMGRID_CONFORMANCE_EVIDENCE_PATH=../conformance-evidence/safe-mutation-smoke.json \
+TEAMGRID_CONFORMANCE_CLEANUP_JOURNAL_PATH=../conformance-evidence/safe-mutation-cleanup.json \
+TEAMGRID_CONFORMANCE_FIXTURE_NAMESPACE=codex-conformance-acme-01 \
+TEAMGRID_CONFORMANCE_REGION=de \
+TEAMGRID_CONFORMANCE_V0_BASE_URL=https://api.teamgrid.app \
+TEAMGRID_CONFORMANCE_V0_PROFILE=conformance-v0 \
+TEAMGRID_CONFORMANCE_V1_BASE_URL=https://api.de.teamgrid.app/v1 \
+TEAMGRID_CONFORMANCE_V1_PROFILE=default \
+npm run conformance:safe-mutation-smoke
+```
+
+This proves routing, authentication, validation, safety, and every SDK/CLI/MCP binding. It does not
+claim that a positive write succeeded.
+
 Mutation certification stays locked until every recipe uses resources created under an explicit
 `codex-conformance-*` namespace. Certification additionally requires
 `TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS=true` and a unique
