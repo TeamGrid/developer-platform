@@ -154,4 +154,20 @@ describe('production conformance configuration', () => {
     })
     expect(config.cleanupJournalPath.replaceAll('\\', '/')).toContain('evidence/cleanup.json')
   })
+
+  it('uses the same deliberate mutation and recovery boundary for safe route smoke', () => {
+    const config = resolveConformanceConfig({
+      environment: liveEnvironment({
+        TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS: 'true',
+        TEAMGRID_CONFORMANCE_CLEANUP_JOURNAL_PATH: './evidence/safe-mutation-cleanup.json',
+        TEAMGRID_CONFORMANCE_FIXTURE_NAMESPACE: 'codex-conformance-acme-01',
+      }),
+      mode: 'safe-mutation-smoke',
+    })
+
+    expect(config).toMatchObject({
+      fixtureNamespace: 'codex-conformance-acme-01',
+      mode: 'safe-mutation-smoke',
+    })
+  })
 })

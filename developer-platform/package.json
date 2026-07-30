@@ -13,6 +13,7 @@
     "conformance:plan": "node scripts/conformance/run.mjs --mode plan",
     "conformance:read-only": "npm run build && node scripts/conformance/run.mjs --mode read-only",
     "conformance:route-smoke": "npm run build && node scripts/conformance/run.mjs --mode route-smoke",
+    "conformance:safe-mutation-smoke": "npm run build && node scripts/conformance/run.mjs --mode safe-mutation-smoke",
     "contract:surfaces": "node scripts/check-operation-surfaces.mjs",
     "e2e:staging": "node scripts/staging-e2e.mjs",
     "e2e:staging:load": "node scripts/staging-load.mjs",

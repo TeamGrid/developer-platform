@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { resolve } from 'node:path'
 
-const modes = new Set(['certification', 'plan', 'read-only', 'route-smoke'])
+const modes = new Set(['certification', 'plan', 'read-only', 'route-smoke', 'safe-mutation-smoke'])
 const regions = new Set(['de', 'us'])
 const productionTargets = {
   v0: new Set(['https://api.teamgrid.app', 'https://api.teamgridapp.com']),
@@ -83,7 +83,7 @@ export function resolveConformanceConfig({
   const mode = modeOverride || value(environment, 'TEAMGRID_CONFORMANCE_MODE') || 'plan'
   if (!modes.has(mode)) {
     throw new Error(
-      'TEAMGRID_CONFORMANCE_MODE must be plan, read-only, route-smoke, or certification.',
+      'TEAMGRID_CONFORMANCE_MODE must be plan, read-only, route-smoke, safe-mutation-smoke, or certification.',
     )
   }
 
@@ -175,9 +175,11 @@ export function resolveConformanceConfig({
     throw new Error('TEAMGRID_CONFORMANCE_EVIDENCE_PATH is required for live checks.')
   }
 
-  if (mode === 'certification') {
+  if (mode === 'certification' || mode === 'safe-mutation-smoke') {
     if (!exactBoolean(environment, 'TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS')) {
-      throw new Error('TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS=true is required for certification.')
+      throw new Error(
+        'TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS=true is required for mutation conformance.',
+      )
     }
     const fixtureNamespace = required(environment, 'TEAMGRID_CONFORMANCE_FIXTURE_NAMESPACE')
     if (!/^codex-conformance-[a-z0-9-]{6,48}$/.test(fixtureNamespace)) {
