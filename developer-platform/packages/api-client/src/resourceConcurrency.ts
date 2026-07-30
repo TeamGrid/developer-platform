@@ -173,12 +173,11 @@ export const taskValidator = (value: unknown): value is Task =>
       Array.isArray(attributes.subtasks) &&
       attributes.subtasks.every(
         (subtask) =>
-          hasExactKeys(subtask, ['completed', 'id', 'name', 'order']) &&
+          hasExactKeys(subtask, ['completed', 'id', 'order', 'title']) &&
           typeof subtask.completed === 'boolean' &&
           typeof subtask.id === 'string' &&
-          typeof subtask.name === 'string' &&
-          typeof subtask.order === 'number' &&
-          Number.isFinite(subtask.order),
+          finiteNumberOrNull(subtask.order) &&
+          typeof subtask.title === 'string',
       ) &&
       stringArray(attributes.tagIds) &&
       typeof attributes.trackingActive === 'boolean' &&
