@@ -92,6 +92,7 @@ export function resolveConformanceConfig({
       ? resolve(value(environment, 'TEAMGRID_CONFORMANCE_EVIDENCE_PATH'))
       : undefined,
     mode,
+    pageLimit: boundedInteger(environment, 'TEAMGRID_CONFORMANCE_PAGE_LIMIT', 1, 1, 100),
     requestIntervalMs: boundedInteger(
       environment,
       'TEAMGRID_CONFORMANCE_REQUEST_INTERVAL_MS',
@@ -213,6 +214,7 @@ export function redactedConfig(config) {
     evidencePath: config.evidencePath,
     ...(config.fixtureNamespace ? { fixtureNamespace: config.fixtureNamespace } : {}),
     mode: config.mode,
+    pageLimit: config.pageLimit,
     requestIntervalMs: config.requestIntervalMs,
     requestTimeoutMs: config.requestTimeoutMs,
     runId: config.runId,

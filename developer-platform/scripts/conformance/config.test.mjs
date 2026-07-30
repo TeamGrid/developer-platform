@@ -26,6 +26,7 @@ describe('production conformance configuration', () => {
     const config = resolveConformanceConfig({
       environment: liveEnvironment(),
       mode: 'plan',
+      pageLimit: 1,
       now: fixedNow,
       runId: 'plan',
     })
@@ -76,6 +77,21 @@ describe('production conformance configuration', () => {
 
     expect(knownSecrets(config)).toEqual(['legacy-production-secret', 'stable-production-secret'])
     expect(JSON.stringify(redactedConfig(config))).not.toContain('production-secret')
+  })
+
+  it('accepts only a bounded cross-surface page limit', () => {
+    expect(
+      resolveConformanceConfig({
+        environment: liveEnvironment({ TEAMGRID_CONFORMANCE_PAGE_LIMIT: '100' }),
+        mode: 'read-only',
+      }),
+    ).toMatchObject({ pageLimit: 100 })
+    expect(() =>
+      resolveConformanceConfig({
+        environment: liveEnvironment({ TEAMGRID_CONFORMANCE_PAGE_LIMIT: '101' }),
+        mode: 'read-only',
+      }),
+    ).toThrow('PAGE_LIMIT must be an integer from 1 to 100')
   })
 
   it('can load a V1-only production credential from the existing CLI keychain profile', async () => {

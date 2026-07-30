@@ -11,6 +11,8 @@ function inventory() {
           mcp: { exposure: 'read', tool: 'teamgrid_workspace_get' },
           sdk: { method: 'workspace.get' },
         },
+        parameters: [],
+        testability: { automaticReadProbe: true },
         version: 'v1',
       },
       {
@@ -20,6 +22,8 @@ function inventory() {
           mcp: { exposure: 'forbidden' },
           sdk: { method: 'workspaceSettings.update' },
         },
+        parameters: [],
+        testability: { automaticReadProbe: false },
         version: 'v1',
       },
     ],
@@ -33,14 +37,16 @@ function runtime(overrides = {}) {
       workspace: { get: () => undefined },
       workspaceSettings: { update: () => undefined },
     },
-    runCliWorkspace: async () => undefined,
-    runMcpWorkspace: async () => ['teamgrid_workspace_get'],
-    runSdkWorkspace: async () => undefined,
+    close: async () => undefined,
+    mcpTools: ['teamgrid_workspace_get'],
+    runCliOperation: async () => undefined,
+    runMcpOperation: async () => undefined,
+    runSdkOperation: async () => undefined,
     ...overrides,
   }
 }
 
-const config = { requestIntervalMs: 250 }
+const config = { pageLimit: 1, requestIntervalMs: 250 }
 
 describe('SDK, CLI, and MCP conformance', () => {
   it('requires every V1 operation to be bound and the exact MCP allowlist', () => {
@@ -81,8 +87,8 @@ describe('SDK, CLI, and MCP conformance', () => {
         outcome: 'passed',
         surface: 'sdk',
       },
-      { outcome: 'passed', surface: 'cli' },
-      { outcome: 'passed', surface: 'mcp' },
+      { operationId: 'getWorkspace', outcome: 'passed', surface: 'cli' },
+      { operationId: 'getWorkspace', outcome: 'passed', surface: 'mcp' },
     ])
   })
 
@@ -92,14 +98,14 @@ describe('SDK, CLI, and MCP conformance', () => {
       inventory: inventory(),
       runtimeLoader: async () =>
         runtime({
-          runCliWorkspace: async () => {
+          runCliOperation: async () => {
             throw new Error('secret upstream response')
           },
         }),
       sleep: () => Promise.resolve(),
     })
     expect(requestFailure[1]).toMatchObject({
-      note: 'cli_workspace_check_failed',
+      note: 'cli_live_read_failed',
       outcome: 'failed',
     })
     expect(JSON.stringify(requestFailure)).not.toContain('secret upstream response')

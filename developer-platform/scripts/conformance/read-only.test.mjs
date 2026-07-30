@@ -19,6 +19,7 @@ function operation(overrides = {}) {
 function config() {
   return {
     mode: 'read-only',
+    pageLimit: 1,
     requestIntervalMs: 250,
     requestTimeoutMs: 1_000,
     runId: 'run-1',

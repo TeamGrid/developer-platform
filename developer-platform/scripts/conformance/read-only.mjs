@@ -23,7 +23,7 @@ function requestUrl(config, operation) {
   const url = new URL(`${baseUrl}${operation.path}`)
 
   if (operation.parameters.some((parameter) => parameter.name === 'limit')) {
-    url.searchParams.set('limit', '1')
+    url.searchParams.set('limit', String(config.pageLimit))
   }
   if (operation.operationId === 'listChanges') {
     url.searchParams.set('startAtLatest', 'true')

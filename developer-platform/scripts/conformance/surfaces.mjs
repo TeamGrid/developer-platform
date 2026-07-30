@@ -18,6 +18,16 @@ function hasFunction(root, dottedPath) {
   return typeof current === 'function'
 }
 
+function functionReceiver(root, dottedPath) {
+  const parts = dottedPath.split('.')
+  const methodName = parts.pop()
+  let receiver = root
+  for (const part of parts) receiver = receiver?.[part]
+  const method = receiver?.[methodName]
+  if (typeof method !== 'function') throw new Error('sdk_surface_drift')
+  return { method, receiver }
+}
+
 function writableCapture() {
   let content = ''
   return {
@@ -33,6 +43,18 @@ function writableCapture() {
 
 function expectedV1Policy(inventory) {
   return inventory.operations.filter((operation) => operation.version === 'v1')
+}
+
+function automaticV1Reads(inventory) {
+  return expectedV1Policy(inventory).filter(
+    (operation) => operation.testability?.automaticReadProbe,
+  )
+}
+
+function listArguments(operation, pageLimit) {
+  return operation.parameters.some((parameter) => parameter.name === 'limit')
+    ? { limit: pageLimit }
+    : {}
 }
 
 export function verifySurfaceBindings({ client, cliCommands, inventory, mcpTools }) {
@@ -71,18 +93,26 @@ async function loadDefaultRuntime(config) {
     ])
   const client = new TeamGridClient({
     baseUrl: config.target.v1BaseUrl,
-    retries: 2,
+    retries: 0,
     timeoutMs: config.requestTimeoutMs,
     token: config.secrets.TEAMGRID_CONFORMANCE_V1_TOKEN,
   })
   const program = createProgram()
+  const server = createTeamGridMcpServer(client, { toolProfile: 'all' })
+  const mcpClient = new Client({ name: 'teamgrid-conformance', version: '1.0.0' })
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
+  await Promise.all([server.connect(serverTransport), mcpClient.connect(clientTransport)])
+  const mcpTools = (await mcpClient.listTools()).tools.map((tool) => tool.name)
 
   return {
     cliCommands: commandPaths(program),
     client,
-    runCliWorkspace: async () => {
+    close: () => Promise.allSettled([mcpClient.close(), server.close()]),
+    mcpTools,
+    runCliOperation: async (operation) => {
       const output = writableCapture()
       const errorOutput = writableCapture()
+      const commandArguments = operation.surfaces.cli.command.split(' ')
       const exitCode = await runCli(
         [
           'node',
@@ -91,7 +121,14 @@ async function loadDefaultRuntime(config) {
           'json',
           '--base-url',
           config.target.v1BaseUrl,
-          'workspace',
+          '--timeout',
+          String(config.requestTimeoutMs),
+          '--retries',
+          '0',
+          ...commandArguments,
+          ...(operation.parameters.some((parameter) => parameter.name === 'limit')
+            ? ['--limit', String(config.pageLimit)]
+            : []),
         ],
         {
           configStore: {
@@ -106,50 +143,47 @@ async function loadDefaultRuntime(config) {
       )
       if (exitCode !== 0) throw new Error('cli_request_failed')
       const payload = JSON.parse(output.text())
-      if (!payload?.id || payload.type !== 'workspace') throw new Error('cli_response_invalid')
+      if (payload === undefined || payload === null) throw new Error('cli_response_invalid')
     },
-    runMcpWorkspace: async () => {
-      const server = createTeamGridMcpServer(client, { toolProfile: 'all' })
-      const mcpClient = new Client({ name: 'teamgrid-conformance', version: '1.0.0' })
-      const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
-      await Promise.all([server.connect(serverTransport), mcpClient.connect(clientTransport)])
-      try {
-        const tools = await mcpClient.listTools()
-        const response = await mcpClient.callTool({
-          arguments: {},
-          name: 'teamgrid_workspace_get',
-        })
-        if (response.isError || !response.structuredContent) {
-          throw new Error('mcp_response_invalid')
-        }
-        return tools.tools.map((tool) => tool.name)
-      } finally {
-        await Promise.allSettled([mcpClient.close(), server.close()])
+    runMcpOperation: async (operation) => {
+      const response = await mcpClient.callTool(
+        {
+          arguments: listArguments(operation, config.pageLimit),
+          name: operation.surfaces.mcp.tool,
+        },
+        undefined,
+        {
+          maxTotalTimeout: config.requestTimeoutMs + 1_000,
+          timeout: config.requestTimeoutMs + 1_000,
+        },
+      )
+      if (response.isError || !response.structuredContent) {
+        throw new Error('mcp_response_invalid')
       }
     },
-    runSdkWorkspace: async () => {
-      const response = await client.workspace.get()
-      if (!response?.data?.id || response.data.type !== 'workspace') {
-        throw new Error('sdk_response_invalid')
-      }
+    runSdkOperation: async (operation) => {
+      const { method, receiver } = functionReceiver(client, operation.surfaces.sdk.method)
+      await method.call(receiver, listArguments(operation, config.pageLimit))
     },
   }
 }
 
-function surfaceFailure(surface, note) {
+function surfaceFailure(surface, note, operationId = 'getWorkspace', error) {
   return evidenceResult({
     note,
-    operationId: 'getWorkspace',
+    ...(Number.isInteger(error?.status) ? { observedStatus: error.status } : {}),
+    operationId,
     outcome: 'failed',
+    ...(error?.requestId ? { requestId: error.requestId } : {}),
     surface,
     version: 'v1',
   })
 }
 
-function surfacePass(surface, note) {
+function surfacePass(surface, note, operationId = 'getWorkspace') {
   return evidenceResult({
     note,
-    operationId: 'getWorkspace',
+    operationId,
     outcome: 'passed',
     surface,
     version: 'v1',
@@ -175,44 +209,51 @@ export async function executeSurfaceConformance({
     ]
   }
 
-  let mcpTools
-  try {
-    await runtime.runSdkWorkspace()
-    results.push(surfacePass('sdk', 'all_methods_bound_and_workspace_live'))
-  } catch {
-    results.push(surfaceFailure('sdk', 'sdk_workspace_check_failed'))
-  }
-
-  await sleep(config.requestIntervalMs)
-  try {
-    await runtime.runCliWorkspace()
-    results.push(surfacePass('cli', 'all_commands_bound_and_workspace_live'))
-  } catch {
-    results.push(surfaceFailure('cli', 'cli_workspace_check_failed'))
-  }
-
-  await sleep(config.requestIntervalMs)
-  try {
-    mcpTools = await runtime.runMcpWorkspace()
-    results.push(surfacePass('mcp', 'exact_read_tools_bound_and_workspace_live'))
-  } catch {
-    results.push(surfaceFailure('mcp', 'mcp_workspace_check_failed'))
-  }
-
   try {
     const coverage = verifySurfaceBindings({
       client: runtime.client,
       cliCommands: runtime.cliCommands,
       inventory,
-      mcpTools: mcpTools || [],
+      mcpTools: runtime.mcpTools || [],
     })
-    for (const result of results) result.coverage = coverage
+    const reads = automaticV1Reads(inventory)
+    for (const [index, operation] of reads.entries()) {
+      if (index > 0) await sleep(config.requestIntervalMs)
+      try {
+        await runtime.runSdkOperation(operation)
+        results.push(surfacePass('sdk', 'live_read_succeeded', operation.operationId))
+      } catch (error) {
+        results.push(surfaceFailure('sdk', 'sdk_live_read_failed', operation.operationId, error))
+      }
+    }
+    for (const [index, operation] of reads.entries()) {
+      if (index > 0 || reads.length > 0) await sleep(config.requestIntervalMs)
+      try {
+        await runtime.runCliOperation(operation)
+        results.push(surfacePass('cli', 'live_read_succeeded', operation.operationId))
+      } catch (error) {
+        results.push(surfaceFailure('cli', 'cli_live_read_failed', operation.operationId, error))
+      }
+    }
+    const mcpReads = reads.filter((operation) => operation.surfaces.mcp.exposure === 'read')
+    for (const [index, operation] of mcpReads.entries()) {
+      if (index > 0 || reads.length > 0) await sleep(config.requestIntervalMs)
+      try {
+        await runtime.runMcpOperation(operation)
+        results.push(surfacePass('mcp', 'live_read_succeeded', operation.operationId))
+      } catch (error) {
+        results.push(surfaceFailure('mcp', 'mcp_live_read_failed', operation.operationId, error))
+      }
+    }
+    for (const surface of ['sdk', 'cli', 'mcp']) {
+      const first = results.find((result) => result.surface === surface)
+      if (first) first.coverage = coverage
+    }
   } catch (error) {
     const note = error instanceof Error ? error.message : 'surface_policy_drift'
-    for (const result of results) {
-      result.note = note
-      result.outcome = 'failed'
-    }
+    return [surfaceFailure('sdk', note), surfaceFailure('cli', note), surfaceFailure('mcp', note)]
+  } finally {
+    await runtime.close?.()
   }
   return results
 }
