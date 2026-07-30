@@ -1,5 +1,7 @@
 import { readFile } from 'node:fs/promises'
 
+import { isReleaseCompatibleWithContract } from './release-version.mjs'
+
 const packageDirectories = ['api-client', 'cli', 'mcp-server']
 const modeIndex = process.argv.indexOf('--mode')
 const mode = modeIndex === -1 ? undefined : process.argv[modeIndex + 1]
@@ -28,8 +30,10 @@ const manifests = await Promise.all(
 const contractManifest = JSON.parse(
   await readFile(new URL('../../openapi/developer-platform-manifest.json', import.meta.url)),
 )
-if (contractManifest.contractVersion !== expectedVersion) {
-  fail(`contract is ${contractManifest.contractVersion}, expected ${expectedVersion}`)
+if (!isReleaseCompatibleWithContract(expectedVersion, contractManifest.contractVersion)) {
+  fail(
+    `release ${expectedVersion} is not compatible with contract ${contractManifest.contractVersion}`,
+  )
 }
 
 for (const manifest of manifests) {

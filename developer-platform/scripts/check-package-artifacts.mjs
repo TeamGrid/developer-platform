@@ -2,6 +2,8 @@ import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
+import { isReleaseCompatibleWithContract } from './release-version.mjs'
+
 const repositoryUrl = 'git+https://github.com/TeamGrid/developer-platform.git'
 const packages = [
   { name: '@teamgrid/api-client', requiredFiles: ['dist/index.d.ts', 'dist/index.js'] },
@@ -37,17 +39,7 @@ if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version)) fail('release version 
 const contractManifest = JSON.parse(
   readFileSync(resolve('..', 'openapi', 'developer-platform-manifest.json'), 'utf8'),
 )
-const releaseParts = version.split('-')[0].split('.').map(Number)
-const contractParts = String(contractManifest.contractVersion).split('-')[0].split('.').map(Number)
-if (
-  releaseParts.length !== 3
-  || contractParts.length !== 3
-  || releaseParts.some(part => !Number.isSafeInteger(part))
-  || contractParts.some(part => !Number.isSafeInteger(part))
-  || releaseParts[0] !== contractParts[0]
-  || releaseParts[1] !== contractParts[1]
-  || releaseParts[2] < contractParts[2]
-) {
+if (!isReleaseCompatibleWithContract(version, contractManifest.contractVersion)) {
   fail('public package versions must be compatible with the canonical contract version')
 }
 
