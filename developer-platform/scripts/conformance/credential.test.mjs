@@ -8,7 +8,9 @@ function dependencies(overrides = {}) {
       get: vi.fn(async () => null),
       set: vi.fn(async () => undefined),
     },
-    parseV1Credential: vi.fn(),
+    parseV1Credential: vi.fn(() => {
+      throw new Error('not v1')
+    }),
     promptSecret: vi.fn(async () => 'hidden-production-token'),
     ...overrides,
   }
@@ -37,6 +39,7 @@ describe('interactive conformance credential helper', () => {
         get: vi.fn(async () => 'hidden-production-token'),
         set: vi.fn(async () => undefined),
       },
+      parseV1Credential: vi.fn(),
     })
     await runCredentialCommand({
       arguments_: ['store', '--version', 'v1', '--profile', 'default'],
@@ -61,6 +64,21 @@ describe('interactive conformance credential helper', () => {
         dependenciesLoader: async () => runtime,
       }),
     ).rejects.toThrow('invalid shape')
+    expect(runtime.credentialStore.set).not.toHaveBeenCalled()
+  })
+
+  it('validates a native Keychain write and deletes an incorrectly classified credential', async () => {
+    const runtime = dependencies({
+      parseV1Credential: vi.fn(),
+      promptAndStore: vi.fn(async () => 'valid-v1-production-token'),
+    })
+    await expect(
+      runCredentialCommand({
+        arguments_: ['store', '--version', 'v0', '--profile', 'conformance-v0'],
+        dependenciesLoader: async () => runtime,
+      }),
+    ).rejects.toThrow('cannot be stored as a legacy V0 credential')
+    expect(runtime.credentialStore.delete).toHaveBeenCalledWith('conformance-v0')
     expect(runtime.credentialStore.set).not.toHaveBeenCalled()
   })
 })

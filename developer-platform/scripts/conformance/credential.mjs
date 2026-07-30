@@ -1,3 +1,5 @@
+import { spawn } from 'node:child_process'
+import { platform } from 'node:os'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -24,7 +26,39 @@ function validateCredential(token, version, parseV1Credential) {
   if (token.length < 16 || token.length > 512 || /\s/.test(token)) {
     throw new Error('The credential has an invalid shape.')
   }
-  if (version === 'v1') parseV1Credential(token)
+  let recognizedAsV1 = false
+  try {
+    parseV1Credential(token)
+    recognizedAsV1 = true
+  } catch {
+    recognizedAsV1 = false
+  }
+  if (version === 'v1' && !recognizedAsV1) {
+    throw new Error('The credential is not a TeamGrid V1 credential.')
+  }
+  if (version === 'v0' && recognizedAsV1) {
+    throw new Error('A V1 credential cannot be stored as a legacy V0 credential.')
+  }
+}
+
+function runNativeMacKeychainPrompt(profile) {
+  return new Promise((resolvePromise, rejectPromise) => {
+    const child = spawn(
+      'security',
+      ['add-generic-password', '-U', '-s', 'teamgrid-cli', '-a', profile, '-w'],
+      {
+        shell: false,
+        stdio: 'inherit',
+        windowsHide: true,
+      },
+    )
+    child.on('error', rejectPromise)
+    child.on('close', (code) => {
+      if (code === 0) resolvePromise()
+      else
+        rejectPromise(new Error(`macOS Keychain helper exited with status ${code ?? 'unknown'}.`))
+    })
+  })
 }
 
 async function loadDefaultDependencies() {
@@ -33,9 +67,21 @@ async function loadDefaultDependencies() {
     import('../../packages/api-client/dist/index.js'),
     import('../../packages/cli/dist/index.js'),
   ])
+  const credentialStore = new SystemCredentialStore()
   return {
-    credentialStore: new SystemCredentialStore(),
+    credentialStore,
     parseV1Credential: parseCredentialLocation,
+    ...(platform() === 'darwin'
+      ? {
+          promptAndStore: async (profile) => {
+            process.stdout.write(
+              `Paste the credential at the native macOS Keychain prompt for '${profile}'.\n`,
+            )
+            await runNativeMacKeychainPrompt(profile)
+            return credentialStore.get(profile)
+          },
+        }
+      : {}),
     promptSecret: (message) => password({ mask: '•', message }),
   }
 }
@@ -56,13 +102,21 @@ export async function runCredentialCommand({
     return { profile: options.profile, stored: Boolean(token), version: options.version }
   }
 
+  const storedByNativePrompt = typeof dependencies.promptAndStore === 'function'
   const token = String(
-    await dependencies.promptSecret(
-      `Paste the TeamGrid ${options.version.toUpperCase()} credential for '${options.profile}'`,
-    ),
+    storedByNativePrompt
+      ? await dependencies.promptAndStore(options.profile)
+      : await dependencies.promptSecret(
+          `Paste the TeamGrid ${options.version.toUpperCase()} credential for '${options.profile}'`,
+        ),
   ).trim()
-  validateCredential(token, options.version, dependencies.parseV1Credential)
-  await dependencies.credentialStore.set(options.profile, token)
+  try {
+    validateCredential(token, options.version, dependencies.parseV1Credential)
+  } catch (error) {
+    if (storedByNativePrompt) await dependencies.credentialStore.delete(options.profile)
+    throw error
+  }
+  if (!storedByNativePrompt) await dependencies.credentialStore.set(options.profile, token)
   return { profile: options.profile, stored: true, version: options.version }
 }
 

@@ -5,6 +5,7 @@ import { hydrateConformanceCredentials, knownSecrets, resolveConformanceConfig }
 import { buildConformanceEvidence, writeConformanceEvidence } from './evidence.mjs'
 import { buildConformanceInventory, formatInventorySummary } from './inventory.mjs'
 import { executeReadOnlyConformance } from './read-only.mjs'
+import { executeRouteSmokeConformance } from './route-smoke.mjs'
 import { executeSurfaceConformance } from './surfaces.mjs'
 
 function parseArguments(arguments_) {
@@ -53,15 +54,23 @@ export async function runConformance({
   }
 
   const inventory = await buildConformanceInventory()
-  if (config.mode === 'read-only') {
+  if (config.mode === 'read-only' || config.mode === 'route-smoke') {
     config = await hydrateConformanceCredentials(config)
     const startedAt = now().toISOString()
-    const results = await executeReadOnlyConformance({
-      config,
-      fetchImpl,
-      inventory,
-      ...(sleep ? { sleep } : {}),
-    })
+    const results =
+      config.mode === 'read-only'
+        ? await executeReadOnlyConformance({
+            config,
+            fetchImpl,
+            inventory,
+            ...(sleep ? { sleep } : {}),
+          })
+        : await executeRouteSmokeConformance({
+            config,
+            fetchImpl,
+            inventory,
+            ...(sleep ? { sleep } : {}),
+          })
     if (config.versions.includes('v1')) {
       results.push(
         ...(await executeSurfaceConformance({

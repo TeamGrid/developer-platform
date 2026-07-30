@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { resolve } from 'node:path'
 
-const modes = new Set(['certification', 'plan', 'read-only'])
+const modes = new Set(['certification', 'plan', 'read-only', 'route-smoke'])
 const regions = new Set(['de', 'us'])
 const productionTargets = {
   v0: new Set(['https://api.teamgrid.app', 'https://api.teamgridapp.com']),
@@ -82,7 +82,9 @@ export function resolveConformanceConfig({
 } = {}) {
   const mode = modeOverride || value(environment, 'TEAMGRID_CONFORMANCE_MODE') || 'plan'
   if (!modes.has(mode)) {
-    throw new Error('TEAMGRID_CONFORMANCE_MODE must be plan, read-only, or certification.')
+    throw new Error(
+      'TEAMGRID_CONFORMANCE_MODE must be plan, read-only, route-smoke, or certification.',
+    )
   }
 
   const base = {
