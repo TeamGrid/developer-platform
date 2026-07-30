@@ -140,19 +140,18 @@ describe('production conformance configuration', () => {
       }),
     ).toThrow('must start with codex-conformance-')
 
-    expect(
-      resolveConformanceConfig({
-        environment: liveEnvironment({
-          TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS: 'true',
-          TEAMGRID_CONFORMANCE_CLEANUP_JOURNAL_PATH: './evidence/cleanup.json',
-          TEAMGRID_CONFORMANCE_FIXTURE_NAMESPACE: 'codex-conformance-acme-01',
-        }),
-        mode: 'certification',
+    const config = resolveConformanceConfig({
+      environment: liveEnvironment({
+        TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS: 'true',
+        TEAMGRID_CONFORMANCE_CLEANUP_JOURNAL_PATH: './evidence/cleanup.json',
+        TEAMGRID_CONFORMANCE_FIXTURE_NAMESPACE: 'codex-conformance-acme-01',
       }),
-    ).toMatchObject({
-      cleanupJournalPath: expect.stringContaining('evidence/cleanup.json'),
+      mode: 'certification',
+    })
+    expect(config).toMatchObject({
       fixtureNamespace: 'codex-conformance-acme-01',
       mode: 'certification',
     })
+    expect(config.cleanupJournalPath.replaceAll('\\', '/')).toContain('evidence/cleanup.json')
   })
 })
