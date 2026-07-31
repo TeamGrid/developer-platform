@@ -44,6 +44,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/cli/storage-compensation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Compensate a failed TeamGrid CLI credential-store write
+         * @description Revokes the exact personal credential issued by a recently consumed TeamGrid CLI browser-authorization grant when the operating-system credential store rejects that credential. The just-issued credential authenticates this request; the grant ID is not an independent authority and cannot select any other credential. The recovery window is short and the operation is intended only for automatic CLI cleanup.
+         */
+        post: operations["compensateCliAuthorizationStorage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/workspace": {
         parameters: {
             query?: never;
@@ -7660,6 +7680,45 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    compensateCliAuthorizationStorage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description JSON payload used to compensate a failed TeamGrid CLI credential-store write. The server validates this payload before applying any change. */
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "grantId": "exampleId"
+                 *     }
+                 */
+                "application/json": {
+                    /** @description The browser-authorization grant that issued the authenticating credential. */
+                    grantId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The just-issued credential was revoked because local secure storage failed. */
+            204: {
+                headers: {
+                    /** @description Prevents caching of credential recovery traffic. */
+                    "Cache-Control": "private, no-store, no-transform";
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

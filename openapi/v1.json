@@ -13188,6 +13188,84 @@
         "x-teamgrid-protocol": "authorization-code-pkce-s256"
       }
     },
+    "/auth/cli/storage-compensation": {
+      "post": {
+        "description": "Revokes the exact personal credential issued by a recently consumed TeamGrid CLI browser-authorization grant when the operating-system credential store rejects that credential. The just-issued credential authenticates this request; the grant ID is not an independent authority and cannot select any other credential. The recovery window is short and the operation is intended only for automatic CLI cleanup.",
+        "operationId": "compensateCliAuthorizationStorage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "grantId": {
+                    "description": "The browser-authorization grant that issued the authenticating credential.",
+                    "maxLength": 172,
+                    "minLength": 16,
+                    "pattern": "^[A-Za-z0-9_-]{16,172}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "grantId"
+                ],
+                "type": "object"
+              },
+              "example": {
+                "grantId": "exampleId"
+              }
+            }
+          },
+          "required": true,
+          "description": "JSON payload used to compensate a failed TeamGrid CLI credential-store write. The server validates this payload before applying any change."
+        },
+        "responses": {
+          "204": {
+            "description": "The just-issued credential was revoked because local secure storage failed.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Prevents caching of credential recovery traffic.",
+                "required": true,
+                "schema": {
+                  "const": "private, no-store, no-transform",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Compensate a failed TeamGrid CLI credential-store write",
+        "tags": [
+          "Authentication"
+        ],
+        "x-teamgrid-client": "teamgrid-cli",
+        "x-teamgrid-protocol": "browser-login-storage-compensation-v1",
+        "x-teamgrid-required-scopes": []
+      }
+    },
     "/workspace": {
       "get": {
         "operationId": "getWorkspace",

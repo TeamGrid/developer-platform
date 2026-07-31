@@ -713,8 +713,58 @@ describe('TeamGrid CLI', () => {
     expect(browserLogin).not.toHaveBeenCalled()
   })
 
-  it('rolls back local metadata and prints a non-secret recovery ID when storage fails', async () => {
+  it('revokes the issued credential and rolls back local metadata when storage fails', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-browser-store-failure-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    const input = new PassThrough() as PassThrough & { isTTY?: boolean }
+    const output = capture()
+    const errorOutput = capture()
+    input.isTTY = true
+    ;(output.stream as PassThrough & { isTTY?: boolean }).isTTY = true
+    const browserLogin = vi.fn(async () => ({
+      accessToken: token,
+      cellId: 'us-mnz-001',
+      credentialId: '0123456789abcdef01234567',
+      expiresAt: '2026-10-29T12:00:00.000Z',
+      grantId: 'authorization_request_1234567890',
+      region: 'us',
+      replayed: false,
+      scopes: ['workspace:read'],
+    }))
+    const compensateBrowserLoginStorage = vi.fn(async () => undefined)
+
+    expect(
+      await runCli(['node', 'teamgrid', 'auth', 'login'], {
+        browserLogin,
+        compensateBrowserLoginStorage,
+        configStore,
+        credentialStore: {
+          delete: vi.fn(),
+          get: vi.fn(async () => null),
+          set: vi.fn(async () => {
+            throw new Error('keychain denied')
+          }),
+        },
+        errorOutput: errorOutput.stream,
+        input,
+        output: output.stream,
+      }),
+    ).toBe(1)
+    expect(await configStore.load()).toEqual({ profiles: {}, version: 1 })
+    expect(compensateBrowserLoginStorage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accessToken: token,
+        grantId: 'authorization_request_1234567890',
+      }),
+    )
+    expect(errorOutput.value()).toContain('revoked the new credential automatically')
+    expect(errorOutput.value()).not.toContain('0123456789abcdef01234567')
+    expect(errorOutput.value()).not.toContain(token)
+    expect(output.value()).toBe('')
+  })
+
+  it('prints only the bounded recovery id when automatic storage compensation fails', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-browser-store-fallback-'))
     const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
     const input = new PassThrough() as PassThrough & { isTTY?: boolean }
     const output = capture()
@@ -735,6 +785,9 @@ describe('TeamGrid CLI', () => {
     expect(
       await runCli(['node', 'teamgrid', 'auth', 'login'], {
         browserLogin,
+        compensateBrowserLoginStorage: vi.fn(async () => {
+          throw new Error('offline')
+        }),
         configStore,
         credentialStore: {
           delete: vi.fn(),

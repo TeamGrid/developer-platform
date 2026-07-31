@@ -94,6 +94,13 @@ const localUsageErrorCodes = new Set([
 export type ProgramDependencies = {
   browserLogin?: (options: BrowserLoginOptions) => Promise<BrowserLoginResult>
   clientFactory?: (options: TeamGridClientOptions) => CliClient
+  compensateBrowserLoginStorage?: (options: {
+    accessToken: string
+    baseUrl?: string
+    grantId: string
+    retries: number
+    timeoutMs: number
+  }) => Promise<void>
   configStore?: ConfigStore
   credentialStore?: CredentialStore
   environment?: NodeJS.ProcessEnv
@@ -564,6 +571,17 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   const askPassword = dependencies.promptPassword || password
   const askConfirm = dependencies.promptConfirm || confirm
   const browserLogin = dependencies.browserLogin || loginWithSystemBrowser
+  const compensateBrowserLoginStorage =
+    dependencies.compensateBrowserLoginStorage ||
+    (async ({ accessToken, baseUrl, grantId, retries, timeoutMs }) => {
+      const client = clientFactory({
+        ...(baseUrl ? { baseUrl } : {}),
+        retries,
+        timeoutMs,
+        token: accessToken,
+      })
+      await client.authorization.compensateCliStorage(grantId)
+    })
   const now = dependencies.now || (() => new Date())
   const program = new Command()
   const packageVersion = (createRequire(import.meta.url)('../package.json') as { version: string })
@@ -909,13 +927,32 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       try {
         await credentialStore.set(name, token)
       } catch (error) {
+        let compensated = false
+        if (browserResult) {
+          try {
+            await compensateBrowserLoginStorage({
+              accessToken: token,
+              ...(globals.baseUrl ? { baseUrl: normalizeApiBaseUrl(globals.baseUrl) } : {}),
+              grantId: browserResult.grantId,
+              retries: globals.retries,
+              timeoutMs: globals.timeout,
+            })
+            compensated = true
+          } catch (_compensationError) {
+            // The reveal-once credential still must never be printed. The
+            // bounded credential id below is the manual recovery fallback.
+          }
+        }
         await configStore.save(previous)
         if (browserResult) {
           throw new TeamGridClientError(
             'credential_store_failed',
-            `The browser login succeeded, but the OS credential store rejected the result. ` +
-              `Revoke credential '${browserResult.credentialId}' in the TeamGrid Developer ` +
-              'Center before retrying.',
+            compensated
+              ? 'The OS credential store rejected the browser login result. TeamGrid revoked ' +
+                  'the new credential automatically; fix the credential store and retry.'
+              : `The browser login succeeded, but the OS credential store rejected the result. ` +
+                  `Automatic revocation could not be confirmed. Revoke credential ` +
+                  `'${browserResult.credentialId}' in the TeamGrid Developer Center before retrying.`,
           )
         }
         throw error

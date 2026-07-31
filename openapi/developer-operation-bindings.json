@@ -641,6 +641,29 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.compensateCliAuthorizationStorage",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.cliAuthorization.compensateStorage",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "compensateCliAuthorizationStorage",
+      "method": "POST",
+      "operationId": "compensateCliAuthorizationStorage",
+      "optionalScopes": [],
+      "path": "/auth/cli/storage-compensation",
+      "requiredScopes": []
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.completeProject",
           "kind": "httpLocal",
           "role": "transport"
@@ -5440,7 +5463,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 205,
+    "authenticatedOperations": 206,
     "publicClientOperations": 1,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
@@ -5470,6 +5493,7 @@
       "developerApi.v1.automationRuns.get",
       "developerApi.v1.automationRuns.list",
       "developerApi.v1.availability.list",
+      "developerApi.v1.cliAuthorization.compensateStorage",
       "developerApi.v1.cliAuthorization.exchange",
       "developerApi.v1.comments.archive",
       "developerApi.v1.comments.create",
