@@ -4,6 +4,10 @@ import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { describe, expect, it, vi } from 'vitest'
 import { createReadOnlyHandlers, createTeamGridMcpServer } from './server.js'
 
+const secretCanary =
+  // gitleaks:allow -- synthetic fixed-format test credential
+  `tg_pat_v2_de_de-nbg-001_${'a'.repeat(24)}_${'b'.repeat(64)}`
+
 describe('TeamGrid read-only MCP adapter', () => {
   it('exposes only bounded reads from the shared API client', async () => {
     const list = vi.fn(async (input) => ({ data: [], meta: { input } }))
@@ -210,6 +214,16 @@ describe('TeamGrid read-only MCP adapter', () => {
       })
       expect(JSON.stringify(response)).toContain('team-1')
       expect(response.structuredContent).toMatchObject({ data: { id: 'team-1' } })
+      apiClient.workspace.get.mockRejectedValueOnce(
+        new Error(`upstream rejected Authorization: Bearer ${secretCanary}`),
+      )
+      const failedResponse = await client.callTool({
+        arguments: {},
+        name: 'teamgrid_workspace_get',
+      })
+      expect(failedResponse.isError).toBe(true)
+      expect(JSON.stringify(failedResponse)).not.toContain(secretCanary)
+      expect(JSON.stringify(failedResponse)).toContain('[redacted]')
       const productResponse = await client.callTool({
         arguments: { id: 'product-1' },
         name: 'teamgrid_product_get',

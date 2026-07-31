@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
+import { redactDeveloperSecrets } from '@teamgrid/api-client'
 import { createMcpApiClient, parseMcpArguments } from './config.js'
 import { createTeamGridMcpServer } from './server.js'
 import { parseMcpToolProfile } from './toolProfiles.js'
@@ -37,7 +38,9 @@ try {
   await main()
 } catch (error) {
   process.stderr.write(
-    `teamgrid-mcp: ${error instanceof Error ? error.message : 'Failed to start.'}\n`,
+    `teamgrid-mcp: ${redactDeveloperSecrets(
+      error instanceof Error ? error.message : 'Failed to start.',
+    )}\n`,
   )
   process.exitCode = 1
 }

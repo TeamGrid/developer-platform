@@ -1,4 +1,4 @@
-import { TeamGridApiError, TeamGridClientError } from '@teamgrid/api-client'
+import { redactDeveloperSecrets, TeamGridApiError, TeamGridClientError } from '@teamgrid/api-client'
 import { CommanderError } from 'commander'
 import { sanitizeTerminalText } from './output.js'
 import { createProgram, exitCodeForError, type ProgramDependencies } from './program.js'
@@ -26,9 +26,13 @@ export async function runCli(argv = process.argv, dependencies: ProgramDependenc
           : 'Unexpected TeamGrid CLI error.'
     const requestId =
       error instanceof TeamGridApiError && error.requestId ? ` (request ${error.requestId})` : ''
-    errorOutput.write(`teamgrid: ${sanitizeTerminalText(`${message}${requestId}`)}\n`)
+    errorOutput.write(
+      `teamgrid: ${sanitizeTerminalText(redactDeveloperSecrets(`${message}${requestId}`))}\n`,
+    )
     if (process.env.TEAMGRID_DEBUG === '1' && error instanceof Error) {
-      errorOutput.write(`${sanitizeTerminalText(error.stack || error.message)}\n`)
+      errorOutput.write(
+        `${sanitizeTerminalText(redactDeveloperSecrets(error.stack || error.message))}\n`,
+      )
     }
     if (error instanceof TeamGridClientError || error instanceof TeamGridApiError) {
       return exitCodeForError(error)

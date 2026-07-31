@@ -49,6 +49,32 @@ describe('TeamGrid CLI', () => {
     expect(exitCodeForError(new TeamGridClientError('invalid_api_response', 'invalid'))).toBe(1)
   })
 
+  it('redacts developer credentials from command failures', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-redaction-'))
+    const errorOutput = capture()
+    const code = await runCli(['node', 'teamgrid', 'workspace'], {
+      clientFactory: () =>
+        ({
+          workspace: {
+            get: async () => {
+              throw new TeamGridClientError(
+                'network_error',
+                `upstream rejected Authorization: Bearer ${token}`,
+              )
+            },
+          },
+        }) as never,
+      configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+      environment: { TEAMGRID_API_TOKEN: token },
+      errorOutput: errorOutput.stream,
+      output: capture().stream,
+    })
+
+    expect(code).toBe(1)
+    expect(errorOutput.value()).not.toContain(token)
+    expect(errorOutput.value()).toContain('[redacted]')
+  })
+
   it('stores only non-secret profile metadata in a mode-0600 config', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
     const path = join(directory, 'config.json')
