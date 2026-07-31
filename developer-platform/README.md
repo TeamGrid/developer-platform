@@ -16,17 +16,16 @@ none imports Meteor runtime code.
 
 All three packages support Node.js 22.14 through Node.js 24 on Linux, macOS,
 and Windows. CI qualifies both Node boundaries on all three operating systems.
-Persistent CLI profiles use macOS Keychain or Linux Secret Service. On Windows,
-use the process-scoped `TEAMGRID_API_TOKEN`; Stable 1.0 does not persist secrets
-through an unqualified third-party credential helper.
+Persistent CLI profiles use macOS Keychain, Linux Secret Service, or the native
+Windows Credential Manager.
 
-The stable 1.0 release is available from npm through the default `latest`
+The stable 1.0.2 release is prepared for npm through the default `latest`
 channel:
 
 ```sh
-npm install @teamgrid/api-client@1.0.0
-npm install --global @teamgrid/cli@1.0.0
-npm install --global @teamgrid/mcp-server@1.0.0
+npm install @teamgrid/api-client@1.0.2
+npm install --global @teamgrid/cli@1.0.2
+npm install --global @teamgrid/mcp-server@1.0.2
 ```
 
 Use the exact version shown above in reproducible deployments. Unpinned
@@ -35,15 +34,38 @@ on the explicit `next` channel.
 
 ## Credential and routing model
 
-Create a scoped API v1 credential in TeamGrid under Settings → Team →
-Developer. A credential is shown once. The CLI stores it in macOS Keychain or
-Linux Secret Service; the non-secret profile file contains only region, cell,
-credential id, optional base URL, and timestamps.
+`teamgrid auth login` opens TeamGrid in the system browser. After normal
+TeamGrid sign-in, select one workspace, compare the pairing phrase shown in the
+browser and terminal, and approve the requested scopes. The owning regional
+cell issues a scoped personal credential directly to the CLI through an
+Authorization Code + PKCE loopback flow.
 
-On Windows, provide `TEAMGRID_API_TOKEN` to the process instead of running
-`teamgrid auth login`. The token is not written to disk, and routing defaults
-to the credential's signed cell hint. Set `TEAMGRID_API_BASE_URL` only for an
-approved local or staging override.
+The CLI stores the reveal-once credential in macOS Keychain, Linux Secret
+Service, or Windows Credential Manager. Its profile file contains only
+non-secret region, cell, credential ID, origin, scopes, expiry, optional base
+URL, and timestamps. Passwords, browser sessions, authorization codes, and API
+tokens are never written to the profile.
+
+Use `teamgrid auth login --no-browser` when the CLI cannot open the browser
+automatically but the terminal can still receive a loopback callback. The
+printed URL is short lived but contains authentication request material; do
+not share it or place it in logs. `--manual` and `--token-stdin` retain the
+reveal-once token workflow as an explicit compatibility path.
+
+Browser login currently rejects sensitive scopes because the regional approval
+flow does not yet receive a qualified recent-authentication signal. Create a
+narrowly scoped personal credential in Developer settings and use `--manual`
+for those cases. Device authorization is not part of this release.
+
+Existing profiles require explicit `--replace`; this prevents accidental
+orphaning of the previous server credential. Local `auth logout` removes only
+the OS credential-store entry and profile metadata. Server revocation remains
+an explicit action in TeamGrid Developer settings.
+
+For CI/CD, containers, and unattended services, provide a service-account
+credential through `TEAMGRID_API_TOKEN` and a secret manager. The token is not
+written to disk, and routing defaults to the credential's signed cell hint.
+Set `TEAMGRID_API_BASE_URL` only for an approved local or staging override.
 
 Credential creation is available to authorized administrators in entitled,
 unlocked workspaces while cell-local issuance is enabled. A rollout pause
@@ -59,6 +81,8 @@ local/staging tests; plain HTTP is accepted only on loopback.
 
 ```sh
 teamgrid auth login
+teamgrid auth login --preset daily-work
+teamgrid auth login --manual
 teamgrid auth status --check
 teamgrid projects list --all --output json
 teamgrid tasks create \
@@ -190,7 +214,7 @@ npm run conformance:plan
 ```
 
 The plan reads the immutable contract set and produces a deterministic inventory of all 87 V0 and
-206 V1 operations. It joins V1 with every SDK method, CLI command, MCP exposure decision, scope,
+207 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
 execution binding, CAS precondition, and idempotency requirement. V0 compatibility statuses and the
 V0-to-V1 migration map remain explicit, so a documented unavailable route is not confused with an
 unexpected regression. Planning never loads a credential or contacts TeamGrid.
@@ -198,7 +222,7 @@ unexpected regression. Planning never loads a credential or contacts TeamGrid.
 The read-only phase performs only parameter-free GET requests, uses `limit=1` where supported, runs
 sequentially below the shared pre-auth limit, and retries at most two `429` responses. Operations
 that need an id, required filter, body, or mutation are recorded as blocked rather than guessed. A
-V1 run additionally proves all 206 SDK and CLI bindings, the exact 29-tool MCP allowlist, and one
+V1 run additionally proves all 206 SDK methods, all 207 CLI bindings, the exact 29-tool MCP allowlist, and one
 live workspace request through SDK, CLI, and MCP:
 
 ```sh

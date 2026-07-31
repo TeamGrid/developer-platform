@@ -554,20 +554,54 @@ describe('TeamGrid CLI', () => {
     expect(input).toBe(token)
   })
 
-  it('fails closed instead of persisting credentials on unsupported Windows stores', async () => {
-    const run = vi.fn()
+  it('uses Windows Credential Manager without placing credentials in process arguments', async () => {
+    const calls: Array<[string, string[], string?]> = []
+    const run = vi.fn(async (command: string, args: string[], input?: string) => {
+      calls.push([command, args, input])
+      return { stderr: '', stdout: input === undefined ? `${token}\n` : '' }
+    })
     const store = new SystemCredentialStore({ currentPlatform: 'win32', run })
 
-    await expect(store.get('default')).rejects.toThrow(
-      'No supported OS credential store is available.',
-    )
-    await expect(store.set('default', token)).rejects.toThrow(
-      'No supported OS credential store is available.',
-    )
-    await expect(store.delete('default')).rejects.toThrow(
-      'No supported OS credential store is available.',
-    )
-    expect(run).not.toHaveBeenCalled()
+    expect(await store.get('default')).toBe(token)
+    await store.set('default', token)
+    await store.delete('default')
+    expect(run).toHaveBeenCalledTimes(3)
+    for (const [command, args] of calls) {
+      expect(command).toBe('powershell.exe')
+      expect(args.join(' ')).not.toContain(token)
+    }
+    expect(calls[1]?.[2]).toBe(token)
+  })
+
+  it('does not issue a browser credential when the local secret service is unavailable', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-secret-service-'))
+    const helperError = Object.assign(new Error('Credential helper exited with status 1.'), {
+      code: 1,
+      stderr: 'Cannot autolaunch D-Bus without X11 $DISPLAY',
+    })
+    const credentialStore = new SystemCredentialStore({
+      currentPlatform: 'linux',
+      run: vi.fn(async () => {
+        throw helperError
+      }),
+    })
+    const browserLogin = vi.fn()
+    const input = new PassThrough() as PassThrough & { isTTY?: boolean }
+    const output = capture()
+    input.isTTY = true
+    ;(output.stream as PassThrough & { isTTY?: boolean }).isTTY = true
+
+    expect(
+      await runCli(['node', 'teamgrid', 'auth', 'login'], {
+        browserLogin,
+        configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+        credentialStore,
+        errorOutput: capture().stream,
+        input,
+        output: output.stream,
+      }),
+    ).toBe(1)
+    expect(browserLogin).not.toHaveBeenCalled()
   })
 
   it('logs in from stdin and lists resources through the shared client', async () => {
@@ -602,6 +636,171 @@ describe('TeamGrid CLI', () => {
     expect(code).toBe(0)
     expect(list).toHaveBeenCalledOnce()
     expect(JSON.parse(output.value()).data[0].id).toBe('task-1')
+  })
+
+  it('uses browser login by default and stores only non-secret authorization metadata', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-browser-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    const credentialStore = new MemoryCredentialStore()
+    const input = new PassThrough() as PassThrough & { isTTY?: boolean }
+    const output = capture()
+    input.isTTY = true
+    ;(output.stream as PassThrough & { isTTY?: boolean }).isTTY = true
+    const browserLogin = vi.fn(async () => ({
+      accessToken: token,
+      cellId: 'us-mnz-001',
+      credentialId: '0123456789abcdef01234567',
+      expiresAt: '2026-10-29T12:00:00.000Z',
+      grantId: 'authorization_request_1234567890',
+      region: 'us',
+      replayed: false,
+      scopes: ['workspace:read', 'tasks:read'],
+    }))
+
+    expect(
+      await runCli(['node', 'teamgrid', '--output', 'json', 'auth', 'login'], {
+        browserLogin,
+        configStore,
+        credentialStore,
+        errorOutput: capture().stream,
+        input,
+        output: output.stream,
+      }),
+    ).toBe(0)
+    expect(browserLogin).toHaveBeenCalledOnce()
+    expect(credentialStore.values.get('default')).toBe(token)
+    const config = await configStore.load()
+    expect(config.installationId).toMatch(/^[A-Za-z0-9_-]{43}$/)
+    expect(config.profiles.default).toMatchObject({
+      authenticationSource: 'browser',
+      expiresAt: '2026-10-29T12:00:00.000Z',
+      scopes: ['workspace:read', 'tasks:read'],
+    })
+    expect(await readFile(configStore.path, 'utf8')).not.toContain(token)
+  })
+
+  it('does not replace an existing profile without explicit confirmation', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-browser-existing-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    await configStore.save({
+      currentProfile: 'default',
+      profiles: {
+        default: {
+          cellId: 'us-mnz-001',
+          createdAt: '2026-07-16T00:00:00.000Z',
+          credentialId: '0123456789abcdef01234567',
+          region: 'us',
+        },
+      },
+      version: 1,
+    })
+    const browserLogin = vi.fn()
+    const input = new PassThrough() as PassThrough & { isTTY?: boolean }
+    const output = capture()
+    input.isTTY = true
+    ;(output.stream as PassThrough & { isTTY?: boolean }).isTTY = true
+
+    expect(
+      await runCli(['node', 'teamgrid', 'auth', 'login'], {
+        browserLogin,
+        configStore,
+        credentialStore: new MemoryCredentialStore(),
+        errorOutput: capture().stream,
+        input,
+        output: output.stream,
+      }),
+    ).toBe(2)
+    expect(browserLogin).not.toHaveBeenCalled()
+  })
+
+  it('rolls back local metadata and prints a non-secret recovery ID when storage fails', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-browser-store-failure-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    const input = new PassThrough() as PassThrough & { isTTY?: boolean }
+    const output = capture()
+    const errorOutput = capture()
+    input.isTTY = true
+    ;(output.stream as PassThrough & { isTTY?: boolean }).isTTY = true
+    const browserLogin = vi.fn(async () => ({
+      accessToken: token,
+      cellId: 'us-mnz-001',
+      credentialId: '0123456789abcdef01234567',
+      expiresAt: '2026-10-29T12:00:00.000Z',
+      grantId: 'authorization_request_1234567890',
+      region: 'us',
+      replayed: false,
+      scopes: ['workspace:read'],
+    }))
+
+    expect(
+      await runCli(['node', 'teamgrid', 'auth', 'login'], {
+        browserLogin,
+        configStore,
+        credentialStore: {
+          delete: vi.fn(),
+          get: vi.fn(async () => null),
+          set: vi.fn(async () => {
+            throw new Error('keychain denied')
+          }),
+        },
+        errorOutput: errorOutput.stream,
+        input,
+        output: output.stream,
+      }),
+    ).toBe(1)
+    expect(await configStore.load()).toEqual({ profiles: {}, version: 1 })
+    expect(errorOutput.value()).toContain('0123456789abcdef01234567')
+    expect(errorOutput.value()).not.toContain(token)
+    expect(output.value()).toBe('')
+  })
+
+  it('rejects expired profiles and warns before a browser credential expires', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-expiry-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    const credentialStore = new MemoryCredentialStore()
+    await credentialStore.set('default', token)
+    await configStore.save({
+      currentProfile: 'default',
+      profiles: {
+        default: {
+          authenticationSource: 'browser',
+          cellId: 'us-mnz-001',
+          createdAt: '2026-07-16T00:00:00.000Z',
+          credentialId: '0123456789abcdef01234567',
+          expiresAt: '2026-08-10T00:00:00.000Z',
+          region: 'us',
+          scopes: ['workspace:read'],
+        },
+      },
+      version: 1,
+    })
+    const clientFactory = vi.fn(
+      () => ({ workspace: { get: async () => ({ data: { id: 'workspace-1' } }) } }) as never,
+    )
+    const warning = capture()
+    expect(
+      await runCli(['node', 'teamgrid', 'workspace'], {
+        clientFactory,
+        configStore,
+        credentialStore,
+        errorOutput: warning.stream,
+        now: () => new Date('2026-08-01T00:00:00.000Z'),
+        output: capture().stream,
+      }),
+    ).toBe(0)
+    expect(warning.value()).toContain('expires at 2026-08-10T00:00:00.000Z')
+
+    expect(
+      await runCli(['node', 'teamgrid', 'workspace'], {
+        clientFactory,
+        configStore,
+        credentialStore,
+        errorOutput: capture().stream,
+        now: () => new Date('2026-08-11T00:00:00.000Z'),
+        output: capture().stream,
+      }),
+    ).toBe(2)
+    expect(clientFactory).toHaveBeenCalledOnce()
   })
 
   it('streams --all JSONL one page at a time', async () => {

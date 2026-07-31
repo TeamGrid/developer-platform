@@ -9,9 +9,9 @@ describe('Developer Platform conformance inventory', () => {
       contractVersion: '1.0.0',
       schemaVersion: 1,
       summary: {
-        byVersion: { v0: 87, v1: 206 },
-        mcp: { forbidden: 177, read: 29, total: 206 },
-        total: 293,
+        byVersion: { v0: 87, v1: 207 },
+        mcp: { forbidden: 178, read: 29, total: 207 },
+        total: 294,
       },
     })
     expect(inventory.inventoryDigest).toMatch(/^[a-f0-9]{64}$/)
@@ -75,11 +75,24 @@ describe('Developer Platform conformance inventory', () => {
       },
       testability: { automaticReadProbe: true, requiresFixture: false },
     })
+    expect(
+      inventory.operations.find(
+        (operation) => operation.operationId === 'exchangeCliAuthorizationCode',
+      ),
+    ).toMatchObject({
+      authenticated: false,
+      governance: { authMode: 'publicClient' },
+      surfaces: {
+        cli: { command: 'auth login', exposure: 'supported' },
+        mcp: { exposure: 'forbidden' },
+        sdk: { exposure: 'not-applicable' },
+      },
+    })
   })
 
   it('prints a deterministic human-readable planning summary', async () => {
     const summary = formatInventorySummary(await buildConformanceInventory())
-    expect(summary).toContain('293 API operations (87 V0, 206 V1)')
-    expect(summary).toContain('29 MCP reads; 177 operations intentionally forbidden')
+    expect(summary).toContain('294 API operations (87 V0, 207 V1)')
+    expect(summary).toContain('29 MCP reads; 178 operations intentionally forbidden')
   })
 })

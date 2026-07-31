@@ -7,6 +7,7 @@ import {
 import {
   ConfigStore,
   type CredentialStore,
+  cliProfileCredentialValidity,
   normalizeProfileName,
   SystemCredentialStore,
 } from '@teamgrid/cli'
@@ -16,6 +17,7 @@ export type McpRuntimeDependencies = {
   configStore?: ConfigStore
   credentialStore?: CredentialStore
   environment?: NodeJS.ProcessEnv
+  now?: () => Date
 }
 
 export type McpArguments = {
@@ -73,6 +75,16 @@ export async function createMcpApiClient(
     )
   }
   const metadata = config.profiles[profile]
+  if (
+    !environmentToken &&
+    cliProfileCredentialValidity(metadata, dependencies.now?.() || new Date()) === 'expired'
+  ) {
+    throw new TeamGridClientError(
+      'credential_expired',
+      `The credential for profile '${profile}' expired at ${metadata?.expiresAt}. ` +
+        "Run 'teamgrid auth login --replace' before starting MCP.",
+    )
+  }
   const location = parseCredentialLocation(token)
   if (
     !environmentToken &&

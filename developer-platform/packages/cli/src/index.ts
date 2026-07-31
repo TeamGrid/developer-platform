@@ -1,4 +1,22 @@
-export { ConfigStore, defaultConfigPath, normalizeProfileName } from './config.js'
+export {
+  type BrowserLoginOptions,
+  type BrowserLoginResult,
+  createCliInstallationId,
+  defaultCliAuthorizationPageUrl,
+  loginWithSystemBrowser,
+  normalizeBrowserAuthorizationScopes,
+  openSystemBrowser,
+  startCliBrowserCallbackServer,
+} from './browserAuth.js'
+export {
+  type CliCredentialValidity,
+  type CliProfile,
+  ConfigStore,
+  cliProfileCredentialValidity,
+  credentialExpiryWarningWindowMs,
+  defaultConfigPath,
+  normalizeProfileName,
+} from './config.js'
 export {
   type CredentialStore,
   runCredentialCommand,

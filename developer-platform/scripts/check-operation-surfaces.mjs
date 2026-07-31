@@ -316,7 +316,17 @@ if (
 
 const sdk = new TeamGridClient({ fetch: async () => new Response(null, { status: 500 }), token: syntheticToken })
 for (const operation of ledger.operationPolicy) {
-  if (!hasFunction(sdk, operation.sdk)) fail(`${operation.operationId} lacks SDK method ${operation.sdk}`)
+  if (operation.sdk === null) {
+    if (
+      operation.operationId !== 'exchangeCliAuthorizationCode' ||
+      typeof operation.sdkExclusionReason !== 'string' ||
+      operation.sdkExclusionReason.length === 0
+    ) {
+      fail(`${operation.operationId} has an invalid SDK exclusion`)
+    }
+  } else if (!hasFunction(sdk, operation.sdk)) {
+    fail(`${operation.operationId} lacks SDK method ${operation.sdk}`)
+  }
 }
 
 const cliCommands = new Set(commandPaths(createProgram()))

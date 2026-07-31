@@ -9,7 +9,7 @@ function inventory() {
         surfaces: {
           cli: { command: 'workspace' },
           mcp: { exposure: 'read', tool: 'teamgrid_workspace_get' },
-          sdk: { method: 'workspace.get' },
+          sdk: { exposure: 'supported', method: 'workspace.get' },
         },
         parameters: [],
         testability: { automaticReadProbe: true },
@@ -20,7 +20,7 @@ function inventory() {
         surfaces: {
           cli: { command: 'workspace-settings update' },
           mcp: { exposure: 'forbidden' },
-          sdk: { method: 'workspaceSettings.update' },
+          sdk: { exposure: 'supported', method: 'workspaceSettings.update' },
         },
         parameters: [],
         testability: { automaticReadProbe: false },

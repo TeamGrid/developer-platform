@@ -85,7 +85,7 @@
     { "name": "resource-grants:read", "availability": "issuable", "sensitive": true },
     { "name": "resource-grants:write", "availability": "issuable", "sensitive": true },
     { "name": "webhooks:read", "availability": "issuable" },
-    { "name": "webhooks:write", "availability": "issuable" },
+    { "name": "webhooks:write", "availability": "issuable", "sensitive": true },
     { "name": "audit:read", "availability": "issuable", "sensitive": true },
     { "name": "events:read", "availability": "issuable" },
     { "name": "changes:read", "availability": "issuable", "sensitive": true }

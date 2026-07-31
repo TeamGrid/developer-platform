@@ -24,6 +24,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/cli/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Exchange a TeamGrid CLI authorization code
+         * @description Exchanges a short-lived, single-use authorization code for a cell-local TeamGrid CLI personal credential. This is a fixed first-party public-client protocol operation: it requires PKCE S256, the exact IPv4 loopback redirect used during browser approval, and no bearer credential. Send the request only to the regional API host returned by the browser callback. The response is reveal-once and must never be logged or cached.
+         */
+        post: operations["exchangeCliAuthorizationCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/workspace": {
         parameters: {
             query?: never;
@@ -7552,6 +7572,97 @@ export interface operations {
                 };
             };
             429: components["responses"]["RateLimited"];
+        };
+    };
+    exchangeCliAuthorizationCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description JSON payload used to exchange a TeamGrid CLI authorization code. The server validates this payload before applying any change. */
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "authorizationCode": "example",
+                 *       "clientId": "teamgrid-cli",
+                 *       "codeVerifier": "example",
+                 *       "grantType": "authorization_code",
+                 *       "redirectUri": "example"
+                 *     }
+                 */
+                "application/json": {
+                    authorizationCode: string;
+                    /** @constant */
+                    clientId: "teamgrid-cli";
+                    codeVerifier: string;
+                    /** @constant */
+                    grantType: "authorization_code";
+                    redirectUri: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The code was consumed and the reveal-once CLI credential was issued. */
+            200: {
+                headers: {
+                    /** @description Prevents storage of reveal-once credential material. */
+                    "Cache-Control": "private, no-store, no-transform";
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "accessToken": "example",
+                     *           "cellId": "exampleId",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "grantId": "exampleId",
+                     *           "region": "example",
+                     *           "replayed": false,
+                     *           "scopes": [
+                     *             "example"
+                     *           ],
+                     *           "tokenType": "Bearer"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "cliAuthorization"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: {
+                            attributes: {
+                                /** @description Reveal-once cell-bound personal credential. Store it immediately in the operating-system credential store. */
+                                accessToken: string;
+                                cellId: string;
+                                /** Format: date-time */
+                                expiresAt: string;
+                                grantId: string;
+                                region: string;
+                                replayed: boolean;
+                                scopes: string[];
+                                /** @constant */
+                                tokenType: "Bearer";
+                            };
+                            id: string;
+                            /** @constant */
+                            type: "cliAuthorization";
+                        };
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
         };
     };
     getWorkspace: {

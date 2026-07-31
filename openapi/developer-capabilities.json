@@ -3,6 +3,7 @@
   "apiVersion": "v1",
   "operationPolicy": [
     { "operationId": "getApiVersion", "method": "GET", "path": "/", "scope": null, "sdk": "system.getApiVersion", "cli": "api-version", "mcp": { "exposure": "forbidden", "reason": "Transport metadata is not a user task." } },
+    { "operationId": "exchangeCliAuthorizationCode", "method": "POST", "path": "/auth/cli/token", "scope": null, "sdk": null, "sdkExclusionReason": "Fixed first-party public-client protocol used only by the TeamGrid CLI browser-login implementation.", "cli": "auth login", "mcp": { "exposure": "forbidden", "reason": "Interactive human authorization must never run inside an MCP stdio process." } },
     { "operationId": "getSystemCapabilities", "method": "GET", "path": "/system/capabilities", "scope": "workspace:read", "sdk": "system.getCapabilities", "cli": "system capabilities", "mcp": { "exposure": "forbidden", "reason": "Capability negotiation is transport metadata and does not need a separate MCP tool." } },
     { "operationId": "getWorkspace", "method": "GET", "path": "/workspace", "scope": "workspace:read", "sdk": "workspace.get", "cli": "workspace", "mcp": { "exposure": "read", "tool": "teamgrid_workspace_get" } },
     { "operationId": "getWorkspaceEntitlements", "method": "GET", "path": "/workspace/entitlements", "scope": "workspace:read", "sdk": "workspace.getEntitlements", "cli": "workspace entitlements", "mcp": { "exposure": "forbidden", "reason": "Workspace entitlement metadata is intentionally not exposed to MCP." } },

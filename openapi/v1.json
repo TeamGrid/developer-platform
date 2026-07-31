@@ -12979,6 +12979,215 @@
         "description": "Use this operation to discover API v1. It returns public contract, version, regional endpoint, and capability metadata without requiring a credential."
       }
     },
+    "/auth/cli/token": {
+      "post": {
+        "description": "Exchanges a short-lived, single-use authorization code for a cell-local TeamGrid CLI personal credential. This is a fixed first-party public-client protocol operation: it requires PKCE S256, the exact IPv4 loopback redirect used during browser approval, and no bearer credential. Send the request only to the regional API host returned by the browser callback. The response is reveal-once and must never be logged or cached.",
+        "operationId": "exchangeCliAuthorizationCode",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "authorizationCode": {
+                    "maxLength": 172,
+                    "minLength": 43,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "type": "string"
+                  },
+                  "clientId": {
+                    "const": "teamgrid-cli",
+                    "type": "string"
+                  },
+                  "codeVerifier": {
+                    "maxLength": 128,
+                    "minLength": 43,
+                    "pattern": "^[A-Za-z0-9._~-]+$",
+                    "type": "string"
+                  },
+                  "grantType": {
+                    "const": "authorization_code",
+                    "type": "string"
+                  },
+                  "redirectUri": {
+                    "maxLength": 256,
+                    "pattern": "^http://127\\.0\\.0\\.1:[0-9]{4,5}/teamgrid/callback/[A-Za-z0-9_-]{22,86}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "authorizationCode",
+                  "clientId",
+                  "codeVerifier",
+                  "grantType",
+                  "redirectUri"
+                ],
+                "type": "object"
+              },
+              "example": {
+                "authorizationCode": "example",
+                "clientId": "teamgrid-cli",
+                "codeVerifier": "example",
+                "grantType": "authorization_code",
+                "redirectUri": "example"
+              }
+            }
+          },
+          "required": true,
+          "description": "JSON payload used to exchange a TeamGrid CLI authorization code. The server validates this payload before applying any change."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "attributes": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "accessToken": {
+                              "description": "Reveal-once cell-bound personal credential. Store it immediately in the operating-system credential store.",
+                              "minLength": 1,
+                              "type": "string",
+                              "x-teamgrid-reveal-once": true
+                            },
+                            "cellId": {
+                              "maxLength": 128,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "expiresAt": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "grantId": {
+                              "maxLength": 172,
+                              "minLength": 22,
+                              "type": "string"
+                            },
+                            "region": {
+                              "maxLength": 128,
+                              "minLength": 1,
+                              "type": "string"
+                            },
+                            "replayed": {
+                              "type": "boolean"
+                            },
+                            "scopes": {
+                              "items": {
+                                "maxLength": 128,
+                                "minLength": 1,
+                                "type": "string"
+                              },
+                              "maxItems": 100,
+                              "minItems": 1,
+                              "type": "array",
+                              "uniqueItems": true
+                            },
+                            "tokenType": {
+                              "const": "Bearer",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "accessToken",
+                            "cellId",
+                            "expiresAt",
+                            "grantId",
+                            "region",
+                            "replayed",
+                            "scopes",
+                            "tokenType"
+                          ],
+                          "type": "object"
+                        },
+                        "id": {
+                          "pattern": "^[a-f0-9]{24}$",
+                          "type": "string"
+                        },
+                        "type": {
+                          "const": "cliAuthorization",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "attributes",
+                        "id",
+                        "type"
+                      ],
+                      "type": "object"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                },
+                "example": {
+                  "data": {
+                    "attributes": {
+                      "accessToken": "example",
+                      "cellId": "exampleId",
+                      "expiresAt": "2026-07-29T10:00:00Z",
+                      "grantId": "exampleId",
+                      "region": "example",
+                      "replayed": false,
+                      "scopes": [
+                        "example"
+                      ],
+                      "tokenType": "Bearer"
+                    },
+                    "id": "exampleId",
+                    "type": "cliAuthorization"
+                  },
+                  "meta": {
+                    "requestId": "exampleId"
+                  }
+                }
+              }
+            },
+            "description": "The code was consumed and the reveal-once CLI credential was issued.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Prevents storage of reveal-once credential material.",
+                "required": true,
+                "schema": {
+                  "const": "private, no-store, no-transform",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [],
+        "summary": "Exchange a TeamGrid CLI authorization code",
+        "tags": [
+          "Authentication"
+        ],
+        "x-teamgrid-client": "teamgrid-cli",
+        "x-teamgrid-protocol": "authorization-code-pkce-s256"
+      }
+    },
     "/workspace": {
       "get": {
         "operationId": "getWorkspace",
@@ -37478,6 +37687,10 @@
     {
       "name": "Audit",
       "description": "Inspect immutable, privacy-reduced events for security investigations, governance, and operational traceability."
+    },
+    {
+      "name": "Authentication",
+      "description": "Complete fixed first-party public-client authorization without sending a TeamGrid password or browser session to the CLI."
     },
     {
       "description": "Secret-free automation catalogs, definitions, immutable versions, and bounded run controls. Internal execution documents remain private.",

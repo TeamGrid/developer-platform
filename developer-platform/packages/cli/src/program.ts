@@ -22,7 +22,18 @@ import {
   type WorkspaceSettingsUpdate,
 } from '@teamgrid/api-client'
 import { Command, Option } from 'commander'
-import { type CliConfig, ConfigStore, normalizeProfileName } from './config.js'
+import {
+  type BrowserLoginOptions,
+  type BrowserLoginResult,
+  createCliInstallationId,
+  loginWithSystemBrowser,
+} from './browserAuth.js'
+import {
+  type CliConfig,
+  ConfigStore,
+  cliProfileCredentialValidity,
+  normalizeProfileName,
+} from './config.js'
 import { revealCredentialSecret } from './credentialSecretOutput.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
 import {
@@ -58,7 +69,9 @@ type CliClient = TeamGridClient
 
 const localUsageErrorCodes = new Set([
   'authentication_required',
+  'browser_sensitive_scopes_unavailable',
   'confirmation_required',
+  'credential_expired',
   'input_too_large',
   'insecure_base_url',
   'invalid_api_domain',
@@ -74,16 +87,19 @@ const localUsageErrorCodes = new Set([
   'invalid_profile_name',
   'invalid_region',
   'profile_credential_mismatch',
+  'profile_exists',
   'unsafe_config_path',
 ])
 
 export type ProgramDependencies = {
+  browserLogin?: (options: BrowserLoginOptions) => Promise<BrowserLoginResult>
   clientFactory?: (options: TeamGridClientOptions) => CliClient
   configStore?: ConfigStore
   credentialStore?: CredentialStore
   environment?: NodeJS.ProcessEnv
   errorOutput?: Writable
   input?: Readable & { isTTY?: boolean }
+  now?: () => Date
   output?: Writable & { isTTY?: boolean }
   promptConfirm?: typeof confirm
   promptPassword?: typeof password
@@ -547,6 +563,8 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   const clientFactory = dependencies.clientFactory || ((options) => new TeamGridClient(options))
   const askPassword = dependencies.promptPassword || password
   const askConfirm = dependencies.promptConfirm || confirm
+  const browserLogin = dependencies.browserLogin || loginWithSystemBrowser
+  const now = dependencies.now || (() => new Date())
   const program = new Command()
   const packageVersion = (createRequire(import.meta.url)('../package.json') as { version: string })
     .version
@@ -583,12 +601,27 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const config = await configStore.load()
     const name = profileName(command, config)
     const profile = config.profiles[name]
-    const token =
-      String(environment.TEAMGRID_API_TOKEN || '').trim() || (await credentialStore.get(name))
+    const environmentToken = String(environment.TEAMGRID_API_TOKEN || '').trim()
+    const token = environmentToken || (await credentialStore.get(name))
     if (!token) {
       throw new TeamGridClientError(
         'authentication_required',
         `No credential found for profile '${name}'. Run 'teamgrid auth login' or set TEAMGRID_API_TOKEN.`,
+      )
+    }
+    const validity = cliProfileCredentialValidity(profile, now())
+    if (!environmentToken && validity === 'expired') {
+      throw new TeamGridClientError(
+        'credential_expired',
+        `The credential for profile '${name}' expired at ${profile?.expiresAt}. ` +
+          "Run 'teamgrid auth login --replace'.",
+      )
+    }
+    if (!environmentToken && validity === 'expiring-soon') {
+      errorOutput.write(
+        `Credential for profile '${sanitizeTerminalText(name)}' expires at ` +
+          `${sanitizeTerminalText(profile?.expiresAt || '')}. ` +
+          "Renew it with 'teamgrid auth login --replace'.\n",
       )
     }
     const location = parseCredentialLocation(token)
@@ -765,28 +798,126 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
   const auth = program.command('auth').description('manage local credential profiles')
   auth
     .command('login')
-    .description('store a reveal-once API v1 credential in the OS keychain')
+    .description('sign in with your browser and store the credential in the OS keychain')
+    .option('--manual', 'paste a reveal-once API v1 credential')
+    .option('--no-browser', 'print the authorization URL instead of opening a browser')
+    .option('--replace', 'replace an existing local profile without revoking its prior credential')
+    .addOption(
+      new Option('--preset <preset>', 'browser-login permission preset')
+        .choices(['read-only', 'daily-work'])
+        .default('read-only'),
+    )
+    .option(
+      '--scope <scope>',
+      'request an exact scope; repeat or comma-separate',
+      commaSeparatedValues(100, 'Scope'),
+      [],
+    )
     .option('--token-stdin', 'read the credential from standard input')
-    .action(async function action(options: { tokenStdin?: boolean }, command: Command) {
+    .action(async function action(
+      options: {
+        browser: boolean
+        manual?: boolean
+        preset: 'daily-work' | 'read-only'
+        replace?: boolean
+        scope: string[]
+        tokenStdin?: boolean
+      },
+      command: Command,
+    ) {
       const config = await configStore.load()
       const name = profileName(command, config)
-      const token = options.tokenStdin
-        ? (await readStdin(input)).trim()
-        : await askPassword({ message: 'TeamGrid API v1 credential:', mask: true })
+      const manual = options.manual || options.tokenStdin
+      if (config.profiles[name] && !options.replace) {
+        throw new TeamGridClientError(
+          'profile_exists',
+          `Profile '${name}' already exists. Use a different --profile or pass --replace. ` +
+            'Replacing a local profile does not revoke its previous credential.',
+        )
+      }
+      if (manual && options.browser === false) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          '--manual and --token-stdin cannot be combined with --no-browser.',
+        )
+      }
+      if (options.manual && options.tokenStdin) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          'Use either --manual or --token-stdin, not both.',
+        )
+      }
+      if (manual && options.scope.length) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          '--scope is available only for browser login.',
+        )
+      }
+      if (!manual && options.browser && (!input.isTTY || !output.isTTY)) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          'Interactive browser login requires a terminal. Use --no-browser, --manual, or --token-stdin.',
+        )
+      }
+      let token: string
+      let browserResult: BrowserLoginResult | undefined
+      let installationId = config.installationId
+      if (manual) {
+        token = options.tokenStdin
+          ? (await readStdin(input)).trim()
+          : await askPassword({ message: 'TeamGrid API v1 credential:', mask: true })
+      } else {
+        // Probe before issuing a remote credential. A missing local item is
+        // fine; an unavailable OS store fails before browser authorization.
+        await credentialStore.get(name)
+        installationId = installationId || createCliInstallationId()
+        const globals = globalOptions(command)
+        browserResult = await browserLogin({
+          ...(globals.baseUrl ? { apiBaseUrl: normalizeApiBaseUrl(globals.baseUrl) } : {}),
+          ...(environment.TEAMGRID_CLI_AUTHORIZATION_URL
+            ? { authorizationPageUrl: environment.TEAMGRID_CLI_AUTHORIZATION_URL }
+            : {}),
+          cliInstallationId: installationId,
+          cliVersion: packageVersion,
+          noBrowser: options.browser === false,
+          preset: options.preset,
+          ...(options.scope.length ? { scopes: options.scope } : {}),
+          writeStatus: (message) => {
+            errorOutput.write(`${sanitizeTerminalText(message, true)}\n`)
+          },
+        })
+        token = browserResult.accessToken
+      }
       const location = parseCredentialLocation(token)
       const globals = globalOptions(command)
       const previous = structuredClone(config)
       config.profiles[name] = {
+        authenticationSource: browserResult ? 'browser' : 'manual',
         ...(globals.baseUrl ? { baseUrl: normalizeApiBaseUrl(globals.baseUrl) } : {}),
         ...location,
-        createdAt: new Date().toISOString(),
+        createdAt: now().toISOString(),
+        ...(browserResult
+          ? {
+              expiresAt: browserResult.expiresAt,
+              scopes: browserResult.scopes,
+            }
+          : {}),
       }
+      if (installationId) config.installationId = installationId
       config.currentProfile = name
       await configStore.save(config)
       try {
         await credentialStore.set(name, token)
       } catch (error) {
         await configStore.save(previous)
+        if (browserResult) {
+          throw new TeamGridClientError(
+            'credential_store_failed',
+            `The browser login succeeded, but the OS credential store rejected the result. ` +
+              `Revoke credential '${browserResult.credentialId}' in the TeamGrid Developer ` +
+              'Center before retrying.',
+          )
+        }
         throw error
       }
       const savedProfile = config.profiles[name]
@@ -840,10 +971,11 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
         )
       }
       if (!options.check) {
+        const validity = cliProfileCredentialValidity(profile, now())
         outputData(
           command,
           profile
-            ? publicProfile(name, profile)
+            ? { ...publicProfile(name, profile), validity }
             : {
                 name,
                 source: 'TEAMGRID_API_TOKEN',
