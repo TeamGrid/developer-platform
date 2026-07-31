@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const evidenceDirectory = path.resolve(root, '../conformance-evidence/browser-auth')
-const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
+const npmCli = process.env.npm_execpath
 const packages = ['@teamgrid/api-client', '@teamgrid/cli', '@teamgrid/mcp-server']
 
 function run(command, args, cwd, capture = false) {
@@ -17,12 +17,23 @@ function run(command, args, cwd, capture = false) {
     stdio: capture ? 'pipe' : 'inherit',
   })
   if (result.status !== 0) {
-    const detail = capture ? String(result.stderr || result.stdout || '').trim() : ''
+    const detail = capture
+      ? String(result.stderr || result.stdout || result.error?.message || '').trim()
+      : String(result.error?.message || '').trim()
     throw new Error(
       `Packed install check failed: ${command} ${args.join(' ')}${detail ? `\n${detail}` : ''}`,
     )
   }
   return String(result.stdout || '')
+}
+
+function runNpm(args, cwd, capture = false) {
+  if (!npmCli) {
+    throw new Error(
+      'Packed install check requires npm_execpath. Run it through npm run pack:install-check.',
+    )
+  }
+  return run(process.execPath, [npmCli, ...args], cwd, capture)
 }
 
 const temporaryRoot = await mkdtemp(path.join(tmpdir(), 'teamgrid-packed-install-'))
@@ -39,8 +50,7 @@ try {
   const artifactIds = []
   const tarballs = packages.map((packageName) => {
     const packed = JSON.parse(
-      run(
-        npmCommand,
+      runNpm(
         ['pack', '--json', '--workspace', packageName, '--pack-destination', tarballDirectory],
         root,
         true,
@@ -58,8 +68,7 @@ try {
     return path.join(tarballDirectory, artifact.filename)
   })
 
-  run(
-    npmCommand,
+  runNpm(
     ['install', '--ignore-scripts', '--no-audit', '--no-fund', ...tarballs],
     installDirectory,
   )
