@@ -123,6 +123,7 @@ export type BrowserLoginOptions = {
   platform?: NodeJS.Platform
   preset?: CliAuthorizationScopePreset
   scopes?: string[]
+  signal?: AbortSignal
   timeoutMs?: number
   writeStatus: (message: string) => void
 }
@@ -626,6 +627,33 @@ const defaultDependencies: BrowserAuthDependencies = {
   startCallbackServer: startCliBrowserCallbackServer,
 }
 
+function waitForBrowserCallback(callback: Promise<BrowserCallback>, signal?: AbortSignal) {
+  if (!signal) return callback
+  if (signal.aborted) {
+    return Promise.reject(
+      new TeamGridClientError(
+        'browser_authorization_interrupted',
+        'Browser authorization was interrupted.',
+      ),
+    )
+  }
+  let onAbort = () => undefined
+  const interrupted = new Promise<never>((_resolve, reject) => {
+    onAbort = () => {
+      reject(
+        new TeamGridClientError(
+          'browser_authorization_interrupted',
+          'Browser authorization was interrupted.',
+        ),
+      )
+    }
+    signal.addEventListener('abort', onAbort, { once: true })
+  })
+  return Promise.race([callback, interrupted]).finally(() => {
+    signal.removeEventListener('abort', onAbort)
+  })
+}
+
 export async function loginWithSystemBrowser(
   options: BrowserLoginOptions,
   dependencies: BrowserAuthDependencies = defaultDependencies,
@@ -674,7 +702,7 @@ export async function loginWithSystemBrowser(
         options.writeStatus(`The browser could not be opened automatically.\n${authorizationUrl}`)
       }
     }
-    const callback = await callbackServer.callback
+    const callback = await waitForBrowserCallback(callbackServer.callback, options.signal)
     return await exchangeAuthorizationCode({
       ...callback,
       apiBaseUrl: options.apiBaseUrl,

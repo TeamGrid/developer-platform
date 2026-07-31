@@ -110,6 +110,7 @@ export type ProgramDependencies = {
   output?: Writable & { isTTY?: boolean }
   promptConfirm?: typeof confirm
   promptPassword?: typeof password
+  signal?: AbortSignal
 }
 
 function positiveInteger(value: string) {
@@ -899,6 +900,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
           cliVersion: packageVersion,
           noBrowser: options.browser === false,
           preset: options.preset,
+          ...(dependencies.signal ? { signal: dependencies.signal } : {}),
           ...(options.scope.length ? { scopes: options.scope } : {}),
           writeStatus: (message) => {
             errorOutput.write(`${sanitizeTerminalText(message, true)}\n`)
@@ -3483,6 +3485,7 @@ export function exitCodeForError(error: unknown) {
     )
   }
   if (error instanceof TeamGridClientError) {
+    if (error.code === 'browser_authorization_interrupted') return 130
     if (error.code === 'cancelled') return 0
     return localUsageErrorCodes.has(error.code) ? 2 : 1
   }

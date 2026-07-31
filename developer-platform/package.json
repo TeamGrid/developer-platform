@@ -23,8 +23,9 @@
     "test": "npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && vitest run",
     "typecheck:staging-e2e": "tsc -p tsconfig.staging-e2e.json",
     "pack:check": "node scripts/check-package-artifacts.mjs",
+    "pack:install-check": "node scripts/verify-packed-install.mjs",
     "audit:production": "node scripts/check-production-audit.mjs",
-    "verify": "npm run audit:production && npm run check && npm test && npm run build && npm run conformance:redaction && npm run pack:check"
+    "verify": "npm run audit:production && npm run check && npm test && npm run build && npm run conformance:redaction && npm run pack:check && npm run pack:install-check"
   },
   "packageManager": "npm@11.18.0",
   "engines": {

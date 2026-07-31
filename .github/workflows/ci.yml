@@ -60,6 +60,14 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Upload packed install evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: developer-platform-packed-install-${{ runner.os }}-node-${{ matrix.node-version }}
+          path: conformance-evidence/browser-auth/packed-install-*.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Audit production dependencies
         if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         run: npm audit --omit=dev --audit-level=high

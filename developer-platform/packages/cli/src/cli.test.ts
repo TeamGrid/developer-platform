@@ -10,7 +10,7 @@ import {
 import { describe, expect, it, vi } from 'vitest'
 import { ConfigStore } from './config.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
-import { exitCodeForError } from './program.js'
+import { createProgram, exitCodeForError } from './program.js'
 import { runCli } from './run.js'
 
 const token = // gitleaks:allow -- synthetic fixed-format test credential
@@ -47,6 +47,9 @@ describe('TeamGrid CLI', () => {
     expect(exitCodeForError(new TeamGridClientError('network_error', 'offline'))).toBe(1)
     expect(exitCodeForError(new TeamGridClientError('request_timeout', 'timeout'))).toBe(1)
     expect(exitCodeForError(new TeamGridClientError('invalid_api_response', 'invalid'))).toBe(1)
+    expect(
+      exitCodeForError(new TeamGridClientError('browser_authorization_interrupted', 'interrupted')),
+    ).toBe(130)
   })
 
   it('redacts developer credentials from command failures', async () => {
@@ -95,6 +98,22 @@ describe('TeamGrid CLI', () => {
     expect(source).not.toContain(token)
     if (process.platform !== 'win32') expect((await stat(path)).mode & 0o777).toBe(0o600)
     expect(await store.load()).toMatchObject({ currentProfile: 'default' })
+  })
+
+  it('keeps device flow and remote self-revocation out of the first browser release', () => {
+    const auth = createProgram().commands.find((command) => command.name() === 'auth')
+    expect(auth).toBeDefined()
+    expect(auth?.commands.map((command) => command.name())).toEqual([
+      'login',
+      'logout',
+      'profiles',
+      'status',
+    ])
+    const login = auth?.commands.find((command) => command.name() === 'login')
+    expect(login?.options.some((option) => option.long === '--device')).toBe(false)
+    expect(auth?.commands.find((command) => command.name() === 'logout')?.description()).toContain(
+      'remove a profile credential from the OS keychain',
+    )
   })
 
   it('does not change permissions on an existing config directory', async () => {
@@ -570,14 +589,40 @@ describe('TeamGrid CLI', () => {
     const calls: Array<[string, string[], string?]> = []
     const run = vi.fn(async (command: string, args: string[], input?: string) => {
       calls.push([command, args, input])
-      return { stderr: '', stdout: '' }
+      return {
+        stderr: '',
+        stdout: args[0] === 'find-generic-password' ? `${token}\n` : '',
+      }
     })
     const store = new SystemCredentialStore({ currentPlatform: 'darwin', run })
+    expect(await store.get('default')).toBe(token)
     await store.set('default', token)
-    expect(run).toHaveBeenCalledOnce()
-    const [, args, input] = calls[0] || ['', []]
-    expect(args).not.toContain(token)
-    expect(input).toBe(token)
+    await store.delete('default')
+    expect(run).toHaveBeenCalledTimes(3)
+    for (const [command, args] of calls) {
+      expect(command).toBe('security')
+      expect(args).not.toContain(token)
+    }
+    expect(calls[1]?.[2]).toBe(token)
+  })
+
+  it('uses Linux Secret Service for complete credential lifecycle operations', async () => {
+    const calls: Array<[string, string[], string?]> = []
+    const run = vi.fn(async (command: string, args: string[], input?: string) => {
+      calls.push([command, args, input])
+      return { stderr: '', stdout: args[0] === 'lookup' ? `${token}\n` : '' }
+    })
+    const store = new SystemCredentialStore({ currentPlatform: 'linux', run })
+
+    expect(await store.get('default')).toBe(token)
+    await store.set('default', token)
+    await store.delete('default')
+    expect(run).toHaveBeenCalledTimes(3)
+    for (const [command, args] of calls) {
+      expect(command).toBe('secret-tool')
+      expect(args).not.toContain(token)
+    }
+    expect(calls[1]?.[2]).toBe(token)
   })
 
   it('uses Windows Credential Manager without placing credentials in process arguments', async () => {
@@ -630,10 +675,72 @@ describe('TeamGrid CLI', () => {
     expect(browserLogin).not.toHaveBeenCalled()
   })
 
+  it('fails closed on unsupported credential stores before browser authorization', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-unsupported-store-'))
+    const browserLogin = vi.fn()
+    const input = new PassThrough() as PassThrough & { isTTY?: boolean }
+    const output = capture()
+    input.isTTY = true
+    ;(output.stream as PassThrough & { isTTY?: boolean }).isTTY = true
+
+    expect(
+      await runCli(['node', 'teamgrid', 'auth', 'login'], {
+        browserLogin,
+        configStore: new ConfigStore({ configPath: join(directory, 'config.json') }),
+        credentialStore: new SystemCredentialStore({ currentPlatform: 'freebsd' }),
+        errorOutput: capture().stream,
+        input,
+        output: output.stream,
+      }),
+    ).toBe(1)
+    expect(browserLogin).not.toHaveBeenCalled()
+  })
+
+  it('requires --no-browser in a non-interactive shell and forwards it explicitly', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-non-interactive-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    const credentialStore = new MemoryCredentialStore()
+    const browserLogin = vi.fn(async () => ({
+      accessToken: token,
+      cellId: 'us-mnz-001',
+      credentialId: '0123456789abcdef01234567',
+      expiresAt: '2026-10-29T12:00:00.000Z',
+      grantId: 'authorization_request_1234567890',
+      region: 'us',
+      replayed: false,
+      scopes: ['workspace:read'],
+    }))
+
+    expect(
+      await runCli(['node', 'teamgrid', 'auth', 'login'], {
+        browserLogin,
+        configStore,
+        credentialStore,
+        errorOutput: capture().stream,
+        input: new PassThrough(),
+        output: capture().stream,
+      }),
+    ).toBe(2)
+    expect(browserLogin).not.toHaveBeenCalled()
+
+    expect(
+      await runCli(['node', 'teamgrid', 'auth', 'login', '--no-browser'], {
+        browserLogin,
+        configStore,
+        credentialStore,
+        errorOutput: capture().stream,
+        input: new PassThrough(),
+        output: capture().stream,
+      }),
+    ).toBe(0)
+    expect(browserLogin).toHaveBeenCalledWith(expect.objectContaining({ noBrowser: true }))
+  })
+
   it('logs in from stdin and lists resources through the shared client', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-'))
     const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
     const credentialStore = new MemoryCredentialStore()
+    const browserLogin = vi.fn()
     const loginInput = new PassThrough()
     loginInput.end(`${token}\n`)
     const loginOutput = capture()
@@ -641,11 +748,13 @@ describe('TeamGrid CLI', () => {
       await runCli(['node', 'teamgrid', '--output', 'json', 'auth', 'login', '--token-stdin'], {
         configStore,
         credentialStore,
+        browserLogin,
         input: loginInput,
         output: loginOutput.stream,
       }),
     ).toBe(0)
     expect(credentialStore.values.get('default')).toBe(token)
+    expect(browserLogin).not.toHaveBeenCalled()
     expect(JSON.parse(loginOutput.value())).toMatchObject({ name: 'default', region: 'us' })
 
     const output = capture()
@@ -662,6 +771,71 @@ describe('TeamGrid CLI', () => {
     expect(code).toBe(0)
     expect(list).toHaveBeenCalledOnce()
     expect(JSON.parse(output.value()).data[0].id).toBe('task-1')
+  })
+
+  it('keeps logout local and removes both profile metadata and the keychain item', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-logout-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    const credentialStore = new MemoryCredentialStore()
+    await credentialStore.set('default', token)
+    await configStore.save({
+      currentProfile: 'default',
+      profiles: {
+        default: {
+          cellId: 'us-mnz-001',
+          createdAt: '2026-07-31T00:00:00.000Z',
+          credentialId: '0123456789abcdef01234567',
+          region: 'us',
+        },
+      },
+      version: 1,
+    })
+    const clientFactory = vi.fn()
+    const output = capture()
+
+    expect(
+      await runCli(['node', 'teamgrid', '--output', 'json', 'auth', 'logout'], {
+        clientFactory,
+        configStore,
+        credentialStore,
+        output: output.stream,
+      }),
+    ).toBe(0)
+    expect(clientFactory).not.toHaveBeenCalled()
+    expect(await credentialStore.get('default')).toBeNull()
+    expect(await configStore.load()).toEqual({ profiles: {}, version: 1 })
+    expect(JSON.parse(output.value())).toEqual({ loggedOut: true, profile: 'default' })
+  })
+
+  it('rejects a profile whose stored credential belongs to another cell', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-profile-location-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    const credentialStore = new MemoryCredentialStore()
+    await credentialStore.set('default', token)
+    await configStore.save({
+      currentProfile: 'default',
+      profiles: {
+        default: {
+          cellId: 'de-nbg-001',
+          createdAt: '2026-07-31T00:00:00.000Z',
+          credentialId: '0123456789abcdef01234567',
+          region: 'de',
+        },
+      },
+      version: 1,
+    })
+    const clientFactory = vi.fn()
+
+    expect(
+      await runCli(['node', 'teamgrid', 'workspace'], {
+        clientFactory,
+        configStore,
+        credentialStore,
+        errorOutput: capture().stream,
+        output: capture().stream,
+      }),
+    ).toBe(2)
+    expect(clientFactory).not.toHaveBeenCalled()
   })
 
   it('uses browser login by default and stores only non-secret authorization metadata', async () => {
