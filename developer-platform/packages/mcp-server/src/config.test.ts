@@ -79,4 +79,34 @@ describe('TeamGrid MCP configuration', () => {
       }),
     ).rejects.toMatchObject({ code: 'profile_credential_mismatch' })
   })
+
+  it('rejects an expired browser profile before starting the MCP client', async () => {
+    await expect(
+      createMcpApiClient(['--profile', 'automation'], {
+        configStore: {
+          load: async () => ({
+            profiles: {
+              automation: {
+                authenticationSource: 'browser',
+                cellId: 'us-mnz-001',
+                createdAt: '2026-07-16T00:00:00.000Z',
+                credentialId: '0123456789abcdef01234567',
+                expiresAt: '2026-07-31T00:00:00.000Z',
+                region: 'us',
+                scopes: ['workspace:read'],
+              },
+            },
+            version: 1,
+          }),
+        } as never,
+        credentialStore: {
+          delete: vi.fn(),
+          get: vi.fn(async () => token),
+          set: vi.fn(),
+        },
+        environment: {},
+        now: () => new Date('2026-08-01T00:00:00.000Z'),
+      }),
+    ).rejects.toMatchObject({ code: 'credential_expired' })
+  })
 })

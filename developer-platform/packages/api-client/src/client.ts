@@ -1106,6 +1106,7 @@ function attachTransport<T extends object, TTransport extends Readonly<Transport
 export class TeamGridClient {
   readonly absences
   readonly activity
+  readonly authorization
   readonly appointments
   readonly automationActions
   readonly automationDefinitions
@@ -1194,6 +1195,32 @@ export class TeamGridClient {
           (resource) => resource.id,
           options,
         ),
+    }
+    this.authorization = {
+      compensateCliStorage: async (grantId: string, options: RequestOptions = {}) => {
+        if (!/^[A-Za-z0-9_-]{16,172}$/.test(grantId)) {
+          throw new TeamGridClientError(
+            'invalid_arguments',
+            'The CLI authorization grant id is invalid.',
+          )
+        }
+        const response = await this.#request('/auth/cli/storage-compensation', {
+          ...options,
+          body: { grantId },
+          method: 'POST',
+        })
+        if (
+          response.transport.status !== 204 ||
+          response.payload !== undefined ||
+          response.transport.headers['cache-control'] !== strongEtagCacheControl
+        ) {
+          throw new TeamGridClientError(
+            'invalid_api_response',
+            'The TeamGrid API returned an invalid CLI storage-compensation response.',
+          )
+        }
+        return response.transport
+      },
     }
     this.system = {
       getApiVersion: async (options?: RequestOptions) => {

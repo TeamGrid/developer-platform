@@ -15,9 +15,9 @@ describe('conformance plan command', () => {
     expect(plan).toMatchObject({
       contractVersion: '1.0.0',
       mode: 'plan',
-      summary: { total: 293 },
+      summary: { total: 295 },
     })
-    expect(plan.operations).toHaveLength(293)
+    expect(plan.operations).toHaveLength(295)
     expect(rendered).not.toContain('legacy-secret')
     expect(rendered).not.toContain('stable-secret')
   })

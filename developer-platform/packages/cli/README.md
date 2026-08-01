@@ -24,15 +24,38 @@ teamgrid time-entries billing get time-entry-id --output json
 teamgrid time-entries billing update time-entry-id --billed --if-match "$REVISION"
 ```
 
-Credentials are read from `TEAMGRID_API_TOKEN` or stored in macOS Keychain /
-Linux Secret Service; they are never written to the profile JSON or passed to a
-credential helper as a command argument. Use JSON/JSONL for automation and
-`--yes` for destructive non-interactive operations.
+Browser login is the default. The CLI opens the system browser, uses PKCE S256
+with an exact IPv4 loopback callback, asks the user to select one workspace and
+approve the displayed scopes, then stores the resulting credential in the
+operating-system credential store. Use `--preset daily-work` for the bounded
+write preset or repeat `--scope` for an exact custom scope set.
+
+Sensitive scopes are intentionally unavailable through browser login until
+TeamGrid can carry a reviewed recent-authentication signal across regions.
+Create a narrowly scoped personal credential in Developer settings and import
+it with `--manual` when one is required.
+
+`--no-browser` prints the approval URL while still waiting on the local
+callback. Treat that short-lived URL as private and never paste it into logs or
+another person's browser. `--manual` prompts for an existing reveal-once
+credential; `--token-stdin` is the non-echoing compatibility path.
+
+An existing profile is never overwritten implicitly. Select another
+`--profile`, or pass `--replace` after deciding how to revoke the previous
+credential. `teamgrid auth logout` removes only the local profile and keychain
+entry; revoke the credential itself in TeamGrid Developer settings.
+
+Credentials are read from `TEAMGRID_API_TOKEN` or stored in macOS Keychain,
+Linux Secret Service, or Windows Credential Manager. They are never written to
+profile JSON or passed to a credential helper as a command argument. Use
+JSON/JSONL for automation and `--yes` for destructive non-interactive
+operations.
 
 Node.js 22.14 through 24 is supported on Linux, macOS, and Windows. Persistent
-profiles are supported on macOS and Linux. Windows users provide
-`TEAMGRID_API_TOKEN` per process; Stable 1.0 intentionally does not persist
-tokens through an unqualified third-party credential helper.
+profiles use each operating system's native credential store. CI/CD and
+unattended services should continue to use a scoped service-account credential
+from a secret manager through `TEAMGRID_API_TOKEN`; they must not start an
+interactive browser login.
 
 The CLI mirrors every public API operation, including project lifecycle jobs,
 products and product groups, finance-gated project statements, call notes,

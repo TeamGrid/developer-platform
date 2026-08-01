@@ -179,8 +179,16 @@ function bindV1Operations(operations, capabilities, bindings) {
     if (policy.scope !== (operation.requiredScopes[0] || null)) {
       fail(`V1 primary scope differs for ${operation.operationId}`)
     }
-    if (!policy.sdk || !policy.cli || !policy.mcp?.exposure) {
+    const sdkSupported = typeof policy.sdk === 'string' && policy.sdk.length > 0
+    const sdkExcluded =
+      policy.sdk === null &&
+      typeof policy.sdkExclusionReason === 'string' &&
+      policy.sdkExclusionReason.length > 0
+    if ((!sdkSupported && !sdkExcluded) || !policy.cli || !policy.mcp?.exposure) {
       fail(`V1 surface policy is incomplete for ${operation.operationId}`)
+    }
+    if (sdkExcluded && operation.operationId !== 'exchangeCliAuthorizationCode') {
+      fail(`V1 SDK exclusion is not approved for ${operation.operationId}`)
     }
 
     return {
@@ -199,7 +207,9 @@ function bindV1Operations(operations, capabilities, bindings) {
           ...(policy.mcp.tool ? { tool: policy.mcp.tool } : {}),
           ...(policy.mcp.reason ? { reason: policy.mcp.reason } : {}),
         },
-        sdk: { method: policy.sdk, exposure: 'supported' },
+        sdk: sdkSupported
+          ? { method: policy.sdk, exposure: 'supported' }
+          : { exposure: 'not-applicable', reason: policy.sdkExclusionReason },
       },
     }
   })

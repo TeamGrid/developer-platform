@@ -59,7 +59,11 @@ function listArguments(operation, pageLimit) {
 
 export function verifySurfaceBindings({ client, cliCommands, inventory, mcpTools }) {
   const operations = expectedV1Policy(inventory)
+  const sdkOperations = operations.filter(
+    (operation) => operation.surfaces.sdk.exposure === 'supported',
+  )
   const missingSdk = operations
+    .filter((operation) => operation.surfaces.sdk.exposure === 'supported')
     .filter((operation) => !hasFunction(client, operation.surfaces.sdk.method))
     .map((operation) => operation.operationId)
   const commandSet = new Set(cliCommands)
@@ -80,7 +84,7 @@ export function verifySurfaceBindings({ client, cliCommands, inventory, mcpTools
   return {
     cliCommands: operations.length,
     mcpTools: expectedMcp.length,
-    sdkMethods: operations.length,
+    sdkMethods: sdkOperations.length,
   }
 }
 
@@ -217,7 +221,8 @@ export async function executeSurfaceConformance({
       mcpTools: runtime.mcpTools || [],
     })
     const reads = automaticV1Reads(inventory)
-    for (const [index, operation] of reads.entries()) {
+    const sdkReads = reads.filter((operation) => operation.surfaces.sdk.exposure === 'supported')
+    for (const [index, operation] of sdkReads.entries()) {
       if (index > 0) await sleep(config.requestIntervalMs)
       try {
         await runtime.runSdkOperation(operation)

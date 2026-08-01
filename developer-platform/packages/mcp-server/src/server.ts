@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import type { TeamGridClient } from '@teamgrid/api-client'
+import { redactDeveloperSecrets, type TeamGridClient } from '@teamgrid/api-client'
 import { z } from 'zod'
 import { type McpToolProfile, toolsByProfile } from './toolProfiles.js'
 
@@ -67,6 +67,22 @@ function toolResult(value: unknown) {
   return {
     content: [{ text, type: 'text' as const }],
     structuredContent,
+  }
+}
+
+function toolError(error: unknown) {
+  const result = {
+    error: {
+      code: 'teamgrid_request_failed',
+      detail: redactDeveloperSecrets(
+        error instanceof Error ? error.message : 'The TeamGrid request failed.',
+      ),
+    },
+  }
+  return {
+    content: [{ text: JSON.stringify(result), type: 'text' as const }],
+    isError: true,
+    structuredContent: result,
   }
 }
 
@@ -216,7 +232,14 @@ export function createTeamGridMcpServer(
   const handlers = createReadOnlyHandlers(client)
   const enabledTools = new Set(toolsByProfile[toolProfile])
   const registerTool: McpServer['registerTool'] = (name, config, callback) => {
-    const registration = server.registerTool(name, config, callback)
+    const safeCallback = (async (...args: unknown[]) => {
+      try {
+        return await Reflect.apply(callback, undefined, args)
+      } catch (error) {
+        return toolError(error)
+      }
+    }) as typeof callback
+    const registration = server.registerTool(name, config, safeCallback)
     if (!enabledTools.has(name)) registration.disable()
     return registration
   }

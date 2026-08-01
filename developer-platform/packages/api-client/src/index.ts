@@ -1,6 +1,7 @@
 export { TEAMGRID_CHANGE_FEED_RESOURCE_TYPES } from './changeFeedContract.js'
 export { TeamGridClient, type TeamGridClientOptions } from './client.js'
 export { TeamGridApiError, TeamGridClientError } from './errors.js'
+export { redactDeveloperSecrets } from './redaction.js'
 export {
   buildRegionalApiBaseUrl,
   type CredentialLocation,

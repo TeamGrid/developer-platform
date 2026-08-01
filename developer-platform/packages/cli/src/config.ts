@@ -6,18 +6,24 @@ import { basename, dirname, join } from 'node:path'
 import { TeamGridClientError } from '@teamgrid/api-client'
 
 export type CliProfile = {
+  authenticationSource?: 'browser' | 'manual'
   baseUrl?: string
   cellId: string
   createdAt: string
   credentialId: string
+  expiresAt?: string
   region: string
+  scopes?: string[]
 }
 
 export type CliConfig = {
   currentProfile?: string
+  installationId?: string
   profiles: Record<string, CliProfile>
   version: 1
 }
+
+export type CliCredentialValidity = 'active' | 'expired' | 'expiring-soon' | 'unknown'
 
 export type ConfigStoreOptions = {
   configPath?: string
@@ -27,6 +33,19 @@ export type ConfigStoreOptions = {
 }
 
 const profileNamePattern = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/
+const installationIdPattern = /^[A-Za-z0-9_-]{43}$/
+const scopePattern = /^[a-z][a-z0-9-]*(?::[a-z][a-z0-9-]*){1,2}$/
+export const credentialExpiryWarningWindowMs = 14 * 24 * 60 * 60 * 1000
+
+export function cliProfileCredentialValidity(
+  profile: CliProfile | undefined,
+  now = new Date(),
+): CliCredentialValidity {
+  if (!profile?.expiresAt) return 'unknown'
+  const remaining = Date.parse(profile.expiresAt) - now.getTime()
+  if (remaining <= 0) return 'expired'
+  return remaining <= credentialExpiryWarningWindowMs ? 'expiring-soon' : 'active'
+}
 
 export function normalizeProfileName(value: string) {
   const name = String(value || '').trim()
@@ -69,15 +88,29 @@ function parseProfile(value: unknown): CliProfile | null {
     typeof value.createdAt !== 'string' ||
     typeof value.credentialId !== 'string' ||
     typeof value.region !== 'string' ||
-    (value.baseUrl !== undefined && typeof value.baseUrl !== 'string')
+    (value.authenticationSource !== undefined &&
+      !['browser', 'manual'].includes(String(value.authenticationSource))) ||
+    (value.baseUrl !== undefined && typeof value.baseUrl !== 'string') ||
+    (value.expiresAt !== undefined &&
+      (typeof value.expiresAt !== 'string' || !Number.isFinite(Date.parse(value.expiresAt)))) ||
+    (value.scopes !== undefined &&
+      (!Array.isArray(value.scopes) ||
+        value.scopes.length < 1 ||
+        value.scopes.length > 100 ||
+        value.scopes.some((scope) => typeof scope !== 'string' || !scopePattern.test(scope))))
   )
     return null
   return {
+    ...(value.authenticationSource === 'browser' || value.authenticationSource === 'manual'
+      ? { authenticationSource: value.authenticationSource }
+      : {}),
     ...(value.baseUrl ? { baseUrl: value.baseUrl } : {}),
     cellId: value.cellId,
     createdAt: value.createdAt,
     credentialId: value.credentialId,
+    ...(typeof value.expiresAt === 'string' ? { expiresAt: value.expiresAt } : {}),
     region: value.region,
+    ...(Array.isArray(value.scopes) ? { scopes: value.scopes as string[] } : {}),
   }
 }
 
@@ -103,7 +136,19 @@ function parseConfig(value: unknown): CliConfig {
       'The current TeamGrid CLI profile does not exist.',
     )
   }
-  return { ...(currentProfile ? { currentProfile } : {}), profiles, version: 1 }
+  const installationId =
+    typeof value.installationId === 'string' && installationIdPattern.test(value.installationId)
+      ? value.installationId
+      : undefined
+  if (value.installationId !== undefined && !installationId) {
+    throw new TeamGridClientError('invalid_config', 'The TeamGrid CLI configuration is invalid.')
+  }
+  return {
+    ...(currentProfile ? { currentProfile } : {}),
+    ...(installationId ? { installationId } : {}),
+    profiles,
+    version: 1,
+  }
 }
 
 async function assertNotSymlink(path: string) {

@@ -16,8 +16,10 @@ remote session, or write path exists.
 ```
 
 Run `teamgrid auth login` first. The adapter reads the same OS keychain profile
-as the CLI. `TEAMGRID_API_TOKEN` and `TEAMGRID_API_BASE_URL` may be supplied to
-the process for ephemeral CI/local use.
+as the CLI, including profiles stored in Windows Credential Manager. The MCP
+stdio process never opens a browser itself. `TEAMGRID_API_TOKEN` and
+`TEAMGRID_API_BASE_URL` may be supplied to the process for ephemeral CI/local
+use.
 
 The default `core` profile exposes 15 bounded reads for workspace, projects,
 tasks, time entries, lists, tags, products, and product groups. Product purchase
