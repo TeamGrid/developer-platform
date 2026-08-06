@@ -4,6 +4,8 @@
     "includes": [
       "packages/**/*.ts",
       "scripts/conformance/**/*.mjs",
+      "scripts/staging-e2e-cleanup.mjs",
+      "scripts/staging-e2e-cleanup.test.mjs",
       "scripts/staging-load.mjs",
       "scripts/staging-load.test.mjs",
       "scripts/validate-release.mjs",

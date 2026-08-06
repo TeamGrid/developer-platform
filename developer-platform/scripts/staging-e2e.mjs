@@ -15,6 +15,7 @@ import {
   resolveQualificationConfig,
   writeQualificationEvidence,
 } from './staging-e2e-evidence.mjs'
+import { selectUniqueWebhookCleanupCandidateId } from './staging-e2e-cleanup.mjs'
 
 const token = String(process.env.TEAMGRID_API_TOKEN || '').trim()
 const baseUrl = String(process.env.TEAMGRID_API_BASE_URL || '').trim()
@@ -57,6 +58,8 @@ const client = new TeamGridClient({ baseUrl, retries: 2, timeoutMs: 30_000, toke
 let taskId
 let timeEntryId
 let webhookId
+let webhookCreateAttempted = false
+let webhookUrl = configuredWebhookUrl
 let exportId
 let customFieldDefinitionId
 let projectTemplateId
@@ -234,6 +237,17 @@ async function verifyArchived(readResource) {
   return resource.data.attributes.archived === true
 }
 
+async function recoverWebhookIdForCleanup() {
+  const webhooks = []
+  for await (const page of client.webhooks.pages({ limit: 100 }, { maxPages: 10 })) {
+    webhooks.push(...page.data)
+  }
+  return selectUniqueWebhookCleanupCandidateId(webhooks, {
+    actions: ['task_created'],
+    url: webhookUrl,
+  })
+}
+
 async function reconcileResourceCleanup({ cleanup, id, label, verify }, report, failures) {
   if (!id) {
     report[label] = {
@@ -271,7 +285,7 @@ try {
     webhookReceiver = await startSignedWebhookReceiver()
     webhookReceiverWasStarted = true
   }
-  const webhookUrl = webhookReceiver?.url || configuredWebhookUrl
+  webhookUrl = webhookReceiver?.url || configuredWebhookUrl
 
   const workspace = await client.workspace.get()
   observedWorkspace = workspace
@@ -322,6 +336,7 @@ try {
     400,
     'invalid_request',
   )
+  webhookCreateAttempted = true
   const createdWebhook = await client.webhooks.create({
     actions: ['task_created'],
     url: webhookUrl,
@@ -547,6 +562,13 @@ try {
 
 const cleanupFailures = []
 const cleanupResources = {}
+if (!webhookId && webhookCreateAttempted) {
+  try {
+    webhookId = await recoverWebhookIdForCleanup()
+  } catch (error) {
+    cleanupFailures.push(new Error('Webhook cleanup discovery failed.', { cause: error }))
+  }
+}
 await reconcileResourceCleanup({
   cleanup: () => client.webhooks.remove(webhookId),
   id: webhookId,
