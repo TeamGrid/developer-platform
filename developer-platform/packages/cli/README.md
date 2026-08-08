@@ -51,6 +51,10 @@ profile JSON or passed to a credential helper as a command argument. Use
 JSON/JSONL for automation and `--yes` for destructive non-interactive
 operations.
 
+`TEAMGRID_API_TOKEN` completely overrides the selected local profile for that
+process, including its saved region, cell, and base URL. The CLI derives routing
+from the environment credential unless `--base-url` is supplied explicitly.
+
 Node.js 22.14 through 24 is supported on Linux, macOS, and Windows. Persistent
 profiles use each operating system's native credential store. CI/CD and
 unattended services should continue to use a scoped service-account credential

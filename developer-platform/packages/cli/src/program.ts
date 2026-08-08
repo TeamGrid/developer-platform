@@ -645,6 +645,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     }
     const location = parseCredentialLocation(token)
     if (
+      !environmentToken &&
       profile &&
       (profile.credentialId !== location.credentialId ||
         profile.cellId !== location.cellId ||
@@ -657,8 +658,12 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     }
     const options = globalOptions(command)
     return clientFactory({
-      ...(options.baseUrl || profile?.baseUrl
-        ? { baseUrl: normalizeApiBaseUrl(options.baseUrl || profile?.baseUrl || '') }
+      ...(options.baseUrl || (!environmentToken && profile?.baseUrl)
+        ? {
+            baseUrl: normalizeApiBaseUrl(
+              options.baseUrl || (!environmentToken ? profile?.baseUrl : '') || '',
+            ),
+          }
         : {}),
       retries: options.retries,
       timeoutMs: options.timeout,
@@ -1003,24 +1008,30 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       const config = await configStore.load()
       const name = profileName(command, config)
       const profile = config.profiles[name]
-      if (!profile && !environment.TEAMGRID_API_TOKEN) {
+      const environmentToken = String(environment.TEAMGRID_API_TOKEN || '').trim()
+      if (!profile && !environmentToken) {
         throw new TeamGridClientError(
           'authentication_required',
           `Profile '${name}' is not configured.`,
         )
       }
       if (!options.check) {
+        if (environmentToken) {
+          outputData(command, {
+            name,
+            source: 'TEAMGRID_API_TOKEN',
+            ...parseCredentialLocation(environmentToken),
+          })
+          return
+        }
+        if (!profile) {
+          throw new TeamGridClientError(
+            'authentication_required',
+            `Profile '${name}' is not configured.`,
+          )
+        }
         const validity = cliProfileCredentialValidity(profile, now())
-        outputData(
-          command,
-          profile
-            ? { ...publicProfile(name, profile), validity }
-            : {
-                name,
-                source: 'TEAMGRID_API_TOKEN',
-                ...parseCredentialLocation(environment.TEAMGRID_API_TOKEN || ''),
-              },
-        )
+        outputData(command, { ...publicProfile(name, profile), validity })
         return
       }
       const client = await loadClient(command)
