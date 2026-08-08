@@ -146,11 +146,42 @@ function encodePowerShell(script: string) {
   return Buffer.from(script, 'utf16le').toString('base64')
 }
 
-function windowsCredentialScript(operation: 'delete' | 'get' | 'set', profile: string) {
+function validateCredentialProfile(profile: string) {
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(profile)) {
     throw new TeamGridClientError('invalid_profile_name', 'The credential profile name is invalid.')
   }
-  const target = `${serviceName}:${profile}`
+  return profile
+}
+
+function darwinCredentialSetScript(profile: string) {
+  const safeProfile = validateCredentialProfile(profile)
+  return `
+set timeout 15
+log_user 0
+if {[gets stdin secret] < 0 || [string length $secret] == 0} { exit 64 }
+spawn -noecho /usr/bin/env LC_ALL=C /usr/bin/security add-generic-password -U -s ${serviceName} -a ${safeProfile} -w
+expect {
+  -exact "password data for new item:" {}
+  timeout { unset secret; exit 124 }
+  eof { unset secret; exit 1 }
+}
+send -- "$secret\r"
+expect {
+  -exact "retype password for new item:" {}
+  timeout { unset secret; exit 124 }
+  eof { unset secret; exit 1 }
+}
+send -- "$secret\r"
+expect eof
+set result [wait]
+set exitCode [lindex $result 3]
+unset secret
+exit $exitCode
+`
+}
+
+function windowsCredentialScript(operation: 'delete' | 'get' | 'set', profile: string) {
+  const target = `${serviceName}:${validateCredentialProfile(profile)}`
   const operationScript =
     operation === 'get'
       ? `$value = [TeamGridCredentialManager]::Read('${target}')
@@ -293,11 +324,7 @@ export class SystemCredentialStore implements CredentialStore {
   async set(profile: string, token: string) {
     try {
       if (this.#platform === 'darwin') {
-        await this.#run(
-          'security',
-          ['add-generic-password', '-U', '-s', serviceName, '-a', profile, '-w'],
-          token,
-        )
+        await this.#run('/usr/bin/expect', ['-c', darwinCredentialSetScript(profile)], token)
         return
       }
       if (this.#platform === 'linux') {

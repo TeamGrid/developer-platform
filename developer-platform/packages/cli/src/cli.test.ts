@@ -16,6 +16,9 @@ import { runCli } from './run.js'
 const token = // gitleaks:allow -- synthetic fixed-format test credential
   'tg_sk_v1_us_us-mnz-001_0123456789abcdef01234567_' +
   '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+const deToken = // gitleaks:allow -- synthetic fixed-format test credential
+  'tg_sk_v1_de_de-nbg-001_fedcba9876543210fedcba98_' +
+  'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210'
 const resourceRevision = 'a'.repeat(64)
 
 class MemoryCredentialStore implements CredentialStore {
@@ -585,7 +588,7 @@ describe('TeamGrid CLI', () => {
     expect(errorOutput.value()).toContain('Plain HTTP is allowed only for loopback')
   })
 
-  it('passes keychain secrets over stdin and never as command arguments', async () => {
+  it('passes macOS keychain secrets only after hidden prompts and never as arguments', async () => {
     const calls: Array<[string, string[], string?]> = []
     const run = vi.fn(async (command: string, args: string[], input?: string) => {
       calls.push([command, args, input])
@@ -599,11 +602,16 @@ describe('TeamGrid CLI', () => {
     await store.set('default', token)
     await store.delete('default')
     expect(run).toHaveBeenCalledTimes(3)
-    for (const [command, args] of calls) {
-      expect(command).toBe('security')
+    for (const [, args] of calls) {
       expect(args).not.toContain(token)
     }
+    expect(calls[0]?.[0]).toBe('security')
+    expect(calls[1]?.[0]).toBe('/usr/bin/expect')
+    expect(calls[1]?.[1][0]).toBe('-c')
+    expect(calls[1]?.[1][1]).toContain('log_user 0')
+    expect(calls[1]?.[1][1]).toContain('/usr/bin/security add-generic-password')
     expect(calls[1]?.[2]).toBe(token)
+    expect(calls[2]?.[0]).toBe('security')
   })
 
   it('uses Linux Secret Service for complete credential lifecycle operations', async () => {
@@ -836,6 +844,55 @@ describe('TeamGrid CLI', () => {
       }),
     ).toBe(2)
     expect(clientFactory).not.toHaveBeenCalled()
+  })
+
+  it('keeps TEAMGRID_API_TOKEN independent from selected profile metadata', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-environment-token-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    await configStore.save({
+      currentProfile: 'default',
+      profiles: {
+        default: {
+          baseUrl: 'https://api.us.teamgrid.app/v1',
+          cellId: 'us-mnz-001',
+          createdAt: '2026-07-31T00:00:00.000Z',
+          credentialId: '0123456789abcdef01234567',
+          region: 'us',
+        },
+      },
+      version: 1,
+    })
+    const clientFactory = vi.fn(
+      (_options: unknown) =>
+        ({ workspace: { get: async () => ({ data: { id: 'workspace-1' } }) } }) as never,
+    )
+
+    expect(
+      await runCli(['node', 'teamgrid', 'workspace'], {
+        clientFactory,
+        configStore,
+        environment: { TEAMGRID_API_TOKEN: deToken },
+        errorOutput: capture().stream,
+        output: capture().stream,
+      }),
+    ).toBe(0)
+    expect(clientFactory).toHaveBeenCalledWith(expect.objectContaining({ token: deToken }))
+    expect(clientFactory.mock.calls[0]?.[0]).not.toHaveProperty('baseUrl')
+
+    const statusOutput = capture()
+    expect(
+      await runCli(['node', 'teamgrid', '--output', 'json', 'auth', 'status'], {
+        configStore,
+        environment: { TEAMGRID_API_TOKEN: deToken },
+        output: statusOutput.stream,
+      }),
+    ).toBe(0)
+    expect(JSON.parse(statusOutput.value())).toMatchObject({
+      cellId: 'de-nbg-001',
+      credentialId: 'fedcba9876543210fedcba98',
+      region: 'de',
+      source: 'TEAMGRID_API_TOKEN',
+    })
   })
 
   it('uses browser login by default and stores only non-secret authorization metadata', async () => {
