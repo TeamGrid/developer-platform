@@ -38,6 +38,19 @@ await teamgrid.timeEntries.updateBilling(
 
 The update fails with `412` if the billing state changed after the read.
 
+Large CSV exports can be consumed as a bounded Web `ReadableStream` instead of
+being buffered in memory. Always select an application-specific ceiling and
+fully consume or cancel the one-shot stream:
+
+```ts
+const intent = await teamgrid.exports.createDownloadIntent('export-id')
+const download = await teamgrid.exports.downloadStream('export-id', {
+  intentToken: intent.data.attributes.token,
+  maxBytes: 10 * 1024 * 1024,
+})
+await download.data.pipeTo(yourWritableStream)
+```
+
 The stable change feed exposes metadata-only resource changes through `teamgrid.changes`.
 Create a checkpoint immediately before a full snapshot, then consume bounded pages from that
 checkpoint. Cursors are opaque and bound to the credential, workspace, cell, epoch, and exact

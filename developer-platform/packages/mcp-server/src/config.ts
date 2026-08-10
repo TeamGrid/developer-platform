@@ -11,7 +11,12 @@ import {
   normalizeProfileName,
   SystemCredentialStore,
 } from '@teamgrid/cli'
-import { type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
+import {
+  type McpToolName,
+  type McpToolProfile,
+  parseMcpToolFilter,
+  parseMcpToolProfile,
+} from './toolProfiles.js'
 
 export type McpRuntimeDependencies = {
   configStore?: ConfigStore
@@ -21,6 +26,8 @@ export type McpRuntimeDependencies = {
 }
 
 export type McpArguments = {
+  allowTools?: McpToolName[]
+  denyTools?: McpToolName[]
   profile?: string
   toolProfile?: McpToolProfile
 }
@@ -30,16 +37,19 @@ export function parseMcpArguments(argv: string[]): McpArguments {
   for (let index = 0; index < argv.length; index += 2) {
     const name = argv[index]
     const value = argv[index + 1]
-    if (!value || !['--profile', '--tool-profile'].includes(name || '')) {
+    if (
+      !value ||
+      !['--allow-tool', '--deny-tool', '--profile', '--tool-profile'].includes(name || '')
+    ) {
       throw new TeamGridClientError(
         'invalid_arguments',
-        "Expected only '--profile <name>' and '--tool-profile <profile>'.",
+        "Expected only '--profile <name>', '--tool-profile <profile>', '--allow-tool <name>', and '--deny-tool <name>'.",
       )
     }
     if (name === '--profile') {
       if (result.profile) throw new TeamGridClientError('invalid_arguments', 'Duplicate profile.')
       result.profile = normalizeProfileName(value)
-    } else {
+    } else if (name === '--tool-profile') {
       if (result.toolProfile) {
         throw new TeamGridClientError('invalid_arguments', 'Duplicate tool profile.')
       }
@@ -49,6 +59,24 @@ export function parseMcpArguments(argv: string[]): McpArguments {
         throw new TeamGridClientError(
           'invalid_arguments',
           error instanceof Error ? error.message : 'Invalid MCP tool profile.',
+        )
+      }
+    } else {
+      const property = name === '--allow-tool' ? 'allowTools' : 'denyTools'
+      try {
+        result[property] = Array.from(
+          new Set([
+            ...(result[property] || []),
+            ...parseMcpToolFilter(
+              value,
+              name === '--allow-tool' ? 'MCP allow filter' : 'MCP deny filter',
+            ),
+          ]),
+        )
+      } catch (error) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          error instanceof Error ? error.message : 'Invalid MCP tool filter.',
         )
       }
     }

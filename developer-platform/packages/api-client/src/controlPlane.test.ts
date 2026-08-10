@@ -46,6 +46,14 @@ function rotation(replayed: boolean, revision = nextWebhookRevision) {
   } as const
 }
 
+function testDelivery(replayed: boolean) {
+  return {
+    attributes: { replayed, test: true, webhookId: 'webhook-1' },
+    id: 'delivery_test_1',
+    type: 'webhookTestDelivery',
+  } as const
+}
+
 function webhook(includeSecret = false) {
   return {
     attributes: {
@@ -131,6 +139,15 @@ describe('developer control-plane SDK surfaces', () => {
           'idempotency-replayed': 'false',
         })
       }
+      if (url.pathname === '/v1/webhooks/webhook-1/test-delivery') {
+        expect(method).toBe('POST')
+        expect(init?.body).toBeUndefined()
+        expect(headers.get('idempotency-key')).toBe('test-delivery-1')
+        return envelope(testDelivery(false), 201, {
+          'cache-control': 'private, no-store',
+          'idempotency-replayed': 'false',
+        })
+      }
       if (url.pathname === '/v1/webhooks/webhook-1' && method === 'PATCH') {
         expect(headers.get('if-match')).toBe(`"${webhookRevision}"`)
         expect(JSON.parse(String(init?.body))).toEqual({
@@ -169,6 +186,9 @@ describe('developer control-plane SDK surfaces', () => {
       idempotencyKey: 'rotate-1',
       ifMatch: webhookRevision,
     })
+    const tested = await client.webhooks.testDelivery('webhook-1', {
+      idempotencyKey: 'test-delivery-1',
+    })
     const updatedWebhook = await client.webhooks.update(
       'webhook-1',
       { actions: ['task.created', 'task.updated'], disabled: false },
@@ -177,6 +197,7 @@ describe('developer control-plane SDK surfaces', () => {
 
     expect(updated.transport.idempotencyReplayed).toBe(false)
     expect(rotated.data.attributes.signingSecret).toBe(signingSecret)
+    expect(tested.data).toEqual(testDelivery(false))
     expect(updatedWebhook.data.attributes.revision).toBe(nextWebhookRevision)
     expect(calls).toEqual(
       new Set([
@@ -186,6 +207,7 @@ describe('developer control-plane SDK surfaces', () => {
         'PATCH /v1/workspace/settings',
         'GET /v1/events/catalog',
         'POST /v1/webhooks/webhook-1/secret-rotation',
+        'POST /v1/webhooks/webhook-1/test-delivery',
         'PATCH /v1/webhooks/webhook-1',
       ]),
     )

@@ -7,12 +7,28 @@ const token = // gitleaks:allow -- synthetic fixed-format test credential
 
 describe('TeamGrid MCP configuration', () => {
   it('parses authentication and least-privilege tool profiles independently', () => {
-    expect(parseMcpArguments(['--tool-profile', 'governance', '--profile', 'automation'])).toEqual({
+    expect(
+      parseMcpArguments([
+        '--tool-profile',
+        'governance',
+        '--profile',
+        'automation',
+        '--allow-tool',
+        'teamgrid_workspace_get,teamgrid_webhooks_list',
+        '--deny-tool',
+        'teamgrid_services_list',
+      ]),
+    ).toEqual({
+      allowTools: ['teamgrid_workspace_get', 'teamgrid_webhooks_list'],
+      denyTools: ['teamgrid_services_list'],
       profile: 'automation',
       toolProfile: 'governance',
     })
     expect(() => parseMcpArguments(['--tool-profile', 'unknown'])).toThrow(
       "MCP tool profile must be 'core', 'collaboration', 'governance', or 'all'.",
+    )
+    expect(() => parseMcpArguments(['--allow-tool', 'teamgrid_unknown_get'])).toThrow(
+      'only registered TeamGrid MCP tool names',
     )
   })
 

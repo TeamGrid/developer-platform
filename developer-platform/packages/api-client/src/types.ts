@@ -75,12 +75,14 @@ export type WebhookCreate = components['schemas']['WebhookCreate']
 export type WebhookUpdate = components['schemas']['WebhookUpdate']
 export type WebhookDelivery = components['schemas']['WebhookDelivery']
 export type WebhookSecretRotation = components['schemas']['WebhookSecretRotation']
+export type WebhookTestDelivery = components['schemas']['WebhookTestDelivery']
 export type SystemCapability = components['schemas']['SystemCapability']
 export type WorkspaceEntitlement = components['schemas']['WorkspaceEntitlement']
 export type WorkspaceSettings = components['schemas']['WorkspaceSettings']
 export type WorkspaceSettingsUpdate = components['schemas']['WorkspaceSettingsUpdate']
 export type EventDefinition = components['schemas']['EventDefinition']
 export type PersonalAccessToken = components['schemas']['PersonalAccessToken']
+export type CredentialContext = components['schemas']['CredentialContext']
 export type PersonalAccessTokenCreate = components['schemas']['PersonalAccessTokenCreate']
 export type PersonalAccessTokenRotation = components['schemas']['PersonalAccessTokenRotation']
 export type ServiceAccount = components['schemas']['ServiceAccount']
@@ -846,6 +848,18 @@ export type ExportDownloadOptions = RequestOptions & {
 export type ExportDownload = TransportAware & {
   contentType: 'text/csv; charset=utf-8'
   data: Uint8Array
+  fileName: string
+}
+
+export type ExportDownloadStream = TransportAware & {
+  /** The verified response length when the server supplied Content-Length. */
+  contentLength: number | null
+  contentType: 'text/csv; charset=utf-8'
+  /**
+   * A one-shot, byte-bounded stream. The SDK cancels the upstream response if
+   * the caller ceiling is exceeded or the advertised Content-Length drifts.
+   */
+  data: ReadableStream<Uint8Array>
   fileName: string
 }
 

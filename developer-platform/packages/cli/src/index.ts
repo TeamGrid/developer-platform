@@ -22,5 +22,11 @@ export {
   runCredentialCommand,
   SystemCredentialStore,
 } from './credentialStore.js'
+export {
+  type DoctorCheck,
+  type DoctorDependencies,
+  type DoctorReport,
+  runDoctorChecks,
+} from './doctor.js'
 export { createProgram, exitCodeForError, type ProgramDependencies } from './program.js'
 export { runCli } from './run.js'

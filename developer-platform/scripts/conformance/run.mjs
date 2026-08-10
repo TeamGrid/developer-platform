@@ -1,6 +1,11 @@
 import { writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {
+  executePositiveCertification,
+  loadCertificationRecipes,
+  recoverPositiveCertification,
+} from './certification.mjs'
 import { hydrateConformanceCredentials, knownSecrets, resolveConformanceConfig } from './config.mjs'
 import { buildConformanceEvidence, writeConformanceEvidence } from './evidence.mjs'
 import { buildConformanceInventory, formatInventorySummary } from './inventory.mjs'
@@ -10,12 +15,13 @@ import { executeSafeMutationSmokeConformance } from './safe-mutation-smoke.mjs'
 import { executeSurfaceConformance } from './surfaces.mjs'
 
 function parseArguments(arguments_) {
-  const result = { format: 'text', mode: undefined, output: undefined }
+  const result = { format: 'text', mode: undefined, output: undefined, recover: false }
   for (let index = 0; index < arguments_.length; index += 1) {
     const argument = arguments_[index]
     if (argument === '--format') result.format = arguments_[++index]
     else if (argument === '--mode') result.mode = arguments_[++index]
     else if (argument === '--output') result.output = arguments_[++index]
+    else if (argument === '--recover') result.recover = true
     else throw new Error(`Unknown conformance argument: ${argument}`)
   }
   if (!['json', 'text'].includes(result.format)) {
@@ -48,42 +54,62 @@ export async function runConformance({
     now: now(),
   })
 
-  if (config.mode === 'certification') {
-    throw new Error(
-      'Certification is locked until the isolated positive fixture and cleanup runner is available.',
-    )
-  }
-
   const inventory = await buildConformanceInventory()
   if (
+    config.mode === 'certification' ||
     config.mode === 'read-only' ||
     config.mode === 'route-smoke' ||
     config.mode === 'safe-mutation-smoke'
   ) {
     config = await hydrateConformanceCredentials(config)
+    const recipes =
+      config.mode === 'certification'
+        ? await loadCertificationRecipes(config.recipePath, {
+            fixtureNamespace: config.fixtureNamespace,
+            inventory,
+          })
+        : undefined
+    if (arguments_.recover) {
+      if (config.mode !== 'certification') {
+        throw new Error('--recover is supported only in certification mode.')
+      }
+      await recoverPositiveCertification({ config, fetchImpl, inventory, now, recipes })
+      return arguments_.format === 'json'
+        ? `${JSON.stringify({ mode: config.mode, recovered: true }, null, 2)}\n`
+        : 'TeamGrid positive certification cleanup recovered successfully.\n'
+    }
     const startedAt = now().toISOString()
     const results =
-      config.mode === 'safe-mutation-smoke'
-        ? await executeSafeMutationSmokeConformance({
+      config.mode === 'certification'
+        ? await executePositiveCertification({
             config,
             fetchImpl,
             inventory,
             now,
+            recipes,
             ...(sleep ? { sleep } : {}),
           })
-        : config.mode === 'read-only'
-          ? await executeReadOnlyConformance({
+        : config.mode === 'safe-mutation-smoke'
+          ? await executeSafeMutationSmokeConformance({
               config,
               fetchImpl,
               inventory,
+              now,
               ...(sleep ? { sleep } : {}),
             })
-          : await executeRouteSmokeConformance({
-              config,
-              fetchImpl,
-              inventory,
-              ...(sleep ? { sleep } : {}),
-            })
+          : config.mode === 'read-only'
+            ? await executeReadOnlyConformance({
+                config,
+                fetchImpl,
+                inventory,
+                ...(sleep ? { sleep } : {}),
+              })
+            : await executeRouteSmokeConformance({
+                config,
+                fetchImpl,
+                inventory,
+                ...(sleep ? { sleep } : {}),
+              })
     if (config.versions.includes('v1')) {
       results.push(
         ...(await executeSurfaceConformance({
@@ -107,6 +133,8 @@ export async function runConformance({
       ? `${JSON.stringify(evidence, null, 2)}\n`
       : `${formatRunSummary(evidence)}\n`
   }
+
+  if (arguments_.recover) throw new Error('--recover requires certification mode.')
 
   const payload = {
     contractVersion: inventory.contractVersion,

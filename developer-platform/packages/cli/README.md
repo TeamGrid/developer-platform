@@ -5,6 +5,8 @@ Official `teamgrid` command-line client for TeamGrid API v1.
 ```sh
 teamgrid auth login
 teamgrid auth status --check
+teamgrid doctor
+teamgrid --output json doctor
 teamgrid tasks list --all --output json
 teamgrid tasks create --data @task.json --idempotency-key task-1
 teamgrid lists create --data @list.json --idempotency-key list-1
@@ -50,6 +52,19 @@ Linux Secret Service, or Windows Credential Manager. They are never written to
 profile JSON or passed to a credential helper as a command argument. Use
 JSON/JSONL for automation and `--yes` for destructive non-interactive
 operations.
+
+`teamgrid doctor` is a read-only diagnostic. It validates local configuration,
+the selected credential and routing metadata, the resolved API base URL,
+network reachability, CLI/API version compatibility, and authenticated API
+capability discovery. Human output is the default; use `--output json` for a
+stable report in support or automation workflows. Reports contain no credential,
+authorization header, raw API error detail, or credential-store content.
+
+Doctor returns `0` when every required check passes, `2` for invalid local
+configuration or routing, `3` for a missing/invalid/expired credential, `4` for
+an authorization failure, `7` for rate limiting, and `1` for network, server,
+protocol, or compatibility failures. An expiring-soon credential is a warning
+and does not fail an otherwise healthy diagnosis.
 
 `TEAMGRID_API_TOKEN` completely overrides the selected local profile for that
 process, including its saved region, cell, and base URL. The CLI derives routing

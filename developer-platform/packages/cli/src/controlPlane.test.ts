@@ -98,12 +98,37 @@ describe('developer control-plane CLI surfaces', () => {
         'events catalog',
         'system capabilities',
         'webhooks rotate-secret',
+        'webhooks test',
         'webhooks update',
         'workspace entitlements',
         'workspace-settings get',
         'workspace-settings update',
       ]),
     )
+  })
+
+  it('queues a signed webhook test with a stable retry key', async () => {
+    const testDelivery = vi.fn(async () => ({
+      data: {
+        attributes: { replayed: false, test: true, webhookId: 'webhook-1' },
+        id: 'delivery_test_1',
+        type: 'webhookTestDelivery',
+      },
+    }))
+    const result = await execute(
+      ['webhooks', 'test', 'webhook-1', '--idempotency-key', 'test-delivery-1'],
+      { webhooks: { testDelivery } },
+    )
+
+    expect(result.code).toBe(0)
+    expect(testDelivery).toHaveBeenCalledWith('webhook-1', {
+      idempotencyKey: 'test-delivery-1',
+    })
+    expect(JSON.parse(result.output)).toMatchObject({
+      attributes: { test: true, webhookId: 'webhook-1' },
+      id: 'delivery_test_1',
+      type: 'webhookTestDelivery',
+    })
   })
 
   it('routes discovery and settings commands with script-safe structured output', async () => {

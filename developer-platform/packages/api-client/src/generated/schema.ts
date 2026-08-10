@@ -2716,6 +2716,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/webhooks/{id}/test-delivery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a signed test webhook delivery
+         * @description Queues a synthetic webhook.test event through the same cell-local worker, HTTPS, signing, retry, and delivery-history pipeline as a real event. The App re-authenticates the exact credential and verifies current workspace, principal, and credential ownership before the worker sends. Test outcomes never change webhook failCount, lastStatus, or disabled state.
+         */
+        post: operations["testWebhookDelivery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Inspect the current credential
+         * @description Returns only the safe metadata of the credential authenticating this request. This operation deliberately requires no additional scope so even a least-privilege credential can diagnose its own routing and expiry.
+         */
+        get: operations["getCurrentCredentialContext"];
+        put?: never;
+        post?: never;
+        /**
+         * Revoke the current credential
+         * @description Permanently revokes exactly the credential authenticating this request. A retry after a confirmed response is expected to receive 401 because the bearer credential is no longer valid.
+         */
+        delete: operations["revokeCurrentCredential"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me/personal-access-tokens": {
         parameters: {
             query?: never;
@@ -6968,6 +7012,28 @@ export interface components {
              */
             type: "webhookSecretRotation";
         };
+        /** @description Public API representation of webhook test delivery. */
+        WebhookTestDelivery: {
+            /** @description The attributes associated with this webhook test delivery. */
+            attributes: {
+                /** @description Whether replayed applies to this webhook test delivery attributes. */
+                replayed: boolean;
+                /**
+                 * @description Whether test applies to this webhook test delivery attributes.
+                 * @constant
+                 */
+                test: true;
+                /** @description Identifier of the webhook associated with this delivery. */
+                webhookId: string;
+            };
+            /** @description Stable TeamGrid identifier for this resource. */
+            id: string;
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
+            type: "webhookTestDelivery";
+        };
         /** @description Public API representation of workspace entitlement. */
         WorkspaceEntitlement: {
             /** @description The attributes associated with this workspace entitlement. */
@@ -7041,6 +7107,40 @@ export interface components {
             defaultShowInScheduling?: boolean;
             /** @description Human-readable name of the resource. */
             name?: string;
+        };
+        /** @description Public API representation of credential context. */
+        CredentialContext: {
+            /** @description The attributes associated with this credential context. */
+            attributes: {
+                /** @description Identifier of the owning TeamGrid application cell. */
+                cellId: string;
+                /**
+                 * Format: date-time
+                 * @description Timestamp after which this capability or record is no longer valid.
+                 */
+                expiresAt: string;
+                /**
+                 * @description Canonical kind value for this credential context attributes.
+                 * @enum {string}
+                 */
+                kind: "personalAccess" | "serviceAccount";
+                /** @description TeamGrid data region that owns and serves the workspace. */
+                region: string;
+                /** @description The scopes associated with this credential context attributes. */
+                scopes: string[];
+                /**
+                 * @description Canonical status of the resource or operation.
+                 * @enum {string}
+                 */
+                status: "active" | "retiring";
+            };
+            /** @description Stable TeamGrid identifier for this resource. */
+            id: string;
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
+            type: "credentialContext";
         };
         /** @description Public API representation of personal access token. */
         PersonalAccessToken: {
@@ -20339,6 +20439,166 @@ export interface operations {
             409: components["responses"]["Conflict"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    testWebhookDelivery: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description An exact replay of the previously queued test delivery. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "replayed": false,
+                     *           "test": true,
+                     *           "webhookId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "webhookTestDelivery"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["WebhookTestDelivery"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description A newly queued signed test delivery. */
+            201: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    "Idempotency-Replayed"?: "false";
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "replayed": false,
+                     *           "test": true,
+                     *           "webhookId": "exampleId"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "webhookTestDelivery"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["WebhookTestDelivery"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getCurrentCredentialContext: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The current credential context. */
+            200: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "cellId": "exampleId",
+                     *           "expiresAt": "2026-07-29T10:00:00Z",
+                     *           "kind": "personalAccess",
+                     *           "region": "example",
+                     *           "scopes": [],
+                     *           "status": "active"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "credentialContext"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["CredentialContext"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    revokeCurrentCredential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The current credential was permanently revoked. */
+            204: {
+                headers: {
+                    "Cache-Control"?: "private, no-store";
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

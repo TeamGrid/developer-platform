@@ -36,6 +36,7 @@ import {
 } from './config.js'
 import { revealCredentialSecret } from './credentialSecretOutput.js'
 import { type CredentialStore, SystemCredentialStore } from './credentialStore.js'
+import { runDoctorChecks } from './doctor.js'
 import {
   type CliExportDownload,
   maximumCliExportBytes,
@@ -819,6 +820,45 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     if (!accepted) throw new TeamGridClientError('cancelled', `${action} cancelled.`)
   }
 
+  program
+    .command('doctor')
+    .description('run read-only configuration, credential, routing, network, and API checks')
+    .action(async function action(_options: Record<string, never>, command: Command) {
+      const globals = globalOptions(command)
+      const diagnosis = await runDoctorChecks({
+        ...(globals.baseUrl ? { baseUrl: globals.baseUrl } : {}),
+        clientFactory,
+        configStore,
+        credentialStore,
+        environment,
+        now: now(),
+        packageVersion,
+        ...(globals.profile ? { profile: globals.profile } : {}),
+        retries: globals.retries,
+        timeoutMs: globals.timeout,
+      })
+      outputData(
+        command,
+        globals.output === 'table'
+          ? diagnosis.report.checks.map((check) => ({
+              check: check.check,
+              code: check.diagnostics?.code || '',
+              detail: check.detail,
+              requestId: check.diagnostics?.requestId || '',
+              retryAfterMs: check.diagnostics?.retryAfterMs ?? '',
+              status: check.status,
+              statusCode: check.diagnostics?.status ?? '',
+            }))
+          : diagnosis.report,
+      )
+      if (diagnosis.exitCode !== 0) {
+        throw new TeamGridClientError(
+          `doctor_exit_${diagnosis.exitCode}`,
+          `Doctor found one or more failed checks. Review the ${globals.output === 'table' ? 'table' : 'JSON report'} above.`,
+        )
+      }
+    })
+
   const auth = program.command('auth').description('manage local credential profiles')
   auth
     .command('login')
@@ -973,17 +1013,29 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
 
   auth
     .command('logout')
-    .description('remove a profile credential from the OS keychain')
-    .action(async function action(_options: unknown, command: Command) {
+    .description('remove a profile credential locally and optionally revoke it in TeamGrid')
+    .option('--revoke', 'revoke the current credential before removing the local profile')
+    .action(async function action(options: { revoke?: boolean }, command: Command) {
       const config = await configStore.load()
       const name = profileName(command, config)
+      const environmentToken = String(environment.TEAMGRID_API_TOKEN || '').trim()
+      if (options.revoke && environmentToken) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          'Unset TEAMGRID_API_TOKEN before using auth logout --revoke so the selected local profile is unambiguous.',
+        )
+      }
+      if (options.revoke) {
+        const client = await loadClient(command)
+        await client.authorization.revokeCurrentCredential()
+      }
       await credentialStore.delete(name)
       delete config.profiles[name]
       if (config.currentProfile === name) {
         config.currentProfile = Object.keys(config.profiles).sort()[0]
       }
       await configStore.save(config)
-      outputData(command, { loggedOut: true, profile: name })
+      outputData(command, { loggedOut: true, profile: name, revoked: options.revoke === true })
     })
 
   auth
@@ -1002,8 +1054,8 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
 
   auth
     .command('status')
-    .description('show the active credential location and optionally verify it')
-    .option('--check', 'call the workspace endpoint')
+    .description('show the active credential location and optionally verify its server context')
+    .option('--check', 'retrieve the authenticated credential context from TeamGrid')
     .action(async function action(options: { check?: boolean }, command: Command) {
       const config = await configStore.load()
       const name = profileName(command, config)
@@ -1035,8 +1087,8 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
         return
       }
       const client = await loadClient(command)
-      const workspace = await client.workspace.get()
-      outputData(command, { profile: name, workspace: workspace.data })
+      const context = await client.authorization.getContext()
+      outputData(command, { credential: context.data, profile: name })
     })
 
   program
@@ -3479,6 +3531,21 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     })
     if (receipt) outputData(command, receipt)
   })
+  webhooks
+    .command('test <id>')
+    .description('queue a signed synthetic delivery through the real webhook pipeline')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.webhooks.testDelivery(id, {
+            idempotencyKey: options.idempotencyKey,
+          })
+        ).data,
+      )
+    })
 
   // Commander does not propagate exitOverride() from the root to nested commands.
   // Throwing from every command keeps usage failures catchable and gives scripts
@@ -3498,6 +3565,8 @@ export function exitCodeForError(error: unknown) {
   if (error instanceof TeamGridClientError) {
     if (error.code === 'browser_authorization_interrupted') return 130
     if (error.code === 'cancelled') return 0
+    const doctorExit = /^doctor_exit_([1-7])$/.exec(error.code)
+    if (doctorExit) return Number(doctorExit[1])
     return localUsageErrorCodes.has(error.code) ? 2 : 1
   }
   return 1

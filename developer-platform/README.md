@@ -84,6 +84,8 @@ teamgrid auth login
 teamgrid auth login --preset daily-work
 teamgrid auth login --manual
 teamgrid auth status --check
+teamgrid doctor
+teamgrid --output json doctor
 teamgrid projects list --all --output json
 teamgrid tasks create \
   --data '{"name":"Prepare launch","projectId":"project-id"}' \
@@ -121,6 +123,12 @@ process. Secrets are never accepted as command arguments.
 Stable exit codes are: `0` success/cancel, `2` local usage/configuration,
 `3` authentication, `4` authorization/scope, `5` not found, `6` conflict,
 `7` rate limit, and `1` unexpected/server/network failure.
+
+`teamgrid doctor` performs only read operations. It checks local configuration,
+credential metadata, the resolved regional base URL, API reachability, client
+compatibility, and authenticated capability discovery. Its human or JSON report
+never contains the credential or raw authorization data and uses the same stable
+exit-code categories.
 
 ## TypeScript client
 
@@ -283,12 +291,34 @@ This proves routing, authentication, validation, safety, and every SDK/CLI/MCP b
 exercised without a fixture. Blocked operations remain explicit; the result cannot be mistaken for
 positive write certification.
 
-Mutation certification stays locked until every recipe uses resources created under an explicit
-`codex-conformance-*` namespace. Certification additionally requires
-`TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS=true` and a unique
-`TEAMGRID_CONFORMANCE_CLEANUP_JOURNAL_PATH`. Every resource must be added to that mode-`0600`
-journal immediately after creation and reconciled in reverse dependency order. A crash leaves the
-journal recoverable and blocks a new run; incomplete cleanup can never produce passing evidence.
+Positive mutation certification is available only for API v1 and only with a complete external
+recipe manifest bound to the exact inventory digest and an explicit `codex-conformance-*`
+namespace. Preflight rejects partial coverage, undocumented expected statuses, missing write
+preconditions, unknown cleanup operations, or mutations without an explicit cleanup decision
+before the first request is sent. Each idempotent creation whose identifier is returned by the API
+is journaled before transport; an ambiguous response can therefore be replayed safely to discover
+and clean the created resource. Cleanup runs in reverse dependency order and incomplete cleanup
+cannot produce passing evidence.
+
+```sh
+TEAMGRID_CONFORMANCE_ALLOW_PRODUCTION=true \
+TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS=true \
+TEAMGRID_CONFORMANCE_VERSIONS=v1 \
+TEAMGRID_CONFORMANCE_EVIDENCE_PATH=../conformance-evidence/certification.json \
+TEAMGRID_CONFORMANCE_CLEANUP_JOURNAL_PATH=../conformance-evidence/certification-cleanup.json \
+TEAMGRID_CONFORMANCE_RECIPE_PATH=../conformance-recipes/acme-v1.json \
+TEAMGRID_CONFORMANCE_FIXTURE_NAMESPACE=codex-conformance-acme-01 \
+TEAMGRID_CONFORMANCE_REGION=de \
+TEAMGRID_CONFORMANCE_V1_BASE_URL=https://api.de.teamgrid.app/v1 \
+TEAMGRID_CONFORMANCE_V1_PROFILE=default \
+npm run conformance:certification
+```
+
+If a process or machine fails after an intent was journaled, rerun the same environment with
+`npm run conformance:certification:recover`. Recovery refuses a different fixture namespace,
+replays only the recorded idempotent intent, and then reconciles the cleanup journal. Use a new,
+nonexistent evidence and journal path for every normal certification run; never delete an
+unfinished journal to bypass recovery.
 
 Canonical contract updates use `npm run sync:contracts --
 /path/to/teamgrid-api <full-api-commit-sha>`. The command reads every artifact

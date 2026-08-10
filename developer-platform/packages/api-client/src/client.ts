@@ -48,6 +48,7 @@ import {
   systemCapabilityValidator,
   timeEntryBillingValidator,
   webhookSecretRotationValidator,
+  webhookTestDeliveryValidator,
   webhookValidator,
   workspaceEntitlementValidator,
   workspaceSettingsValidator,
@@ -106,6 +107,7 @@ import type {
   ContactGroupUpdate,
   ContactListOptions,
   ContactUpdate,
+  CredentialContext,
   CustomFieldDefinition,
   CustomFieldDefinitionCreate,
   CustomFieldDefinitionListOptions,
@@ -123,6 +125,7 @@ import type {
   ExportCreate,
   ExportDownload,
   ExportDownloadOptions,
+  ExportDownloadStream,
   FileGetOptions,
   FileListOptions,
   FileMutationOptions,
@@ -416,25 +419,7 @@ async function readBoundedResponseText(response: Response, maxResponseBytes: num
 }
 
 async function readBoundedResponseBytes(response: Response, maximumBytes: number) {
-  const rawLength = response.headers.get('content-length')
-  let expectedLength: number | undefined
-  if (rawLength !== null) {
-    if (!/^\d+$/.test(rawLength)) {
-      await response.body?.cancel()
-      throw new TeamGridClientError(
-        'invalid_api_response',
-        'The TeamGrid export download returned an invalid Content-Length.',
-      )
-    }
-    expectedLength = Number(rawLength)
-    if (!Number.isSafeInteger(expectedLength) || expectedLength > maximumBytes) {
-      await response.body?.cancel()
-      throw new TeamGridClientError(
-        'export_download_too_large',
-        `The TeamGrid export download exceeded ${maximumBytes} bytes.`,
-      )
-    }
-  }
+  const expectedLength = exportContentLength(response, maximumBytes)
   if (!response.body) {
     throw new TeamGridClientError(
       'invalid_api_response',
@@ -472,6 +457,90 @@ async function readBoundedResponseBytes(response: Response, maximumBytes: number
   return bytes
 }
 
+function exportContentLength(response: Response, maximumBytes: number) {
+  const rawLength = response.headers.get('content-length')
+  if (rawLength === null) return undefined
+  if (!/^\d+$/.test(rawLength)) {
+    void response.body?.cancel()
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'The TeamGrid export download returned an invalid Content-Length.',
+    )
+  }
+  const expectedLength = Number(rawLength)
+  if (!Number.isSafeInteger(expectedLength) || expectedLength > maximumBytes) {
+    void response.body?.cancel()
+    throw new TeamGridClientError(
+      'export_download_too_large',
+      `The TeamGrid export download exceeded ${maximumBytes} bytes.`,
+    )
+  }
+  return expectedLength
+}
+
+function boundedExportResponseStream(
+  response: Response,
+  maximumBytes: number,
+  cleanup: () => void,
+) {
+  const expectedLength = exportContentLength(response, maximumBytes)
+  if (!response.body) {
+    cleanup()
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'The TeamGrid export download did not include a response body.',
+    )
+  }
+  const reader = response.body.getReader()
+  let received = 0
+  let completed = false
+  const finish = () => {
+    if (completed) return
+    completed = true
+    cleanup()
+  }
+  return {
+    contentLength: expectedLength ?? null,
+    stream: new ReadableStream<Uint8Array>({
+      async cancel(reason) {
+        try {
+          await reader.cancel(reason)
+        } finally {
+          finish()
+        }
+      },
+      async pull(controller) {
+        try {
+          const { done, value } = await reader.read()
+          if (done) {
+            if (expectedLength !== undefined && received !== expectedLength) {
+              throw new TeamGridClientError(
+                'invalid_api_response',
+                'The TeamGrid export download did not match its Content-Length.',
+              )
+            }
+            finish()
+            controller.close()
+            return
+          }
+          received += value.byteLength
+          if (received > maximumBytes) {
+            await reader.cancel()
+            throw new TeamGridClientError(
+              'export_download_too_large',
+              `The TeamGrid export download exceeded ${maximumBytes} bytes.`,
+            )
+          }
+          controller.enqueue(value)
+        } catch (error) {
+          finish()
+          controller.error(error)
+        }
+      },
+    }),
+  }
+}
+
 function exportDownloadFileName(value: string | null) {
   if (!value || !/^attachment\s*;/i.test(value)) return null
   const utf8 = value.match(/(?:^|;)\s*filename\*=UTF-8''([^;]+)(?:;|$)/i)?.[1]
@@ -507,6 +576,28 @@ function hasExactKeys(value: unknown, keys: readonly string[]): value is Record<
   const actual = Object.keys(value).sort()
   const expected = [...keys].sort()
   return actual.length === expected.length && actual.every((key, index) => key === expected[index])
+}
+
+function credentialContextValidator(value: unknown): value is CredentialContext {
+  if (
+    !hasExactKeys(value, ['attributes', 'id', 'type']) ||
+    value.type !== 'credentialContext' ||
+    typeof value.id !== 'string' ||
+    !/^[A-Za-z0-9_.:-]{1,128}$/.test(value.id) ||
+    !hasExactKeys(value.attributes, ['cellId', 'expiresAt', 'kind', 'region', 'scopes', 'status'])
+  )
+    return false
+  const attributes = value.attributes
+  return (
+    typeof attributes.cellId === 'string' &&
+    typeof attributes.region === 'string' &&
+    typeof attributes.expiresAt === 'string' &&
+    !Number.isNaN(Date.parse(attributes.expiresAt)) &&
+    ['personalAccess', 'serviceAccount'].includes(String(attributes.kind)) &&
+    ['active', 'retiring'].includes(String(attributes.status)) &&
+    Array.isArray(attributes.scopes) &&
+    attributes.scopes.every((scope) => typeof scope === 'string')
+  )
 }
 
 const taskBulkStatuses = new Set([
@@ -1220,6 +1311,35 @@ export class TeamGridClient {
           )
         }
         return response.transport
+      },
+      getContext: async (options: RequestOptions = {}) => {
+        const context = await this.#strictResource(
+          '/auth/context',
+          credentialContextValidator,
+          'credential context',
+          options,
+          200,
+        )
+        if (context.transport.headers['cache-control'] !== credentialSecretCacheControl) {
+          throw new TeamGridClientError(
+            'invalid_api_response',
+            'The TeamGrid API did not protect credential context from caching.',
+          )
+        }
+        return context
+      },
+      revokeCurrentCredential: async (options: RequestOptions = {}) => {
+        const transport = await this.#strictNoContent('/auth/context', {
+          ...options,
+          method: 'DELETE',
+        })
+        if (transport.headers['cache-control'] !== credentialSecretCacheControl) {
+          throw new TeamGridClientError(
+            'invalid_api_response',
+            'The TeamGrid API did not protect credential revocation from caching.',
+          )
+        }
+        return transport
       },
     }
     this.system = {
@@ -1996,6 +2116,8 @@ export class TeamGridClient {
           201,
         ),
       download: (id: string, options: ExportDownloadOptions) => this.#downloadExport(id, options),
+      downloadStream: (id: string, options: ExportDownloadOptions) =>
+        this.#downloadExportStream(id, options),
       get: (id: string, options?: RequestOptions) =>
         this.#strictResource(
           `/exports/${encodeURIComponent(id)}`,
@@ -2813,6 +2935,43 @@ export class TeamGridClient {
         this.#archive(`/webhooks/${encodeURIComponent(id)}`, options),
       rotateSecret: (id: string, options: WebhookSecretRotationOptions) =>
         this.#rotateWebhookSecret(id, options),
+      testDelivery: async (id: string, options: MutationOptions = {}) => {
+        if (!isValidWebhookId(id)) {
+          throw new TeamGridClientError('invalid_arguments', 'Webhook id is invalid.')
+        }
+        const { idempotencyKey, ...requestOptions } = options
+        const response = await this.#request(`/webhooks/${encodeURIComponent(id)}/test-delivery`, {
+          ...requestOptions,
+          idempotencyKey: canonicalIdempotencyKey(idempotencyKey),
+          method: 'POST',
+        })
+        const replayed = response.transport.status === 200
+        if (
+          (response.transport.status !== 200 && response.transport.status !== 201) ||
+          response.transport.headers['cache-control'] !== credentialSecretCacheControl ||
+          response.transport.headers['idempotency-replayed'] !== (replayed ? 'true' : 'false')
+        ) {
+          throw new TeamGridClientError(
+            'invalid_api_response',
+            'The TeamGrid API returned unsafe webhook test-delivery metadata.',
+          )
+        }
+        const envelope = assertStrictResource(
+          response.payload,
+          webhookTestDeliveryValidator,
+          'webhook test delivery',
+        )
+        if (
+          envelope.data.attributes.replayed !== replayed ||
+          envelope.data.attributes.webhookId !== id
+        ) {
+          throw new TeamGridClientError(
+            'invalid_api_response',
+            'The TeamGrid API returned an inconsistent webhook test delivery.',
+          )
+        }
+        return attachTransport(envelope, response.transport)
+      },
       update: (id: string, data: WebhookUpdate, options: WebhookUpdateOptions) =>
         this.#updateWebhook(id, data, options),
     }
@@ -3394,6 +3553,141 @@ export class TeamGridClient {
       return attachTransport({ contentType: exportContentType, data, fileName }, transport)
     } finally {
       combined.cleanup()
+    }
+  }
+
+  async #downloadExportStream(
+    id: string,
+    options: ExportDownloadOptions,
+  ): Promise<ExportDownloadStream> {
+    const opened = await this.#openExportDownload(id, options)
+    let streamOwnsCleanup = false
+    try {
+      const bounded = boundedExportResponseStream(opened.response, opened.maxBytes, opened.cleanup)
+      streamOwnsCleanup = true
+      return attachTransport(
+        {
+          contentLength: bounded.contentLength,
+          contentType: exportContentType,
+          data: bounded.stream,
+          fileName: opened.fileName,
+        },
+        opened.transport,
+      )
+    } finally {
+      if (!streamOwnsCleanup) opened.cleanup()
+    }
+  }
+
+  async #openExportDownload(id: string, options: ExportDownloadOptions) {
+    const { intentToken, maxBytes = maximumExportDownloadBytes, requestId, signal } = options
+    if (!isDownloadIntentToken(intentToken)) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'The export download intent token is invalid.',
+      )
+    }
+    if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > maximumExportDownloadBytes) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'Export maxBytes must be an integer between 1 and 52428800.',
+      )
+    }
+    const resolvedRequestId = requestId || newRequestId()
+    const url = new URL(`${this.#baseUrl}/exports/${encodeURIComponent(id)}/download`)
+    const headers = new Headers({
+      accept: 'text/csv',
+      authorization: `Bearer ${this.#token}`,
+      'x-teamgrid-client': '@teamgrid/api-client',
+      'x-teamgrid-client-version': apiClientVersion,
+      'x-teamgrid-export-download-intent': intentToken,
+      'x-request-id': resolvedRequestId,
+    })
+    const combined = buildCombinedSignal(signal, this.#timeoutMs)
+    let response: Response
+    try {
+      response = await this.#fetch(url, {
+        headers,
+        method: 'GET',
+        redirect: 'manual',
+        signal: combined.signal,
+      })
+    } catch (error) {
+      combined.cleanup()
+      if (error instanceof TeamGridClientError) throw error
+      throw new TeamGridClientError(
+        combined.signal.aborted ? 'request_aborted' : 'network_error',
+        combined.signal.aborted
+          ? 'The TeamGrid export download was aborted.'
+          : 'The TeamGrid export download could not reach the service.',
+        { cause: error },
+      )
+    }
+    const retryAfterMs = parseRetryAfter(response.headers.get('retry-after'))
+    const transport = transportMetadata({
+      attempts: 1,
+      fallbackRequestId: response.headers.get('x-request-id') || resolvedRequestId,
+      response,
+      retryAfterMs,
+    })
+    try {
+      if (response.status >= 300 && response.status < 400) {
+        await response.body?.cancel()
+        throw new TeamGridClientError(
+          'unexpected_redirect',
+          'The TeamGrid export download refused an HTTP redirect.',
+        )
+      }
+      if (response.status !== 200) {
+        const text = await readBoundedResponseText(response, this.#maxResponseBytes)
+        let payload: unknown
+        try {
+          payload = text ? (JSON.parse(text) as unknown) : undefined
+        } catch {
+          payload = undefined
+        }
+        const envelope = isObject(payload) ? payload : {}
+        const responseRequestId =
+          isObject(envelope.meta) && typeof envelope.meta.requestId === 'string'
+            ? envelope.meta.requestId
+            : transport.requestId
+        throw new TeamGridApiError({
+          errors: Array.isArray(envelope.errors) ? envelope.errors : undefined,
+          requestId: responseRequestId,
+          retryAfterMs,
+          status: response.status,
+          transport,
+        })
+      }
+      if (
+        response.headers.get('content-type')?.toLowerCase() !== exportContentType ||
+        response.headers.get('cache-control')?.toLowerCase() !== 'private, no-store' ||
+        response.headers.get('x-content-type-options')?.toLowerCase() !== 'nosniff'
+      ) {
+        await response.body?.cancel()
+        throw new TeamGridClientError(
+          'invalid_api_response',
+          'The TeamGrid export download returned unsafe response headers.',
+        )
+      }
+      const fileName = exportDownloadFileName(response.headers.get('content-disposition'))
+      if (!fileName) {
+        await response.body?.cancel()
+        throw new TeamGridClientError(
+          'invalid_api_response',
+          'The TeamGrid export download returned an invalid file name.',
+        )
+      }
+      return {
+        cleanup: combined.cleanup,
+        fileName,
+        maxBytes,
+        response,
+        transport,
+      }
+    } catch (error) {
+      combined.cleanup()
+      throw error
     }
   }
 

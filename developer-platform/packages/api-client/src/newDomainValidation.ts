@@ -33,6 +33,7 @@ import type {
   Webhook,
   WebhookCreate,
   WebhookSecretRotation,
+  WebhookTestDelivery,
   WebhookUpdate,
   WorkspaceEntitlement,
   WorkspaceSettings,
@@ -1457,6 +1458,21 @@ export const webhookSecretRotationValidator: ResourceValidator<WebhookSecretRota
       webhookRevisionPattern.test(attributes.revision) &&
       typeof attributes.signingSecret === 'string' &&
       webhookSigningSecretPattern.test(attributes.signingSecret),
+  )
+
+export const webhookTestDeliveryValidator: ResourceValidator<WebhookTestDelivery> = (
+  value,
+): value is WebhookTestDelivery =>
+  exactResource(
+    value,
+    'webhookTestDelivery',
+    /^[A-Za-z0-9_-]{1,256}$/,
+    (attributes) =>
+      hasExactKeys(attributes, ['replayed', 'test', 'webhookId']) &&
+      typeof attributes.replayed === 'boolean' &&
+      attributes.test === true &&
+      typeof attributes.webhookId === 'string' &&
+      webhookIdPattern.test(attributes.webhookId),
   )
 
 function safeWebhookUrl(value: unknown) {

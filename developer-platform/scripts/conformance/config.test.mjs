@@ -135,6 +135,8 @@ describe('production conformance configuration', () => {
           TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS: 'true',
           TEAMGRID_CONFORMANCE_CLEANUP_JOURNAL_PATH: './evidence/cleanup.json',
           TEAMGRID_CONFORMANCE_FIXTURE_NAMESPACE: 'customer-data',
+          TEAMGRID_CONFORMANCE_RECIPE_PATH: './recipes/certification.json',
+          TEAMGRID_CONFORMANCE_VERSIONS: 'v1',
         }),
         mode: 'certification',
       }),
@@ -145,6 +147,8 @@ describe('production conformance configuration', () => {
         TEAMGRID_CONFORMANCE_ALLOW_MUTATIONS: 'true',
         TEAMGRID_CONFORMANCE_CLEANUP_JOURNAL_PATH: './evidence/cleanup.json',
         TEAMGRID_CONFORMANCE_FIXTURE_NAMESPACE: 'codex-conformance-acme-01',
+        TEAMGRID_CONFORMANCE_RECIPE_PATH: './recipes/certification.json',
+        TEAMGRID_CONFORMANCE_VERSIONS: 'v1',
       }),
       mode: 'certification',
     })
@@ -153,6 +157,7 @@ describe('production conformance configuration', () => {
       mode: 'certification',
     })
     expect(config.cleanupJournalPath.replaceAll('\\', '/')).toContain('evidence/cleanup.json')
+    expect(config.recipePath.replaceAll('\\', '/')).toContain('recipes/certification.json')
   })
 
   it('uses the same deliberate mutation and recovery boundary for safe route smoke', () => {

@@ -8,9 +8,12 @@ import {
   cleanupResourcesInReverseOrder,
   createCleanupJournal,
   finalizeCleanupJournal,
+  pendingMutationIntents,
   readCleanupJournal,
   recordCleanupResult,
   registerCleanupResource,
+  registerMutationIntent,
+  resolveMutationIntent,
   writeCleanupJournal,
 } from './cleanup-journal.mjs'
 
@@ -21,11 +24,13 @@ function journal() {
     runId: 'run-1',
   })
 }
+const taskIdTemplate = `\${taskId}`
 
 describe('crash-safe mutation cleanup journal', () => {
   it('registers every created resource immediately and cleans up in reverse order', () => {
     const withProject = registerCleanupResource(journal(), {
       cleanupOperationId: 'archiveProject',
+      cleanupRequest: { pathParameters: { id: 'project-1' } },
       createdByOperationId: 'createProject',
       registeredAt: '2026-07-30T12:00:01.000Z',
       resourceId: 'project-1',
@@ -33,6 +38,10 @@ describe('crash-safe mutation cleanup journal', () => {
     })
     const withTask = registerCleanupResource(withProject, {
       cleanupOperationId: 'archiveTask',
+      cleanupRequest: {
+        ifMatch: '"tsk1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"',
+        pathParameters: { id: 'task-1' },
+      },
       createdByOperationId: 'createTask',
       registeredAt: '2026-07-30T12:00:02.000Z',
       resourceId: 'task-1',
@@ -45,6 +54,7 @@ describe('crash-safe mutation cleanup journal', () => {
     expect(() =>
       registerCleanupResource(withTask, {
         cleanupOperationId: 'archiveTask',
+        cleanupRequest: { pathParameters: { id: 'task-1' } },
         createdByOperationId: 'createTask',
         resourceId: 'task-1',
         resourceType: 'task',
@@ -55,6 +65,7 @@ describe('crash-safe mutation cleanup journal', () => {
   it('cannot report success until every resource is reconciled', () => {
     const registered = registerCleanupResource(journal(), {
       cleanupOperationId: 'archiveTask',
+      cleanupRequest: { pathParameters: { id: 'task-1' } },
       createdByOperationId: 'createTask',
       resourceId: 'task-1',
       resourceType: 'task',
@@ -79,6 +90,34 @@ describe('crash-safe mutation cleanup journal', () => {
     expect(assertCleanupComplete(recovered)).toBe(true)
   })
 
+  it('persists idempotent mutation intent before creation and requires reconciliation', () => {
+    const pending = registerMutationIntent(journal(), {
+      captures: { taskId: { jsonPointer: '/data/id' } },
+      cleanup: {
+        operationId: 'archiveTask',
+        pathParameters: { id: taskIdTemplate },
+        resourceId: taskIdTemplate,
+        resourceType: 'task',
+      },
+      idempotencyKey: 'fixture-task-1',
+      operationId: 'createTask',
+      request: {
+        body: { name: 'codex-conformance-acme-01' },
+        headers: { 'idempotency-key': 'fixture-task-1' },
+        pathParameters: {},
+      },
+    })
+
+    expect(pendingMutationIntents(pending)).toHaveLength(1)
+    expect(() => finalizeCleanupJournal(pending)).toThrow('unresolved mutation intents')
+    const resolved = resolveMutationIntent(pending, {
+      idempotencyKey: 'fixture-task-1',
+      operationId: 'createTask',
+    })
+    expect(pendingMutationIntents(resolved)).toEqual([])
+    expect(finalizeCleanupJournal(resolved)).toMatchObject({ state: 'complete' })
+  })
+
   it('can finish a run that proved every mutation was rejected before creating a resource', () => {
     const completed = finalizeCleanupJournal(journal(), {
       completedAt: '2026-07-30T12:00:03.000Z',
@@ -95,6 +134,7 @@ describe('crash-safe mutation cleanup journal', () => {
   it('refuses to finish while a registered resource still needs cleanup', () => {
     const pending = registerCleanupResource(journal(), {
       cleanupOperationId: 'archiveTask',
+      cleanupRequest: { pathParameters: { id: 'task-1' } },
       createdByOperationId: 'createTask',
       resourceId: 'task-1',
       resourceType: 'task',
@@ -108,6 +148,7 @@ describe('crash-safe mutation cleanup journal', () => {
     const path = join(directory, 'cleanup.json')
     const registered = registerCleanupResource(journal(), {
       cleanupOperationId: 'archiveTask',
+      cleanupRequest: { pathParameters: { id: 'task-1' } },
       createdByOperationId: 'createTask',
       resourceId: 'task-1',
       resourceType: 'task',
@@ -133,6 +174,7 @@ describe('crash-safe mutation cleanup journal', () => {
     const path = join(directory, 'cleanup.json')
     const pending = registerCleanupResource(journal(), {
       cleanupOperationId: 'archiveTask',
+      cleanupRequest: { pathParameters: { id: 'task-1' } },
       createdByOperationId: 'createTask',
       resourceId: 'task-1',
       resourceType: 'task',

@@ -45,6 +45,44 @@ function credential(type: 'personalAccessToken' | 'serviceAccountCredential') {
 }
 
 describe('native credential SDK surfaces', () => {
+  it('inspects and explicitly revokes the current credential with no-store enforcement', async () => {
+    const requests: Request[] = []
+    const context = {
+      attributes: {
+        cellId: 'de-nbg-001',
+        expiresAt: '2026-10-27T12:00:00.000Z',
+        kind: 'personalAccess',
+        region: 'de',
+        scopes: ['tasks:read'],
+        status: 'active',
+      },
+      id: credentialId,
+      type: 'credentialContext',
+    }
+    const client = new TeamGridClient({
+      fetch: vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const request = new Request(input, init)
+        requests.push(request)
+        return request.method === 'DELETE'
+          ? new Response(null, {
+              headers: { 'cache-control': 'private, no-store' },
+              status: 204,
+            })
+          : envelope(context, 200, { 'cache-control': 'private, no-store' })
+      }),
+      token,
+    })
+
+    await expect(client.authorization.getContext()).resolves.toMatchObject({ data: context })
+    await expect(client.authorization.revokeCurrentCredential()).resolves.toMatchObject({
+      status: 204,
+    })
+    expect(requests.map((request) => [request.method, new URL(request.url).pathname])).toEqual([
+      ['GET', '/v1/auth/context'],
+      ['DELETE', '/v1/auth/context'],
+    ])
+  })
+
   it('preserves no-store reveal semantics for personal and service credentials', async () => {
     const fetch = vi.fn(async (input: RequestInfo | URL) => {
       const url = new URL(String(input))

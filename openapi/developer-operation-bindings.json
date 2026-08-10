@@ -1906,6 +1906,29 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.getCurrentCredentialContext",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.credentials.self.get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getCurrentCredentialContext",
+      "method": "GET",
+      "operationId": "getCurrentCredentialContext",
+      "optionalScopes": [],
+      "path": "/auth/context",
+      "requiredScopes": []
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.getCustomFieldDefinition",
           "kind": "httpLocal",
           "role": "transport"
@@ -4567,6 +4590,29 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.revokeCurrentCredential",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.credentials.self.revoke",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "revokeCurrentCredential",
+      "method": "DELETE",
+      "operationId": "revokeCurrentCredential",
+      "optionalScopes": [],
+      "path": "/auth/context",
+      "requiredScopes": []
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.revokePersonalAccessToken",
           "kind": "httpLocal",
           "role": "transport"
@@ -4830,6 +4876,31 @@
       "requiredScopes": [
         "tasks:write",
         "time-entries:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.testWebhookDelivery",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.webhooks.testDelivery",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "testWebhookDelivery",
+      "method": "POST",
+      "operationId": "testWebhookDelivery",
+      "optionalScopes": [],
+      "path": "/webhooks/{id}/test-delivery",
+      "requiredScopes": [
+        "webhooks:write"
       ]
     },
     {
@@ -5463,7 +5534,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 206,
+    "authenticatedOperations": 209,
     "publicClientOperations": 1,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
@@ -5500,6 +5571,8 @@
       "developerApi.v1.comments.get",
       "developerApi.v1.comments.list",
       "developerApi.v1.comments.restore",
+      "developerApi.v1.credentials.self.get",
+      "developerApi.v1.credentials.self.revoke",
       "developerApi.v1.customFieldValues.clear",
       "developerApi.v1.customFieldValues.get",
       "developerApi.v1.customFieldValues.getMany",
@@ -5581,6 +5654,7 @@
       "developerApi.v1.webhooks.get",
       "developerApi.v1.webhooks.list",
       "developerApi.v1.webhooks.rotateSecret",
+      "developerApi.v1.webhooks.testDelivery",
       "developerApi.v1.webhooks.update",
       "developerApi.v1.workspaceEntitlements.get",
       "developerApi.v1.workspaceSettings.get",

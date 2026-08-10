@@ -11938,6 +11938,57 @@
         "type": "object",
         "description": "Public API representation of webhook secret rotation."
       },
+      "WebhookTestDelivery": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "replayed": {
+                "type": "boolean",
+                "description": "Whether replayed applies to this webhook test delivery attributes."
+              },
+              "test": {
+                "const": true,
+                "type": "boolean",
+                "description": "Whether test applies to this webhook test delivery attributes."
+              },
+              "webhookId": {
+                "maxLength": 128,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_.:-]+$",
+                "type": "string",
+                "description": "Identifier of the webhook associated with this delivery."
+              }
+            },
+            "required": [
+              "replayed",
+              "test",
+              "webhookId"
+            ],
+            "type": "object",
+            "description": "The attributes associated with this webhook test delivery."
+          },
+          "id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string",
+            "description": "Stable TeamGrid identifier for this resource."
+          },
+          "type": {
+            "const": "webhookTestDelivery",
+            "description": "Canonical type discriminator for this resource."
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object",
+        "description": "Public API representation of webhook test delivery."
+      },
       "WorkspaceEntitlement": {
         "additionalProperties": false,
         "properties": {
@@ -12136,6 +12187,87 @@
         },
         "type": "object",
         "description": "Public API representation of workspace settings."
+      },
+      "CredentialContext": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": false,
+            "properties": {
+              "cellId": {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$",
+                "type": "string",
+                "description": "Identifier of the owning TeamGrid application cell."
+              },
+              "expiresAt": {
+                "format": "date-time",
+                "type": "string",
+                "description": "Timestamp after which this capability or record is no longer valid."
+              },
+              "kind": {
+                "enum": [
+                  "personalAccess",
+                  "serviceAccount"
+                ],
+                "type": "string",
+                "description": "Canonical kind value for this credential context attributes."
+              },
+              "region": {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$",
+                "type": "string",
+                "description": "TeamGrid data region that owns and serves the workspace."
+              },
+              "scopes": {
+                "items": {
+                  "pattern": "^[a-z][a-z0-9-]*(?::[a-z][a-z0-9-]*){1,2}$",
+                  "type": "string"
+                },
+                "maxItems": 100,
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true,
+                "description": "The scopes associated with this credential context attributes."
+              },
+              "status": {
+                "enum": [
+                  "active",
+                  "retiring"
+                ],
+                "type": "string",
+                "description": "Canonical status of the resource or operation."
+              }
+            },
+            "required": [
+              "cellId",
+              "expiresAt",
+              "kind",
+              "region",
+              "scopes",
+              "status"
+            ],
+            "type": "object",
+            "description": "The attributes associated with this credential context."
+          },
+          "id": {
+            "type": "string",
+            "description": "Stable TeamGrid identifier for this resource."
+          },
+          "type": {
+            "const": "credentialContext",
+            "description": "Canonical type discriminator for this resource."
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "attributes"
+        ],
+        "type": "object",
+        "description": "Public API representation of credential context."
       },
       "PersonalAccessToken": {
         "additionalProperties": false,
@@ -36033,6 +36165,292 @@
         "x-teamgrid-required-scopes": [
           "webhooks:write"
         ]
+      }
+    },
+    "/webhooks/{id}/test-delivery": {
+      "post": {
+        "description": "Queues a synthetic webhook.test event through the same cell-local worker, HTTPS, signing, retry, and delivery-history pipeline as a real event. The App re-authenticates the exact credential and verifies current workspace, principal, and credential ownership before the worker sends. Test outcomes never change webhook failCount, lastStatus, or disabled state.",
+        "operationId": "testWebhookDelivery",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/WebhookTestDelivery"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                },
+                "example": {
+                  "data": {
+                    "attributes": {
+                      "replayed": false,
+                      "test": true,
+                      "webhookId": "exampleId"
+                    },
+                    "id": "exampleId",
+                    "type": "webhookTestDelivery"
+                  },
+                  "meta": {
+                    "requestId": "exampleId"
+                  }
+                }
+              }
+            },
+            "description": "An exact replay of the previously queued test delivery.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "private, no-store",
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "const": "true",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/WebhookTestDelivery"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                },
+                "example": {
+                  "data": {
+                    "attributes": {
+                      "replayed": false,
+                      "test": true,
+                      "webhookId": "exampleId"
+                    },
+                    "id": "exampleId",
+                    "type": "webhookTestDelivery"
+                  },
+                  "meta": {
+                    "requestId": "exampleId"
+                  }
+                }
+              }
+            },
+            "description": "A newly queued signed test delivery.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "private, no-store",
+                  "type": "string"
+                }
+              },
+              "Idempotency-Replayed": {
+                "schema": {
+                  "const": "false",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Send a signed test webhook delivery",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-teamgrid-required-scopes": [
+          "webhooks:write"
+        ]
+      }
+    },
+    "/auth/context": {
+      "delete": {
+        "description": "Permanently revokes exactly the credential authenticating this request. A retry after a confirmed response is expected to receive 401 because the bearer credential is no longer valid.",
+        "operationId": "revokeCurrentCredential",
+        "responses": {
+          "204": {
+            "description": "The current credential was permanently revoked.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "private, no-store",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke the current credential",
+        "tags": [
+          "Authentication"
+        ],
+        "x-teamgrid-required-scopes": []
+      },
+      "get": {
+        "description": "Returns only the safe metadata of the credential authenticating this request. This operation deliberately requires no additional scope so even a least-privilege credential can diagnose its own routing and expiry.",
+        "operationId": "getCurrentCredentialContext",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CredentialContext"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                },
+                "example": {
+                  "data": {
+                    "attributes": {
+                      "cellId": "exampleId",
+                      "expiresAt": "2026-07-29T10:00:00Z",
+                      "kind": "personalAccess",
+                      "region": "example",
+                      "scopes": [],
+                      "status": "active"
+                    },
+                    "id": "exampleId",
+                    "type": "credentialContext"
+                  },
+                  "meta": {
+                    "requestId": "exampleId"
+                  }
+                }
+              }
+            },
+            "description": "The current credential context.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "const": "private, no-store",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Inspect the current credential",
+        "tags": [
+          "Authentication"
+        ],
+        "x-teamgrid-required-scopes": []
       }
     },
     "/me/personal-access-tokens": {

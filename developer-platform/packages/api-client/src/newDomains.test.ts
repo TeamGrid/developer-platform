@@ -764,6 +764,83 @@ describe('final TeamGrid SDK domains', () => {
       }),
     ).rejects.toMatchObject({ code: 'invalid_arguments' })
   })
+
+  it('streams large exports without buffering while enforcing byte and length boundaries', async () => {
+    const exportHeaders = {
+      'cache-control': 'private, no-store',
+      'content-disposition': `attachment; filename="x.csv"; filename*=UTF-8''x.csv`,
+      'content-type': 'text/csv; charset=utf-8',
+      'x-content-type-options': 'nosniff',
+      'x-request-id': 'stream-request',
+    }
+    const client = new TeamGridClient({
+      fetch: vi.fn(
+        async () =>
+          new Response(
+            new ReadableStream({
+              start(controller) {
+                controller.enqueue(new TextEncoder().encode('a,b\n'))
+                controller.enqueue(new TextEncoder().encode('1,2\n'))
+                controller.close()
+              },
+            }),
+            { headers: { ...exportHeaders, 'content-length': '8' } },
+          ),
+      ),
+      token,
+    })
+    const download = await client.exports.downloadStream('export-1', {
+      intentToken,
+      maxBytes: 8,
+    })
+    expect(download).toMatchObject({
+      contentLength: 8,
+      contentType: 'text/csv; charset=utf-8',
+      fileName: 'x.csv',
+    })
+    expect(download.transport).toMatchObject({ requestId: 'stream-request', status: 200 })
+    await expect(new Response(download.data).text()).resolves.toBe('a,b\n1,2\n')
+
+    const tooLarge = new TeamGridClient({
+      fetch: vi.fn(
+        async () =>
+          new Response(
+            new ReadableStream({
+              start(controller) {
+                controller.enqueue(new Uint8Array(3))
+                controller.enqueue(new Uint8Array(3))
+                controller.close()
+              },
+            }),
+            { headers: exportHeaders },
+          ),
+      ),
+      token,
+    })
+    const oversizedStream = await tooLarge.exports.downloadStream('export-1', {
+      intentToken,
+      maxBytes: 5,
+    })
+    await expect(new Response(oversizedStream.data).arrayBuffer()).rejects.toMatchObject({
+      code: 'export_download_too_large',
+    })
+
+    const truncated = new TeamGridClient({
+      fetch: vi.fn(
+        async () =>
+          new Response(new Uint8Array(3), {
+            headers: { ...exportHeaders, 'content-length': '4' },
+          }),
+      ),
+      token,
+    })
+    const truncatedStream = await truncated.exports.downloadStream('export-1', {
+      intentToken,
+    })
+    await expect(new Response(truncatedStream.data).arrayBuffer()).rejects.toMatchObject({
+      code: 'invalid_api_response',
+    })
+  })
 })
 
 const action = {

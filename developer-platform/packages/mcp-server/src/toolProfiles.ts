@@ -38,6 +38,10 @@ const governanceTools = [
 ] as const
 const allTools = Array.from(new Set([...collaborationTools, ...governanceTools, 'teamgrid_search']))
 
+export type McpToolName = (typeof allTools)[number]
+
+export const allMcpTools: readonly McpToolName[] = Object.freeze([...allTools])
+
 export const toolsByProfile: Readonly<Record<McpToolProfile, readonly string[]>> = Object.freeze({
   all: allTools,
   collaboration: collaborationTools,
@@ -53,4 +57,48 @@ export function parseMcpToolProfile(value: string | undefined): McpToolProfile {
     throw new Error("MCP tool profile must be 'core', 'collaboration', 'governance', or 'all'.")
   }
   return profile as McpToolProfile
+}
+
+export function parseMcpToolFilter(value: string | undefined, option: string): McpToolName[] {
+  if (!value?.trim()) return []
+  const names = Array.from(
+    new Set(
+      value
+        .split(',')
+        .map((name) => name.trim())
+        .filter(Boolean),
+    ),
+  )
+  const knownTools = new Set<string>(allMcpTools)
+  if (
+    !names.length ||
+    names.length > allMcpTools.length ||
+    names.some((name) => !knownTools.has(name))
+  ) {
+    throw new Error(`${option} must contain only registered TeamGrid MCP tool names.`)
+  }
+  return names as McpToolName[]
+}
+
+export function enabledMcpTools(
+  profile: McpToolProfile,
+  {
+    allowTools,
+    denyTools = [],
+  }: { allowTools?: readonly McpToolName[]; denyTools?: readonly McpToolName[] } = {},
+) {
+  const profileTools = new Set<McpToolName>(toolsByProfile[profile] as readonly McpToolName[])
+  const allow = allowTools === undefined ? new Set(profileTools) : new Set(allowTools)
+  const deny = new Set(denyTools)
+  const outsideProfile = [...allow].filter((name) => !profileTools.has(name))
+  const overlap = allowTools === undefined ? [] : [...allow].filter((name) => deny.has(name))
+  if (outsideProfile.length) {
+    throw new Error(
+      `MCP allow filter cannot enable tools outside the '${profile}' profile: ${outsideProfile.join(', ')}.`,
+    )
+  }
+  if (overlap.length) {
+    throw new Error(`MCP allow and deny filters overlap: ${overlap.join(', ')}.`)
+  }
+  return Object.freeze([...allow].filter((name) => !deny.has(name)))
 }

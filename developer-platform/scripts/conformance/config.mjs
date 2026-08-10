@@ -191,11 +191,22 @@ export function resolveConformanceConfig({
     if (cleanupJournalPath === base.evidencePath) {
       throw new Error('Cleanup journal and conformance evidence paths must be distinct.')
     }
+    if (mode === 'certification' && JSON.stringify(base.versions) !== JSON.stringify(['v1'])) {
+      throw new Error('Positive certification is intentionally limited to API v1.')
+    }
+    const recipePath =
+      mode === 'certification'
+        ? resolve(required(environment, 'TEAMGRID_CONFORMANCE_RECIPE_PATH'))
+        : undefined
+    if (recipePath && [cleanupJournalPath, base.evidencePath].includes(recipePath)) {
+      throw new Error('Recipe, cleanup journal, and evidence paths must be distinct.')
+    }
     return {
       ...base,
       cleanupJournalPath,
       credentialProfiles,
       fixtureNamespace,
+      ...(recipePath ? { recipePath } : {}),
       secrets,
       target: { region, v0BaseUrl, v1BaseUrl },
     }
@@ -219,6 +230,7 @@ export function redactedConfig(config) {
     pageLimit: config.pageLimit,
     requestIntervalMs: config.requestIntervalMs,
     requestTimeoutMs: config.requestTimeoutMs,
+    ...(config.recipePath ? { recipePath: config.recipePath } : {}),
     runId: config.runId,
     target: config.target,
     versions: config.versions,

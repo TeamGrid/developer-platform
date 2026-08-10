@@ -103,7 +103,7 @@ describe('TeamGrid CLI', () => {
     expect(await store.load()).toMatchObject({ currentProfile: 'default' })
   })
 
-  it('keeps device flow and remote self-revocation out of the first browser release', () => {
+  it('keeps device flow out and exposes explicit remote self-revocation', () => {
     const auth = createProgram().commands.find((command) => command.name() === 'auth')
     expect(auth).toBeDefined()
     expect(auth?.commands.map((command) => command.name())).toEqual([
@@ -114,9 +114,9 @@ describe('TeamGrid CLI', () => {
     ])
     const login = auth?.commands.find((command) => command.name() === 'login')
     expect(login?.options.some((option) => option.long === '--device')).toBe(false)
-    expect(auth?.commands.find((command) => command.name() === 'logout')?.description()).toContain(
-      'remove a profile credential from the OS keychain',
-    )
+    const logout = auth?.commands.find((command) => command.name() === 'logout')
+    expect(logout?.description()).toContain('optionally revoke it in TeamGrid')
+    expect(logout?.options.some((option) => option.long === '--revoke')).toBe(true)
   })
 
   it('does not change permissions on an existing config directory', async () => {
@@ -812,7 +812,135 @@ describe('TeamGrid CLI', () => {
     expect(clientFactory).not.toHaveBeenCalled()
     expect(await credentialStore.get('default')).toBeNull()
     expect(await configStore.load()).toEqual({ profiles: {}, version: 1 })
-    expect(JSON.parse(output.value())).toEqual({ loggedOut: true, profile: 'default' })
+    expect(JSON.parse(output.value())).toEqual({
+      loggedOut: true,
+      profile: 'default',
+      revoked: false,
+    })
+  })
+
+  it('revokes remotely before deleting the selected local credential', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-revoke-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    const credentialStore = new MemoryCredentialStore()
+    await credentialStore.set('default', token)
+    await configStore.save({
+      currentProfile: 'default',
+      profiles: {
+        default: {
+          cellId: 'us-mnz-001',
+          createdAt: '2026-07-31T00:00:00.000Z',
+          credentialId: '0123456789abcdef01234567',
+          region: 'us',
+        },
+      },
+      version: 1,
+    })
+    const revokeCurrentCredential = vi.fn(async () => ({ status: 204 }))
+    const output = capture()
+
+    expect(
+      await runCli(['node', 'teamgrid', '--output', 'json', 'auth', 'logout', '--revoke'], {
+        clientFactory: () => ({ authorization: { revokeCurrentCredential } }) as never,
+        configStore,
+        credentialStore,
+        output: output.stream,
+      }),
+    ).toBe(0)
+    expect(revokeCurrentCredential).toHaveBeenCalledOnce()
+    expect(await credentialStore.get('default')).toBeNull()
+    expect(await configStore.load()).toEqual({ profiles: {}, version: 1 })
+    expect(JSON.parse(output.value())).toEqual({
+      loggedOut: true,
+      profile: 'default',
+      revoked: true,
+    })
+  })
+
+  it('keeps the local credential when remote revocation fails', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-revoke-failure-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    const credentialStore = new MemoryCredentialStore()
+    await credentialStore.set('default', token)
+    await configStore.save({
+      currentProfile: 'default',
+      profiles: {
+        default: {
+          cellId: 'us-mnz-001',
+          createdAt: '2026-07-31T00:00:00.000Z',
+          credentialId: '0123456789abcdef01234567',
+          region: 'us',
+        },
+      },
+      version: 1,
+    })
+
+    expect(
+      await runCli(['node', 'teamgrid', '--output', 'json', 'auth', 'logout', '--revoke'], {
+        clientFactory: () =>
+          ({
+            authorization: {
+              revokeCurrentCredential: async () => {
+                throw new TeamGridClientError('network_error', 'offline')
+              },
+            },
+          }) as never,
+        configStore,
+        credentialStore,
+        errorOutput: capture().stream,
+        output: capture().stream,
+      }),
+    ).toBe(1)
+    expect(await credentialStore.get('default')).toBe(token)
+    expect((await configStore.load()).profiles.default).toBeDefined()
+  })
+
+  it('checks the exact authenticated credential context without exposing the token', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'teamgrid-cli-auth-context-'))
+    const configStore = new ConfigStore({ configPath: join(directory, 'config.json') })
+    const credentialStore = new MemoryCredentialStore()
+    await credentialStore.set('default', token)
+    await configStore.save({
+      currentProfile: 'default',
+      profiles: {
+        default: {
+          cellId: 'us-mnz-001',
+          createdAt: '2026-07-31T00:00:00.000Z',
+          credentialId: '0123456789abcdef01234567',
+          region: 'us',
+        },
+      },
+      version: 1,
+    })
+    const getContext = vi.fn(async () => ({
+      data: {
+        attributes: {
+          cellId: 'us-mnz-001',
+          kind: 'personal',
+          region: 'us',
+          scopes: ['workspace:read'],
+          status: 'active',
+        },
+        id: '0123456789abcdef01234567',
+        type: 'credentialContext',
+      },
+    }))
+    const output = capture()
+
+    expect(
+      await runCli(['node', 'teamgrid', '--output', 'json', 'auth', 'status', '--check'], {
+        clientFactory: () => ({ authorization: { getContext } }) as never,
+        configStore,
+        credentialStore,
+        output: output.stream,
+      }),
+    ).toBe(0)
+    expect(getContext).toHaveBeenCalledOnce()
+    expect(output.value()).not.toContain(token)
+    expect(JSON.parse(output.value())).toMatchObject({
+      credential: { id: '0123456789abcdef01234567', type: 'credentialContext' },
+      profile: 'default',
+    })
   })
 
   it('rejects a profile whose stored credential belongs to another cell', async () => {

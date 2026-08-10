@@ -6,19 +6,19 @@
       "bytes": 602,
       "id": "action-policy-registry",
       "path": "contracts/developer-action-policy-registry.json",
-      "sha256": "be5faff0042359e3aa881f57639ba0a03cc95714f02ccc8a6327f810a63278d6"
+      "sha256": "ad76fdd749980a3953a686a87692c197099fb1eaf696b651efb0b4129926e7f9"
     },
     {
-      "bytes": 72496,
+      "bytes": 73461,
       "id": "capability-ledger",
       "path": "contracts/developer-capabilities.json",
-      "sha256": "167d282d9ff23fed83ba6bcb732dca8c80a3b34f317a01d8ba53524466f6726c"
+      "sha256": "e63fa6e679122f5efae20313e8d3599c0675e4ab02cd8b7d3bde9148ebbef4b2"
     },
     {
-      "bytes": 150923,
+      "bytes": 153007,
       "id": "operation-bindings",
       "path": "contracts/developer-operation-bindings.json",
-      "sha256": "f50a7a16db740b86b6d996eb4c6d7ecbbb4b0d8bd9ea1574a56192449c222224"
+      "sha256": "1f5307b78f96b2fa24b0b6b0657a62f65b657f5086e4b0382b2129c28b023567"
     },
     {
       "bytes": 9707,
@@ -45,29 +45,29 @@
       "sha256": "902adb098fa9c7079c4d77b409237549d96399a8da6fc342f95f397f59c2d7ff"
     },
     {
-      "bytes": 1262047,
+      "bytes": 1275674,
       "id": "openapi-v1",
       "path": "openapi/v1.json",
-      "sha256": "1b37f9bcd62e1ac54f8e8c83bbfff0c06cc733712bff4b79e2e22dc1c9ee705a"
+      "sha256": "8ad925c53dba32ccccd1b47d084c573a3867a4f7371473c637a9cdd6f2f35c6c"
     }
   ],
   "summary": {
-    "actionPolicyRegistryOperations": 208,
-    "actionPolicyRegistrySha256": "1fc9f58c6ede70164c6da4f2cf28057d4f100ec8d19f2252a418104c6421f274",
+    "actionPolicyRegistryOperations": 211,
+    "actionPolicyRegistrySha256": "b9e0f3fe0fbab1afd8362f47b49e496133235ce0f1830462b6c848d7d289f566",
     "actionPolicyRegistryVersion": "developer-action-policy-v5",
-    "authenticatedActionPolicies": 206,
+    "authenticatedActionPolicies": 209,
     "classifiedProductCapabilities": 73,
     "canonicalScopes": 87,
-    "governedV1Operations": 208,
-    "operationBindings": 208,
+    "governedV1Operations": 211,
+    "operationBindings": 211,
     "principalPolicyFamilies": 12,
-    "referencedAppMethods": 207,
+    "referencedAppMethods": 210,
     "remainingDirectCellReads": 0,
     "unmediatedDirectCellReads": 0,
     "resourceCasMutationOperations": 18,
     "resourceCasOperationReads": 2,
     "v0Operations": 87,
     "v0MigrationRoutes": 87,
-    "v1Operations": 208
+    "v1Operations": 211
   }
 }

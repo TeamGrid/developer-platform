@@ -9,9 +9,9 @@ describe('Developer Platform conformance inventory', () => {
       contractVersion: '1.0.0',
       schemaVersion: 1,
       summary: {
-        byVersion: { v0: 87, v1: 208 },
-        mcp: { forbidden: 179, read: 29, total: 208 },
-        total: 295,
+        byVersion: { v0: 87, v1: 211 },
+        mcp: { forbidden: 182, read: 29, total: 211 },
+        total: 298,
       },
     })
     expect(inventory.inventoryDigest).toMatch(/^[a-f0-9]{64}$/)
@@ -101,11 +101,34 @@ describe('Developer Platform conformance inventory', () => {
         sdk: { exposure: 'supported', method: 'authorization.compensateCliStorage' },
       },
     })
+    expect(
+      inventory.operations.find(
+        (operation) => operation.operationId === 'getCurrentCredentialContext',
+      ),
+    ).toMatchObject({
+      authenticated: true,
+      requiredScopes: [],
+      surfaces: {
+        cli: { command: 'auth status', exposure: 'supported' },
+        mcp: { exposure: 'forbidden' },
+        sdk: { exposure: 'supported', method: 'authorization.getContext' },
+      },
+    })
+    expect(
+      inventory.operations.find((operation) => operation.operationId === 'testWebhookDelivery'),
+    ).toMatchObject({
+      requiredScopes: ['webhooks:write'],
+      surfaces: {
+        cli: { command: 'webhooks test', exposure: 'supported' },
+        mcp: { exposure: 'forbidden' },
+        sdk: { exposure: 'supported', method: 'webhooks.testDelivery' },
+      },
+    })
   })
 
   it('prints a deterministic human-readable planning summary', async () => {
     const summary = formatInventorySummary(await buildConformanceInventory())
-    expect(summary).toContain('295 API operations (87 V0, 208 V1)')
-    expect(summary).toContain('29 MCP reads; 179 operations intentionally forbidden')
+    expect(summary).toContain('298 API operations (87 V0, 211 V1)')
+    expect(summary).toContain('29 MCP reads; 182 operations intentionally forbidden')
   })
 })

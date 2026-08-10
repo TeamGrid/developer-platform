@@ -9,7 +9,10 @@
   "scripts": {
     "build": "npm run generate:types && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server",
     "check": "node scripts/check-contract-manifest.mjs && npm run generate:types && git diff --exit-code -- packages/api-client/src/generated/schema.ts && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server && npm run typecheck -w @teamgrid/api-client && npm run typecheck -w @teamgrid/cli && npm run typecheck -w @teamgrid/mcp-server && npm run typecheck:staging-e2e && npm run contract:surfaces && node scripts/check-client-version.mjs && biome check packages scripts",
+    "check:edge-client": "npm run build -w @teamgrid/api-client && node scripts/check-edge-client.mjs",
     "conformance:credential": "npm run build && node scripts/conformance/credential.mjs",
+    "conformance:certification": "npm run build && node scripts/conformance/run.mjs --mode certification",
+    "conformance:certification:recover": "npm run build && node scripts/conformance/run.mjs --mode certification --recover",
     "conformance:redaction": "npm run build && node scripts/redaction-conformance.mjs",
     "conformance:plan": "node scripts/conformance/run.mjs --mode plan",
     "conformance:read-only": "npm run build && node scripts/conformance/run.mjs --mode read-only",
@@ -25,7 +28,7 @@
     "pack:check": "node scripts/check-package-artifacts.mjs",
     "pack:install-check": "node scripts/verify-packed-install.mjs",
     "audit:production": "node scripts/check-production-audit.mjs",
-    "verify": "npm run audit:production && npm run check && npm test && npm run build && npm run conformance:redaction && npm run pack:check && npm run pack:install-check"
+    "verify": "npm run audit:production && npm run check && npm run check:edge-client && npm test && npm run build && npm run conformance:redaction && npm run pack:check && npm run pack:install-check"
   },
   "packageManager": "npm@11.18.0",
   "engines": {
