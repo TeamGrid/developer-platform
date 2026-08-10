@@ -13049,15 +13049,15 @@
     },
     "securitySchemes": {
       "bearerAuth": {
-        "bearerFormat": "tg_sk_v1",
-        "description": "Reveal-once cell-bound TeamGrid service credential.",
+        "bearerFormat": "tg_pat_v2 | tg_sa_v2 | tg_sk_v1 (legacy)",
+        "description": "Reveal-once cell-bound TeamGrid personal-access or service-account credential. Legacy tg_sk_v1 credentials remain accepted during migration.",
         "scheme": "bearer",
         "type": "http"
       }
     }
   },
   "info": {
-    "description": "Stable, cell-aware TeamGrid API for service credentials and the TeamGrid CLI.",
+    "description": "Stable, cell-aware TeamGrid API for scoped personal-access and service-account credentials, the TeamGrid CLI, and first-party developer clients.",
     "title": "TeamGrid API v1",
     "version": "1.0.0"
   },

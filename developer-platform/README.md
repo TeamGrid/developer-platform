@@ -58,9 +58,11 @@ narrowly scoped personal credential in Developer settings and use `--manual`
 for those cases. Device authorization is not part of this release.
 
 Existing profiles require explicit `--replace`; this prevents accidental
-orphaning of the previous server credential. Local `auth logout` removes only
-the OS credential-store entry and profile metadata. Server revocation remains
-an explicit action in TeamGrid Developer settings.
+orphaning of the previous server credential. Plain `auth logout` remains an
+offline-capable local cleanup. `auth logout --revoke` first revokes the exact
+selected credential in TeamGrid and removes local state only after the server
+confirms permanent revocation. It refuses an ambiguous environment-token
+override instead of risking revocation of the wrong credential.
 
 For CI/CD, containers, and unattended services, provide a service-account
 credential through `TEAMGRID_API_TOKEN` and a secret manager. The token is not
@@ -84,6 +86,7 @@ teamgrid auth login
 teamgrid auth login --preset daily-work
 teamgrid auth login --manual
 teamgrid auth status --check
+teamgrid auth logout --revoke
 teamgrid doctor
 teamgrid --output json doctor
 teamgrid projects list --all --output json
@@ -103,6 +106,9 @@ teamgrid tags archive tag-id --yes --output json
 teamgrid webhooks create \
   --data '{"url":"https://hooks.example.com/teamgrid","actions":["task_created"]}' \
   --idempotency-key webhook-1 \
+  --output json
+teamgrid webhooks test webhook-id \
+  --idempotency-key webhook-test-1 \
   --output json
 teamgrid custom-field-values get project project-id field-id --output json
 teamgrid project-templates list --origin-project-id project-id --output json
@@ -222,7 +228,7 @@ npm run conformance:plan
 ```
 
 The plan reads the immutable contract set and produces a deterministic inventory of all 87 V0 and
-207 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
+211 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
 execution binding, CAS precondition, and idempotency requirement. V0 compatibility statuses and the
 V0-to-V1 migration map remain explicit, so a documented unavailable route is not confused with an
 unexpected regression. Planning never loads a credential or contacts TeamGrid.
@@ -230,7 +236,7 @@ unexpected regression. Planning never loads a credential or contacts TeamGrid.
 The read-only phase performs only parameter-free GET requests, uses `limit=1` where supported, runs
 sequentially below the shared pre-auth limit, and retries at most two `429` responses. Operations
 that need an id, required filter, body, or mutation are recorded as blocked rather than guessed. A
-V1 run additionally proves all 206 SDK methods, all 207 CLI bindings, the exact 29-tool MCP allowlist, and one
+V1 run additionally proves all 210 SDK methods, all 211 CLI operation mappings, the exact 29-tool MCP allowlist, and one
 live workspace request through SDK, CLI, and MCP:
 
 ```sh

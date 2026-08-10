@@ -5,6 +5,7 @@ Official `teamgrid` command-line client for TeamGrid API v1.
 ```sh
 teamgrid auth login
 teamgrid auth status --check
+teamgrid auth logout --revoke
 teamgrid doctor
 teamgrid --output json doctor
 teamgrid tasks list --all --output json
@@ -12,6 +13,7 @@ teamgrid tasks create --data @task.json --idempotency-key task-1
 teamgrid lists create --data @list.json --idempotency-key list-1
 teamgrid services update service-id --data '{"billingRate":175}'
 teamgrid tags archive tag-id --yes
+teamgrid webhooks test webhook-id --idempotency-key webhook-test-1 --output json
 teamgrid custom-field-values set project project-id field-id \
   --data '{"value":"ACME-42"}' --if-match "$REVISION" --output json
 teamgrid custom-field-values get-many project project-id \
@@ -44,8 +46,11 @@ credential; `--token-stdin` is the non-echoing compatibility path.
 
 An existing profile is never overwritten implicitly. Select another
 `--profile`, or pass `--replace` after deciding how to revoke the previous
-credential. `teamgrid auth logout` removes only the local profile and keychain
-entry; revoke the credential itself in TeamGrid Developer settings.
+credential. Plain `teamgrid auth logout` removes only the local profile and
+credential-store entry. `teamgrid auth logout --revoke` revokes the exact
+selected credential first and removes local state only after TeamGrid confirms
+the revocation. It refuses an ambiguous `TEAMGRID_API_TOKEN` override so it
+cannot revoke a credential different from the selected saved profile.
 
 Credentials are read from `TEAMGRID_API_TOKEN` or stored in macOS Keychain,
 Linux Secret Service, or Windows Credential Manager. They are never written to

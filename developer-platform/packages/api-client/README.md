@@ -1,9 +1,10 @@
 # @teamgrid/api-client
 
-Typed, region-aware client for TeamGrid API v1. It validates `tg_sk_v1`
-credentials, derives the regional endpoint, applies bounded timeouts/retries,
-supports stable cursor iterators, and exposes versioned errors without retaining
-the bearer secret.
+Typed, region-aware client for TeamGrid API v1. It validates native
+`tg_pat_v2` personal-access credentials, `tg_sa_v2` service-account credentials,
+and supported legacy `tg_sk_v1` credentials, derives the regional endpoint,
+applies bounded timeouts/retries, supports stable cursor iterators, and exposes
+versioned errors without retaining the bearer secret.
 
 ```ts
 import { TeamGridClient } from '@teamgrid/api-client'
@@ -14,7 +15,19 @@ const list = await teamgrid.lists.create(
   { name: 'Delivery', parentId: 'project-id', type: 'tasks' },
   { idempotencyKey: 'delivery-list-1' },
 )
+
+const context = await teamgrid.authorization.getContext()
+console.log(context.data.attributes.scopes)
+
+const testDelivery = await teamgrid.webhooks.testDelivery('webhook-id', {
+  idempotencyKey: 'webhook-test-1',
+})
 ```
+
+`authorization.getContext()` returns only safe, no-store metadata for the exact
+current credential and requires no additional scope. Use
+`authorization.revokeCurrentCredential()` only for an explicit permanent
+self-revocation flow; the credential cannot be restored after success.
 
 The typed surface covers projects and lifecycle operations, tasks and timers,
 time entries, contacts, call notes, contact groups, products and product groups,
