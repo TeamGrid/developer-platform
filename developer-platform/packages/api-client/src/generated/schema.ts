@@ -4069,6 +4069,11 @@ export interface components {
                 createdById: string | null;
                 /** @description Human-readable description of the resource. */
                 description: string;
+                /**
+                 * @description How to interpret the task description. Legacy and unmarked descriptions are plain-text; markdown-v1 enables TeamGrid Markdown.
+                 * @enum {string}
+                 */
+                descriptionFormat: "plain-text" | "markdown-v1";
                 /** @description The developer revision associated with this task attributes. */
                 developerRevision: string;
                 /**
@@ -5887,6 +5892,11 @@ export interface components {
             /** @description Human-readable description of the resource. */
             description?: string | null;
             /**
+             * @description How to interpret the task description. Legacy and unmarked descriptions are plain-text; markdown-v1 enables TeamGrid Markdown.
+             * @enum {string}
+             */
+            descriptionFormat?: "plain-text" | "markdown-v1";
+            /**
              * Format: date-time
              * @description ISO 8601 timestamp for due at.
              */
@@ -5929,6 +5939,11 @@ export interface components {
             /** @description Human-readable description of the resource. */
             description?: string | null;
             /**
+             * @description How to interpret the task description. Legacy and unmarked descriptions are plain-text; markdown-v1 enables TeamGrid Markdown.
+             * @enum {string}
+             */
+            descriptionFormat?: "plain-text" | "markdown-v1";
+            /**
              * Format: date-time
              * @description ISO 8601 timestamp for due at.
              */
@@ -5968,6 +5983,11 @@ export interface components {
             contactId?: string | null;
             /** @description Human-readable description of the resource. */
             description?: string | null;
+            /**
+             * @description How to interpret the task description. Legacy and unmarked descriptions are plain-text; markdown-v1 enables TeamGrid Markdown.
+             * @enum {string}
+             */
+            descriptionFormat?: "plain-text" | "markdown-v1";
             /**
              * Format: date-time
              * @description ISO 8601 timestamp for due at.
@@ -12939,6 +12959,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",
@@ -13002,6 +13023,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",
@@ -13139,6 +13161,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",
@@ -13272,6 +13295,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",
@@ -13361,6 +13385,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",
@@ -13465,6 +13490,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",
@@ -13528,6 +13554,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",
@@ -13630,6 +13657,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",
@@ -13731,6 +13759,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",
@@ -13820,6 +13849,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",
@@ -13909,6 +13939,7 @@ export interface operations {
                      *           "createdAt": "2026-07-29T10:00:00Z",
                      *           "createdById": "exampleId",
                      *           "description": "Example generated from the documented schema.",
+                     *           "descriptionFormat": "plain-text",
                      *           "developerRevision": "\"example-revision\"",
                      *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
                      *           "duplicateOfTaskId": "exampleId",

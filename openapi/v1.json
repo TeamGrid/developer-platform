@@ -3457,6 +3457,14 @@
                 "type": "string",
                 "description": "Human-readable description of the resource."
               },
+              "descriptionFormat": {
+                "enum": [
+                  "plain-text",
+                  "markdown-v1"
+                ],
+                "type": "string",
+                "description": "How to interpret the task description. Legacy and unmarked descriptions are plain-text; markdown-v1 enables TeamGrid Markdown."
+              },
               "developerRevision": {
                 "pattern": "^[a-f0-9]{64}$",
                 "type": "string",
@@ -3655,6 +3663,7 @@
               "createdAt",
               "createdById",
               "description",
+              "descriptionFormat",
               "developerRevision",
               "developerUpdatedAt",
               "duplicateOfTaskId",
@@ -8866,6 +8875,11 @@
       },
       "TaskCreate": {
         "additionalProperties": false,
+        "dependentRequired": {
+          "descriptionFormat": [
+            "description"
+          ]
+        },
         "not": {
           "properties": {
             "assigneeId": {
@@ -8913,6 +8927,14 @@
               "null"
             ],
             "description": "Human-readable description of the resource."
+          },
+          "descriptionFormat": {
+            "enum": [
+              "plain-text",
+              "markdown-v1"
+            ],
+            "type": "string",
+            "description": "How to interpret the task description. Legacy and unmarked descriptions are plain-text; markdown-v1 enables TeamGrid Markdown."
           },
           "dueAt": {
             "format": "date-time",
@@ -9019,6 +9041,11 @@
       },
       "TaskUpdate": {
         "additionalProperties": false,
+        "dependentRequired": {
+          "descriptionFormat": [
+            "description"
+          ]
+        },
         "minProperties": 1,
         "not": {
           "properties": {
@@ -9067,6 +9094,14 @@
               "null"
             ],
             "description": "Human-readable description of the resource."
+          },
+          "descriptionFormat": {
+            "enum": [
+              "plain-text",
+              "markdown-v1"
+            ],
+            "type": "string",
+            "description": "How to interpret the task description. Legacy and unmarked descriptions are plain-text; markdown-v1 enables TeamGrid Markdown."
           },
           "dueAt": {
             "format": "date-time",
@@ -9170,6 +9205,11 @@
       },
       "TaskBulkUpdateData": {
         "additionalProperties": false,
+        "dependentRequired": {
+          "descriptionFormat": [
+            "description"
+          ]
+        },
         "minProperties": 1,
         "properties": {
           "billable": {
@@ -9194,6 +9234,14 @@
               "null"
             ],
             "description": "Human-readable description of the resource."
+          },
+          "descriptionFormat": {
+            "enum": [
+              "plain-text",
+              "markdown-v1"
+            ],
+            "type": "string",
+            "description": "How to interpret the task description. Legacy and unmarked descriptions are plain-text; markdown-v1 enables TeamGrid Markdown."
           },
           "dueAt": {
             "format": "date-time",
@@ -22777,6 +22825,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",
@@ -22862,6 +22911,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",
@@ -23140,6 +23190,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",
@@ -23277,6 +23328,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",
@@ -23413,6 +23465,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",
@@ -23568,6 +23621,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",
@@ -23653,6 +23707,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",
@@ -23815,6 +23870,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",
@@ -23967,6 +24023,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",
@@ -24103,6 +24160,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",
@@ -24239,6 +24297,7 @@
                       "createdAt": "2026-07-29T10:00:00Z",
                       "createdById": "exampleId",
                       "description": "Example generated from the documented schema.",
+                      "descriptionFormat": "plain-text",
                       "developerRevision": "\"example-revision\"",
                       "developerUpdatedAt": "2026-07-29T10:00:00Z",
                       "duplicateOfTaskId": "exampleId",

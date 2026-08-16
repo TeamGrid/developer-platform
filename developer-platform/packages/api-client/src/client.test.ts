@@ -28,6 +28,7 @@ function taskResource(overrides: Record<string, unknown> = {}) {
       createdAt: fixtureDate,
       createdById: null,
       description: '',
+      descriptionFormat: 'plain-text',
       developerRevision,
       developerUpdatedAt: fixtureDate,
       duplicateOfTaskId: null,
@@ -545,6 +546,46 @@ describe('TeamGrid API client', () => {
     expect(retriedPage.transport.attempts).toBe(2)
     expect(sleep).toHaveBeenCalledTimes(2)
     expect(sleep.mock.calls[0]?.[0]).toBe(1000)
+  })
+
+  it('transports explicit task description formats without rewriting content', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(new URL(String(input)).pathname).toBe('/v1/tasks')
+      expect(init?.method).toBe('POST')
+      expect(JSON.parse(String(init?.body))).toEqual({
+        description: '# Heading',
+        descriptionFormat: 'markdown-v1',
+        name: 'Formatted task',
+      })
+      return json(
+        {
+          data: taskResource({
+            description: '# Heading',
+            descriptionFormat: 'markdown-v1',
+            name: 'Formatted task',
+          }),
+          meta: { requestId: 'request-markdown-task' },
+        },
+        201,
+        {
+          'cache-control': 'private, no-store, no-transform',
+          etag: taskEtag,
+          'idempotency-replayed': 'false',
+        },
+      )
+    })
+    const client = new TeamGridClient({ fetch, token })
+
+    const response = await client.tasks.create(
+      {
+        description: '# Heading',
+        descriptionFormat: 'markdown-v1',
+        name: 'Formatted task',
+      },
+      { idempotencyKey: 'formatted-task-1' },
+    )
+
+    expect(response.data.attributes.descriptionFormat).toBe('markdown-v1')
   })
 
   it('iterates stable pages and detects cursor cycles', async () => {

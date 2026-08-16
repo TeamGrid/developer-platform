@@ -45,10 +45,10 @@
       "sha256": "902adb098fa9c7079c4d77b409237549d96399a8da6fc342f95f397f59c2d7ff"
     },
     {
-      "bytes": 1275862,
+      "bytes": 1278195,
       "id": "openapi-v1",
       "path": "openapi/v1.json",
-      "sha256": "4f46b47e28cafe0bf578d06d43bea6a4fd83569be74f0d14109af48c4025cb73"
+      "sha256": "ddd8dd9d09f7feff3d708413eaf456c808ee1ba84fe3fa3451e862b204b17f8c"
     }
   ],
   "summary": {

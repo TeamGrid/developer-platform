@@ -27,6 +27,7 @@ function task() {
       createdAt: now,
       createdById: null,
       description: '',
+      descriptionFormat: 'plain-text',
       developerRevision: revision,
       developerUpdatedAt: now,
       duplicateOfTaskId: null,
