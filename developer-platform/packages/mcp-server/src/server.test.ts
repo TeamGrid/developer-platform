@@ -134,7 +134,17 @@ describe('TeamGrid read-only MCP adapter', () => {
         list: vi.fn(async () => ({ data: [], meta: {} })),
       },
       tasks: {
-        get: vi.fn(async (id) => ({ data: { id }, meta: {} })),
+        get: vi.fn(async (id) => ({
+          data: {
+            attributes: {
+              description: '# Heading',
+              descriptionFormat: 'markdown-v1',
+            },
+            id,
+            type: 'task',
+          },
+          meta: {},
+        })),
         list: vi.fn(async () => ({ data: [], meta: {} })),
       },
       timeEntries: {
@@ -248,6 +258,16 @@ describe('TeamGrid read-only MCP adapter', () => {
       })
       expect(JSON.stringify(response)).toContain('team-1')
       expect(response.structuredContent).toMatchObject({ data: { id: 'team-1' } })
+      const taskResponse = await client.callTool({
+        arguments: { id: 'task-1' },
+        name: 'teamgrid_task_get',
+      })
+      expect(taskResponse.structuredContent).toMatchObject({
+        data: {
+          attributes: { descriptionFormat: 'markdown-v1' },
+          id: 'task-1',
+        },
+      })
       apiClient.workspace.get.mockRejectedValueOnce(
         new Error(`upstream rejected Authorization: Bearer ${secretCanary}`),
       )

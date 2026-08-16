@@ -107,6 +107,7 @@ export const taskValidator = (value: unknown): value is Task =>
         'createdAt',
         'createdById',
         'description',
+        'descriptionFormat',
         'developerRevision',
         'developerUpdatedAt',
         'duplicateOfTaskId',
@@ -148,6 +149,8 @@ export const taskValidator = (value: unknown): value is Task =>
       nullableDate(attributes.createdAt) &&
       nullableId(attributes.createdById) &&
       typeof attributes.description === 'string' &&
+      (attributes.descriptionFormat === 'plain-text' ||
+        attributes.descriptionFormat === 'markdown-v1') &&
       typeof attributes.developerRevision === 'string' &&
       developerRevisionPattern.test(attributes.developerRevision) &&
       canonicalDate(attributes.developerUpdatedAt) &&

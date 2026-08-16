@@ -23,6 +23,7 @@ function task(id: string) {
       createdAt: timestamp,
       createdById: null,
       description: '',
+      descriptionFormat: 'plain-text',
       developerRevision: nextRevision,
       developerUpdatedAt: timestamp,
       dueAt: null,

@@ -402,7 +402,7 @@ describe('TeamGrid CLI', () => {
           'update',
           'task-1',
           '--data',
-          '{"name":"Changed"}',
+          '{"description":"# Changed","descriptionFormat":"markdown-v1"}',
           '--if-match',
           `tsk1-${resourceRevision}`,
         ],
@@ -416,7 +416,7 @@ describe('TeamGrid CLI', () => {
     ).toBe(0)
     expect(update).toHaveBeenCalledWith(
       'task-1',
-      { name: 'Changed' },
+      { description: '# Changed', descriptionFormat: 'markdown-v1' },
       { ifMatch: `tsk1-${resourceRevision}` },
     )
   })
