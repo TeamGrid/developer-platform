@@ -1,6 +1,6 @@
 {
   "name": "@teamgrid/api-client",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Typed, cell-aware client for the TeamGrid Developer Platform API v1",
   "license": "MIT",
   "repository": {
