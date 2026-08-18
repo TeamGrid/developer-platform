@@ -6,9 +6,21 @@ import { isReleaseCompatibleWithContract } from './release-version.mjs'
 
 const repositoryUrl = 'git+https://github.com/TeamGrid/developer-platform.git'
 const packages = [
-  { name: '@teamgrid/api-client', requiredFiles: ['dist/index.d.ts', 'dist/index.js'] },
-  { name: '@teamgrid/cli', requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js'] },
-  { name: '@teamgrid/mcp-server', requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js'] },
+  {
+    maxUnpackedSize: 2_000_000,
+    name: '@teamgrid/api-client',
+    requiredFiles: ['dist/index.d.ts', 'dist/index.js'],
+  },
+  {
+    maxUnpackedSize: 1_500_000,
+    name: '@teamgrid/cli',
+    requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js'],
+  },
+  {
+    maxUnpackedSize: 1_500_000,
+    name: '@teamgrid/mcp-server',
+    requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js'],
+  },
 ]
 
 function fail(message) {
@@ -43,7 +55,7 @@ if (!isReleaseCompatibleWithContract(version, contractManifest.contractVersion))
   fail('public package versions must be compatible with the canonical contract version')
 }
 
-for (const { manifest, name, requiredFiles } of manifests) {
+for (const { manifest, maxUnpackedSize, name, requiredFiles } of manifests) {
   for (const dependencyName of ['@teamgrid/api-client', '@teamgrid/cli']) {
     const dependencyVersion = manifest.dependencies?.[dependencyName]
     if (dependencyVersion && dependencyVersion !== version) {
@@ -68,6 +80,8 @@ for (const { manifest, name, requiredFiles } of manifests) {
     if (!files.includes(requiredFile)) fail(`${name} is missing ${requiredFile}`)
   }
   if (files.some(path => path.endsWith('.map'))) fail(`${name} contains unpublished source maps`)
-  if (artifact.unpackedSize > 1_500_000) fail(`${name} exceeds the 1.5 MB unpacked limit`)
+  if (artifact.unpackedSize > maxUnpackedSize) {
+    fail(`${name} exceeds its ${maxUnpackedSize} byte unpacked limit`)
+  }
   console.log(`${artifact.id}: ${files.length} files, ${artifact.unpackedSize} bytes`)
 }

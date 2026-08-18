@@ -28,6 +28,12 @@ import type {
   Role,
   SearchResult,
   SystemCapability,
+  TaskRecurrence,
+  TaskRecurrenceEvent,
+  TaskRecurrenceOccurrence,
+  TaskRecurrenceOperation,
+  TaskRecurrencePreview,
+  TaskRecurrenceVersion,
   TimeEntryBilling,
   TransportMetadata,
   Webhook,
@@ -52,6 +58,10 @@ const automationDefinitionVersionPattern = /^dav1-[a-f0-9]{64}$/
 const workspaceSettingsRevisionPattern = /^wst1-[a-f0-9]{64}$/
 const webhookRevisionPattern = /^whk1-[a-f0-9]{64}$/
 const timeEntryBillingRevisionPattern = /^tib1-[a-f0-9]{64}$/
+const taskRecurrenceRevisionPattern = /^[a-f0-9]{64}$/
+const taskRecurrenceIdPattern = /^[A-Za-z0-9_.:-]{1,256}$/
+const taskRecurrenceOccurrenceKeyPattern = /^(?:occ1-[a-f0-9]{64}|seed:[A-Za-z0-9_-]{1,128})$/
+const taskRecurrencePlaceholderTokenPattern = /^trp1\.[A-Za-z0-9_-]+$/
 const webhookSigningSecretPattern = /^whsec_v2_[A-Za-z0-9_-]{43}$/
 const publicCapabilityIdPattern = /^[A-Za-z][A-Za-z0-9-]{0,127}$/
 const webhookIdPattern = /^[A-Za-z0-9_.:-]{1,128}$/
@@ -138,6 +148,24 @@ const exportFields: Record<string, ReadonlySet<string>> = {
     'id',
     'name',
     'projectId',
+    'updatedAt',
+  ]),
+  taskRecurrences: new Set([
+    'archivedAt',
+    'createdAt',
+    'createdBy',
+    'currentDefinitionVersionId',
+    'definitionHash',
+    'definitionVersion',
+    'id',
+    'name',
+    'ownerId',
+    'ownerKind',
+    'policy',
+    'projectId',
+    'status',
+    'summary',
+    'template',
     'updatedAt',
   ]),
   timeEntries: new Set([
@@ -1548,6 +1576,751 @@ export function isWebhookUpdate(value: unknown): value is WebhookUpdate {
     (value.url === undefined || safeWebhookUrl(value.url))
   )
 }
+
+function recurrenceJsonObject(value: unknown, maximumBytes = 256 * 1024) {
+  if (!isRecord(value) || Object.keys(value).length > 256) return false
+  try {
+    return new TextEncoder().encode(JSON.stringify(value)).byteLength <= maximumBytes
+  } catch {
+    return false
+  }
+}
+
+const recurrenceLocalDatePattern = /^\d{4}-\d{2}-\d{2}$/
+const recurrenceLocalDateTimePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?$/
+const recurrenceNodePattern = /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$/
+const recurrenceReferencePattern = /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,255}$/
+const recurrenceEventTypePattern = /^[A-Za-z][A-Za-z0-9_.:-]{0,127}$/
+const recurrenceConditionRefPattern =
+  /^(?:event\.[A-Za-z0-9_.:-]+|occurrence\.(?:scheduledFor|scheduledDate)|previousOccurrence\.(?:archived|completed|exists|state)|project\.(?:active|archived|completed|exists)|series\.(?:status|occurrenceCount)|customField\.[A-Za-z0-9_.:-]+)$/
+const recurrenceDurationUnits = ['minute', 'hour', 'day', 'week', 'month', 'year', 'business-day']
+
+function recurrenceInteger(value: unknown, minimum: number, maximum: number) {
+  return Number.isSafeInteger(value) && Number(value) >= minimum && Number(value) <= maximum
+}
+
+function recurrenceIntegerArray(
+  value: unknown,
+  minimum: number,
+  maximum: number,
+  maximumItems: number,
+  excludeZero = false,
+) {
+  return (
+    Array.isArray(value) &&
+    value.length <= maximumItems &&
+    value.every(
+      (item) => recurrenceInteger(item, minimum, maximum) && (!excludeZero || item !== 0),
+    ) &&
+    new Set(value).size === value.length
+  )
+}
+
+function recurrenceDuration(value: unknown, nonNegative = false) {
+  return (
+    hasExactKeys(value, ['unit', 'value']) &&
+    recurrenceDurationUnits.includes(String(value.unit)) &&
+    recurrenceInteger(value.value, nonNegative ? 0 : -1_000_000, 1_000_000) &&
+    (value.unit !== 'business-day' ||
+      recurrenceInteger(value.value, nonNegative ? 0 : -10_000, 10_000))
+  )
+}
+
+function recurrenceCalendarRule(value: unknown) {
+  if (
+    !hasAllowedKeys(
+      value,
+      [
+        'byHour',
+        'byMinute',
+        'byMonth',
+        'byMonthDay',
+        'bySetPosition',
+        'byWeekDay',
+        'frequency',
+        'interval',
+        'invalidDayHandling',
+        'startLocal',
+        'weekStart',
+      ],
+      ['frequency', 'interval', 'startLocal'],
+    )
+  )
+    return false
+  return (
+    ['minutely', 'hourly', 'daily', 'weekly', 'monthly', 'yearly'].includes(
+      String(value.frequency),
+    ) &&
+    recurrenceInteger(value.interval, 1, 1_000_000) &&
+    recurrenceLocalDateTimePattern.test(String(value.startLocal)) &&
+    (value.byHour === undefined || recurrenceIntegerArray(value.byHour, 0, 23, 24)) &&
+    (value.byMinute === undefined || recurrenceIntegerArray(value.byMinute, 0, 59, 60)) &&
+    (value.byMonth === undefined || recurrenceIntegerArray(value.byMonth, 1, 12, 12)) &&
+    (value.byMonthDay === undefined ||
+      recurrenceIntegerArray(value.byMonthDay, -31, 31, 62, true)) &&
+    (value.bySetPosition === undefined ||
+      recurrenceIntegerArray(value.bySetPosition, -366, 366, 732, true)) &&
+    (value.byWeekDay === undefined || recurrenceIntegerArray(value.byWeekDay, 0, 6, 7)) &&
+    (value.invalidDayHandling === undefined ||
+      ['next-valid-day', 'omit', 'previous-valid-day'].includes(
+        String(value.invalidDayHandling),
+      )) &&
+    (value.weekStart === undefined || recurrenceInteger(value.weekStart, 0, 6))
+  )
+}
+
+type RecurrenceCandidateState = { nodeIds: Set<string>; nodes: number }
+
+function recurrenceCandidate(value: unknown, state: RecurrenceCandidateState, depth = 0): boolean {
+  if (!isRecord(value) || depth > 12 || state.nodes >= 128) return false
+  state.nodes += 1
+  if (value.op === 'union' || value.op === 'intersection') {
+    return (
+      hasExactKeys(value, ['op', 'sources']) &&
+      Array.isArray(value.sources) &&
+      value.sources.length >= 1 &&
+      value.sources.length <= 32 &&
+      value.sources.every((source) => recurrenceCandidate(source, state, depth + 1))
+    )
+  }
+  if (value.op === 'difference') {
+    return (
+      hasExactKeys(value, ['exclude', 'include', 'op']) &&
+      recurrenceCandidate(value.include, state, depth + 1) &&
+      recurrenceCandidate(value.exclude, state, depth + 1)
+    )
+  }
+  if (value.op === 'deduplicate') {
+    return (
+      hasExactKeys(value, ['granularity', 'op', 'source']) &&
+      ['instant', 'day', 'minute'].includes(String(value.granularity)) &&
+      recurrenceCandidate(value.source, state, depth + 1)
+    )
+  }
+  if (
+    !recurrenceNodePattern.test(String(value.nodeId)) ||
+    state.nodeIds.has(String(value.nodeId))
+  ) {
+    return false
+  }
+  state.nodeIds.add(String(value.nodeId))
+  if (value.op === 'calendarRule') {
+    return hasExactKeys(value, ['nodeId', 'op', 'rule']) && recurrenceCalendarRule(value.rule)
+  }
+  if (value.op === 'dateSet') {
+    return (
+      hasExactKeys(value, ['dates', 'nodeId', 'op']) &&
+      Array.isArray(value.dates) &&
+      value.dates.length >= 1 &&
+      value.dates.length <= 500 &&
+      value.dates.every((date) => recurrenceLocalDateTimePattern.test(String(date)))
+    )
+  }
+  if (value.op === 'monthSet') {
+    return (
+      hasExactKeys(value, ['months', 'nodeId', 'op']) &&
+      recurrenceIntegerArray(value.months, 1, 12, 12) &&
+      (value.months as unknown[]).length >= 1
+    )
+  }
+  if (value.op === 'sequence') {
+    return (
+      hasExactKeys(value, ['anchorLocal', 'intervals', 'nodeId', 'op']) &&
+      recurrenceLocalDateTimePattern.test(String(value.anchorLocal)) &&
+      Array.isArray(value.intervals) &&
+      value.intervals.length >= 1 &&
+      value.intervals.length <= 500 &&
+      value.intervals.every((item) => recurrenceDuration(item, true))
+    )
+  }
+  if (value.op === 'afterOccurrenceEvent') {
+    return (
+      hasAllowedKeys(
+        value,
+        ['completionMode', 'delay', 'event', 'nodeId', 'op'],
+        ['event', 'nodeId', 'op'],
+      ) &&
+      ['completed', 'created', 'reopened'].includes(String(value.event)) &&
+      (value.completionMode === undefined ||
+        ['every-completion-transition', 'first-completion-only'].includes(
+          String(value.completionMode),
+        )) &&
+      (value.delay === undefined || recurrenceDuration(value.delay, true))
+    )
+  }
+  if (value.op === 'afterProjectEvent') {
+    return (
+      hasAllowedKeys(
+        value,
+        ['delay', 'event', 'nodeId', 'op', 'projectId'],
+        ['event', 'nodeId', 'op', 'projectId'],
+      ) &&
+      ['archived', 'completed', 'created', 'reopened', 'restored'].includes(String(value.event)) &&
+      recurrenceReferencePattern.test(String(value.projectId)) &&
+      (value.delay === undefined || recurrenceDuration(value.delay, true))
+    )
+  }
+  return (
+    value.op === 'externalEvent' &&
+    hasAllowedKeys(
+      value,
+      ['delay', 'eventType', 'nodeId', 'op', 'sourceId'],
+      ['eventType', 'nodeId', 'op'],
+    ) &&
+    recurrenceEventTypePattern.test(String(value.eventType)) &&
+    (value.sourceId === undefined || recurrenceNodePattern.test(String(value.sourceId))) &&
+    (value.delay === undefined || recurrenceDuration(value.delay, true))
+  )
+}
+
+function recurrenceTransform(value: unknown) {
+  if (!isRecord(value)) return false
+  if (value.op === 'offset') {
+    return (
+      hasAllowedKeys(value, ['op', 'unit', 'unitMode', 'value'], ['op', 'unit', 'value']) &&
+      recurrenceDuration({ unit: value.unit, value: value.value }) &&
+      (value.unitMode === undefined || ['elapsed', 'wall-clock'].includes(String(value.unitMode)))
+    )
+  }
+  if (value.op === 'nthBusinessDay') {
+    return (
+      hasAllowedKeys(
+        value,
+        ['calendarBinding', 'op', 'period', 'position'],
+        ['op', 'period', 'position'],
+      ) &&
+      ['month', 'quarter', 'year'].includes(String(value.period)) &&
+      recurrenceInteger(value.position, -366, 366) &&
+      value.position !== 0 &&
+      (value.calendarBinding === undefined ||
+        ['assignee', 'project', 'series'].includes(String(value.calendarBinding)))
+    )
+  }
+  if (value.op === 'shiftToBusinessTime' || value.op === 'snapToWorkingTime') {
+    return (
+      hasAllowedKeys(
+        value,
+        ['calendarBinding', 'direction', 'includeAbsences', 'op'],
+        ['direction', 'op'],
+      ) &&
+      ['next', 'previous'].includes(String(value.direction)) &&
+      (value.includeAbsences === undefined || typeof value.includeAbsences === 'boolean') &&
+      (value.calendarBinding === undefined ||
+        ['assignee', 'project', 'series'].includes(String(value.calendarBinding)))
+    )
+  }
+  if (value.op === 'setLocalTime') {
+    return (
+      hasExactKeys(value, ['hour', 'minute', 'op']) &&
+      recurrenceInteger(value.hour, 0, 23) &&
+      recurrenceInteger(value.minute, 0, 59)
+    )
+  }
+  if (value.op === 'limit') {
+    return (
+      hasAllowedKeys(value, ['count', 'op', 'start', 'until'], ['op']) &&
+      Object.keys(value).length > 1 &&
+      (value.count === undefined || recurrenceInteger(value.count, 1, 1_000_000)) &&
+      (value.start === undefined || boundedString(value.start, 32, false)) &&
+      (value.until === undefined || boundedString(value.until, 32, false))
+    )
+  }
+  if (value.op === 'excludeDateSet') {
+    return (
+      hasExactKeys(value, ['dates', 'op']) &&
+      Array.isArray(value.dates) &&
+      value.dates.length >= 1 &&
+      value.dates.length <= 500 &&
+      value.dates.every((date) => recurrenceLocalDatePattern.test(String(date)))
+    )
+  }
+  if (value.op === 'excludePeriod') {
+    return (
+      hasExactKeys(value, ['end', 'op', 'start']) &&
+      boundedString(value.start, 32, false) &&
+      boundedString(value.end, 32, false)
+    )
+  }
+  return (
+    value.op === 'mapToDueAndPlanningDates' &&
+    hasAllowedKeys(value, ['dueOffset', 'op', 'plannedEndOffset', 'plannedStartOffset'], ['op']) &&
+    (value.dueOffset === undefined || recurrenceDuration(value.dueOffset)) &&
+    (value.plannedEndOffset === undefined || recurrenceDuration(value.plannedEndOffset)) &&
+    (value.plannedStartOffset === undefined || recurrenceDuration(value.plannedStartOffset))
+  )
+}
+
+function recurrenceConditionValue(value: unknown) {
+  if (value === null || ['boolean', 'number', 'string'].includes(typeof value)) {
+    return typeof value !== 'number' || Number.isFinite(value)
+  }
+  return hasExactKeys(value, ['ref']) && recurrenceConditionRefPattern.test(String(value.ref))
+}
+
+function recurrenceCondition(value: unknown, depth = 0): boolean {
+  if (!isRecord(value) || depth > 12) return false
+  if (value.op === 'all' || value.op === 'any') {
+    return (
+      hasExactKeys(value, ['conditions', 'op']) &&
+      Array.isArray(value.conditions) &&
+      value.conditions.length <= 64 &&
+      value.conditions.every((condition) => recurrenceCondition(condition, depth + 1))
+    )
+  }
+  if (value.op === 'not') {
+    return (
+      hasExactKeys(value, ['condition', 'op']) && recurrenceCondition(value.condition, depth + 1)
+    )
+  }
+  if (value.op === 'exists') {
+    return hasExactKeys(value, ['op', 'value']) && recurrenceConditionValue(value.value)
+  }
+  if (
+    !['eq', 'neq', 'lt', 'lte', 'gt', 'gte', 'in'].includes(String(value.op)) ||
+    !hasExactKeys(value, ['left', 'op', 'right']) ||
+    !recurrenceConditionValue(value.left)
+  )
+    return false
+  if (value.op === 'in') {
+    return (
+      Array.isArray(value.right) &&
+      value.right.length <= 100 &&
+      value.right.every(recurrenceConditionValue)
+    )
+  }
+  return recurrenceConditionValue(value.right)
+}
+
+function recurrencePolicy(value: unknown) {
+  if (
+    !hasExactKeys(value, [
+      'candidates',
+      'conditions',
+      'engineVersion',
+      'limits',
+      'materialization',
+      'schemaVersion',
+      'timeBasis',
+      'transforms',
+    ]) ||
+    value.engineVersion !== 'recurrence-v1' ||
+    value.schemaVersion !== 1
+  )
+    return false
+  const candidateState = { nodeIds: new Set<string>(), nodes: 0 }
+  return (
+    recurrenceCandidate(value.candidates, candidateState) &&
+    Array.isArray(value.conditions) &&
+    value.conditions.length <= 64 &&
+    value.conditions.every((condition) => recurrenceCondition(condition)) &&
+    hasExactKeys(value.limits, ['maxOccurrences', 'until']) &&
+    (value.limits.maxOccurrences === null ||
+      recurrenceInteger(value.limits.maxOccurrences, 1, 10_000_000)) &&
+    (value.limits.until === null || boundedString(value.limits.until, 32, false)) &&
+    hasAllowedKeys(
+      value.materialization,
+      ['catchUp', 'catchUpLimit', 'lead', 'overlap'],
+      ['catchUp', 'lead', 'overlap'],
+    ) &&
+    ['all', 'bounded', 'latest', 'none'].includes(String(value.materialization.catchUp)) &&
+    (value.materialization.catchUp === 'bounded'
+      ? recurrenceInteger(value.materialization.catchUpLimit, 1, 100)
+      : value.materialization.catchUpLimit === undefined) &&
+    recurrenceDuration(value.materialization.lead, true) &&
+    ['allow', 'defer', 'latest-only', 'pause-series', 'skip'].includes(
+      String(value.materialization.overlap),
+    ) &&
+    hasExactKeys(value.timeBasis, ['disambiguation', 'mode', 'timeZone']) &&
+    ['compatible', 'earlier', 'later', 'reject'].includes(String(value.timeBasis.disambiguation)) &&
+    ['elapsed', 'wall-clock'].includes(String(value.timeBasis.mode)) &&
+    boundedString(value.timeBasis.timeZone, 128, false) &&
+    Array.isArray(value.transforms) &&
+    value.transforms.length <= 64 &&
+    value.transforms.every(recurrenceTransform)
+  )
+}
+
+function recurrenceCustomFieldValue(value: unknown) {
+  if (value === null || ['boolean', 'number', 'string'].includes(typeof value)) {
+    return typeof value !== 'number' || Number.isFinite(value)
+  }
+  return (
+    Array.isArray(value) &&
+    value.length <= 250 &&
+    value.every((item) => item === null || ['boolean', 'number', 'string'].includes(typeof item))
+  )
+}
+
+function recurrenceCustomFieldValues(value: unknown) {
+  return (
+    isRecord(value) &&
+    Object.keys(value).length <= 256 &&
+    Object.entries(value).every(
+      ([key, item]) => recurrenceReferencePattern.test(key) && recurrenceCustomFieldValue(item),
+    )
+  )
+}
+
+function recurrenceSubTasks(value: unknown) {
+  return (
+    Array.isArray(value) &&
+    value.length <= 500 &&
+    value.every(
+      (subTask) =>
+        hasAllowedKeys(subTask, ['order', 'title'], ['title']) &&
+        boundedString(subTask.title, 5000, false) &&
+        (subTask.order === undefined ||
+          (typeof subTask.order === 'number' &&
+            Number.isFinite(subTask.order) &&
+            Math.abs(subTask.order) <= 100_000_000)),
+    )
+  )
+}
+
+function recurrenceTemplate(value: unknown, requireName = true) {
+  if (
+    !hasAllowedKeys(
+      value,
+      [
+        'billable',
+        'contactId',
+        'customFieldValues',
+        'description',
+        'descriptionFormat',
+        'groupId',
+        'listId',
+        'name',
+        'personalListId',
+        'plannedTime',
+        'projectId',
+        'serviceId',
+        'subscriberIds',
+        'subTasks',
+        'tagIds',
+        'userId',
+      ],
+      requireName ? ['name'] : [],
+    )
+  )
+    return false
+  const idFields = [
+    'contactId',
+    'groupId',
+    'listId',
+    'personalListId',
+    'projectId',
+    'serviceId',
+    'userId',
+  ]
+  return (
+    (!requireName || boundedString(value.name, 1000, false)) &&
+    (value.name === undefined || boundedString(value.name, 1000, false)) &&
+    (value.billable === undefined || typeof value.billable === 'boolean') &&
+    (value.description === undefined || boundedString(value.description, 200_000)) &&
+    (value.descriptionFormat === undefined ||
+      ['markdown-v1', 'plain-text'].includes(String(value.descriptionFormat))) &&
+    (value.plannedTime === undefined ||
+      (typeof value.plannedTime === 'number' &&
+        Number.isFinite(value.plannedTime) &&
+        value.plannedTime >= 0 &&
+        value.plannedTime <= 100_000_000)) &&
+    idFields.every(
+      (key) => value[key] === undefined || recurrenceReferencePattern.test(String(value[key])),
+    ) &&
+    (value.subscriberIds === undefined ||
+      sortedUniqueStrings(value.subscriberIds, 250, (id) => recurrenceReferencePattern.test(id))) &&
+    (value.subTasks === undefined || recurrenceSubTasks(value.subTasks)) &&
+    (value.tagIds === undefined ||
+      sortedUniqueStrings(value.tagIds, 250, (id) => recurrenceReferencePattern.test(id))) &&
+    (value.customFieldValues === undefined ||
+      recurrenceCustomFieldValues(value.customFieldValues)) &&
+    recurrenceJsonObject(value)
+  )
+}
+
+function recurrenceOccurrenceOverride(value: unknown) {
+  return (
+    hasAllowedKeys(
+      value,
+      ['action', 'placeholderToken', 'scheduledForLocal', 'templatePatch'],
+      ['action'],
+    ) &&
+    ['materialize', 'skip'].includes(String(value.action)) &&
+    (value.placeholderToken === undefined ||
+      (boundedString(value.placeholderToken, 32 * 1024, false) &&
+        taskRecurrencePlaceholderTokenPattern.test(String(value.placeholderToken)))) &&
+    (value.scheduledForLocal === undefined ||
+      recurrenceLocalDateTimePattern.test(String(value.scheduledForLocal))) &&
+    (value.templatePatch === undefined || recurrenceTemplate(value.templatePatch, false))
+  )
+}
+
+function recurrenceCardDates(value: unknown) {
+  return (
+    hasAllowedKeys(value, ['dueDate', 'plannedEnd', 'plannedStart'], []) &&
+    Object.values(value).every(canonicalDate)
+  )
+}
+
+function recurrenceDefinition(value: unknown) {
+  if (
+    !hasExactKeys(value, [
+      'costClass',
+      'definitionHash',
+      'engineVersion',
+      'id',
+      'policy',
+      'schemaVersion',
+      'summary',
+      'template',
+      'version',
+    ])
+  )
+    return false
+  return (
+    ['low', 'medium', 'high', 'async'].includes(String(value.costClass)) &&
+    taskRecurrenceRevisionPattern.test(String(value.definitionHash)) &&
+    value.engineVersion === 'recurrence-v1' &&
+    taskRecurrenceIdPattern.test(String(value.id)) &&
+    recurrencePolicy(value.policy) &&
+    value.schemaVersion === 1 &&
+    recurrenceJsonObject(value.summary, 32 * 1024) &&
+    recurrenceTemplate(value.template) &&
+    Number.isSafeInteger(value.version) &&
+    Number(value.version) >= 1
+  )
+}
+
+export const taskRecurrenceValidator: ResourceValidator<TaskRecurrence> = (
+  value,
+): value is TaskRecurrence =>
+  exactResource(
+    value,
+    'taskRecurrence',
+    taskRecurrenceIdPattern,
+    (attributes) =>
+      hasExactKeys(attributes, [
+        'attentionCode',
+        'createdAt',
+        'currentDefinition',
+        'developerUpdatedAt',
+        'name',
+        'owner',
+        'replayed',
+        'resourceContext',
+        'revision',
+        'status',
+        'updatedAt',
+      ]) &&
+      (attributes.attentionCode === null || boundedString(attributes.attentionCode, 1000, false)) &&
+      canonicalDate(attributes.createdAt) &&
+      recurrenceDefinition(attributes.currentDefinition) &&
+      canonicalDate(attributes.developerUpdatedAt) &&
+      (attributes.name === null || boundedString(attributes.name, 1000)) &&
+      hasExactKeys(attributes.owner, ['id', 'kind']) &&
+      taskRecurrenceIdPattern.test(String(attributes.owner.id)) &&
+      ['developerPrincipal', 'user'].includes(String(attributes.owner.kind)) &&
+      typeof attributes.replayed === 'boolean' &&
+      recurrenceJsonObject(attributes.resourceContext, 32 * 1024) &&
+      taskRecurrenceRevisionPattern.test(String(attributes.revision)) &&
+      ['active', 'paused', 'suspended', 'needs_attention', 'ended', 'archived'].includes(
+        String(attributes.status),
+      ) &&
+      canonicalDate(attributes.updatedAt),
+  )
+
+export const taskRecurrenceVersionValidator: ResourceValidator<TaskRecurrenceVersion> = (
+  value,
+): value is TaskRecurrenceVersion =>
+  exactResource(
+    value,
+    'taskRecurrenceVersion',
+    taskRecurrenceIdPattern,
+    (attributes) =>
+      hasExactKeys(attributes, [
+        'changeReason',
+        'costClass',
+        'createdAt',
+        'createdBy',
+        'definitionHash',
+        'effectiveFromOccurrenceKey',
+        'engineVersion',
+        'policy',
+        'schemaVersion',
+        'seriesId',
+        'summary',
+        'template',
+        'version',
+      ]) &&
+      (attributes.changeReason === null || boundedString(attributes.changeReason, 1000)) &&
+      ['low', 'medium', 'high', 'async'].includes(String(attributes.costClass)) &&
+      canonicalDate(attributes.createdAt) &&
+      taskRecurrenceIdPattern.test(String(attributes.createdBy)) &&
+      taskRecurrenceRevisionPattern.test(String(attributes.definitionHash)) &&
+      (attributes.effectiveFromOccurrenceKey === null ||
+        taskRecurrenceIdPattern.test(String(attributes.effectiveFromOccurrenceKey))) &&
+      attributes.engineVersion === 'recurrence-v1' &&
+      recurrencePolicy(attributes.policy) &&
+      attributes.schemaVersion === 1 &&
+      taskRecurrenceIdPattern.test(String(attributes.seriesId)) &&
+      recurrenceJsonObject(attributes.summary, 32 * 1024) &&
+      recurrenceTemplate(attributes.template) &&
+      Number.isSafeInteger(attributes.version) &&
+      Number(attributes.version) >= 1,
+  )
+
+export const taskRecurrenceOccurrenceValidator: ResourceValidator<TaskRecurrenceOccurrence> = (
+  value,
+): value is TaskRecurrenceOccurrence =>
+  exactResource(
+    value,
+    'taskRecurrenceOccurrence',
+    taskRecurrenceIdPattern,
+    (attributes) =>
+      hasExactKeys(attributes, [
+        'attempts',
+        'cardId',
+        'decision',
+        'definitionVersionId',
+        'lastErrorCode',
+        'materializeAt',
+        'materializedAt',
+        'occurrenceKey',
+        'override',
+        'revision',
+        'scheduledFor',
+        'scheduledForLocal',
+        'seriesId',
+        'state',
+        'timeZone',
+        'updatedAt',
+      ]) &&
+      Number.isSafeInteger(attributes.attempts) &&
+      Number(attributes.attempts) >= 0 &&
+      nullableId(attributes.cardId) &&
+      (attributes.decision === null || recurrenceJsonObject(attributes.decision, 32 * 1024)) &&
+      taskRecurrenceIdPattern.test(String(attributes.definitionVersionId)) &&
+      (attributes.lastErrorCode === null || boundedString(attributes.lastErrorCode, 1000, false)) &&
+      canonicalDate(attributes.materializeAt) &&
+      nullableCanonicalDate(attributes.materializedAt) &&
+      taskRecurrenceOccurrenceKeyPattern.test(String(attributes.occurrenceKey)) &&
+      (attributes.override === null || recurrenceOccurrenceOverride(attributes.override)) &&
+      taskRecurrenceRevisionPattern.test(String(attributes.revision)) &&
+      canonicalDate(attributes.scheduledFor) &&
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?$/.test(String(attributes.scheduledForLocal)) &&
+      taskRecurrenceIdPattern.test(String(attributes.seriesId)) &&
+      ['planned', 'claimed', 'materialized', 'skipped', 'blocked', 'failed'].includes(
+        String(attributes.state),
+      ) &&
+      boundedString(attributes.timeZone, 128, false) &&
+      canonicalDate(attributes.updatedAt),
+  )
+
+export const taskRecurrencePreviewValidator: ResourceValidator<TaskRecurrencePreview> = (
+  value,
+): value is TaskRecurrencePreview =>
+  exactResource(
+    value,
+    'taskRecurrencePreview',
+    taskRecurrenceIdPattern,
+    (attributes) =>
+      hasExactKeys(attributes, ['costClass', 'definitionHash', 'occurrences', 'summary']) &&
+      (attributes.costClass === null ||
+        ['low', 'medium', 'high', 'async'].includes(String(attributes.costClass))) &&
+      taskRecurrenceRevisionPattern.test(String(attributes.definitionHash)) &&
+      Array.isArray(attributes.occurrences) &&
+      attributes.occurrences.length <= 100 &&
+      attributes.occurrences.every(
+        (occurrence) =>
+          hasExactKeys(occurrence, [
+            'cardDates',
+            'occurrenceKey',
+            'placeholderToken',
+            'provenance',
+            'scheduledFor',
+            'scheduledForLocal',
+            'timeZone',
+          ]) &&
+          recurrenceCardDates(occurrence.cardDates) &&
+          taskRecurrenceOccurrenceKeyPattern.test(String(occurrence.occurrenceKey)) &&
+          (occurrence.placeholderToken === null ||
+            (boundedString(occurrence.placeholderToken, 32 * 1024, false) &&
+              taskRecurrencePlaceholderTokenPattern.test(String(occurrence.placeholderToken)))) &&
+          Array.isArray(occurrence.provenance) &&
+          occurrence.provenance.length <= 100 &&
+          occurrence.provenance.every((item) => boundedString(item, 256, false)) &&
+          canonicalDate(occurrence.scheduledFor) &&
+          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?$/.test(String(occurrence.scheduledForLocal)) &&
+          boundedString(occurrence.timeZone, 128, false),
+      ) &&
+      recurrenceJsonObject(attributes.summary, 32 * 1024),
+  )
+
+function recurrenceOperationProgress(value: unknown) {
+  return (
+    value === null ||
+    (hasAllowedKeys(value, ['current', 'total'], ['current']) &&
+      typeof value.current === 'number' &&
+      Number.isSafeInteger(value.current) &&
+      value.current >= 0 &&
+      (value.total === undefined ||
+        (typeof value.total === 'number' &&
+          Number.isSafeInteger(value.total) &&
+          value.total >= value.current)))
+  )
+}
+
+export const taskRecurrenceOperationValidator: ResourceValidator<TaskRecurrenceOperation> = (
+  value,
+): value is TaskRecurrenceOperation =>
+  exactResource(value, 'taskRecurrenceOperation', taskRecurrenceIdPattern, (attributes) => {
+    if (
+      !hasExactKeys(attributes, [
+        'completedAt',
+        'createdAt',
+        'errorCode',
+        'operationType',
+        'progress',
+        'result',
+        'seriesId',
+        'status',
+        'updatedAt',
+      ]) ||
+      !nullableCanonicalDate(attributes.completedAt) ||
+      !canonicalDate(attributes.createdAt) ||
+      !['catchUp', 'preview', 'recheck', 'repair'].includes(String(attributes.operationType)) ||
+      !['pending', 'running', 'succeeded', 'failed', 'cancelled'].includes(
+        String(attributes.status),
+      ) ||
+      !canonicalDate(attributes.updatedAt)
+    )
+      return false
+    const terminal = ['succeeded', 'failed', 'cancelled'].includes(String(attributes.status))
+    return (
+      recurrenceOperationProgress(attributes.progress) &&
+      (attributes.operationType === 'preview'
+        ? attributes.seriesId === null
+        : nullableId(attributes.seriesId) && attributes.seriesId !== null) &&
+      (terminal ? attributes.completedAt !== null : attributes.completedAt === null) &&
+      (attributes.status === 'succeeded'
+        ? recurrenceJsonObject(attributes.result, 64 * 1024)
+        : attributes.result === null) &&
+      (attributes.status === 'failed'
+        ? boundedString(attributes.errorCode, 1000, false)
+        : attributes.errorCode === null)
+    )
+  })
+
+export const taskRecurrenceEventValidator: ResourceValidator<TaskRecurrenceEvent> = (
+  value,
+): value is TaskRecurrenceEvent =>
+  exactResource(
+    value,
+    'taskRecurrenceEvent',
+    taskRecurrenceIdPattern,
+    (attributes) =>
+      hasExactKeys(attributes, ['acceptedAt']) && canonicalDate(attributes.acceptedAt),
+  )
 
 export function assertRevisionEtag(
   transport: Readonly<TransportMetadata>,

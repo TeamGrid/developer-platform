@@ -21,12 +21,12 @@ stdio process never opens a browser itself. `TEAMGRID_API_TOKEN` and
 `TEAMGRID_API_BASE_URL` may be supplied to the process for ephemeral CI/local
 use.
 
-The default `core` profile exposes 15 bounded reads for workspace, projects,
-tasks, time entries, lists, tags, products, and product groups. Product purchase
+The default `core` profile exposes 22 bounded reads for workspace, projects,
+tasks, recurring-task definitions/versions/occurrences, time entries, lists, tags, products, and product groups. Product purchase
 prices are removed from MCP results even when the selected credential has a
 finance overlay. Use `collaboration` for contact, call-note, contact-group, and user
 reads; `governance` for webhook, service, and custom-field-definition
-reads; or `all` for the explicit 29-tool union. Project statements and webhook
+reads; or `all` for the explicit 36-tool union. Project statements and webhook
 delivery history remain forbidden in every MCP profile. The adapter does not
 expose write or secret-bearing operations.
 Time-entry billing state is also forbidden in every profile because it is a
@@ -64,6 +64,9 @@ reveal secrets, broaden scopes or tool filters, or follow additional cursors.
 
 Project and task tools include their stable developer revision. MCP remains intentionally
 read-only, so compare-and-set inputs are not part of its curated tool surface.
+The seven recurrence tools list/get saved definitions, preview saved schedules, and list/get
+immutable versions and occurrence-ledger entries. Unsaved preview, lifecycle writes, external
+trigger submission, retries, overrides, and asynchronous operation control are deliberately absent.
 The two time-entry tools additionally remove `billable`, `billed`, and `billedAt`
 from every result. Their input schema does not expose the `billable` or `billed`
 filters.

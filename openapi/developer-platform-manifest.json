@@ -1,30 +1,30 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.0.0",
+  "contractVersion": "1.1.0",
   "artifacts": [
     {
       "bytes": 602,
       "id": "action-policy-registry",
       "path": "contracts/developer-action-policy-registry.json",
-      "sha256": "ad76fdd749980a3953a686a87692c197099fb1eaf696b651efb0b4129926e7f9"
+      "sha256": "357d66979da48ae60697fbe4c467d2ee01a579107a82ec9254136f2c322556e3"
     },
     {
-      "bytes": 73461,
+      "bytes": 83246,
       "id": "capability-ledger",
       "path": "contracts/developer-capabilities.json",
-      "sha256": "e63fa6e679122f5efae20313e8d3599c0675e4ab02cd8b7d3bde9148ebbef4b2"
+      "sha256": "bcc853bcd6b141efb2ffbbd22c42c9a008cb24997a0e2a75594286cf50091e3b"
     },
     {
-      "bytes": 153007,
+      "bytes": 173009,
       "id": "operation-bindings",
       "path": "contracts/developer-operation-bindings.json",
-      "sha256": "1f5307b78f96b2fa24b0b6b0657a62f65b657f5086e4b0382b2129c28b023567"
+      "sha256": "aaeb6273d02436e5a30e68ba4d46d62e28708d655c29c222537a44d977e42215"
     },
     {
-      "bytes": 9707,
+      "bytes": 10004,
       "id": "scope-contract",
       "path": "contracts/developer-scopes.json",
-      "sha256": "7378a809c9bd9eb507bd310c44aef03212340a299222ab44bbaca42612c3414c"
+      "sha256": "bf7c5cd3a50c0ba8881285e562f0602d9b67122a9dfeeff0e58cd346c2e063d7"
     },
     {
       "bytes": 17437,
@@ -45,29 +45,29 @@
       "sha256": "902adb098fa9c7079c4d77b409237549d96399a8da6fc342f95f397f59c2d7ff"
     },
     {
-      "bytes": 1278195,
+      "bytes": 1485045,
       "id": "openapi-v1",
       "path": "openapi/v1.json",
-      "sha256": "ddd8dd9d09f7feff3d708413eaf456c808ee1ba84fe3fa3451e862b204b17f8c"
+      "sha256": "cf26d41b9125cecbd65c1a2fd88b1006ca3441d195abba86370c2755098bc373"
     }
   ],
   "summary": {
-    "actionPolicyRegistryOperations": 211,
-    "actionPolicyRegistrySha256": "b9e0f3fe0fbab1afd8362f47b49e496133235ce0f1830462b6c848d7d289f566",
-    "actionPolicyRegistryVersion": "developer-action-policy-v5",
-    "authenticatedActionPolicies": 209,
-    "classifiedProductCapabilities": 73,
-    "canonicalScopes": 87,
-    "governedV1Operations": 211,
-    "operationBindings": 211,
+    "actionPolicyRegistryOperations": 236,
+    "actionPolicyRegistrySha256": "cd37ce1dccf37979572074010efc8c809e40a8c10744fd47af686d0151de8cc0",
+    "actionPolicyRegistryVersion": "developer-action-policy-v7",
+    "authenticatedActionPolicies": 234,
+    "classifiedProductCapabilities": 74,
+    "canonicalScopes": 90,
+    "governedV1Operations": 236,
+    "operationBindings": 236,
     "principalPolicyFamilies": 12,
-    "referencedAppMethods": 210,
+    "referencedAppMethods": 231,
     "remainingDirectCellReads": 0,
     "unmediatedDirectCellReads": 0,
     "resourceCasMutationOperations": 18,
     "resourceCasOperationReads": 2,
     "v0Operations": 87,
     "v0MigrationRoutes": 87,
-    "v1Operations": 211
+    "v1Operations": 236
   }
 }

@@ -11,6 +11,9 @@
     { "name": "projects:sharing", "availability": "issuable", "sensitive": true },
     { "name": "tasks:read", "availability": "issuable" },
     { "name": "tasks:write", "availability": "issuable" },
+    { "name": "task-recurrences:read", "availability": "issuable", "sensitive": true },
+    { "name": "task-recurrences:write", "availability": "issuable", "sensitive": true },
+    { "name": "task-recurrences:run", "availability": "issuable", "sensitive": true },
     { "name": "time-entries:read", "availability": "issuable" },
     { "name": "time-entries:write", "availability": "issuable" },
     { "name": "time-entries:billing", "availability": "issuable", "sensitive": true },
@@ -159,6 +162,7 @@
       "scopes": [
         "contacts:read",
         "projects:read",
+        "task-recurrences:read",
         "tasks:read",
         "time-entries:read"
       ],

@@ -13,11 +13,11 @@ describe('conformance plan command', () => {
     const plan = JSON.parse(rendered)
 
     expect(plan).toMatchObject({
-      contractVersion: '1.0.0',
+      contractVersion: '1.1.0',
       mode: 'plan',
-      summary: { total: 298 },
+      summary: { total: 323 },
     })
-    expect(plan.operations).toHaveLength(298)
+    expect(plan.operations).toHaveLength(323)
     expect(rendered).not.toContain('legacy-secret')
     expect(rendered).not.toContain('stable-secret')
   })

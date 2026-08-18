@@ -19,13 +19,13 @@ and Windows. CI qualifies both Node boundaries on all three operating systems.
 Persistent CLI profiles use macOS Keychain, Linux Secret Service, or the native
 Windows Credential Manager.
 
-The stable 1.0.7 release is prepared for npm through the default `latest`
+The stable 1.1.0 release is prepared for npm through the default `latest`
 channel:
 
 ```sh
-npm install @teamgrid/api-client@1.0.7
-npm install --global @teamgrid/cli@1.0.7
-npm install --global @teamgrid/mcp-server@1.0.7
+npm install @teamgrid/api-client@1.1.0
+npm install --global @teamgrid/cli@1.1.0
+npm install --global @teamgrid/mcp-server@1.1.0
 ```
 
 Use the exact version shown above in reproducible deployments. Unpinned
@@ -119,6 +119,10 @@ teamgrid planned-work list --start 2026-07-20T00:00:00Z --end 2026-07-27T00:00:0
   --user-id user-id --output json
 teamgrid changes checkpoint --resource-type task --output json
 teamgrid changes list --cursor "$CHECKPOINT" --resource-type task --all --output jsonl
+teamgrid task-recurrences create --data @recurrence.json \
+  --idempotency-key daily-review-v1 --output json
+teamgrid task-recurrences preview-stored recurrence-id --count 10 --output json
+teamgrid task-recurrences occurrences list recurrence-id --output json
 ```
 
 Use `--data @payload.json` or `--data -` for files/stdin. Destructive commands
@@ -154,6 +158,14 @@ exact filter set. The MCP adapter intentionally does not expose this high-volume
 primitive. Use signed webhooks for low-latency notifications and the change feed to detect and
 reconcile missed changes.
 
+Recurring tasks use immutable definition versions, a durable occurrence ledger, strong
+compare-and-set revisions, and encrypted asynchronous preview/recovery operations. API v1, the TypeScript SDK, and
+the CLI expose the complete lifecycle, including preview, pause/resume/end/archive/restore,
+ownership transfer, version restore, occurrence overrides/retries, external event ingress, and
+recheck operation polling. The MCP adapter exposes only seven bounded saved-definition,
+version, preview, and occurrence reads; it never exposes drafts, writes, trigger ingress, or
+operation control.
+
 GET requests and POST requests with an idempotency key are retried for bounded transient failures.
 Tasks, projects, and project templates expose developer revisions and strong ETags. Every update,
 archive, restore, completion, reopen, lifecycle start, and template instantiation requires the
@@ -186,8 +198,8 @@ hooks separately and reveals a new v2 signing secret only once.
 
 MCP is intentionally downstream of API v1 and is not required for automation.
 It reads the same CLI keychain profile and offers only bounded read tools.
-The default `core` tool profile includes workspace, projects, tasks, time
-entries, lists, and tags. `collaboration` additionally exposes contacts and
+The default `core` tool profile includes workspace, projects, tasks, recurring-task definitions,
+versions and occurrences, time entries, lists, and tags. `collaboration` additionally exposes contacts and
 users; `governance` adds webhooks, services, and custom-field definitions. Service reads are kept
 out of `core` because they include billing-rate data. `all` is the explicit
 union of the collaboration and governance profiles.
@@ -228,7 +240,7 @@ npm run conformance:plan
 ```
 
 The plan reads the immutable contract set and produces a deterministic inventory of all 87 V0 and
-211 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
+236 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
 execution binding, CAS precondition, and idempotency requirement. V0 compatibility statuses and the
 V0-to-V1 migration map remain explicit, so a documented unavailable route is not confused with an
 unexpected regression. Planning never loads a credential or contacts TeamGrid.
@@ -236,7 +248,7 @@ unexpected regression. Planning never loads a credential or contacts TeamGrid.
 The read-only phase performs only parameter-free GET requests, uses `limit=1` where supported, runs
 sequentially below the shared pre-auth limit, and retries at most two `429` responses. Operations
 that need an id, required filter, body, or mutation are recorded as blocked rather than guessed. A
-V1 run additionally proves all 210 SDK methods, all 211 CLI operation mappings, the exact 29-tool MCP allowlist, and one
+V1 run additionally proves all 235 SDK methods, all 236 CLI operation mappings, the exact 36-tool MCP allowlist, and one
 live workspace request through SDK, CLI, and MCP:
 
 ```sh
@@ -334,7 +346,7 @@ the exact repository, commit, manifest size, and manifest digest in
 working tree.
 
 The mirrored manifest also contains `developer-action-policy-registry.json`.
-It pins the App/API authorization registry version, SHA-256 identity, all 205
+It pins the App/API authorization registry version, SHA-256 identity, all 236
 action policies, and 12 principal-policy rollout families. SDK, CLI, and MCP do
 not evaluate or broaden this policy locally; every request remains subject to
 the owning App cell's authorization decision.

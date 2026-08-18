@@ -110,6 +110,22 @@ export type TaskSubtasksReplace = components['schemas']['TaskSubtasksReplace']
 export type TaskUpdate = components['schemas']['TaskUpdate']
 export type TaskBulkUpdate = components['schemas']['TaskBulkUpdate']
 export type TaskBulkUpdateResult = components['schemas']['TaskBulkUpdateResult']
+export type TaskRecurrence = components['schemas']['TaskRecurrence']
+export type TaskRecurrenceVersion = components['schemas']['TaskRecurrenceVersion']
+export type TaskRecurrenceOccurrence = components['schemas']['TaskRecurrenceOccurrence']
+export type TaskRecurrencePreview = components['schemas']['TaskRecurrencePreview']
+export type TaskRecurrenceOperation = components['schemas']['TaskRecurrenceOperation']
+export type TaskRecurrenceEvent = components['schemas']['TaskRecurrenceEvent']
+export type TaskRecurrenceCreate = components['schemas']['TaskRecurrenceCreate']
+export type TaskRecurrenceUpdate = components['schemas']['TaskRecurrenceUpdate']
+export type TaskRecurrencePreviewInput = components['schemas']['TaskRecurrencePreviewInput']
+export type TaskRecurrenceOwnerUpdate = components['schemas']['TaskRecurrenceOwnerUpdate']
+export type TaskRecurrenceTaskTemplateUpdate =
+  components['schemas']['TaskRecurrenceTaskTemplateUpdate']
+export type TaskRecurrenceVersionRestore = components['schemas']['TaskRecurrenceVersionRestore']
+export type TaskRecurrenceOccurrenceOverride =
+  components['schemas']['TaskRecurrenceOccurrenceOverride']
+export type TaskRecurrenceEventSubmit = components['schemas']['TaskRecurrenceEventSubmit']
 export type TimeEntryCreate = components['schemas']['TimeEntryCreate']
 export type TimeEntryBilling = components['schemas']['TimeEntryBilling']
 export type TimeEntryBillingUpdate = components['schemas']['TimeEntryBillingUpdate']
@@ -270,7 +286,13 @@ export type TaskSearchResult = SearchResultBase<'task'> & {
 
 export type SearchResult = ContactSearchResult | ProjectSearchResult | TaskSearchResult
 
-export type ExportResourceType = 'auditEvents' | 'contacts' | 'projects' | 'tasks' | 'timeEntries'
+export type ExportResourceType =
+  | 'auditEvents'
+  | 'contacts'
+  | 'projects'
+  | 'taskRecurrences'
+  | 'tasks'
+  | 'timeEntries'
 export type AuditEventExportField =
   | 'id'
   | 'createdAt'
@@ -313,6 +335,23 @@ export type TaskExportField =
   | 'name'
   | 'projectId'
   | 'updatedAt'
+export type TaskRecurrenceExportField =
+  | 'archivedAt'
+  | 'createdAt'
+  | 'createdBy'
+  | 'currentDefinitionVersionId'
+  | 'definitionHash'
+  | 'definitionVersion'
+  | 'id'
+  | 'name'
+  | 'ownerId'
+  | 'ownerKind'
+  | 'policy'
+  | 'projectId'
+  | 'status'
+  | 'summary'
+  | 'template'
+  | 'updatedAt'
 export type TimeEntryExportField =
   | 'archived'
   | 'durationMinutes'
@@ -327,6 +366,7 @@ export type ExportField =
   | AuditEventExportField
   | ContactExportField
   | ProjectExportField
+  | TaskRecurrenceExportField
   | TaskExportField
   | TimeEntryExportField
 
@@ -353,6 +393,10 @@ export type ExportCreate =
       (
         | { fields?: readonly ContactExportField[]; resourceType: 'contacts' }
         | { fields?: readonly ProjectExportField[]; resourceType: 'projects' }
+        | {
+            fields?: readonly TaskRecurrenceExportField[]
+            resourceType: 'taskRecurrences'
+          }
         | { fields?: readonly TaskExportField[]; resourceType: 'tasks' }
         | { fields?: readonly TimeEntryExportField[]; resourceType: 'timeEntries' }
       ))
@@ -689,6 +733,46 @@ export type TaskListOptions = ListOptions &
     subscriberId?: string
     tagId?: string
   }
+
+export type TaskRecurrenceListOptions = ListOptions & {
+  projectId?: string
+  status?: TaskRecurrence['attributes']['status']
+}
+
+export type TaskRecurrenceStoredPreviewOptions = RequestOptions & {
+  count?: number
+  from?: string | Date
+  until?: string | Date
+}
+
+export type TaskRecurrenceMutationOptions = RequestOptions & {
+  /** The raw 64-hex revision or its canonical tr1 strong ETag. */
+  ifMatch: string
+}
+
+export type TaskRecurrenceOccurrenceMutationOptions = RequestOptions & {
+  /** The raw 64-hex revision or its canonical tro1 strong ETag. */
+  ifMatch: string
+}
+
+export type TaskRecurrenceOccurrenceOverrideOptions = RequestOptions &
+  (
+    | {
+        /** Create a ledger placeholder from the stored-preview placeholder token. */
+        createIfMissing: true
+        ifMatch?: never
+      }
+    | {
+        createIfMissing?: false
+        /** The raw 64-hex revision or its canonical tro1 strong ETag. */
+        ifMatch: string
+      }
+  )
+
+export type TaskRecurrenceOperationWaitOptions = RequestOptions & {
+  maxWaitMs?: number
+  pollIntervalMs?: number
+}
 
 export type TimeEntryListOptions = ListOptions &
   ArchiveFilter & {

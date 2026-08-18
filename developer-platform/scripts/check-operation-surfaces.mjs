@@ -94,7 +94,7 @@ const changeEventResourceTypes = openapi.components?.schemas?.ChangeEvent?.prope
   ?.properties?.resourceType?.enum
 if (
   !Array.isArray(changeResourceTypes) ||
-  changeResourceTypes.length !== 23 ||
+  changeResourceTypes.length !== 24 ||
   new Set(changeResourceTypes).size !== changeResourceTypes.length ||
   JSON.stringify(changeResourceTypes) !== JSON.stringify(changeEventResourceTypes) ||
   JSON.stringify(changeResourceTypes) !== JSON.stringify(TEAMGRID_CHANGE_FEED_RESOURCE_TYPES) ||
@@ -149,18 +149,24 @@ const expectedCoreOperationIds = [
 ]
 const expectedIndependentIfMatchOperationIds = [
   'abortAutomationRun',
+  'applyTaskAsTaskRecurrenceTemplate',
   'archiveAbsence',
   'archiveAppointment',
   'archiveAutomationDefinition',
   'archiveComment',
   'archiveDocument',
   'archiveFile',
+  'archiveTaskRecurrence',
   'cancelInvitation',
   'clearCustomFieldValue',
+  'clearTaskRecurrenceOccurrenceOverride',
   'deleteGroup',
   'deleteRole',
+  'endTaskRecurrence',
   'removeMember',
   'renameFile',
+  'overrideTaskRecurrenceOccurrence',
+  'pauseTaskRecurrence',
   'replaceServiceAccountResourceGrants',
   'replaceTaskPlannedWork',
   'resendInvitation',
@@ -170,8 +176,13 @@ const expectedIndependentIfMatchOperationIds = [
   'restoreComment',
   'restoreDocument',
   'restoreFile',
+  'restoreTaskRecurrence',
+  'restoreTaskRecurrenceVersion',
+  'resumeTaskRecurrence',
+  'retryTaskRecurrenceOccurrence',
   'rotateWebhookSecret',
   'setCustomFieldValue',
+  'transferTaskRecurrenceOwner',
   'updateAbsence',
   'updateAppointment',
   'updateAutomationDefinition',
@@ -180,6 +191,7 @@ const expectedIndependentIfMatchOperationIds = [
   'updateMemberRole',
   'updateRole',
   'updateTimeEntryBilling',
+  'updateTaskRecurrence',
   'updateWebhook',
   'updateWorkspaceSettings',
 ]
@@ -346,7 +358,17 @@ for (const operation of independentIfMatchOperations) {
   const policy = ledger.operationPolicy.find((entry) => entry.operationId === operation.operationId)
   const command = policy && cliCommandMap.get(policy.cli)
   const ifMatchOptions = command?.options.filter((option) => option.long === '--if-match') || []
-  if (!policy || ifMatchOptions.length !== 1 || ifMatchOptions[0].mandatory !== true) {
+  const createIfMissingOptions =
+    command?.options.filter((option) => option.long === '--create-if-missing') || []
+  const createsFutureOccurrence = operation.operationId === 'overrideTaskRecurrenceOccurrence'
+  if (
+    !policy ||
+    ifMatchOptions.length !== 1 ||
+    ifMatchOptions[0].mandatory !== !createsFutureOccurrence ||
+    (createsFutureOccurrence
+      ? createIfMissingOptions.length !== 1 || createIfMissingOptions[0].mandatory === true
+      : createIfMissingOptions.length !== 0)
+  ) {
     fail(`${operation.operationId} must preserve one required CLI --if-match option`)
   }
 }

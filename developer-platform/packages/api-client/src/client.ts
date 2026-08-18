@@ -46,6 +46,12 @@ import {
   roleValidator,
   searchResultValidator,
   systemCapabilityValidator,
+  taskRecurrenceEventValidator,
+  taskRecurrenceOccurrenceValidator,
+  taskRecurrenceOperationValidator,
+  taskRecurrencePreviewValidator,
+  taskRecurrenceValidator,
+  taskRecurrenceVersionValidator,
   timeEntryBillingValidator,
   webhookSecretRotationValidator,
   webhookTestDeliveryValidator,
@@ -217,6 +223,20 @@ import type {
   TaskMutationOptions,
   TaskPlacement,
   TaskPlannedWork,
+  TaskRecurrenceCreate,
+  TaskRecurrenceEventSubmit,
+  TaskRecurrenceListOptions,
+  TaskRecurrenceMutationOptions,
+  TaskRecurrenceOccurrenceMutationOptions,
+  TaskRecurrenceOccurrenceOverride,
+  TaskRecurrenceOccurrenceOverrideOptions,
+  TaskRecurrenceOperationWaitOptions,
+  TaskRecurrenceOwnerUpdate,
+  TaskRecurrencePreviewInput,
+  TaskRecurrenceStoredPreviewOptions,
+  TaskRecurrenceTaskTemplateUpdate,
+  TaskRecurrenceUpdate,
+  TaskRecurrenceVersionRestore,
   TaskSubtasksReplace,
   TaskUpdate,
   TimeEntry,
@@ -252,6 +272,7 @@ type InternalRequestOptions = RequestOptions & {
   body?: unknown
   idempotencyKey?: string
   ifMatch?: string
+  ifNoneMatch?: string
   method?: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT'
   query?: Query
 }
@@ -736,6 +757,16 @@ const strongProjectEtag = (value: string) =>
 const strongProjectTemplateEtag = (value: string) =>
   strongResourceEtag(value, /^tpl1-[a-f0-9]{64}$/, 'Project template')
 const strongTaskEtag = (value: string) => strongResourceEtag(value, /^tsk1-[a-f0-9]{64}$/, 'Task')
+function strongTaskRecurrenceEtag(value: string) {
+  const candidate = value.startsWith('"') && value.endsWith('"') ? value.slice(1, -1) : value
+  const revision = /^[a-f0-9]{64}$/.test(candidate) ? `tr1-${candidate}` : candidate
+  return strongResourceEtag(revision, /^tr1-[a-f0-9]{64}$/, 'Task recurrence')
+}
+function strongTaskRecurrenceOccurrenceEtag(value: string) {
+  const candidate = value.startsWith('"') && value.endsWith('"') ? value.slice(1, -1) : value
+  const revision = /^[a-f0-9]{64}$/.test(candidate) ? `tro1-${candidate}` : candidate
+  return strongResourceEtag(revision, /^tro1-[a-f0-9]{64}$/, 'Task recurrence occurrence')
+}
 
 function customFieldValuePath(
   targetType: CustomFieldValueTargetType,
@@ -807,6 +838,14 @@ function expectedResourceTypes(path: string) {
     'service-accounts': ['serviceAccount', 'serviceAccountCredential'],
     tags: ['tag'],
     tasks: ['task'],
+    'task-recurrences': [
+      'taskRecurrence',
+      'taskRecurrenceVersion',
+      'taskRecurrenceOccurrence',
+      'taskRecurrencePreview',
+      'taskRecurrenceEvent',
+    ],
+    'task-recurrence-operations': ['taskRecurrenceOperation'],
     'time-entries': ['timeEntry'],
     users: ['user'],
     availability: ['availability'],
@@ -1240,6 +1279,10 @@ export class TeamGridClient {
   readonly system
   readonly tags
   readonly tasks
+  readonly taskRecurrences
+  readonly taskRecurrenceVersions
+  readonly taskRecurrenceOccurrences
+  readonly taskRecurrenceOperations
   readonly timeEntries
   readonly users
   readonly webhookDeliveries
@@ -2306,6 +2349,254 @@ export class TeamGridClient {
         pagination?: PaginationOptions,
       ) => this.#snapshotThenCatchUp(snapshot, options, pagination),
     }
+    this.taskRecurrences = {
+      applyTaskTemplate: (
+        id: string,
+        data: TaskRecurrenceTaskTemplateUpdate,
+        options: TaskRecurrenceMutationOptions,
+      ) =>
+        this.#taskRecurrenceMutation(
+          `/task-recurrences/${encodeURIComponent(id)}/definition-from-task`,
+          data,
+          options,
+          'POST',
+          'task recurrence template replacement',
+        ),
+      archive: (id: string, options: TaskRecurrenceMutationOptions) =>
+        this.#taskRecurrenceMutation(
+          `/task-recurrences/${encodeURIComponent(id)}`,
+          undefined,
+          options,
+          'DELETE',
+          'task recurrence archive',
+        ),
+      create: (data: TaskRecurrenceCreate, options: MutationOptions = {}) =>
+        this.#createTaskRecurrence(data, options),
+      end: (id: string, options: TaskRecurrenceMutationOptions) =>
+        this.#taskRecurrenceMutation(
+          `/task-recurrences/${encodeURIComponent(id)}/end`,
+          undefined,
+          options,
+          'POST',
+          'task recurrence end',
+        ),
+      get: (id: string, options: RequestOptions = {}) =>
+        this.#strictResource(
+          `/task-recurrences/${encodeURIComponent(id)}`,
+          taskRecurrenceValidator,
+          'task recurrence',
+          options,
+          200,
+          undefined,
+          (resource) => `"tr1-${resource.attributes.revision}"`,
+          true,
+        ),
+      list: (options: TaskRecurrenceListOptions = {}) =>
+        this.#strictPage(
+          '/task-recurrences',
+          taskRecurrenceValidator,
+          'task recurrence list',
+          options,
+        ),
+      pages: (options: TaskRecurrenceListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          '/task-recurrences',
+          taskRecurrenceValidator,
+          'task recurrence list',
+          options,
+          pagination,
+        ),
+      pause: (id: string, options: TaskRecurrenceMutationOptions) =>
+        this.#taskRecurrenceMutation(
+          `/task-recurrences/${encodeURIComponent(id)}/pause`,
+          undefined,
+          options,
+          'POST',
+          'task recurrence pause',
+        ),
+      preview: (data: TaskRecurrencePreviewInput, options: RequestOptions = {}) =>
+        this.#previewTaskRecurrence(data, options),
+      previewStored: (id: string, options: TaskRecurrenceStoredPreviewOptions = {}) => {
+        const { requestId, signal, ...query } = options
+        return this.#strictResource(
+          `/task-recurrences/${encodeURIComponent(id)}/preview`,
+          taskRecurrencePreviewValidator,
+          'task recurrence stored preview',
+          { query, requestId, signal },
+        )
+      },
+      recheck: (id: string, options: RequestOptions = {}) =>
+        this.#acceptTaskRecurrenceOperation(id, options),
+      restore: (id: string, options: TaskRecurrenceMutationOptions) =>
+        this.#taskRecurrenceMutation(
+          `/task-recurrences/${encodeURIComponent(id)}/restore`,
+          undefined,
+          options,
+          'POST',
+          'task recurrence restore',
+        ),
+      resume: (id: string, options: TaskRecurrenceMutationOptions) =>
+        this.#taskRecurrenceMutation(
+          `/task-recurrences/${encodeURIComponent(id)}/resume`,
+          undefined,
+          options,
+          'POST',
+          'task recurrence resume',
+        ),
+      submitEvent: (id: string, data: TaskRecurrenceEventSubmit, options: RequestOptions = {}) =>
+        this.#strictResource(
+          `/task-recurrences/${encodeURIComponent(id)}/events`,
+          taskRecurrenceEventValidator,
+          'task recurrence event acceptance',
+          { ...options, body: data, method: 'POST' },
+          202,
+        ),
+      transferOwner: (
+        id: string,
+        data: TaskRecurrenceOwnerUpdate,
+        options: TaskRecurrenceMutationOptions,
+      ) =>
+        this.#taskRecurrenceMutation(
+          `/task-recurrences/${encodeURIComponent(id)}/owner`,
+          data,
+          options,
+          'POST',
+          'task recurrence owner transfer',
+        ),
+      update: (id: string, data: TaskRecurrenceUpdate, options: TaskRecurrenceMutationOptions) =>
+        this.#taskRecurrenceMutation(
+          `/task-recurrences/${encodeURIComponent(id)}`,
+          data,
+          options,
+          'PATCH',
+          'task recurrence update',
+        ),
+    }
+    this.taskRecurrenceVersions = {
+      get: (seriesId: string, versionId: string, options: RequestOptions = {}) =>
+        this.#strictResource(
+          `/task-recurrences/${encodeURIComponent(seriesId)}/versions/${encodeURIComponent(versionId)}`,
+          taskRecurrenceVersionValidator,
+          'task recurrence version',
+          options,
+        ),
+      list: (seriesId: string, options: ListOptions = {}) =>
+        this.#strictPage(
+          `/task-recurrences/${encodeURIComponent(seriesId)}/versions`,
+          taskRecurrenceVersionValidator,
+          'task recurrence version list',
+          options,
+        ),
+      pages: (seriesId: string, options: ListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          `/task-recurrences/${encodeURIComponent(seriesId)}/versions`,
+          taskRecurrenceVersionValidator,
+          'task recurrence version list',
+          options,
+          pagination,
+        ),
+      restore: (
+        seriesId: string,
+        versionId: string,
+        data: TaskRecurrenceVersionRestore = {},
+        options: TaskRecurrenceMutationOptions,
+      ) =>
+        this.#taskRecurrenceMutation(
+          `/task-recurrences/${encodeURIComponent(seriesId)}/versions/${encodeURIComponent(versionId)}/restore`,
+          data,
+          options,
+          'POST',
+          'task recurrence version restore',
+        ),
+    }
+    this.taskRecurrenceOccurrences = {
+      clearOverride: (
+        seriesId: string,
+        occurrenceKey: string,
+        options: TaskRecurrenceOccurrenceMutationOptions,
+      ) =>
+        this.#taskRecurrenceOccurrenceMutation(
+          seriesId,
+          occurrenceKey,
+          'override',
+          undefined,
+          options,
+          'DELETE',
+        ),
+      get: (seriesId: string, occurrenceKey: string, options: RequestOptions = {}) =>
+        this.#strictResource(
+          `/task-recurrences/${encodeURIComponent(seriesId)}/occurrences/${encodeURIComponent(occurrenceKey)}`,
+          taskRecurrenceOccurrenceValidator,
+          'task recurrence occurrence',
+          options,
+          200,
+          undefined,
+          (resource) => `"tro1-${resource.attributes.revision}"`,
+          true,
+        ),
+      list: (seriesId: string, options: ListOptions = {}) =>
+        this.#strictPage(
+          `/task-recurrences/${encodeURIComponent(seriesId)}/occurrences`,
+          taskRecurrenceOccurrenceValidator,
+          'task recurrence occurrence list',
+          options,
+        ),
+      override: (
+        seriesId: string,
+        occurrenceKey: string,
+        data: TaskRecurrenceOccurrenceOverride,
+        options: TaskRecurrenceOccurrenceOverrideOptions,
+      ) =>
+        this.#taskRecurrenceOccurrenceMutation(
+          seriesId,
+          occurrenceKey,
+          'override',
+          data,
+          options,
+          'PUT',
+        ),
+      pages: (seriesId: string, options: ListOptions = {}, pagination?: PaginationOptions) =>
+        this.#strictPages(
+          `/task-recurrences/${encodeURIComponent(seriesId)}/occurrences`,
+          taskRecurrenceOccurrenceValidator,
+          'task recurrence occurrence list',
+          options,
+          pagination,
+        ),
+      retry: (
+        seriesId: string,
+        occurrenceKey: string,
+        options: TaskRecurrenceOccurrenceMutationOptions,
+      ) =>
+        this.#taskRecurrenceOccurrenceMutation(
+          seriesId,
+          occurrenceKey,
+          'retry',
+          undefined,
+          options,
+          'POST',
+        ),
+    }
+    this.taskRecurrenceOperations = {
+      cancel: (id: string, options: RequestOptions = {}) =>
+        this.#strictOperationResource(
+          `/task-recurrence-operations/${encodeURIComponent(id)}/cancel`,
+          id,
+          taskRecurrenceOperationValidator,
+          'task recurrence operation cancellation',
+          { ...options, method: 'POST' },
+        ),
+      get: (id: string, options: RequestOptions = {}) =>
+        this.#strictOperationResource(
+          `/task-recurrence-operations/${encodeURIComponent(id)}`,
+          id,
+          taskRecurrenceOperationValidator,
+          'task recurrence operation',
+          options,
+        ),
+      wait: (id: string, options: TaskRecurrenceOperationWaitOptions = {}) =>
+        this.#waitForTaskRecurrenceOperation(id, options),
+    }
     this.plannedWork = {
       getForTask: (id: string, options?: RequestOptions) =>
         this.#resource<TaskPlannedWork>(`/tasks/${encodeURIComponent(id)}/planned-work`, options),
@@ -3245,6 +3536,171 @@ export class TeamGridClient {
     return attachTransport(envelope, response.transport)
   }
 
+  async #createTaskRecurrence(data: TaskRecurrenceCreate, options: MutationOptions = {}) {
+    const response = await this.#request('/task-recurrences', {
+      ...options,
+      body: data,
+      idempotencyKey: options.idempotencyKey || newRequestId(),
+      method: 'POST',
+    })
+    const replayed = response.transport.headers['idempotency-replayed']
+    if (
+      ![200, 201].includes(response.transport.status) ||
+      replayed !== (response.transport.status === 200 ? 'true' : 'false')
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned invalid task recurrence creation metadata.',
+      )
+    }
+    const envelope = assertStrictResource(
+      response.payload,
+      taskRecurrenceValidator,
+      'task recurrence creation',
+    )
+    if (envelope.data.attributes.replayed !== (replayed === 'true')) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned inconsistent task recurrence replay metadata.',
+      )
+    }
+    assertRevisionEtag(
+      response.transport,
+      `tr1-${envelope.data.attributes.revision}`,
+      'task recurrence creation',
+    )
+    if (response.transport.headers['cache-control'] !== strongEtagCacheControl) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned unsafe task recurrence cache metadata.',
+      )
+    }
+    return attachTransport(envelope, response.transport)
+  }
+
+  async #previewTaskRecurrence(data: TaskRecurrencePreviewInput, options: RequestOptions = {}) {
+    const response = await this.#request('/task-recurrences/preview', {
+      ...options,
+      body: data,
+      method: 'POST',
+    })
+    if (response.transport.status === 200) {
+      return attachTransport(
+        assertStrictResource(
+          response.payload,
+          taskRecurrencePreviewValidator,
+          'task recurrence draft preview',
+        ),
+        response.transport,
+      )
+    }
+    if (response.transport.status === 202) {
+      const envelope = assertStrictResource(
+        response.payload,
+        taskRecurrenceOperationValidator,
+        'task recurrence draft preview operation',
+      )
+      if (
+        envelope.data.attributes.operationType !== 'preview' ||
+        envelope.data.attributes.seriesId !== null ||
+        response.transport.headers.location !==
+          `/v1/task-recurrence-operations/${encodeURIComponent(envelope.data.id)}`
+      ) {
+        throw new TeamGridClientError(
+          'invalid_api_response',
+          'The TeamGrid API returned invalid asynchronous preview metadata.',
+        )
+      }
+      return attachTransport(envelope, response.transport)
+    }
+    throw new TeamGridClientError(
+      'invalid_api_response',
+      'The TeamGrid API returned an unexpected status for task recurrence draft preview.',
+    )
+  }
+
+  #taskRecurrenceMutation(
+    path: string,
+    data: unknown,
+    options: TaskRecurrenceMutationOptions,
+    method: 'DELETE' | 'PATCH' | 'POST',
+    label: string,
+  ) {
+    const { ifMatch, ...requestOptions } = options
+    return this.#strictResource(
+      path,
+      taskRecurrenceValidator,
+      label,
+      {
+        ...requestOptions,
+        ...(data === undefined ? {} : { body: data }),
+        ifMatch: strongTaskRecurrenceEtag(ifMatch),
+        method,
+      },
+      200,
+      undefined,
+      (resource) => `"tr1-${resource.attributes.revision}"`,
+      true,
+    )
+  }
+
+  #taskRecurrenceOccurrenceMutation(
+    seriesId: string,
+    occurrenceKey: string,
+    action: 'override' | 'retry',
+    data: unknown,
+    options: TaskRecurrenceOccurrenceMutationOptions | TaskRecurrenceOccurrenceOverrideOptions,
+    method: 'DELETE' | 'POST' | 'PUT',
+  ) {
+    const { createIfMissing, ifMatch, ...requestOptions } =
+      options as TaskRecurrenceOccurrenceOverrideOptions & { ifMatch?: string }
+    if (Boolean(createIfMissing) === Boolean(ifMatch)) {
+      throw new TeamGridClientError(
+        'invalid_task_recurrence_occurrence_precondition',
+        'Choose exactly one occurrence precondition: ifMatch or createIfMissing.',
+      )
+    }
+    const path = `/task-recurrences/${encodeURIComponent(seriesId)}/occurrences/${encodeURIComponent(occurrenceKey)}/${action}`
+    return this.#strictResource(
+      path,
+      taskRecurrenceOccurrenceValidator,
+      `task recurrence occurrence ${action}`,
+      {
+        ...requestOptions,
+        ...(data === undefined ? {} : { body: data }),
+        ...(createIfMissing
+          ? { ifNoneMatch: '*' }
+          : { ifMatch: strongTaskRecurrenceOccurrenceEtag(String(ifMatch)) }),
+        method,
+      },
+      200,
+      undefined,
+      (resource) => `"tro1-${resource.attributes.revision}"`,
+      true,
+    )
+  }
+
+  async #acceptTaskRecurrenceOperation(id: string, options: RequestOptions) {
+    const envelope = await this.#strictResource(
+      `/task-recurrences/${encodeURIComponent(id)}/recheck`,
+      taskRecurrenceOperationValidator,
+      'task recurrence recheck',
+      { ...options, method: 'POST' },
+      202,
+    )
+    if (
+      envelope.data.attributes.seriesId !== id ||
+      envelope.transport.headers.location !==
+        `/v1/task-recurrence-operations/${encodeURIComponent(envelope.data.id)}`
+    ) {
+      throw new TeamGridClientError(
+        'invalid_api_response',
+        'The TeamGrid API returned an invalid task recurrence operation location.',
+      )
+    }
+    return envelope
+  }
+
   async #projectSharing(id: string, options: RequestOptions = {}) {
     const envelope = await this.#strictResource<ProjectSharing>(
       `/projects/${encodeURIComponent(id)}/sharing`,
@@ -3706,6 +4162,7 @@ export class TeamGridClient {
     if (options.body !== undefined) headers.set('content-type', 'application/json')
     if (options.idempotencyKey) headers.set('idempotency-key', options.idempotencyKey)
     if (options.ifMatch) headers.set('if-match', options.ifMatch)
+    if (options.ifNoneMatch) headers.set('if-none-match', options.ifNoneMatch)
 
     for (let attempt = 0; attempt <= this.#retries; attempt += 1) {
       const combined = buildCombinedSignal(options.signal, this.#timeoutMs)
@@ -3908,6 +4365,48 @@ export class TeamGridClient {
         )
       }
       await this.#sleep(Math.min(pollIntervalMs, maxWaitMs - elapsed), options.signal)
+    }
+  }
+
+  async #waitForTaskRecurrenceOperation(
+    id: string,
+    options: TaskRecurrenceOperationWaitOptions = {},
+  ) {
+    const {
+      maxWaitMs: requestedMaxWaitMs,
+      pollIntervalMs: requestedPollIntervalMs,
+      ...requestOptions
+    } = options
+    const pollIntervalMs = Math.max(
+      100,
+      Math.min(Math.trunc(requestedPollIntervalMs ?? 1000), 30_000),
+    )
+    const maxWaitMs = Math.max(100, Math.min(Math.trunc(requestedMaxWaitMs ?? 300_000), 86_400_000))
+    const startedAt = Date.now()
+    let previousUpdatedAt: string | undefined
+    while (true) {
+      const operation = await this.taskRecurrenceOperations.get(id, requestOptions)
+      if (
+        previousUpdatedAt !== undefined &&
+        Date.parse(operation.data.attributes.updatedAt) < Date.parse(previousUpdatedAt)
+      ) {
+        throw new TeamGridClientError(
+          'invalid_api_response',
+          'The TeamGrid task recurrence operation moved backwards in time.',
+        )
+      }
+      previousUpdatedAt = operation.data.attributes.updatedAt
+      if (['succeeded', 'failed', 'cancelled'].includes(operation.data.attributes.status)) {
+        return operation
+      }
+      const elapsed = Date.now() - startedAt
+      if (elapsed >= maxWaitMs) {
+        throw new TeamGridClientError(
+          'task_recurrence_operation_wait_timeout',
+          `Task recurrence operation ${id} did not finish within ${maxWaitMs} ms.`,
+        )
+      }
+      await this.#sleep(Math.min(pollIntervalMs, maxWaitMs - elapsed), requestOptions.signal)
     }
   }
 

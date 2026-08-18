@@ -45,6 +45,11 @@ const listInput = {
   cursor: z.string().max(512).optional(),
   limit: z.number().int().min(1).max(100).optional(),
 }
+const taskRecurrenceId = z.string().regex(/^[A-Za-z0-9_.:-]{1,256}$/)
+const taskRecurrenceOccurrenceKey = z
+  .string()
+  .regex(/^(?:occ1-[a-f0-9]{64}|seed:[A-Za-z0-9_-]{1,128})$/)
+const boundedRecurrenceDate = z.string().trim().min(1).max(64)
 const searchResourceTypes = ['contacts', 'projects', 'tasks'] as const
 const searchInput = z
   .object({
@@ -203,6 +208,50 @@ function withoutResourceAttributes<T>(value: T, names: ReadonlySet<string>): T {
 const productForbiddenAttributes = new Set(['purchasePrice'])
 const timeEntryForbiddenAttributes = new Set(['billable', 'billed', 'billedAt'])
 
+// The generated API response union is intentionally large. Keeping it out of the
+// exported MCP declaration prevents TypeScript from trying to serialize the whole
+// OpenAPI graph for every read-only handler.
+// biome-ignore lint/suspicious/noExplicitAny: handler inputs stay validated by their MCP schemas
+type ReadOnlyHandler = (...args: any[]) => Promise<unknown>
+type ReadOnlyHandlerName =
+  | 'callNoteGet'
+  | 'callNotesList'
+  | 'contactGet'
+  | 'contactGroupGet'
+  | 'contactGroupsList'
+  | 'contactsList'
+  | 'customFieldDefinitionGet'
+  | 'customFieldDefinitionsList'
+  | 'listGet'
+  | 'listsList'
+  | 'productGet'
+  | 'productGroupGet'
+  | 'productGroupsList'
+  | 'productsList'
+  | 'projectGet'
+  | 'projectsList'
+  | 'searchQuery'
+  | 'serviceGet'
+  | 'servicesList'
+  | 'tagGet'
+  | 'tagsList'
+  | 'taskGet'
+  | 'taskRecurrenceGet'
+  | 'taskRecurrenceOccurrenceGet'
+  | 'taskRecurrenceOccurrencesList'
+  | 'taskRecurrencePreview'
+  | 'taskRecurrenceVersionGet'
+  | 'taskRecurrenceVersionsList'
+  | 'taskRecurrencesList'
+  | 'tasksList'
+  | 'timeEntriesList'
+  | 'timeEntryGet'
+  | 'usersList'
+  | 'webhookGet'
+  | 'webhooksList'
+  | 'workspaceGet'
+type ReadOnlyHandlers = Readonly<Record<ReadOnlyHandlerName, ReadOnlyHandler>>
+
 function withoutProductPurchasePrices<T>(value: T): T {
   return withoutResourceAttributes(value, productForbiddenAttributes)
 }
@@ -211,7 +260,7 @@ function withoutTimeEntryBilling<T>(value: T): T {
   return withoutResourceAttributes(value, timeEntryForbiddenAttributes)
 }
 
-export function createReadOnlyHandlers(client: TeamGridClient) {
+export function createReadOnlyHandlers(client: TeamGridClient): ReadOnlyHandlers {
   return Object.freeze({
     callNoteGet: (input: { id: string }) => client.callNotes.get(input.id),
     callNotesList: (input: { archived?: boolean; cursor?: string; limit?: number }) =>
@@ -295,6 +344,38 @@ export function createReadOnlyHandlers(client: TeamGridClient) {
       client.tags.list(input),
     tagGet: (input: { id: string }) => client.tags.get(input.id),
     taskGet: (input: { id: string }) => client.tasks.get(input.id),
+    taskRecurrenceGet: (input: { id: string }) => client.taskRecurrences.get(input.id),
+    taskRecurrenceOccurrenceGet: (input: { occurrenceKey: string; seriesId: string }) =>
+      client.taskRecurrenceOccurrences.get(input.seriesId, input.occurrenceKey),
+    taskRecurrenceOccurrencesList: (input: {
+      cursor?: string
+      limit?: number
+      seriesId: string
+    }) => {
+      const { seriesId, ...options } = input
+      return client.taskRecurrenceOccurrences.list(seriesId, options)
+    },
+    taskRecurrencePreview: (input: {
+      count?: number
+      from?: string
+      id: string
+      until?: string
+    }) => {
+      const { id, ...options } = input
+      return client.taskRecurrences.previewStored(id, options)
+    },
+    taskRecurrencesList: (input: {
+      cursor?: string
+      limit?: number
+      projectId?: string
+      status?: 'active' | 'paused' | 'suspended' | 'needs_attention' | 'ended' | 'archived'
+    }) => client.taskRecurrences.list(input),
+    taskRecurrenceVersionGet: (input: { seriesId: string; versionId: string }) =>
+      client.taskRecurrenceVersions.get(input.seriesId, input.versionId),
+    taskRecurrenceVersionsList: (input: { cursor?: string; limit?: number; seriesId: string }) => {
+      const { seriesId, ...options } = input
+      return client.taskRecurrenceVersions.list(seriesId, options)
+    },
     tasksList: (input: {
       archived?: boolean
       assigneeId?: string
@@ -478,6 +559,90 @@ export function createTeamGridMcpServer(
       inputSchema: z.object({ id: z.string().min(1).max(128) }).strict(),
     },
     async (input) => toolResult(await handlers.taskGet(input)),
+  )
+  registerTool(
+    'teamgrid_task_recurrences_list',
+    {
+      annotations: readOnlyAnnotations,
+      description:
+        'List recurring TeamGrid task definitions with stable cursor pagination and optional project or lifecycle filters.',
+      inputSchema: z
+        .object({
+          ...listInput,
+          projectId: taskRecurrenceId.optional(),
+          status: z
+            .enum(['active', 'paused', 'suspended', 'needs_attention', 'ended', 'archived'])
+            .optional(),
+        })
+        .strict(),
+    },
+    async (input) => toolResult(await handlers.taskRecurrencesList(input)),
+  )
+  registerTool(
+    'teamgrid_task_recurrence_get',
+    {
+      annotations: readOnlyAnnotations,
+      description:
+        'Get one recurring TeamGrid task definition, including its current immutable policy version.',
+      inputSchema: z.object({ id: taskRecurrenceId }).strict(),
+    },
+    async (input) => toolResult(await handlers.taskRecurrenceGet(input)),
+  )
+  registerTool(
+    'teamgrid_task_recurrence_preview',
+    {
+      annotations: readOnlyAnnotations,
+      description:
+        'Preview bounded future occurrences from a saved TeamGrid task recurrence without changing state.',
+      inputSchema: z
+        .object({
+          count: z.number().int().min(1).max(100).optional(),
+          from: boundedRecurrenceDate.optional(),
+          id: taskRecurrenceId,
+          until: boundedRecurrenceDate.optional(),
+        })
+        .strict(),
+    },
+    async (input) => toolResult(await handlers.taskRecurrencePreview(input)),
+  )
+  registerTool(
+    'teamgrid_task_recurrence_versions_list',
+    {
+      annotations: readOnlyAnnotations,
+      description: 'List immutable definition versions for one TeamGrid task recurrence.',
+      inputSchema: z.object({ ...listInput, seriesId: taskRecurrenceId }).strict(),
+    },
+    async (input) => toolResult(await handlers.taskRecurrenceVersionsList(input)),
+  )
+  registerTool(
+    'teamgrid_task_recurrence_version_get',
+    {
+      annotations: readOnlyAnnotations,
+      description: 'Get one immutable TeamGrid task recurrence definition version.',
+      inputSchema: z.object({ seriesId: taskRecurrenceId, versionId: taskRecurrenceId }).strict(),
+    },
+    async (input) => toolResult(await handlers.taskRecurrenceVersionGet(input)),
+  )
+  registerTool(
+    'teamgrid_task_recurrence_occurrences_list',
+    {
+      annotations: readOnlyAnnotations,
+      description:
+        'List the immutable occurrence ledger for one TeamGrid task recurrence with stable cursor pagination.',
+      inputSchema: z.object({ ...listInput, seriesId: taskRecurrenceId }).strict(),
+    },
+    async (input) => toolResult(await handlers.taskRecurrenceOccurrencesList(input)),
+  )
+  registerTool(
+    'teamgrid_task_recurrence_occurrence_get',
+    {
+      annotations: readOnlyAnnotations,
+      description: 'Get one occurrence-ledger entry for a TeamGrid task recurrence.',
+      inputSchema: z
+        .object({ occurrenceKey: taskRecurrenceOccurrenceKey, seriesId: taskRecurrenceId })
+        .strict(),
+    },
+    async (input) => toolResult(await handlers.taskRecurrenceOccurrenceGet(input)),
   )
   registerTool(
     'teamgrid_time_entries_list',

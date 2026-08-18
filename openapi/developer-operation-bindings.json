@@ -29,6 +29,33 @@
     },
     {
       "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.applyTaskAsTaskRecurrenceTemplate",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/applyTaskTemplate",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "applyTaskAsTaskRecurrenceTemplate",
+      "method": "POST",
+      "operationId": "applyTaskAsTaskRecurrenceTemplate",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/definition-from-task",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
       "conditionalScopes": [
         "absences:admin:write"
       ],
@@ -509,6 +536,33 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.archiveTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/transition",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "archiveTaskRecurrence",
+      "method": "DELETE",
+      "operationId": "archiveTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.archiveTimeEntry",
           "kind": "httpLocal",
           "role": "transport"
@@ -605,6 +659,33 @@
     },
     {
       "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.cancelTaskRecurrenceOperation",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrenceOperations/cancel",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "cancelTaskRecurrenceOperation",
+      "method": "POST",
+      "operationId": "cancelTaskRecurrenceOperation",
+      "optionalScopes": [],
+      "path": "/task-recurrence-operations/{id}/cancel",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
       "conditionalScopes": [
         "contacts:write",
         "projects:write",
@@ -633,6 +714,33 @@
       "path": "/custom-field-values/{targetType}/{resourceId}/{fieldId}",
       "requiredScopes": [
         "custom-field-values:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.clearTaskRecurrenceOccurrenceOverride",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/occurrences/clearOverride",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "clearTaskRecurrenceOccurrenceOverride",
+      "method": "DELETE",
+      "operationId": "clearTaskRecurrenceOccurrenceOverride",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/occurrences/{occurrenceKey}/override",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
       ]
     },
     {
@@ -964,6 +1072,7 @@
       "conditionalScopes": [
         "contacts:read",
         "projects:read",
+        "task-recurrences:read",
         "tasks:read",
         "time-entries:read"
       ],
@@ -996,6 +1105,7 @@
       "conditionalScopes": [
         "contacts:read",
         "projects:read",
+        "task-recurrences:read",
         "tasks:read",
         "time-entries:read"
       ],
@@ -1463,6 +1573,33 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.createTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/create",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "createTaskRecurrence",
+      "method": "POST",
+      "operationId": "createTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.createTimeEntry",
           "kind": "httpLocal",
           "role": "transport"
@@ -1567,6 +1704,7 @@
       "conditionalScopes": [
         "contacts:read",
         "projects:read",
+        "task-recurrences:read",
         "tasks:read",
         "time-entries:read"
       ],
@@ -1616,6 +1754,33 @@
       "optionalScopes": [],
       "path": "/tasks/{id}/duplicate",
       "requiredScopes": [
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.endTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/transition",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "endTaskRecurrence",
+      "method": "POST",
+      "operationId": "endTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/end",
+      "requiredScopes": [
+        "task-recurrences:write",
         "tasks:read",
         "tasks:write"
       ]
@@ -2071,6 +2236,7 @@
       "conditionalScopes": [
         "contacts:read",
         "projects:read",
+        "task-recurrences:read",
         "tasks:read",
         "time-entries:read"
       ],
@@ -2664,6 +2830,110 @@
       "path": "/tasks/{id}/planned-work",
       "requiredScopes": [
         "planned-work:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getTaskRecurrence",
+      "method": "GET",
+      "operationId": "getTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}",
+      "requiredScopes": [
+        "task-recurrences:read",
+        "tasks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getTaskRecurrenceOccurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/occurrences/get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getTaskRecurrenceOccurrence",
+      "method": "GET",
+      "operationId": "getTaskRecurrenceOccurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/occurrences/{occurrenceKey}",
+      "requiredScopes": [
+        "task-recurrences:read",
+        "tasks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getTaskRecurrenceOperation",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrenceOperations/get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getTaskRecurrenceOperation",
+      "method": "GET",
+      "operationId": "getTaskRecurrenceOperation",
+      "optionalScopes": [],
+      "path": "/task-recurrence-operations/{id}",
+      "requiredScopes": [
+        "task-recurrences:read",
+        "tasks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.getTaskRecurrenceVersion",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/versions/get",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "getTaskRecurrenceVersion",
+      "method": "GET",
+      "operationId": "getTaskRecurrenceVersion",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/versions/{versionId}",
+      "requiredScopes": [
+        "task-recurrences:read",
+        "tasks:read"
       ]
     },
     {
@@ -3738,6 +4008,84 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.listTaskRecurrenceOccurrences",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/occurrences/list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listTaskRecurrenceOccurrences",
+      "method": "GET",
+      "operationId": "listTaskRecurrenceOccurrences",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/occurrences",
+      "requiredScopes": [
+        "task-recurrences:read",
+        "tasks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listTaskRecurrences",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listTaskRecurrences",
+      "method": "GET",
+      "operationId": "listTaskRecurrences",
+      "optionalScopes": [],
+      "path": "/task-recurrences",
+      "requiredScopes": [
+        "task-recurrences:read",
+        "tasks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.listTaskRecurrenceVersions",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/versions/list",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "listTaskRecurrenceVersions",
+      "method": "GET",
+      "operationId": "listTaskRecurrenceVersions",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/versions",
+      "requiredScopes": [
+        "task-recurrences:read",
+        "tasks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.listTasks",
           "kind": "httpLocal",
           "role": "transport"
@@ -3879,6 +4227,140 @@
       "optionalScopes": [],
       "path": "/tasks/{id}/move",
       "requiredScopes": [
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.overrideTaskRecurrenceOccurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/occurrences/override",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "overrideTaskRecurrenceOccurrence",
+      "method": "PUT",
+      "operationId": "overrideTaskRecurrenceOccurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/occurrences/{occurrenceKey}/override",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.pauseTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/transition",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "pauseTaskRecurrence",
+      "method": "POST",
+      "operationId": "pauseTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/pause",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.previewStoredTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/previewStored",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "previewStoredTaskRecurrence",
+      "method": "GET",
+      "operationId": "previewStoredTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/preview",
+      "requiredScopes": [
+        "task-recurrences:read",
+        "tasks:read"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.previewTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/preview",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "previewTaskRecurrence",
+      "method": "POST",
+      "operationId": "previewTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/preview",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.recheckTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/recheck",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "recheckTaskRecurrence",
+      "method": "POST",
+      "operationId": "recheckTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/recheck",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
         "tasks:write"
       ]
     },
@@ -4565,6 +5047,60 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.restoreTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/transition",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreTaskRecurrence",
+      "method": "POST",
+      "operationId": "restoreTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/restore",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.restoreTaskRecurrenceVersion",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/versions/restore",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "restoreTaskRecurrenceVersion",
+      "method": "POST",
+      "operationId": "restoreTaskRecurrenceVersion",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/versions/{versionId}/restore",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.restoreTimeEntry",
           "kind": "httpLocal",
           "role": "transport"
@@ -4582,6 +5118,60 @@
       "path": "/time-entries/{id}/restore",
       "requiredScopes": [
         "time-entries:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.resumeTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/transition",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "resumeTaskRecurrence",
+      "method": "POST",
+      "operationId": "resumeTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/resume",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.retryTaskRecurrenceOccurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/occurrences/retry",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "retryTaskRecurrenceOccurrence",
+      "method": "POST",
+      "operationId": "retryTaskRecurrenceOccurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/occurrences/{occurrenceKey}/retry",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
       ]
     },
     {
@@ -4884,6 +5474,32 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.submitTaskRecurrenceEvent",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/submitEvent",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "submitTaskRecurrenceEvent",
+      "method": "POST",
+      "operationId": "submitTaskRecurrenceEvent",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/events",
+      "requiredScopes": [
+        "task-recurrences:run",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.testWebhookDelivery",
           "kind": "httpLocal",
           "role": "transport"
@@ -4901,6 +5517,33 @@
       "path": "/webhooks/{id}/test-delivery",
       "requiredScopes": [
         "webhooks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
+          "id": "api.v1.transferTaskRecurrenceOwner",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/transferOwner",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "transferTaskRecurrenceOwner",
+      "method": "POST",
+      "operationId": "transferTaskRecurrenceOwner",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/owner",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
       ]
     },
     {
@@ -5437,6 +6080,33 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.updateTaskRecurrence",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateTaskRecurrence",
+      "method": "PATCH",
+      "operationId": "updateTaskRecurrence",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.updateTimeEntry",
           "kind": "httpLocal",
           "role": "transport"
@@ -5534,7 +6204,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 209,
+    "authenticatedOperations": 234,
     "publicClientOperations": 1,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
@@ -5723,6 +6393,27 @@
       "teamgrid/internal/v1/tags/list",
       "teamgrid/internal/v1/tags/restore",
       "teamgrid/internal/v1/tags/update",
+      "teamgrid/internal/v1/taskRecurrenceOperations/cancel",
+      "teamgrid/internal/v1/taskRecurrenceOperations/get",
+      "teamgrid/internal/v1/taskRecurrences/applyTaskTemplate",
+      "teamgrid/internal/v1/taskRecurrences/create",
+      "teamgrid/internal/v1/taskRecurrences/get",
+      "teamgrid/internal/v1/taskRecurrences/list",
+      "teamgrid/internal/v1/taskRecurrences/occurrences/clearOverride",
+      "teamgrid/internal/v1/taskRecurrences/occurrences/get",
+      "teamgrid/internal/v1/taskRecurrences/occurrences/list",
+      "teamgrid/internal/v1/taskRecurrences/occurrences/override",
+      "teamgrid/internal/v1/taskRecurrences/occurrences/retry",
+      "teamgrid/internal/v1/taskRecurrences/preview",
+      "teamgrid/internal/v1/taskRecurrences/previewStored",
+      "teamgrid/internal/v1/taskRecurrences/recheck",
+      "teamgrid/internal/v1/taskRecurrences/submitEvent",
+      "teamgrid/internal/v1/taskRecurrences/transferOwner",
+      "teamgrid/internal/v1/taskRecurrences/transition",
+      "teamgrid/internal/v1/taskRecurrences/update",
+      "teamgrid/internal/v1/taskRecurrences/versions/get",
+      "teamgrid/internal/v1/taskRecurrences/versions/list",
+      "teamgrid/internal/v1/taskRecurrences/versions/restore",
       "teamgrid/internal/v1/tasks/archive",
       "teamgrid/internal/v1/tasks/complete",
       "teamgrid/internal/v1/tasks/create",
