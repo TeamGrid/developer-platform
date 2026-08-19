@@ -40,6 +40,7 @@ function task(id: string) {
       plannedMinutes: null,
       plannedStartAt: null,
       projectId: null,
+      recurrence: null,
       serviceId: null,
       subscriberIds: [],
       subtasks: [],
