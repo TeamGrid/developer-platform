@@ -2182,6 +2182,9 @@ export const taskRecurrenceOccurrenceValidator: ResourceValidator<TaskRecurrence
         'cardId',
         'decision',
         'definitionVersionId',
+        'detachedAt',
+        'detachedBy',
+        'detachedCardId',
         'lastErrorCode',
         'materializeAt',
         'materializedAt',
@@ -2200,6 +2203,14 @@ export const taskRecurrenceOccurrenceValidator: ResourceValidator<TaskRecurrence
       nullableId(attributes.cardId) &&
       (attributes.decision === null || recurrenceJsonObject(attributes.decision, 32 * 1024)) &&
       taskRecurrenceIdPattern.test(String(attributes.definitionVersionId)) &&
+      nullableCanonicalDate(attributes.detachedAt) &&
+      nullableId(attributes.detachedBy) &&
+      nullableId(attributes.detachedCardId) &&
+      (attributes.detachedCardId === null
+        ? attributes.detachedAt === null && attributes.detachedBy === null
+        : attributes.cardId === null &&
+          attributes.detachedAt !== null &&
+          attributes.detachedBy !== null) &&
       (attributes.lastErrorCode === null || boundedString(attributes.lastErrorCode, 1000, false)) &&
       canonicalDate(attributes.materializeAt) &&
       nullableCanonicalDate(attributes.materializedAt) &&

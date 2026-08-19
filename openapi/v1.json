@@ -15396,6 +15396,30 @@
                 "type": "string",
                 "description": "The definition version id associated with this task recurrence occurrence attributes."
               },
+              "detachedAt": {
+                "format": "date-time",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "ISO 8601 timestamp for detached at."
+              },
+              "detachedBy": {
+                "maxLength": 128,
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The detached by associated with this task recurrence occurrence attributes."
+              },
+              "detachedCardId": {
+                "maxLength": 128,
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The detached card id associated with this task recurrence occurrence attributes."
+              },
               "lastErrorCode": {
                 "type": [
                   "string",
@@ -15484,6 +15508,9 @@
               "cardId",
               "decision",
               "definitionVersionId",
+              "detachedAt",
+              "detachedBy",
+              "detachedCardId",
               "lastErrorCode",
               "materializeAt",
               "materializedAt",
@@ -42594,6 +42621,119 @@
         "description": "Use this operation to end a task recurrence. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change."
       }
     },
+    "/task-recurrences/{id}/remove-from-tasks": {
+      "post": {
+        "operationId": "removeTaskRecurrenceFromTasks",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchTaskRecurrence"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TaskRecurrence"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                },
+                "example": {
+                  "data": {
+                    "attributes": {
+                      "attentionCode": "example",
+                      "createdAt": "2026-07-29T10:00:00Z",
+                      "currentDefinition": {},
+                      "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                      "name": "Example",
+                      "owner": {},
+                      "replayed": false,
+                      "resourceContext": {},
+                      "revision": "\"example-revision\"",
+                      "status": "active",
+                      "updatedAt": "2026-07-29T10:00:00Z"
+                    },
+                    "id": "exampleId",
+                    "type": "taskRecurrence"
+                  },
+                  "meta": {
+                    "requestId": "exampleId"
+                  }
+                }
+              }
+            },
+            "description": "The authorized recurrence resource.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/TaskRecurrenceETag"
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove a task recurrence from its tasks",
+        "tags": [
+          "Task Recurrences"
+        ],
+        "x-teamgrid-required-scopes": [
+          "task-recurrences:write",
+          "tasks:read",
+          "tasks:write"
+        ],
+        "description": "Use this operation to remove a task recurrence from its tasks. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change."
+      }
+    },
     "/task-recurrences/{id}/owner": {
       "post": {
         "operationId": "transferTaskRecurrenceOwner",
@@ -43355,6 +43495,9 @@
                       "attempts": 0,
                       "cardId": "exampleId",
                       "definitionVersionId": "exampleId",
+                      "detachedAt": "2026-07-29T10:00:00Z",
+                      "detachedBy": "example",
+                      "detachedCardId": "exampleId",
                       "lastErrorCode": "example",
                       "materializeAt": "2026-07-29T10:00:00Z",
                       "materializedAt": "2026-07-29T10:00:00Z",
@@ -43464,6 +43607,9 @@
                       "attempts": 0,
                       "cardId": "exampleId",
                       "definitionVersionId": "exampleId",
+                      "detachedAt": "2026-07-29T10:00:00Z",
+                      "detachedBy": "example",
+                      "detachedCardId": "exampleId",
                       "lastErrorCode": "example",
                       "materializeAt": "2026-07-29T10:00:00Z",
                       "materializedAt": "2026-07-29T10:00:00Z",
@@ -43605,6 +43751,9 @@
                       "attempts": 0,
                       "cardId": "exampleId",
                       "definitionVersionId": "exampleId",
+                      "detachedAt": "2026-07-29T10:00:00Z",
+                      "detachedBy": "example",
+                      "detachedCardId": "exampleId",
                       "lastErrorCode": "example",
                       "materializeAt": "2026-07-29T10:00:00Z",
                       "materializedAt": "2026-07-29T10:00:00Z",
@@ -43724,6 +43873,9 @@
                       "attempts": 0,
                       "cardId": "exampleId",
                       "definitionVersionId": "exampleId",
+                      "detachedAt": "2026-07-29T10:00:00Z",
+                      "detachedBy": "example",
+                      "detachedCardId": "exampleId",
                       "lastErrorCode": "example",
                       "materializeAt": "2026-07-29T10:00:00Z",
                       "materializedAt": "2026-07-29T10:00:00Z",

@@ -169,7 +169,14 @@ if (draft.data.type === 'taskRecurrenceOperation') {
 }
 const operation = await teamgrid.taskRecurrences.recheck(created.data.id)
 await teamgrid.taskRecurrenceOperations.wait(operation.data.id)
+// Ends the series and detaches its materialized tasks without deleting history.
+await teamgrid.taskRecurrences.removeFromTasks(created.data.id, {
+  ifMatch: created.etag!,
+})
 ```
+
+After detachment, occurrence resources expose `cardId: null` together with the immutable
+`detachedCardId`, `detachedAt`, and `detachedBy` audit fields.
 
 The generated policy types include all materialization strategies (`none`, `latest`, `bounded`,
 `all`; `allow`, `defer`, `skip`, `latest-only`, `pause-series`), invalid monthly-date handling,

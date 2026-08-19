@@ -34,6 +34,8 @@ teamgrid task-recurrences occurrences override recurrence-id occurrence-key \
 teamgrid task-recurrences occurrences override recurrence-id future-occurrence-key \
   --data @future-override.json --create-if-missing
 teamgrid task-recurrences recheck recurrence-id --wait --output json
+teamgrid task-recurrences remove-from-tasks recurrence-id \
+  --if-match "$REVISION" --yes --output json
 teamgrid task-recurrence-operations wait operation-id --output json
 ```
 
@@ -114,8 +116,9 @@ The `task-recurrences` command group mirrors the full recurrence lifecycle. Exis
 occurrence mutations require their latest strong ETag through `--if-match`. A future occurrence
 from `preview-stored` can instead be created atomically with `--create-if-missing` when its override
 JSON includes that preview item's opaque `placeholderToken`; the two preconditions are mutually
-exclusive. Archive/end and asynchronous
-operation cancellation additionally require confirmation. Draft preview does not persist state,
+exclusive. Archive/end, `remove-from-tasks`, and asynchronous operation cancellation additionally
+require confirmation. `remove-from-tasks` ends the series and removes recurrence links from
+materialized tasks without deleting the immutable occurrence audit history. Draft preview does not persist state,
 but a high-cost draft can return a recoverable operation; use
 `task-recurrence-operations wait` for its terminal result. `preview-stored`, `versions`, and
 `occurrences` operate on the saved immutable history.

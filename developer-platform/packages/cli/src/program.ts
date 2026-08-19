@@ -1958,6 +1958,24 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     const client = await loadClient(command)
     outputData(command, (await client.taskRecurrences.end(id, { ifMatch: options.ifMatch })).data)
   })
+  archiveOptions(
+    taskRecurrences
+      .command('remove-from-tasks <id>')
+      .description(
+        'end the series and remove recurrence links from its tasks while preserving history',
+      )
+      .requiredOption(
+        '--if-match <revision|etag>',
+        'latest task recurrence revision or strong ETag',
+      ),
+  ).action(async function action(id: string, options, command: Command) {
+    await confirmDestructive(command, 'Remove from tasks', 'task recurrence', id)
+    const client = await loadClient(command)
+    outputData(
+      command,
+      (await client.taskRecurrences.removeFromTasks(id, { ifMatch: options.ifMatch })).data,
+    )
+  })
   taskRecurrences
     .command('owner <id>')
     .description('transfer task recurrence ownership')

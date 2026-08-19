@@ -3132,6 +3132,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/task-recurrences/{id}/remove-from-tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Remove a task recurrence from its tasks
+         * @description Use this operation to remove a task recurrence from its tasks. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        post: operations["removeTaskRecurrenceFromTasks"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/task-recurrences/{id}/owner": {
         parameters: {
             query?: never;
@@ -8676,6 +8696,15 @@ export interface components {
                 } | null;
                 /** @description The definition version id associated with this task recurrence occurrence attributes. */
                 definitionVersionId: string;
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for detached at.
+                 */
+                detachedAt: string | null;
+                /** @description The detached by associated with this task recurrence occurrence attributes. */
+                detachedBy: string | null;
+                /** @description The detached card id associated with this task recurrence occurrence attributes. */
+                detachedCardId: string | null;
                 /** @description The last error code associated with this task recurrence occurrence attributes. */
                 lastErrorCode: string | null;
                 /**
@@ -23962,6 +23991,71 @@ export interface operations {
             503: components["responses"]["ServiceUnavailable"];
         };
     };
+    removeTaskRecurrenceFromTasks: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     transferTaskRecurrenceOwner: {
         parameters: {
             query?: never;
@@ -24403,6 +24497,9 @@ export interface operations {
                      *           "attempts": 0,
                      *           "cardId": "exampleId",
                      *           "definitionVersionId": "exampleId",
+                     *           "detachedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedBy": "example",
+                     *           "detachedCardId": "exampleId",
                      *           "lastErrorCode": "example",
                      *           "materializeAt": "2026-07-29T10:00:00Z",
                      *           "materializedAt": "2026-07-29T10:00:00Z",
@@ -24489,6 +24586,9 @@ export interface operations {
                      *           "attempts": 0,
                      *           "cardId": "exampleId",
                      *           "definitionVersionId": "exampleId",
+                     *           "detachedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedBy": "example",
+                     *           "detachedCardId": "exampleId",
                      *           "lastErrorCode": "example",
                      *           "materializeAt": "2026-07-29T10:00:00Z",
                      *           "materializedAt": "2026-07-29T10:00:00Z",
@@ -24559,6 +24659,9 @@ export interface operations {
                      *           "attempts": 0,
                      *           "cardId": "exampleId",
                      *           "definitionVersionId": "exampleId",
+                     *           "detachedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedBy": "example",
+                     *           "detachedCardId": "exampleId",
                      *           "lastErrorCode": "example",
                      *           "materializeAt": "2026-07-29T10:00:00Z",
                      *           "materializedAt": "2026-07-29T10:00:00Z",
@@ -24629,6 +24732,9 @@ export interface operations {
                      *           "attempts": 0,
                      *           "cardId": "exampleId",
                      *           "definitionVersionId": "exampleId",
+                     *           "detachedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedBy": "example",
+                     *           "detachedCardId": "exampleId",
                      *           "lastErrorCode": "example",
                      *           "materializeAt": "2026-07-29T10:00:00Z",
                      *           "materializedAt": "2026-07-29T10:00:00Z",

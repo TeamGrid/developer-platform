@@ -164,6 +164,7 @@ const expectedIndependentIfMatchOperationIds = [
   'deleteRole',
   'endTaskRecurrence',
   'removeMember',
+  'removeTaskRecurrenceFromTasks',
   'renameFile',
   'overrideTaskRecurrenceOccurrence',
   'pauseTaskRecurrence',

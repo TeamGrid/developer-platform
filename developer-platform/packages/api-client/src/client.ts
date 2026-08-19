@@ -2427,6 +2427,14 @@ export class TeamGridClient {
       },
       recheck: (id: string, options: RequestOptions = {}) =>
         this.#acceptTaskRecurrenceOperation(id, options),
+      removeFromTasks: (id: string, options: TaskRecurrenceMutationOptions) =>
+        this.#taskRecurrenceMutation(
+          `/task-recurrences/${encodeURIComponent(id)}/remove-from-tasks`,
+          undefined,
+          options,
+          'POST',
+          'task recurrence removal from tasks',
+        ),
       restore: (id: string, options: TaskRecurrenceMutationOptions) =>
         this.#taskRecurrenceMutation(
           `/task-recurrences/${encodeURIComponent(id)}/restore`,

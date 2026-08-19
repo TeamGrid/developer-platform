@@ -80,6 +80,7 @@ describe('task recurrence commands', () => {
         'task-recurrences pause',
         'task-recurrences resume',
         'task-recurrences end',
+        'task-recurrences remove-from-tasks',
         'task-recurrences owner',
         'task-recurrences template-from-task',
         'task-recurrences versions list',
@@ -514,13 +515,14 @@ describe('task recurrence commands', () => {
     })
   })
 
-  it('requires explicit confirmation for archive, end, and operation cancellation', async () => {
+  it('requires explicit confirmation for destructive series and operation actions', async () => {
     const archive = vi.fn(async () => resource())
     const end = vi.fn(async () => resource())
+    const removeFromTasks = vi.fn(async () => resource())
     const cancel = vi.fn(async () => resource('operation-1'))
     const client = {
       taskRecurrenceOperations: { cancel },
-      taskRecurrences: { archive, end },
+      taskRecurrences: { archive, end, removeFromTasks },
     }
 
     const unconfirmed = await execute(
@@ -551,6 +553,23 @@ describe('task recurrence commands', () => {
       ).code,
     ).toBe(0)
     expect(end).toHaveBeenCalledWith('series-1', { ifMatch: 'tr1-end' })
+
+    expect(
+      (
+        await execute(
+          [
+            'task-recurrences',
+            'remove-from-tasks',
+            'series-1',
+            '--if-match',
+            'tr1-remove',
+            '--yes',
+          ],
+          client,
+        )
+      ).code,
+    ).toBe(0)
+    expect(removeFromTasks).toHaveBeenCalledWith('series-1', { ifMatch: 'tr1-remove' })
 
     expect(
       (await execute(['task-recurrence-operations', 'cancel', 'operation-1', '--yes'], client))

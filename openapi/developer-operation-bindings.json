@@ -4395,6 +4395,33 @@
       "dynamicPolicyIds": [],
       "executionBindings": [
         {
+          "id": "api.v1.removeTaskRecurrenceFromTasks",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "teamgrid/internal/v1/taskRecurrences/removeFromTasks",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "removeTaskRecurrenceFromTasks",
+      "method": "POST",
+      "operationId": "removeTaskRecurrenceFromTasks",
+      "optionalScopes": [],
+      "path": "/task-recurrences/{id}/remove-from-tasks",
+      "requiredScopes": [
+        "task-recurrences:write",
+        "tasks:read",
+        "tasks:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
+      "conditionalScopes": [],
+      "dynamicPolicyIds": [],
+      "executionBindings": [
+        {
           "id": "api.v1.removeWebhook",
           "kind": "httpLocal",
           "role": "transport"
@@ -6204,7 +6231,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 234,
+    "authenticatedOperations": 235,
     "publicClientOperations": 1,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
@@ -6407,6 +6434,7 @@
       "teamgrid/internal/v1/taskRecurrences/preview",
       "teamgrid/internal/v1/taskRecurrences/previewStored",
       "teamgrid/internal/v1/taskRecurrences/recheck",
+      "teamgrid/internal/v1/taskRecurrences/removeFromTasks",
       "teamgrid/internal/v1/taskRecurrences/submitEvent",
       "teamgrid/internal/v1/taskRecurrences/transferOwner",
       "teamgrid/internal/v1/taskRecurrences/transition",

@@ -240,7 +240,7 @@ npm run conformance:plan
 ```
 
 The plan reads the immutable contract set and produces a deterministic inventory of all 87 V0 and
-236 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
+237 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
 execution binding, CAS precondition, and idempotency requirement. V0 compatibility statuses and the
 V0-to-V1 migration map remain explicit, so a documented unavailable route is not confused with an
 unexpected regression. Planning never loads a credential or contacts TeamGrid.
@@ -248,7 +248,7 @@ unexpected regression. Planning never loads a credential or contacts TeamGrid.
 The read-only phase performs only parameter-free GET requests, uses `limit=1` where supported, runs
 sequentially below the shared pre-auth limit, and retries at most two `429` responses. Operations
 that need an id, required filter, body, or mutation are recorded as blocked rather than guessed. A
-V1 run additionally proves all 235 SDK methods, all 236 CLI operation mappings, the exact 36-tool MCP allowlist, and one
+V1 run additionally proves all 236 SDK methods, all 237 CLI operation mappings, the exact 36-tool MCP allowlist, and one
 live workspace request through SDK, CLI, and MCP:
 
 ```sh
@@ -346,7 +346,7 @@ the exact repository, commit, manifest size, and manifest digest in
 working tree.
 
 The mirrored manifest also contains `developer-action-policy-registry.json`.
-It pins the App/API authorization registry version, SHA-256 identity, all 236
+It pins the App/API authorization registry version, SHA-256 identity, all 237
 action policies, and 12 principal-policy rollout families. SDK, CLI, and MCP do
 not evaluate or broaden this policy locally; every request remains subject to
 the owning App cell's authorization decision.

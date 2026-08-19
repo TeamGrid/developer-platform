@@ -114,6 +114,9 @@ function occurrence(overrides: Record<string, unknown> = {}) {
       cardId: null,
       decision: null,
       definitionVersionId: 'version-1',
+      detachedAt: null,
+      detachedBy: null,
+      detachedCardId: null,
       lastErrorCode: null,
       materializeAt: now,
       materializedAt: null,
@@ -221,6 +224,21 @@ describe('task recurrence SDK surface', () => {
     expect(taskRecurrenceOccurrenceValidator(occurrence({ occurrenceKey: 'arbitrary' }))).toBe(
       false,
     )
+    expect(
+      taskRecurrenceOccurrenceValidator(
+        occurrence({
+          detachedAt: now,
+          detachedBy: 'user-1',
+          detachedCardId: 'task-1',
+          state: 'materialized',
+        }),
+      ),
+    ).toBe(true)
+    expect(
+      taskRecurrenceOccurrenceValidator(
+        occurrence({ detachedAt: now, detachedBy: 'user-1', detachedCardId: null }),
+      ),
+    ).toBe(false)
     expect(
       taskRecurrenceOccurrenceValidator(
         occurrence({
@@ -385,6 +403,7 @@ describe('task recurrence SDK surface', () => {
       { idempotencyKey: 'recurrence-create-1' },
     )
     await client.taskRecurrences.update('series-1', { name: 'Renamed' }, { ifMatch: revision })
+    await client.taskRecurrences.removeFromTasks('series-1', { ifMatch: revision })
     await client.taskRecurrenceVersions.restore(
       'series-1',
       'version-1',
@@ -410,20 +429,22 @@ describe('task recurrence SDK surface', () => {
     expect(calls.map(({ method, path }) => `${method} ${path}`)).toEqual([
       'POST /v1/task-recurrences',
       'PATCH /v1/task-recurrences/series-1',
+      'POST /v1/task-recurrences/series-1/remove-from-tasks',
       'POST /v1/task-recurrences/series-1/versions/version-1/restore',
       `PUT /v1/task-recurrences/series-1/occurrences/${occurrenceKey}/override`,
       `PUT /v1/task-recurrences/series-1/occurrences/${occurrenceKey}/override`,
       `DELETE /v1/task-recurrences/series-1/occurrences/${occurrenceKey}/override`,
     ])
     expect(calls[0]?.headers.get('idempotency-key')).toBe('recurrence-create-1')
-    expect(calls.slice(1, 3).map((call) => call.headers.get('if-match'))).toEqual([
+    expect(calls.slice(1, 4).map((call) => call.headers.get('if-match'))).toEqual([
+      `"tr1-${revision}"`,
       `"tr1-${revision}"`,
       `"tr1-${revision}"`,
     ])
-    expect(calls[3]?.headers.get('if-match')).toBe(`"tro1-${revision}"`)
-    expect(calls[4]?.headers.get('if-none-match')).toBe('*')
-    expect(calls[4]?.headers.get('if-match')).toBeNull()
-    expect(calls[5]?.headers.get('if-match')).toBe(`"tro1-${revision}"`)
+    expect(calls[4]?.headers.get('if-match')).toBe(`"tro1-${revision}"`)
+    expect(calls[5]?.headers.get('if-none-match')).toBe('*')
+    expect(calls[5]?.headers.get('if-match')).toBeNull()
+    expect(calls[6]?.headers.get('if-match')).toBe(`"tro1-${revision}"`)
   })
 
   it('validates async operation acceptance, cancellation, and monotonic polling', async () => {
