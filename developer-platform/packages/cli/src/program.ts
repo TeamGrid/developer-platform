@@ -1834,6 +1834,400 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       )
     })
 
+  const taskRecurrences = program
+    .command('task-recurrences')
+    .description('define, inspect, and operate recurring tasks')
+  addListOptions(taskRecurrences.command('list'), 100)
+    .option('--project-id <id>', 'filter by target project')
+    .addOption(
+      new Option('--status <status>', 'filter lifecycle status').choices([
+        'active',
+        'paused',
+        'suspended',
+        'needs_attention',
+        'ended',
+        'archived',
+      ]),
+    )
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      await listResources(command, options, client.taskRecurrences as never)
+    })
+  taskRecurrences.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.taskRecurrences.get(id)).data)
+  })
+  taskRecurrences
+    .command('create')
+    .requiredOption('--data <json|@file|->', 'task recurrence definition JSON')
+    .option('--idempotency-key <key>', 'stable retry key')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.taskRecurrences.create(
+            (await readJsonObject(options.data, input)) as never,
+            { idempotencyKey: options.idempotencyKey },
+          )
+        ).data,
+      )
+    })
+  taskRecurrences
+    .command('preview')
+    .description('evaluate an unsaved recurrence definition without changing state')
+    .requiredOption('--data <json|@file|->', 'task recurrence preview JSON')
+    .action(async function action(options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.taskRecurrences.preview((await readJsonObject(options.data, input)) as never))
+          .data,
+      )
+    })
+  taskRecurrences
+    .command('update <id>')
+    .requiredOption('--data <json|@file|->', 'task recurrence patch JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest task recurrence revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.taskRecurrences.update(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
+          )
+        ).data,
+      )
+    })
+  archiveOptions(
+    taskRecurrences
+      .command('archive <id>')
+      .requiredOption(
+        '--if-match <revision|etag>',
+        'latest task recurrence revision or strong ETag',
+      ),
+  ).action(async function action(id: string, options, command: Command) {
+    await confirmDestructive(command, 'Archive', 'task recurrence', id)
+    const client = await loadClient(command)
+    outputData(
+      command,
+      (await client.taskRecurrences.archive(id, { ifMatch: options.ifMatch })).data,
+    )
+  })
+  taskRecurrences
+    .command('preview-stored <id>')
+    .description('preview occurrences from the current saved definition')
+    .option('--count <number>', 'number of occurrences (1–100)', integerInRange(1, 100, 'Count'))
+    .option('--from <date>', 'preview window start')
+    .option('--until <date>', 'preview window end')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(command, (await client.taskRecurrences.previewStored(id, options)).data)
+    })
+  for (const lifecycle of ['restore', 'pause', 'resume'] as const) {
+    taskRecurrences
+      .command(`${lifecycle} <id>`)
+      .requiredOption(
+        '--if-match <revision|etag>',
+        'latest task recurrence revision or strong ETag',
+      )
+      .action(async function action(id: string, options, command: Command) {
+        const client = await loadClient(command)
+        outputData(
+          command,
+          (await client.taskRecurrences[lifecycle](id, { ifMatch: options.ifMatch })).data,
+        )
+      })
+  }
+  archiveOptions(
+    taskRecurrences
+      .command('end <id>')
+      .requiredOption(
+        '--if-match <revision|etag>',
+        'latest task recurrence revision or strong ETag',
+      ),
+  ).action(async function action(id: string, options, command: Command) {
+    await confirmDestructive(command, 'End', 'task recurrence', id)
+    const client = await loadClient(command)
+    outputData(command, (await client.taskRecurrences.end(id, { ifMatch: options.ifMatch })).data)
+  })
+  archiveOptions(
+    taskRecurrences
+      .command('remove-from-tasks <id>')
+      .description(
+        'end the series and remove recurrence links from its tasks while preserving history',
+      )
+      .requiredOption(
+        '--if-match <revision|etag>',
+        'latest task recurrence revision or strong ETag',
+      ),
+  ).action(async function action(id: string, options, command: Command) {
+    await confirmDestructive(command, 'Remove from tasks', 'task recurrence', id)
+    const client = await loadClient(command)
+    outputData(
+      command,
+      (await client.taskRecurrences.removeFromTasks(id, { ifMatch: options.ifMatch })).data,
+    )
+  })
+  taskRecurrences
+    .command('owner <id>')
+    .description('transfer task recurrence ownership')
+    .requiredOption('--data <json|@file|->', 'new owner JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest task recurrence revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.taskRecurrences.transferOwner(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
+          )
+        ).data,
+      )
+    })
+  taskRecurrences
+    .command('template-from-task <id>')
+    .description('replace the recurrence task template from an existing task')
+    .requiredOption('--data <json|@file|->', 'source task and copy policy JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest task recurrence revision or strong ETag')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.taskRecurrences.applyTaskTemplate(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+            { ifMatch: options.ifMatch },
+          )
+        ).data,
+      )
+    })
+
+  const taskRecurrenceVersions = taskRecurrences
+    .command('versions')
+    .description('inspect and restore immutable recurrence definitions')
+  addListOptions(taskRecurrenceVersions.command('list <series-id>'), 100).action(
+    async function action(seriesId: string, options, command: Command) {
+      const client = await loadClient(command)
+      await listNestedResources(command, seriesId, options, client.taskRecurrenceVersions as never)
+    },
+  )
+  taskRecurrenceVersions.command('get <series-id> <version-id>').action(async function action(
+    seriesId: string,
+    versionId: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.taskRecurrenceVersions.get(seriesId, versionId)).data)
+  })
+  taskRecurrenceVersions
+    .command('restore <series-id> <version-id>')
+    .option('--data <json|@file|->', 'optional restore reason JSON')
+    .requiredOption('--if-match <revision|etag>', 'latest task recurrence revision or strong ETag')
+    .action(async function action(seriesId: string, versionId: string, options, command: Command) {
+      const client = await loadClient(command)
+      const data = options.data ? await readJsonObject(options.data, input) : {}
+      outputData(
+        command,
+        (
+          await client.taskRecurrenceVersions.restore(seriesId, versionId, data as never, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
+    })
+
+  const taskRecurrenceOccurrences = taskRecurrences
+    .command('occurrences')
+    .description('inspect and override the immutable occurrence ledger')
+  addListOptions(taskRecurrenceOccurrences.command('list <series-id>'), 100).action(
+    async function action(seriesId: string, options, command: Command) {
+      const client = await loadClient(command)
+      await listNestedResources(
+        command,
+        seriesId,
+        options,
+        client.taskRecurrenceOccurrences as never,
+      )
+    },
+  )
+  taskRecurrenceOccurrences
+    .command('get <series-id> <occurrence-key>')
+    .action(async function action(
+      seriesId: string,
+      occurrenceKey: string,
+      _options,
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (await client.taskRecurrenceOccurrences.get(seriesId, occurrenceKey)).data,
+      )
+    })
+  taskRecurrenceOccurrences
+    .command('override <series-id> <occurrence-key>')
+    .requiredOption('--data <json|@file|->', 'occurrence override JSON')
+    .option(
+      '--if-match <revision|etag>',
+      'latest task recurrence occurrence revision or strong ETag',
+    )
+    .option(
+      '--create-if-missing',
+      'create a ledger placeholder using placeholderToken from stored preview',
+    )
+    .action(async function action(
+      seriesId: string,
+      occurrenceKey: string,
+      options,
+      command: Command,
+    ) {
+      if (Boolean(options.ifMatch) === Boolean(options.createIfMissing)) {
+        throw new TeamGridClientError(
+          'invalid_arguments',
+          'Choose exactly one precondition: --if-match or --create-if-missing.',
+        )
+      }
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.taskRecurrenceOccurrences.override(
+            seriesId,
+            occurrenceKey,
+            (await readJsonObject(options.data, input)) as never,
+            options.createIfMissing ? { createIfMissing: true } : { ifMatch: options.ifMatch },
+          )
+        ).data,
+      )
+    })
+  taskRecurrenceOccurrences
+    .command('clear-override <series-id> <occurrence-key>')
+    .requiredOption(
+      '--if-match <revision|etag>',
+      'latest task recurrence occurrence revision or strong ETag',
+    )
+    .action(async function action(
+      seriesId: string,
+      occurrenceKey: string,
+      options,
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.taskRecurrenceOccurrences.clearOverride(seriesId, occurrenceKey, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
+    })
+  taskRecurrenceOccurrences
+    .command('retry <series-id> <occurrence-key>')
+    .requiredOption(
+      '--if-match <revision|etag>',
+      'latest task recurrence occurrence revision or strong ETag',
+    )
+    .action(async function action(
+      seriesId: string,
+      occurrenceKey: string,
+      options,
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.taskRecurrenceOccurrences.retry(seriesId, occurrenceKey, {
+            ifMatch: options.ifMatch,
+          })
+        ).data,
+      )
+    })
+
+  taskRecurrences
+    .command('recheck <id>')
+    .option('--wait', 'wait until the asynchronous recheck finishes')
+    .option('--poll-interval <milliseconds>', 'poll interval while waiting', positiveInteger, 1000)
+    .option('--max-wait <milliseconds>', 'maximum wait time', positiveInteger, 300_000)
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      const accepted = await client.taskRecurrences.recheck(id)
+      const result = options.wait
+        ? await client.taskRecurrenceOperations.wait(accepted.data.id, {
+            maxWaitMs: options.maxWait,
+            pollIntervalMs: options.pollInterval,
+          })
+        : accepted
+      outputData(command, result.data)
+    })
+  taskRecurrences
+    .command('events')
+    .description('submit deduplicated external trigger events')
+    .command('submit <id>')
+    .requiredOption('--data <json|@file|->', 'event envelope JSON')
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.taskRecurrences.submitEvent(
+            id,
+            (await readJsonObject(options.data, input)) as never,
+          )
+        ).data,
+      )
+    })
+
+  const taskRecurrenceOperations = program
+    .command('task-recurrence-operations')
+    .description('inspect and cancel asynchronous recurrence operations')
+  taskRecurrenceOperations.command('get <id>').action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    const client = await loadClient(command)
+    outputData(command, (await client.taskRecurrenceOperations.get(id)).data)
+  })
+  taskRecurrenceOperations
+    .command('wait <id>')
+    .option('--poll-interval <milliseconds>', 'poll interval while waiting', positiveInteger, 1000)
+    .option('--max-wait <milliseconds>', 'maximum wait time', positiveInteger, 300_000)
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.taskRecurrenceOperations.wait(id, {
+            maxWaitMs: options.maxWait,
+            pollIntervalMs: options.pollInterval,
+          })
+        ).data,
+      )
+    })
+  archiveOptions(taskRecurrenceOperations.command('cancel <id>')).action(async function action(
+    id: string,
+    _options,
+    command: Command,
+  ) {
+    await confirmDestructive(command, 'Cancel', 'task recurrence operation', id)
+    const client = await loadClient(command)
+    outputData(command, (await client.taskRecurrenceOperations.cancel(id)).data)
+  })
+
   const times = program
     .command('time-entries')
     .alias('times')

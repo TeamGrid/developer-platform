@@ -26,6 +26,17 @@ teamgrid changes checkpoint --resource-type task --output json
 teamgrid changes list --cursor "$CHECKPOINT" --resource-type task --all --output jsonl
 teamgrid time-entries billing get time-entry-id --output json
 teamgrid time-entries billing update time-entry-id --billed --if-match "$REVISION"
+teamgrid task-recurrences create --data @recurrence.json \
+  --idempotency-key daily-review-v1 --output json
+teamgrid task-recurrences preview-stored recurrence-id --count 10 --output json
+teamgrid task-recurrences occurrences override recurrence-id occurrence-key \
+  --data '{"action":"skip"}' --if-match "$OCCURRENCE_REVISION"
+teamgrid task-recurrences occurrences override recurrence-id future-occurrence-key \
+  --data @future-override.json --create-if-missing
+teamgrid task-recurrences recheck recurrence-id --wait --output json
+teamgrid task-recurrences remove-from-tasks recurrence-id \
+  --if-match "$REVISION" --yes --output json
+teamgrid task-recurrence-operations wait operation-id --output json
 ```
 
 Browser login is the default. The CLI opens the system browser, uses PKCE S256
@@ -84,7 +95,8 @@ interactive browser login.
 The CLI mirrors every public API operation, including project lifecycle jobs,
 products and product groups, finance-gated project statements, call notes,
 contact groups, custom-field definitions, and credential-owned webhook delivery
-history, custom-field values, project templates, and planned work. Use
+history, custom-field values, project templates, recurring tasks and their immutable occurrence
+ledger, and planned work. Use
 `teamgrid <group> --help` for the contract-derived filters. The
 original direct list form for lists, services, and tags remains available as a
 compatibility alias.
@@ -100,6 +112,16 @@ revision returns exit code `6` and must be refreshed before retrying. Planned-wo
 non-interactive use additionally requires `--yes`; always provide a stable idempotency key.
 Project lifecycle operations, template instantiation, and planned-work replacement can be polled to
 a terminal state with `--wait`, bounded by `--max-wait`.
+The `task-recurrences` command group mirrors the full recurrence lifecycle. Existing series and
+occurrence mutations require their latest strong ETag through `--if-match`. A future occurrence
+from `preview-stored` can instead be created atomically with `--create-if-missing` when its override
+JSON includes that preview item's opaque `placeholderToken`; the two preconditions are mutually
+exclusive. Archive/end, `remove-from-tasks`, and asynchronous operation cancellation additionally
+require confirmation. `remove-from-tasks` ends the series and removes recurrence links from
+materialized tasks without deleting the immutable occurrence audit history. Draft preview does not persist state,
+but a high-cost draft can return a recoverable operation; use
+`task-recurrence-operations wait` for its terminal result. `preview-stored`, `versions`, and
+`occurrences` operate on the saved immutable history.
 Billing updates likewise require an explicit revision and exactly one of
 `--billed` or `--unbilled`; the separate billing scope is never implied by
 ordinary time-entry write access.

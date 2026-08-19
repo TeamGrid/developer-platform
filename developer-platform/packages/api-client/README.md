@@ -32,7 +32,8 @@ self-revocation flow; the credential cannot be restored after success.
 The typed surface covers projects and lifecycle operations, tasks and timers,
 time entries, contacts, call notes, contact groups, products and product groups,
 project statements, lists, services, tags, custom-field definitions and values,
-project templates and instantiations, planned work and replacement operations, users,
+project templates and instantiations, recurring-task definitions, immutable versions and
+occurrence ledgers, planned work and replacement operations, users,
 webhooks and credential-owned delivery history, audit events, and workspace
 discovery. Every public operation is checked against the canonical capability
 manifest during CI. Finance-gated fields are typed as optional and are absent
@@ -140,6 +141,48 @@ Pass the accepted operation to `wait` as shown above: the client then binds ever
 accepted operation ID, action, and target resource, and rejects inconsistent terminal states.
 Independent compare-and-set contracts such as custom-field values and planned work keep their
 documented `ifMatch` requirements.
+
+Recurring tasks have their own strong `tr1` series and `tro1` occurrence validators. Creation is
+idempotent and existing series/occurrence mutations require the latest ETag. A stored preview also
+returns an opaque `placeholderToken`: combine it with `{ createIfMissing: true }` to atomically
+override a future occurrence before the scanner has created its ledger row. A bounded draft
+preview returns the preview directly; a high-cost policy returns an
+encrypted recoverable preview operation. Recheck and preview operations can be polled to a
+monotonic terminal state:
+
+```ts
+const created = await teamgrid.taskRecurrences.create(
+  { sourceTaskId: 'task-id', policy: recurrencePolicy },
+  { idempotencyKey: 'daily-review-v1' },
+)
+const preview = await teamgrid.taskRecurrences.previewStored(created.data.id, { count: 10 })
+const future = preview.data.attributes.occurrences[0]
+await teamgrid.taskRecurrenceOccurrences.override(
+  created.data.id,
+  future.occurrenceKey,
+  { action: 'skip', placeholderToken: future.placeholderToken! },
+  { createIfMissing: true },
+)
+const draft = await teamgrid.taskRecurrences.preview({ policy: recurrencePolicy })
+if (draft.data.type === 'taskRecurrenceOperation') {
+  await teamgrid.taskRecurrenceOperations.wait(draft.data.id)
+}
+const operation = await teamgrid.taskRecurrences.recheck(created.data.id)
+await teamgrid.taskRecurrenceOperations.wait(operation.data.id)
+// Ends the series and detaches its materialized tasks without deleting history.
+await teamgrid.taskRecurrences.removeFromTasks(created.data.id, {
+  ifMatch: created.etag!,
+})
+```
+
+After detachment, occurrence resources expose `cardId: null` together with the immutable
+`detachedCardId`, `detachedAt`, and `detachedBy` audit fields.
+
+The generated policy types include all materialization strategies (`none`, `latest`, `bounded`,
+`all`; `allow`, `defer`, `skip`, `latest-only`, `pause-series`), invalid monthly-date handling,
+wall-clock versus elapsed time, and completion-transition semantics. Completion-relative rules
+default to the first completion; opt into `every-completion-transition` only for workflows that
+must react again after reopen/complete cycles.
 
 Node.js 22.14–24 is supported. See the workspace README and checked OpenAPI v1
 contract for the complete resource and security model.

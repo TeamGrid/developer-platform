@@ -25,6 +25,7 @@ export const TEAMGRID_CHANGE_FEED_RESOURCE_TYPES = Object.freeze([
   'service',
   'tag',
   'task',
+  'taskRecurrence',
   'timeEntry',
   'webhook',
 ] as const satisfies readonly ChangeResourceType[])

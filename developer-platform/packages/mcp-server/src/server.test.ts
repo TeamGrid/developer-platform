@@ -24,6 +24,9 @@ describe('TeamGrid read-only MCP adapter', () => {
       search: { query },
       services: { get, list },
       tags: { get, list },
+      taskRecurrenceOccurrences: { get, list },
+      taskRecurrences: { get, list, previewStored: get },
+      taskRecurrenceVersions: { get, list },
       tasks: { get, list },
       timeEntries: { get, list },
       users: { list },
@@ -42,6 +45,16 @@ describe('TeamGrid read-only MCP adapter', () => {
       serviceId: 'service-1',
     })
     await handlers.taskGet({ id: 'task-1' })
+    await handlers.taskRecurrencesList({ limit: 10, projectId: 'project-1', status: 'active' })
+    await handlers.taskRecurrenceGet({ id: 'series-1' })
+    await handlers.taskRecurrencePreview({ count: 5, id: 'series-1' })
+    await handlers.taskRecurrenceVersionsList({ limit: 10, seriesId: 'series-1' })
+    await handlers.taskRecurrenceVersionGet({ seriesId: 'series-1', versionId: 'version-1' })
+    await handlers.taskRecurrenceOccurrencesList({ limit: 10, seriesId: 'series-1' })
+    await handlers.taskRecurrenceOccurrenceGet({
+      occurrenceKey: `occ1-${'d'.repeat(64)}`,
+      seriesId: 'series-1',
+    })
     await handlers.searchQuery({ limit: 50, term: 'proposal', types: ['projects', 'tasks'] })
     expect(list).toHaveBeenCalledWith({ limit: 25, projectId: 'project-1' })
     expect(list).toHaveBeenCalledWith({
@@ -54,12 +67,20 @@ describe('TeamGrid read-only MCP adapter', () => {
       serviceId: 'service-1',
     })
     expect(get).toHaveBeenCalledWith('task-1')
+    expect(list).toHaveBeenCalledWith({ limit: 10, projectId: 'project-1', status: 'active' })
+    expect(get).toHaveBeenCalledWith('series-1')
+    expect(get).toHaveBeenCalledWith('series-1', { count: 5 })
+    expect(list).toHaveBeenCalledWith('series-1', { limit: 10 })
+    expect(get).toHaveBeenCalledWith('series-1', 'version-1')
+    expect(get).toHaveBeenCalledWith('series-1', `occ1-${'d'.repeat(64)}`)
     expect(query).toHaveBeenCalledWith({
       limit: 50,
       term: 'proposal',
       types: ['projects', 'tasks'],
     })
-    expect(Object.keys(handlers).every((name) => /(?:Get|List|Query)$/.test(name))).toBe(true)
+    expect(Object.keys(handlers).every((name) => /(?:Get|List|Preview|Query)$/.test(name))).toBe(
+      true,
+    )
     expect(JSON.stringify(Object.keys(handlers))).not.toMatch(/create|update|remove|archive/i)
   })
 
@@ -147,6 +168,28 @@ describe('TeamGrid read-only MCP adapter', () => {
         })),
         list: vi.fn(async () => ({ data: [], meta: {} })),
       },
+      taskRecurrences: {
+        get: vi.fn(async (id) => ({ data: { id, type: 'taskRecurrence' }, meta: {} })),
+        list: vi.fn(async (input) => ({ data: [], meta: { input } })),
+        previewStored: vi.fn(async (id, input) => ({
+          data: { id, type: 'taskRecurrencePreview' },
+          meta: { input },
+        })),
+      },
+      taskRecurrenceVersions: {
+        get: vi.fn(async (_seriesId, versionId) => ({
+          data: { id: versionId, type: 'taskRecurrenceVersion' },
+          meta: {},
+        })),
+        list: vi.fn(async (seriesId, input) => ({ data: [], meta: { input, seriesId } })),
+      },
+      taskRecurrenceOccurrences: {
+        get: vi.fn(async (_seriesId, occurrenceKey) => ({
+          data: { id: 'occurrence-1', type: 'taskRecurrenceOccurrence' },
+          meta: { occurrenceKey },
+        })),
+        list: vi.fn(async (seriesId, input) => ({ data: [], meta: { input, seriesId } })),
+      },
       timeEntries: {
         get: vi.fn(async (id) => ({
           data: {
@@ -231,6 +274,13 @@ describe('TeamGrid read-only MCP adapter', () => {
         'teamgrid_tag_get',
         'teamgrid_tags_list',
         'teamgrid_task_get',
+        'teamgrid_task_recurrence_get',
+        'teamgrid_task_recurrence_occurrence_get',
+        'teamgrid_task_recurrence_occurrences_list',
+        'teamgrid_task_recurrence_preview',
+        'teamgrid_task_recurrence_version_get',
+        'teamgrid_task_recurrence_versions_list',
+        'teamgrid_task_recurrences_list',
         'teamgrid_tasks_list',
         'teamgrid_time_entries_list',
         'teamgrid_time_entry_get',
@@ -239,7 +289,7 @@ describe('TeamGrid read-only MCP adapter', () => {
         'teamgrid_webhooks_list',
         'teamgrid_workspace_get',
       ])
-      expect(advertisedNames).toHaveLength(29)
+      expect(advertisedNames).toHaveLength(36)
       expect(advertisedNames.join(' ')).not.toMatch(/create|update|remove|archive/i)
       expect(tools.tools.every((tool) => tool.title?.includes('TeamGrid'))).toBe(true)
       expect(
@@ -268,6 +318,41 @@ describe('TeamGrid read-only MCP adapter', () => {
           id: 'task-1',
         },
       })
+      const recurrenceListResponse = await client.callTool({
+        arguments: { limit: 10, projectId: 'project-1', status: 'active' },
+        name: 'teamgrid_task_recurrences_list',
+      })
+      expect(recurrenceListResponse.isError).not.toBe(true)
+      expect(apiClient.taskRecurrences.list).toHaveBeenCalledWith({
+        limit: 10,
+        projectId: 'project-1',
+        status: 'active',
+      })
+      const recurrencePreviewResponse = await client.callTool({
+        arguments: { count: 5, from: '2026-08-18T10:00:00.000Z', id: 'series-1' },
+        name: 'teamgrid_task_recurrence_preview',
+      })
+      expect(recurrencePreviewResponse.isError).not.toBe(true)
+      expect(apiClient.taskRecurrences.previewStored).toHaveBeenCalledWith('series-1', {
+        count: 5,
+        from: '2026-08-18T10:00:00.000Z',
+      })
+      const occurrenceResponse = await client.callTool({
+        arguments: { occurrenceKey: `occ1-${'d'.repeat(64)}`, seriesId: 'series-1' },
+        name: 'teamgrid_task_recurrence_occurrence_get',
+      })
+      expect(occurrenceResponse.isError).not.toBe(true)
+      expect(apiClient.taskRecurrenceOccurrences.get).toHaveBeenCalledWith(
+        'series-1',
+        `occ1-${'d'.repeat(64)}`,
+      )
+      const occurrenceCalls = apiClient.taskRecurrenceOccurrences.get.mock.calls.length
+      const invalidOccurrenceResponse = await client.callTool({
+        arguments: { occurrenceKey: 'arbitrary', seriesId: 'series-1' },
+        name: 'teamgrid_task_recurrence_occurrence_get',
+      })
+      expect(invalidOccurrenceResponse.isError).toBe(true)
+      expect(apiClient.taskRecurrenceOccurrences.get).toHaveBeenCalledTimes(occurrenceCalls)
       apiClient.workspace.get.mockRejectedValueOnce(
         new Error(`upstream rejected Authorization: Bearer ${secretCanary}`),
       )
@@ -406,7 +491,7 @@ describe('TeamGrid read-only MCP adapter', () => {
     ])
     try {
       const names = (await coreClient.listTools()).tools.map((tool) => tool.name)
-      expect(names).toHaveLength(15)
+      expect(names).toHaveLength(22)
       expect(names.join(' ')).not.toMatch(/audit|contact|users|webhook/)
       expect(names.join(' ')).not.toMatch(/service/)
       expect(names).not.toContain('teamgrid_search')
@@ -424,7 +509,7 @@ describe('TeamGrid read-only MCP adapter', () => {
         get: () => new Proxy({}, { get: () => method }),
       },
     )
-    const expectedToolCounts = { collaboration: 22, core: 15, governance: 21 } as const
+    const expectedToolCounts = { collaboration: 29, core: 22, governance: 28 } as const
     for (const toolProfile of ['collaboration', 'core', 'governance'] as const) {
       const server = createTeamGridMcpServer(apiClient as never, { toolProfile })
       const client = new Client({ name: `${toolProfile}-test-client`, version: '1.0.0' })
@@ -478,7 +563,7 @@ describe('TeamGrid read-only MCP adapter', () => {
     ])
     try {
       const names = (await denyClient.listTools()).tools.map((tool) => tool.name)
-      expect(names).toHaveLength(14)
+      expect(names).toHaveLength(21)
       expect(names).not.toContain('teamgrid_projects_list')
     } finally {
       await denyClient.close()

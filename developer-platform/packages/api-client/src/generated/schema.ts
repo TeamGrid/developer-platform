@@ -2960,6 +2960,462 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/task-recurrences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List task recurrences
+         * @description Use this operation to list task recurrences. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        get: operations["listTaskRecurrences"];
+        put?: never;
+        /**
+         * Create a task recurrence
+         * @description Use this operation to create a task recurrence. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Use a stable Idempotency-Key when retrying so a transport timeout cannot create duplicate work.
+         */
+        post: operations["createTaskRecurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview a draft task recurrence
+         * @description Use this operation to preview a draft task recurrence. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        post: operations["previewTaskRecurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a task recurrence
+         * @description Use this operation to get a task recurrence. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        get: operations["getTaskRecurrence"];
+        put?: never;
+        post?: never;
+        /**
+         * Archive a task recurrence
+         * @description Use this operation to archive a task recurrence. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        delete: operations["archiveTaskRecurrence"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a task recurrence
+         * @description Use this operation to update a task recurrence. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        patch: operations["updateTaskRecurrence"];
+        trace?: never;
+    };
+    "/task-recurrences/{id}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preview a stored task recurrence
+         * @description Use this operation to preview a stored task recurrence. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        get: operations["previewStoredTaskRecurrence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore a task recurrence
+         * @description Use this operation to restore a task recurrence. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        post: operations["restoreTaskRecurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause a task recurrence
+         * @description Use this operation to pause a task recurrence. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        post: operations["pauseTaskRecurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resume a task recurrence
+         * @description Use this operation to resume a task recurrence. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        post: operations["resumeTaskRecurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End a task recurrence
+         * @description Use this operation to end a task recurrence. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        post: operations["endTaskRecurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/remove-from-tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Remove a task recurrence from its tasks
+         * @description Use this operation to remove a task recurrence from its tasks. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        post: operations["removeTaskRecurrenceFromTasks"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/owner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Transfer task recurrence ownership
+         * @description Use this operation to transfer task recurrence ownership. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        post: operations["transferTaskRecurrenceOwner"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/definition-from-task": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Replace a recurrence template from a task
+         * @description Use this operation to replace a recurrence template from a task. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        post: operations["applyTaskAsTaskRecurrenceTemplate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List task recurrence versions
+         * @description Use this operation to list task recurrence versions. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        get: operations["listTaskRecurrenceVersions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/versions/{versionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a task recurrence version
+         * @description Use this operation to get a task recurrence version. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        get: operations["getTaskRecurrenceVersion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/versions/{versionId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore a task recurrence version
+         * @description Use this operation to restore a task recurrence version. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        post: operations["restoreTaskRecurrenceVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/occurrences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List task recurrence occurrences
+         * @description Use this operation to list task recurrence occurrences. It returns only resources visible to the credential and applies the documented filters before producing a bounded, stable page. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        get: operations["listTaskRecurrenceOccurrences"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/occurrences/{occurrenceKey}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a task recurrence occurrence
+         * @description Use this operation to get a task recurrence occurrence. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        get: operations["getTaskRecurrenceOccurrence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/occurrences/{occurrenceKey}/override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Override a task recurrence occurrence
+         * @description Use this operation to override a task recurrence occurrence. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        put: operations["overrideTaskRecurrenceOccurrence"];
+        post?: never;
+        /**
+         * Clear a task recurrence occurrence override
+         * @description Use this operation to clear a task recurrence occurrence override. The operation preserves TeamGrid lifecycle and permission rules instead of bypassing them with a direct data deletion. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        delete: operations["clearTaskRecurrenceOccurrenceOverride"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/occurrences/{occurrenceKey}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry a failed task recurrence occurrence
+         * @description Use this operation to retry a failed task recurrence occurrence. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
+         */
+        post: operations["retryTaskRecurrenceOccurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/recheck": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Recheck a task recurrence asynchronously
+         * @description Use this operation to recheck a task recurrence asynchronously. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        post: operations["recheckTaskRecurrence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrences/{id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit an event to a task recurrence
+         * @description Use this operation to submit an event to a task recurrence. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        post: operations["submitTaskRecurrenceEvent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrence-operations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a task recurrence operation
+         * @description Use this operation to get a task recurrence operation. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        get: operations["getTaskRecurrenceOperation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/task-recurrence-operations/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel a task recurrence operation
+         * @description Use this operation to cancel a task recurrence operation. The server validates the complete payload and derives workspace ownership from the authenticated credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         */
+        post: operations["cancelTaskRecurrenceOperation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2999,7 +3455,7 @@ export interface components {
                  * @description The contract version associated with this api version data.
                  * @constant
                  */
-                contractVersion: "1.0.0";
+                contractVersion: "1.1.0";
                 /** @description The deprecations associated with this api version data. */
                 deprecations: {
                     /** @description Stable TeamGrid identifier for this resource. */
@@ -4118,6 +4574,27 @@ export interface components {
                 plannedStartAt: string | null;
                 /** @description Identifier of the related project. */
                 projectId: string | null;
+                /** @description The recurrence associated with this task attributes. */
+                recurrence: {
+                    /** @description The definition version id associated with this task attributes recurrence. */
+                    definitionVersionId: string | null;
+                    /**
+                     * Format: date-time
+                     * @description ISO 8601 timestamp for generated at.
+                     */
+                    generatedAt: string | null;
+                    /** @description The occurrence id associated with this task attributes recurrence. */
+                    occurrenceId: string | null;
+                    /** @description The occurrence key associated with this task attributes recurrence. */
+                    occurrenceKey: string | null;
+                    /**
+                     * Format: date-time
+                     * @description ISO 8601 timestamp for scheduled for.
+                     */
+                    scheduledFor: string | null;
+                    /** @description The series id associated with this task attributes recurrence. */
+                    seriesId: string | null;
+                } | null;
                 /** @description Identifier of the related service. */
                 serviceId: string | null;
                 /** @description Ordered set of subscriber identifiers associated with this task attributes. */
@@ -5327,7 +5804,7 @@ export interface components {
                  * @description Canonical TeamGrid resource type.
                  * @enum {string}
                  */
-                resourceType: "absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook";
+                resourceType: "absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "taskRecurrence" | "timeEntry" | "webhook";
                 /** @description The sequence associated with this change event attributes. */
                 sequence: number;
                 /** @description Whether tombstone applies to this change event attributes. */
@@ -6454,7 +6931,7 @@ export interface components {
                  * @description Canonical TeamGrid resource type.
                  * @enum {string}
                  */
-                resourceType: "auditEvents" | "contacts" | "projects" | "tasks" | "timeEntries";
+                resourceType: "auditEvents" | "contacts" | "projects" | "taskRecurrences" | "tasks" | "timeEntries";
                 /** @description Number of row records represented by this export attributes. */
                 readonly rowCount?: number;
                 /**
@@ -6544,7 +7021,7 @@ export interface components {
              * @description Canonical TeamGrid resource type.
              * @enum {string}
              */
-            resourceType: "auditEvents" | "contacts" | "projects" | "tasks" | "timeEntries";
+            resourceType: "auditEvents" | "contacts" | "projects" | "taskRecurrences" | "tasks" | "timeEntries";
             /**
              * Format: date-time
              * @description ISO 8601 timestamp for updated from.
@@ -7466,6 +7943,1047 @@ export interface components {
             /** @description The grants associated with this service account resource grant set replace. */
             grants: components["schemas"]["ResourceGrantInput"][];
         };
+        /** @description Public API representation of task recurrence duration. */
+        TaskRecurrenceDuration: {
+            /**
+             * @description Canonical unit value for this task recurrence duration.
+             * @enum {string}
+             */
+            unit: "minute" | "hour" | "day" | "week" | "month" | "year" | "business-day";
+            /** @description Canonical value represented by this field. */
+            value: number;
+        } & unknown;
+        /** @description Public API representation of task recurrence calendar rule. */
+        TaskRecurrenceCalendarRule: {
+            /** @description The by hour associated with this task recurrence calendar rule. */
+            byHour?: number[];
+            /** @description The by minute associated with this task recurrence calendar rule. */
+            byMinute?: number[];
+            /** @description The by month associated with this task recurrence calendar rule. */
+            byMonth?: number[];
+            /** @description The by month day associated with this task recurrence calendar rule. */
+            byMonthDay?: number[];
+            /** @description The by set position associated with this task recurrence calendar rule. */
+            bySetPosition?: number[];
+            /** @description The by week day associated with this task recurrence calendar rule. */
+            byWeekDay?: number[];
+            /**
+             * @description Canonical frequency value for this task recurrence calendar rule.
+             * @enum {string}
+             */
+            frequency: "minutely" | "hourly" | "daily" | "weekly" | "monthly" | "yearly";
+            /**
+             * @description The interval associated with this task recurrence calendar rule.
+             * @default 1
+             */
+            interval: number;
+            /**
+             * @description Canonical invalid day handling value for this task recurrence calendar rule.
+             * @enum {string}
+             */
+            invalidDayHandling?: "next-valid-day" | "omit" | "previous-valid-day";
+            /** @description The start local associated with this task recurrence calendar rule. */
+            startLocal: string;
+            /** @description The week start associated with this task recurrence calendar rule. */
+            weekStart?: number;
+        };
+        /** @description Public API representation of task recurrence candidate source. */
+        TaskRecurrenceCandidateSource: {
+            /** @description The node id associated with this task recurrence candidate source. */
+            nodeId: string;
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "calendarRule";
+            /** @description The rule associated with this task recurrence candidate source. */
+            rule: components["schemas"]["TaskRecurrenceCalendarRule"];
+        } | {
+            /** @description The node id associated with this task recurrence candidate source. */
+            nodeId: string;
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "dateSet";
+            /** @description The dates associated with this task recurrence candidate source. */
+            dates: string[];
+        } | {
+            /** @description The node id associated with this task recurrence candidate source. */
+            nodeId: string;
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "monthSet";
+            /** @description The months associated with this task recurrence candidate source. */
+            months: number[];
+        } | {
+            /** @description The node id associated with this task recurrence candidate source. */
+            nodeId: string;
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "sequence";
+            /** @description The anchor local associated with this task recurrence candidate source. */
+            anchorLocal: string;
+            /** @description The intervals associated with this task recurrence candidate source. */
+            intervals: (components["schemas"]["TaskRecurrenceDuration"] & {
+                /** @description Canonical value represented by this field. */
+                value?: number;
+            })[];
+        } | {
+            /** @description The node id associated with this task recurrence candidate source. */
+            nodeId: string;
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "afterOccurrenceEvent";
+            /**
+             * @description Canonical completion mode value for this task recurrence candidate source.
+             * @enum {string}
+             */
+            completionMode?: "every-completion-transition" | "first-completion-only";
+            /** @description The delay associated with this task recurrence candidate source. */
+            delay?: components["schemas"]["TaskRecurrenceDuration"] & {
+                /** @description Canonical value represented by this field. */
+                value?: number;
+            };
+            /**
+             * @description Canonical TeamGrid event name.
+             * @enum {string}
+             */
+            event: "completed" | "created" | "reopened";
+        } | {
+            /** @description The node id associated with this task recurrence candidate source. */
+            nodeId: string;
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "afterProjectEvent";
+            /** @description The delay associated with this task recurrence candidate source. */
+            delay?: components["schemas"]["TaskRecurrenceDuration"] & {
+                /** @description Canonical value represented by this field. */
+                value?: number;
+            };
+            /**
+             * @description Canonical TeamGrid event name.
+             * @enum {string}
+             */
+            event: "archived" | "completed" | "created" | "reopened" | "restored";
+            /** @description Identifier of the related project. */
+            projectId: string;
+        } | {
+            /** @description The node id associated with this task recurrence candidate source. */
+            nodeId: string;
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "externalEvent";
+            /** @description The delay associated with this task recurrence candidate source. */
+            delay?: components["schemas"]["TaskRecurrenceDuration"] & {
+                /** @description Canonical value represented by this field. */
+                value?: number;
+            };
+            /** @description The event type associated with this task recurrence candidate source. */
+            eventType: string;
+            /** @description The source id associated with this task recurrence candidate source. */
+            sourceId?: string;
+        } | {
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "union";
+            /** @description The sources associated with this task recurrence candidate source. */
+            sources: components["schemas"]["TaskRecurrenceCandidateSource"][];
+        } | {
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "intersection";
+            /** @description The sources associated with this task recurrence candidate source. */
+            sources: components["schemas"]["TaskRecurrenceCandidateSource"][];
+        } | {
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "difference";
+            /** @description The exclude associated with this task recurrence candidate source. */
+            exclude: components["schemas"]["TaskRecurrenceCandidateSource"];
+            /** @description The include associated with this task recurrence candidate source. */
+            include: components["schemas"]["TaskRecurrenceCandidateSource"];
+        } | {
+            /**
+             * @description The op associated with this task recurrence candidate source.
+             * @constant
+             */
+            op: "deduplicate";
+            /**
+             * @description Canonical granularity value for this task recurrence candidate source.
+             * @enum {string}
+             */
+            granularity: "instant" | "day" | "minute";
+            /** @description The source associated with this task recurrence candidate source. */
+            source: components["schemas"]["TaskRecurrenceCandidateSource"];
+        };
+        /** @description Public API representation of task recurrence transform. */
+        TaskRecurrenceTransform: ({
+            /**
+             * @description The op associated with this task recurrence transform.
+             * @constant
+             */
+            op: "offset";
+            /**
+             * @description Canonical unit value for this task recurrence transform.
+             * @enum {string}
+             */
+            unit: "minute" | "hour" | "day" | "week" | "month" | "year" | "business-day";
+            /**
+             * @description Canonical unit mode value for this task recurrence transform.
+             * @enum {string}
+             */
+            unitMode?: "elapsed" | "wall-clock";
+            /** @description Canonical value represented by this field. */
+            value: number;
+        } & unknown) | {
+            /**
+             * @description The op associated with this task recurrence transform.
+             * @constant
+             */
+            op: "nthBusinessDay";
+            /**
+             * @description Canonical calendar binding value for this task recurrence transform.
+             * @enum {string}
+             */
+            calendarBinding?: "assignee" | "project" | "series";
+            /**
+             * @description Canonical period value for this task recurrence transform.
+             * @enum {string}
+             */
+            period: "month" | "quarter" | "year";
+            /** @description The position associated with this task recurrence transform. */
+            position: number;
+        } | {
+            /**
+             * @description The op associated with this task recurrence transform.
+             * @constant
+             */
+            op: "shiftToBusinessTime";
+            /**
+             * @description Canonical calendar binding value for this task recurrence transform.
+             * @enum {string}
+             */
+            calendarBinding?: "assignee" | "project" | "series";
+            /**
+             * @description Canonical direction value for this task recurrence transform.
+             * @enum {string}
+             */
+            direction: "next" | "previous";
+            /** @description Whether include absences applies to this task recurrence transform. */
+            includeAbsences?: boolean;
+        } | {
+            /**
+             * @description The op associated with this task recurrence transform.
+             * @constant
+             */
+            op: "snapToWorkingTime";
+            /**
+             * @description Canonical calendar binding value for this task recurrence transform.
+             * @enum {string}
+             */
+            calendarBinding?: "assignee" | "project" | "series";
+            /**
+             * @description Canonical direction value for this task recurrence transform.
+             * @enum {string}
+             */
+            direction: "next" | "previous";
+            /** @description Whether include absences applies to this task recurrence transform. */
+            includeAbsences?: boolean;
+        } | {
+            /**
+             * @description The op associated with this task recurrence transform.
+             * @constant
+             */
+            op: "setLocalTime";
+            /** @description The hour associated with this task recurrence transform. */
+            hour: number;
+            /** @description The minute associated with this task recurrence transform. */
+            minute: number;
+        } | ({
+            /**
+             * @description The op associated with this task recurrence transform.
+             * @constant
+             */
+            op: "limit";
+            /** @description The count associated with this task recurrence transform. */
+            count?: number;
+            /** @description Start timestamp of the represented interval. */
+            start?: string;
+            /** @description The until associated with this task recurrence transform. */
+            until?: string;
+        } | {
+            /** @description The count associated with this task recurrence transform. */
+            count: number;
+        } | {
+            /** @description Start timestamp of the represented interval. */
+            start: string;
+        } | {
+            /** @description The until associated with this task recurrence transform. */
+            until: string;
+        }) | {
+            /**
+             * @description The op associated with this task recurrence transform.
+             * @constant
+             */
+            op: "excludeDateSet";
+            /** @description The dates associated with this task recurrence transform. */
+            dates: string[];
+        } | {
+            /**
+             * @description The op associated with this task recurrence transform.
+             * @constant
+             */
+            op: "excludePeriod";
+            /** @description End timestamp of the represented interval. */
+            end: string;
+            /** @description Start timestamp of the represented interval. */
+            start: string;
+        } | {
+            /**
+             * @description The op associated with this task recurrence transform.
+             * @constant
+             */
+            op: "mapToDueAndPlanningDates";
+            /** @description The due offset associated with this task recurrence transform. */
+            dueOffset?: components["schemas"]["TaskRecurrenceDuration"];
+            /** @description The planned end offset associated with this task recurrence transform. */
+            plannedEndOffset?: components["schemas"]["TaskRecurrenceDuration"];
+            /** @description The planned start offset associated with this task recurrence transform. */
+            plannedStartOffset?: components["schemas"]["TaskRecurrenceDuration"];
+        };
+        /** @description Public API representation of task recurrence condition value. */
+        TaskRecurrenceConditionValue: (boolean | number | string | null) | {
+            /** @description The ref associated with this task recurrence condition value. */
+            ref: string;
+        };
+        /** @description Public API representation of task recurrence condition. */
+        TaskRecurrenceCondition: {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "all";
+            /** @description The conditions associated with this task recurrence condition. */
+            conditions: components["schemas"]["TaskRecurrenceCondition"][];
+        } | {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "any";
+            /** @description The conditions associated with this task recurrence condition. */
+            conditions: components["schemas"]["TaskRecurrenceCondition"][];
+        } | {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "not";
+            /** @description The condition associated with this task recurrence condition. */
+            condition: components["schemas"]["TaskRecurrenceCondition"];
+        } | {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "exists";
+            /** @description Canonical value represented by this field. */
+            value: components["schemas"]["TaskRecurrenceConditionValue"];
+        } | {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "eq";
+            /** @description The left associated with this task recurrence condition. */
+            left: components["schemas"]["TaskRecurrenceConditionValue"];
+            /** @description The right associated with this task recurrence condition. */
+            right: components["schemas"]["TaskRecurrenceConditionValue"];
+        } | {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "neq";
+            /** @description The left associated with this task recurrence condition. */
+            left: components["schemas"]["TaskRecurrenceConditionValue"];
+            /** @description The right associated with this task recurrence condition. */
+            right: components["schemas"]["TaskRecurrenceConditionValue"];
+        } | {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "lt";
+            /** @description The left associated with this task recurrence condition. */
+            left: components["schemas"]["TaskRecurrenceConditionValue"];
+            /** @description The right associated with this task recurrence condition. */
+            right: components["schemas"]["TaskRecurrenceConditionValue"];
+        } | {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "lte";
+            /** @description The left associated with this task recurrence condition. */
+            left: components["schemas"]["TaskRecurrenceConditionValue"];
+            /** @description The right associated with this task recurrence condition. */
+            right: components["schemas"]["TaskRecurrenceConditionValue"];
+        } | {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "gt";
+            /** @description The left associated with this task recurrence condition. */
+            left: components["schemas"]["TaskRecurrenceConditionValue"];
+            /** @description The right associated with this task recurrence condition. */
+            right: components["schemas"]["TaskRecurrenceConditionValue"];
+        } | {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "gte";
+            /** @description The left associated with this task recurrence condition. */
+            left: components["schemas"]["TaskRecurrenceConditionValue"];
+            /** @description The right associated with this task recurrence condition. */
+            right: components["schemas"]["TaskRecurrenceConditionValue"];
+        } | {
+            /**
+             * @description The op associated with this task recurrence condition.
+             * @constant
+             */
+            op: "in";
+            /** @description The left associated with this task recurrence condition. */
+            left: components["schemas"]["TaskRecurrenceConditionValue"];
+            /** @description The right associated with this task recurrence condition. */
+            right: components["schemas"]["TaskRecurrenceConditionValue"][];
+        };
+        /** @description Canonical, strictly discriminated recurrence-v1 policy. */
+        TaskRecurrencePolicyInput: {
+            /** @description The candidates associated with this task recurrence policy. */
+            candidates: components["schemas"]["TaskRecurrenceCandidateSource"];
+            /** @description The conditions associated with this task recurrence policy. */
+            conditions: components["schemas"]["TaskRecurrenceCondition"][];
+            /**
+             * @description The engine version associated with this task recurrence policy.
+             * @constant
+             */
+            engineVersion: "recurrence-v1";
+            /** @description The limits associated with this task recurrence policy. */
+            limits: {
+                /** @description The max occurrences associated with this task recurrence policy limits. */
+                maxOccurrences: number | null;
+                /** @description The until associated with this task recurrence policy limits. */
+                until: string | null;
+            };
+            /** @description The materialization associated with this task recurrence policy. */
+            materialization: {
+                /**
+                 * @description Canonical catch up value for this task recurrence policy materialization.
+                 * @enum {string}
+                 */
+                catchUp: "all" | "bounded" | "latest" | "none";
+                /** @description The catch up limit associated with this task recurrence policy materialization. */
+                catchUpLimit?: number;
+                /** @description The lead associated with this task recurrence policy materialization. */
+                lead: components["schemas"]["TaskRecurrenceDuration"] & {
+                    /** @description Canonical value represented by this field. */
+                    value?: number;
+                };
+                /**
+                 * @description Canonical overlap value for this task recurrence policy materialization.
+                 * @enum {string}
+                 */
+                overlap: "allow" | "defer" | "latest-only" | "pause-series" | "skip";
+            } & unknown;
+            /**
+             * @description The schema version associated with this task recurrence policy.
+             * @constant
+             */
+            schemaVersion: 1;
+            /** @description The time basis associated with this task recurrence policy. */
+            timeBasis: {
+                /**
+                 * @description Canonical disambiguation value for this task recurrence policy time basis.
+                 * @enum {string}
+                 */
+                disambiguation: "compatible" | "earlier" | "later" | "reject";
+                /**
+                 * @description Canonical mode value for this task recurrence policy time basis.
+                 * @enum {string}
+                 */
+                mode: "elapsed" | "wall-clock";
+                /** @description The time zone associated with this task recurrence policy time basis. */
+                timeZone: string;
+            };
+            /** @description The transforms associated with this task recurrence policy. */
+            transforms: components["schemas"]["TaskRecurrenceTransform"][];
+        };
+        /** @description Exact recurrence-approved task template projection. */
+        TaskRecurrenceTemplateInput: {
+            /** @description Whether this time or service can be billed. */
+            billable?: boolean;
+            /** @description Identifier of the related contact. */
+            contactId?: string;
+            /** @description The custom field values associated with this task recurrence template. */
+            customFieldValues?: {
+                [key: string]: (boolean | number | string | null) | (boolean | number | string | null)[];
+            };
+            /** @description Human-readable description of the resource. */
+            description?: string;
+            /**
+             * @description How to interpret the task description. Legacy and unmarked descriptions are plain-text; markdown-v1 enables TeamGrid Markdown.
+             * @enum {string}
+             */
+            descriptionFormat?: "markdown-v1" | "plain-text";
+            /** @description Identifier of the related workspace group. */
+            groupId?: string;
+            /** @description Identifier of the related task list. */
+            listId?: string;
+            /** @description Human-readable name of the resource. */
+            name: string;
+            /** @description The personal list id associated with this task recurrence template. */
+            personalListId?: string;
+            /** @description Planned effort in minutes. */
+            plannedTime?: number;
+            /** @description Identifier of the related project. */
+            projectId?: string;
+            /** @description Identifier of the related service. */
+            serviceId?: string;
+            /** @description Ordered set of subscriber identifiers associated with this task recurrence template. */
+            subscriberIds?: string[];
+            /** @description The sub tasks associated with this task recurrence template. */
+            subTasks?: {
+                /** @description The order associated with this task recurrence template sub tasks. */
+                order?: number;
+                /** @description Human-readable title of the resource. */
+                title: string;
+            }[];
+            /** @description Ordered set of tag identifiers associated with this task recurrence template. */
+            tagIds?: string[];
+            /** @description Identifier of the related workspace user. */
+            userId?: string;
+        };
+        /** @description Public API representation of task recurrence template patch. */
+        TaskRecurrenceTemplatePatch: {
+            /** @description Whether this time or service can be billed. */
+            billable?: boolean;
+            /** @description Identifier of the related contact. */
+            contactId?: string;
+            /** @description The custom field values associated with this task recurrence template patch. */
+            customFieldValues?: {
+                [key: string]: (boolean | number | string | null) | (boolean | number | string | null)[];
+            };
+            /** @description Human-readable description of the resource. */
+            description?: string;
+            /**
+             * @description How to interpret the task description. Legacy and unmarked descriptions are plain-text; markdown-v1 enables TeamGrid Markdown.
+             * @enum {string}
+             */
+            descriptionFormat?: "markdown-v1" | "plain-text";
+            /** @description Identifier of the related workspace group. */
+            groupId?: string;
+            /** @description Identifier of the related task list. */
+            listId?: string;
+            /** @description Human-readable name of the resource. */
+            name?: string;
+            /** @description The personal list id associated with this task recurrence template patch. */
+            personalListId?: string;
+            /** @description Planned effort in minutes. */
+            plannedTime?: number;
+            /** @description Identifier of the related project. */
+            projectId?: string;
+            /** @description Identifier of the related service. */
+            serviceId?: string;
+            /** @description Ordered set of subscriber identifiers associated with this task recurrence template patch. */
+            subscriberIds?: string[];
+            /** @description The sub tasks associated with this task recurrence template patch. */
+            subTasks?: {
+                /** @description The order associated with this task recurrence template patch sub tasks. */
+                order?: number;
+                /** @description Human-readable title of the resource. */
+                title: string;
+            }[];
+            /** @description Ordered set of tag identifiers associated with this task recurrence template patch. */
+            tagIds?: string[];
+            /** @description Identifier of the related workspace user. */
+            userId?: string;
+        };
+        /** @description Public API representation of task recurrence occurrence override. */
+        TaskRecurrenceOccurrenceOverride: {
+            /**
+             * @description Canonical action represented by this record.
+             * @enum {string}
+             */
+            action: "materialize" | "skip";
+            /** @description The placeholder token associated with this task recurrence occurrence override. */
+            placeholderToken?: string;
+            /** @description The scheduled for local associated with this task recurrence occurrence override. */
+            scheduledForLocal?: string;
+            /** @description The template patch associated with this task recurrence occurrence override. */
+            templatePatch?: components["schemas"]["TaskRecurrenceTemplatePatch"];
+        };
+        /** @description Public API representation of task recurrence. */
+        TaskRecurrence: {
+            /** @description The attributes associated with this task recurrence. */
+            attributes: {
+                /** @description The attention code associated with this task recurrence attributes. */
+                attentionCode: string | null;
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
+                createdAt: string;
+                /** @description The current definition associated with this task recurrence attributes. */
+                currentDefinition: {
+                    /**
+                     * @description Canonical cost class value for this task recurrence attributes current definition.
+                     * @enum {string}
+                     */
+                    costClass: "low" | "medium" | "high" | "async";
+                    /** @description The definition hash associated with this task recurrence attributes current definition. */
+                    definitionHash: string;
+                    /**
+                     * @description The engine version associated with this task recurrence attributes current definition.
+                     * @constant
+                     */
+                    engineVersion: "recurrence-v1";
+                    /** @description Stable TeamGrid identifier for this resource. */
+                    id: string;
+                    /** @description The policy associated with this task recurrence attributes current definition. */
+                    policy: components["schemas"]["TaskRecurrencePolicyInput"];
+                    /**
+                     * @description The schema version associated with this task recurrence attributes current definition.
+                     * @constant
+                     */
+                    schemaVersion: 1;
+                    /** @description Short human-readable summary. */
+                    summary: {
+                        [key: string]: unknown;
+                    };
+                    /** @description The template associated with this task recurrence attributes current definition. */
+                    template: components["schemas"]["TaskRecurrenceTemplateInput"];
+                    /** @description The version associated with this task recurrence attributes current definition. */
+                    version: number;
+                };
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for developer updated at.
+                 */
+                developerUpdatedAt: string;
+                /** @description Human-readable name of the resource. */
+                name: string | null;
+                /** @description The owner associated with this task recurrence attributes. */
+                owner: {
+                    /** @description Stable TeamGrid identifier for this resource. */
+                    id: string;
+                    /**
+                     * @description Canonical kind value for this task recurrence attributes owner.
+                     * @enum {string}
+                     */
+                    kind: "developerPrincipal" | "user";
+                };
+                /** @description Whether replayed applies to this task recurrence attributes. */
+                replayed: boolean;
+                /** @description The resource context associated with this task recurrence attributes. */
+                resourceContext: {
+                    [key: string]: unknown;
+                };
+                /** @description Strong resource revision used for optimistic concurrency control. */
+                revision: string;
+                /**
+                 * @description Canonical status of the resource or operation.
+                 * @enum {string}
+                 */
+                status: "active" | "paused" | "suspended" | "needs_attention" | "ended" | "archived";
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
+                updatedAt: string;
+            };
+            /** @description Stable TeamGrid identifier for this resource. */
+            id: string;
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
+            type: "taskRecurrence";
+        };
+        /** @description Public API representation of task recurrence version. */
+        TaskRecurrenceVersion: {
+            /** @description The attributes associated with this task recurrence version. */
+            attributes: {
+                /** @description The change reason associated with this task recurrence version attributes. */
+                changeReason: string | null;
+                /**
+                 * @description Canonical cost class value for this task recurrence version attributes.
+                 * @enum {string}
+                 */
+                costClass: "low" | "medium" | "high" | "async";
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
+                createdAt: string;
+                /** @description Identifier of the user or principal that created the resource. */
+                createdBy: string;
+                /** @description The definition hash associated with this task recurrence version attributes. */
+                definitionHash: string;
+                /** @description The effective from occurrence key associated with this task recurrence version attributes. */
+                effectiveFromOccurrenceKey: string | null;
+                /**
+                 * @description The engine version associated with this task recurrence version attributes.
+                 * @constant
+                 */
+                engineVersion: "recurrence-v1";
+                /** @description The policy associated with this task recurrence version attributes. */
+                policy: components["schemas"]["TaskRecurrencePolicyInput"];
+                /**
+                 * @description The schema version associated with this task recurrence version attributes.
+                 * @constant
+                 */
+                schemaVersion: 1;
+                /** @description The series id associated with this task recurrence version attributes. */
+                seriesId: string;
+                /** @description Short human-readable summary. */
+                summary: {
+                    [key: string]: unknown;
+                };
+                /** @description The template associated with this task recurrence version attributes. */
+                template: components["schemas"]["TaskRecurrenceTemplateInput"];
+                /** @description The version associated with this task recurrence version attributes. */
+                version: number;
+            };
+            /** @description Stable TeamGrid identifier for this resource. */
+            id: string;
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
+            type: "taskRecurrenceVersion";
+        };
+        /** @description Public API representation of task recurrence occurrence. */
+        TaskRecurrenceOccurrence: {
+            /** @description The attributes associated with this task recurrence occurrence. */
+            attributes: {
+                /** @description The attempts associated with this task recurrence occurrence attributes. */
+                attempts: number;
+                /** @description The card id associated with this task recurrence occurrence attributes. */
+                cardId: string | null;
+                /** @description The decision associated with this task recurrence occurrence attributes. */
+                decision: {
+                    [key: string]: unknown;
+                } | null;
+                /** @description The definition version id associated with this task recurrence occurrence attributes. */
+                definitionVersionId: string;
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for detached at.
+                 */
+                detachedAt: string | null;
+                /** @description The detached by associated with this task recurrence occurrence attributes. */
+                detachedBy: string | null;
+                /** @description The detached card id associated with this task recurrence occurrence attributes. */
+                detachedCardId: string | null;
+                /** @description The last error code associated with this task recurrence occurrence attributes. */
+                lastErrorCode: string | null;
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for materialize at.
+                 */
+                materializeAt: string;
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for materialized at.
+                 */
+                materializedAt: string | null;
+                /** @description The occurrence key associated with this task recurrence occurrence attributes. */
+                occurrenceKey: string;
+                /** @description The override associated with this task recurrence occurrence attributes. */
+                override: components["schemas"]["TaskRecurrenceOccurrenceOverride"] | null;
+                /** @description Strong resource revision used for optimistic concurrency control. */
+                revision: string;
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for scheduled for.
+                 */
+                scheduledFor: string;
+                /** @description The scheduled for local associated with this task recurrence occurrence attributes. */
+                scheduledForLocal: string;
+                /** @description The series id associated with this task recurrence occurrence attributes. */
+                seriesId: string;
+                /**
+                 * @description Canonical lifecycle state of the resource or operation.
+                 * @enum {string}
+                 */
+                state: "planned" | "claimed" | "materialized" | "skipped" | "blocked" | "failed";
+                /** @description The time zone associated with this task recurrence occurrence attributes. */
+                timeZone: string;
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
+                updatedAt: string;
+            };
+            /** @description Stable TeamGrid identifier for this resource. */
+            id: string;
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
+            type: "taskRecurrenceOccurrence";
+        };
+        /** @description Public API representation of task recurrence preview. */
+        TaskRecurrencePreview: {
+            /** @description The attributes associated with this task recurrence preview. */
+            attributes: {
+                /**
+                 * @description Canonical cost class value for this task recurrence preview attributes.
+                 * @enum {string|null}
+                 */
+                costClass: "low" | "medium" | "high" | "async" | null;
+                /** @description The definition hash associated with this task recurrence preview attributes. */
+                definitionHash: string;
+                /** @description The occurrences associated with this task recurrence preview attributes. */
+                occurrences: {
+                    /** @description The card dates associated with this task recurrence preview attributes occurrences. */
+                    cardDates: {
+                        /**
+                         * Format: date-time
+                         * @description ISO 8601 timestamp for due date.
+                         */
+                        dueDate?: string;
+                        /**
+                         * Format: date-time
+                         * @description Planned end timestamp.
+                         */
+                        plannedEnd?: string;
+                        /**
+                         * Format: date-time
+                         * @description Planned start timestamp.
+                         */
+                        plannedStart?: string;
+                    };
+                    /** @description The occurrence key associated with this task recurrence preview attributes occurrences. */
+                    occurrenceKey: string;
+                    /** @description The placeholder token associated with this task recurrence preview attributes occurrences. */
+                    placeholderToken: string | null;
+                    /** @description The provenance associated with this task recurrence preview attributes occurrences. */
+                    provenance: string[];
+                    /**
+                     * Format: date-time
+                     * @description ISO 8601 timestamp for scheduled for.
+                     */
+                    scheduledFor: string;
+                    /** @description The scheduled for local associated with this task recurrence preview attributes occurrences. */
+                    scheduledForLocal: string;
+                    /** @description The time zone associated with this task recurrence preview attributes occurrences. */
+                    timeZone: string;
+                }[];
+                /** @description Short human-readable summary. */
+                summary: {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Stable TeamGrid identifier for this resource. */
+            id: string;
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
+            type: "taskRecurrencePreview";
+        };
+        /** @description Public API representation of task recurrence operation. */
+        TaskRecurrenceOperation: {
+            /** @description The attributes associated with this task recurrence operation. */
+            attributes: {
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the work item was completed.
+                 */
+                completedAt: string | null;
+                /**
+                 * Format: date-time
+                 * @description Timestamp at which the resource was created.
+                 */
+                createdAt: string;
+                /** @description The error code associated with this task recurrence operation attributes. */
+                errorCode: string | null;
+                /**
+                 * @description Canonical operation type value for this task recurrence operation attributes.
+                 * @enum {string}
+                 */
+                operationType: "catchUp" | "preview" | "recheck" | "repair";
+                /** @description The progress associated with this task recurrence operation attributes. */
+                progress: {
+                    [key: string]: unknown;
+                } | null;
+                /** @description The result associated with this task recurrence operation attributes. */
+                result: {
+                    [key: string]: unknown;
+                } | null;
+                /** @description The series id associated with this task recurrence operation attributes. */
+                seriesId: string | null;
+                /**
+                 * @description Canonical status of the resource or operation.
+                 * @enum {string}
+                 */
+                status: "pending" | "running" | "succeeded" | "failed" | "cancelled";
+                /**
+                 * Format: date-time
+                 * @description Timestamp of the most recent successful update.
+                 */
+                updatedAt: string;
+            };
+            /** @description Stable TeamGrid identifier for this resource. */
+            id: string;
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
+            type: "taskRecurrenceOperation";
+        };
+        /** @description Public API representation of task recurrence event. */
+        TaskRecurrenceEvent: {
+            /** @description The attributes associated with this task recurrence event. */
+            attributes: {
+                /**
+                 * Format: date-time
+                 * @description ISO 8601 timestamp for accepted at.
+                 */
+                acceptedAt: string;
+            };
+            /** @description Stable TeamGrid identifier for this resource. */
+            id: string;
+            /**
+             * @description Canonical type discriminator for this resource.
+             * @constant
+             */
+            type: "taskRecurrenceEvent";
+        };
+        /** @description Public API representation of task recurrence. */
+        TaskRecurrenceCreate: {
+            /** @description The change reason associated with this task recurrence. */
+            changeReason?: string;
+            /** @description Human-readable name of the resource. */
+            name?: string;
+            /** @description The policy associated with this task recurrence. */
+            policy: components["schemas"]["TaskRecurrencePolicyInput"];
+            /** @description The source task id associated with this task recurrence. */
+            sourceTaskId?: string;
+            /** @description The template associated with this task recurrence. */
+            template?: components["schemas"]["TaskRecurrenceTemplateInput"];
+            /** @description The template patch associated with this task recurrence. */
+            templatePatch?: components["schemas"]["TaskRecurrenceTemplatePatch"];
+        } & (unknown | unknown);
+        /** @description Public API representation of task recurrence. */
+        TaskRecurrenceUpdate: {
+            /** @description The change reason associated with this task recurrence. */
+            changeReason?: string;
+            /** @description Human-readable name of the resource. */
+            name?: string;
+            /** @description The policy associated with this task recurrence. */
+            policy?: components["schemas"]["TaskRecurrencePolicyInput"];
+            /** @description The template associated with this task recurrence. */
+            template?: components["schemas"]["TaskRecurrenceTemplateInput"];
+        };
+        /** @description Public API representation of task recurrence preview. */
+        TaskRecurrencePreviewInput: {
+            /** @description The context associated with this task recurrence preview. */
+            context?: {
+                [key: string]: unknown;
+            };
+            /**
+             * @description The count associated with this task recurrence preview.
+             * @default 20
+             */
+            count: number;
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for from.
+             */
+            from?: string;
+            /** @description The policy associated with this task recurrence preview. */
+            policy: components["schemas"]["TaskRecurrencePolicyInput"];
+            /** @description The template associated with this task recurrence preview. */
+            template?: components["schemas"]["TaskRecurrenceTemplateInput"];
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for until.
+             */
+            until?: string;
+        };
+        /** @description Public API representation of task recurrence owner. */
+        TaskRecurrenceOwnerUpdate: {
+            /** @description Stable TeamGrid identifier for this resource. */
+            id: string;
+            /**
+             * @description Canonical kind value for this task recurrence owner.
+             * @enum {string}
+             */
+            kind: "developerPrincipal" | "user";
+        };
+        /** @description Public API representation of task recurrence task template. */
+        TaskRecurrenceTaskTemplateUpdate: {
+            /** @description The change reason associated with this task recurrence task template. */
+            changeReason?: string;
+            /** @description The policy associated with this task recurrence task template. */
+            policy?: components["schemas"]["TaskRecurrencePolicyInput"];
+            /** @description Identifier of the related task. */
+            taskId: string;
+        };
+        /** @description Public API representation of task recurrence version restore. */
+        TaskRecurrenceVersionRestore: {
+            /** @description The change reason associated with this task recurrence version restore. */
+            changeReason?: string;
+        };
+        /** @description Public API representation of task recurrence event submit. */
+        TaskRecurrenceEventSubmit: {
+            /** @description The causation id associated with this task recurrence event submit. */
+            causationId?: string;
+            /** @description The correlation id associated with this task recurrence event submit. */
+            correlationId?: string;
+            /** @description The event id associated with this task recurrence event submit. */
+            eventId: string;
+            /** @description The event type associated with this task recurrence event submit. */
+            eventType: string;
+            /**
+             * Format: date-time
+             * @description ISO 8601 timestamp for occurred at.
+             */
+            occurredAt: string;
+            /** @description The payload associated with this task recurrence event submit. */
+            payload?: {
+                [key: string]: unknown;
+            };
+            /**
+             * @description The schema version associated with this task recurrence event submit.
+             * @constant
+             */
+            schemaVersion: 1;
+            /** @description The source id associated with this task recurrence event submit. */
+            sourceId: string;
+        };
     };
     responses: {
         /** @description The cell-local application returned an invalid response. */
@@ -7626,6 +9144,18 @@ export interface components {
         WebhookLimit: number;
         /** @description Exactly one latest strong service-account grant-policy ETag. */
         IfMatchResourceGrantSet: string;
+        /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+        IfMatchTaskRecurrence: string;
+        /** @description Exactly one latest strong task-recurrence occurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+        IfMatchTaskRecurrenceOccurrence: string;
+        /** @description Latest strong occurrence ETag. For placeholder creation omit this header and send If-None-Match: * instead. */
+        IfMatchTaskRecurrenceOccurrenceOptional: string;
+        /** @description Send exactly * to atomically create a future ledger placeholder from a valid stored-preview token. It is mutually exclusive with If-Match. */
+        IfNoneMatchTaskRecurrenceOccurrence: "*";
+        /** @description Stable occurrence Key used to identify the target within the authenticated workspace. */
+        TaskRecurrenceOccurrenceKey: string;
+        /** @description Stable version Id used to identify the target within the authenticated workspace. */
+        TaskRecurrenceVersionId: string;
     };
     requestBodies: never;
     headers: {
@@ -7665,6 +9195,10 @@ export interface components {
         WorkspaceSettingsETag: string;
         /** @description Strong revision for the complete service-account grant policy. */
         ResourceGrantSetETag: string;
+        /** @description Strong task-recurrence series revision returned by reads and mutations. */
+        TaskRecurrenceETag: string;
+        /** @description Strong task-recurrence occurrence revision returned by reads and mutations. */
+        TaskRecurrenceOccurrenceETag: string;
     };
     pathItems: never;
 }
@@ -7688,7 +9222,7 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "contractVersion": "1.0.0",
+                     *         "contractVersion": "1.1.0",
                      *         "deprecations": [
                      *           {}
                      *         ],
@@ -19230,7 +20764,12 @@ export interface operations {
     };
     createExportDownloadIntent: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
+                limit?: components["parameters"]["Limit"];
+            };
             header?: never;
             path: {
                 /** @description Stable identifier of the resource in the authenticated workspace. */
@@ -20108,7 +21647,7 @@ export interface operations {
                 /** @description Filter by one or more change operations. Repeat the query parameter for multiple values. */
                 operations?: ("created" | "deleted" | "updated")[];
                 /** @description Filter by one or more public resource types. Repeat the query parameter for multiple values. */
-                resourceTypes?: ("absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "timeEntry" | "webhook")[];
+                resourceTypes?: ("absence" | "appointment" | "automationDefinition" | "automationRun" | "callNote" | "comment" | "contact" | "contactGroup" | "customFieldDefinition" | "document" | "file" | "integration" | "list" | "product" | "productGroup" | "project" | "projectStatement" | "projectTemplate" | "service" | "tag" | "task" | "taskRecurrence" | "timeEntry" | "webhook")[];
                 /** @description Create an empty checkpoint at the latest committed cell sequence. Cannot be combined with cursor. Use this before a full resource snapshot, then poll with the returned cursor. */
                 startAtLatest?: boolean;
             };
@@ -21644,6 +23183,1829 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             412: components["responses"]["PreconditionFailed"];
             428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listTaskRecurrences: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
+                limit?: components["parameters"]["Limit"];
+                /** @description Filter by project context. */
+                projectId?: string;
+                /** @description Filter by recurrence lifecycle state. */
+                status?: "active" | "paused" | "suspended" | "needs_attention" | "ended" | "archived";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "taskRecurrence"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createTaskRecurrence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique request key retained for seven days. Within that window, reuse with different data is rejected. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        /** @description JSON payload used to create a task recurrence. The server validates this payload before applying any change. */
+        requestBody: {
+            content: {
+                /** @example example */
+                "application/json": components["schemas"]["TaskRecurrenceCreate"];
+            };
+        };
+        responses: {
+            /** @description An idempotent replay of an existing resource. */
+            200: {
+                headers: {
+                    "Idempotency-Replayed"?: "true";
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description The request to create a task recurrence created the resource. The response contains its canonical public representation and request metadata. */
+            201: {
+                headers: {
+                    "Idempotency-Replayed"?: "false";
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    previewTaskRecurrence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description JSON payload used to preview a draft task recurrence. The server validates this payload before applying any change. */
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "policy": {
+                 *         "conditions": [],
+                 *         "engineVersion": "recurrence-v1",
+                 *         "limits": {},
+                 *         "materialization": {},
+                 *         "schemaVersion": 1,
+                 *         "timeBasis": {},
+                 *         "transforms": []
+                 *       },
+                 *       "context": {},
+                 *       "count": 20,
+                 *       "from": "2026-07-29T10:00:00Z"
+                 *     }
+                 */
+                "application/json": components["schemas"]["TaskRecurrencePreviewInput"];
+            };
+        };
+        responses: {
+            /** @description A deterministic, bounded draft preview with no persisted side effects. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "costClass": "low",
+                     *           "definitionHash": "example",
+                     *           "occurrences": [],
+                     *           "summary": {}
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrencePreview"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrencePreview"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            /** @description An encrypted, recoverable asynchronous preview operation. */
+            202: {
+                headers: {
+                    /** @description Canonical polling location for the preview operation. */
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "errorCode": "example",
+                     *           "operationType": "catchUp",
+                     *           "seriesId": "exampleId",
+                     *           "status": "pending",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrenceOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceOperation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description The policy exceeds the synchronous preview complexity budget. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getTaskRecurrence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    archiveTaskRecurrence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateTaskRecurrence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        /** @description JSON payload used to update a task recurrence. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "changeReason": "example",
+                 *       "name": "Example",
+                 *       "policy": {
+                 *         "conditions": [],
+                 *         "engineVersion": "recurrence-v1",
+                 *         "limits": {},
+                 *         "materialization": {},
+                 *         "schemaVersion": 1,
+                 *         "timeBasis": {},
+                 *         "transforms": []
+                 *       }
+                 *     }
+                 */
+                "application/json": components["schemas"]["TaskRecurrenceUpdate"];
+            };
+        };
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    previewStoredTaskRecurrence: {
+        parameters: {
+            query?: {
+                /** @description Preview lower time boundary. */
+                from?: string;
+                /** @description Preview upper time boundary. */
+                until?: string;
+                /** @description Maximum preview occurrences. */
+                count?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "costClass": "low",
+                     *           "definitionHash": "example",
+                     *           "occurrences": [],
+                     *           "summary": {}
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrencePreview"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrencePreview"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    restoreTaskRecurrence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    pauseTaskRecurrence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    resumeTaskRecurrence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    endTaskRecurrence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    removeTaskRecurrenceFromTasks: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    transferTaskRecurrenceOwner: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        /** @description JSON payload used to transfer task recurrence ownership. The server validates this payload before applying any change. */
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "id": "exampleId",
+                 *       "kind": "developerPrincipal"
+                 *     }
+                 */
+                "application/json": components["schemas"]["TaskRecurrenceOwnerUpdate"];
+            };
+        };
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    applyTaskAsTaskRecurrenceTemplate: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        /** @description JSON payload used to replace a recurrence template from a task. The server validates this payload before applying any change. */
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "taskId": "exampleId",
+                 *       "changeReason": "example",
+                 *       "policy": {
+                 *         "conditions": [],
+                 *         "engineVersion": "recurrence-v1",
+                 *         "limits": {},
+                 *         "materialization": {},
+                 *         "schemaVersion": 1,
+                 *         "timeBasis": {},
+                 *         "transforms": []
+                 *       }
+                 *     }
+                 */
+                "application/json": components["schemas"]["TaskRecurrenceTaskTemplateUpdate"];
+            };
+        };
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listTaskRecurrenceVersions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "taskRecurrenceVersion"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceVersion"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getTaskRecurrenceVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+                /** @description Stable version Id used to identify the target within the authenticated workspace. */
+                versionId: components["parameters"]["TaskRecurrenceVersionId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The immutable recurrence definition version. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "changeReason": "example",
+                     *           "costClass": "low",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdBy": "example",
+                     *           "definitionHash": "example",
+                     *           "effectiveFromOccurrenceKey": "example",
+                     *           "engineVersion": "recurrence-v1",
+                     *           "schemaVersion": 1,
+                     *           "seriesId": "exampleId",
+                     *           "summary": {},
+                     *           "version": 1
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrenceVersion"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceVersion"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    restoreTaskRecurrenceVersion: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+                /** @description Stable version Id used to identify the target within the authenticated workspace. */
+                versionId: components["parameters"]["TaskRecurrenceVersionId"];
+            };
+            cookie?: never;
+        };
+        /** @description JSON payload used to restore a task recurrence version. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
+        requestBody?: {
+            content: {
+                /**
+                 * @example {
+                 *       "changeReason": "example"
+                 *     }
+                 */
+                "application/json": components["schemas"]["TaskRecurrenceVersionRestore"];
+            };
+        };
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attentionCode": "example",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "currentDefinition": {},
+                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
+                     *           "name": "Example",
+                     *           "owner": {},
+                     *           "replayed": false,
+                     *           "resourceContext": {},
+                     *           "revision": "\"example-revision\"",
+                     *           "status": "active",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    listTaskRecurrenceOccurrences: {
+        parameters: {
+            query?: {
+                /** @description Opaque cursor returned in meta.page.nextCursor. */
+                cursor?: components["parameters"]["Cursor"];
+                /** @description Maximum number of records to return in this page. The response may contain fewer records. */
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A bounded page of resources visible to the credential, with request metadata and an opaque cursor when another page is available. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "attributes": {},
+                     *           "id": "exampleId",
+                     *           "type": "taskRecurrenceOccurrence"
+                     *         }
+                     *       ],
+                     *       "meta": {
+                     *         "page": {
+                     *           "limit": 1,
+                     *           "nextCursor": "example"
+                     *         },
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceOccurrence"][];
+                        meta: {
+                            page: {
+                                limit: number;
+                                nextCursor: string | null;
+                            };
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getTaskRecurrenceOccurrence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+                /** @description Stable occurrence Key used to identify the target within the authenticated workspace. */
+                occurrenceKey: components["parameters"]["TaskRecurrenceOccurrenceKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceOccurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attempts": 0,
+                     *           "cardId": "exampleId",
+                     *           "definitionVersionId": "exampleId",
+                     *           "detachedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedBy": "example",
+                     *           "detachedCardId": "exampleId",
+                     *           "lastErrorCode": "example",
+                     *           "materializeAt": "2026-07-29T10:00:00Z",
+                     *           "materializedAt": "2026-07-29T10:00:00Z",
+                     *           "occurrenceKey": "example",
+                     *           "revision": "\"example-revision\"",
+                     *           "scheduledFor": "2026-07-29T10:00:00Z",
+                     *           "scheduledForLocal": "example",
+                     *           "seriesId": "exampleId",
+                     *           "state": "planned",
+                     *           "timeZone": "Europe/Berlin",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrenceOccurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceOccurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    overrideTaskRecurrenceOccurrence: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Latest strong occurrence ETag. For placeholder creation omit this header and send If-None-Match: * instead. */
+                "If-Match"?: components["parameters"]["IfMatchTaskRecurrenceOccurrenceOptional"];
+                /** @description Send exactly * to atomically create a future ledger placeholder from a valid stored-preview token. It is mutually exclusive with If-Match. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatchTaskRecurrenceOccurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+                /** @description Stable occurrence Key used to identify the target within the authenticated workspace. */
+                occurrenceKey: components["parameters"]["TaskRecurrenceOccurrenceKey"];
+            };
+            cookie?: never;
+        };
+        /** @description JSON payload used to override a task recurrence occurrence. The server validates this payload before applying any change. */
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "action": "materialize",
+                 *       "placeholderToken": "example",
+                 *       "scheduledForLocal": "example",
+                 *       "templatePatch": {
+                 *         "billable": false,
+                 *         "contactId": "exampleId",
+                 *         "customFieldValues": {}
+                 *       }
+                 *     }
+                 */
+                "application/json": components["schemas"]["TaskRecurrenceOccurrenceOverride"];
+            };
+        };
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceOccurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attempts": 0,
+                     *           "cardId": "exampleId",
+                     *           "definitionVersionId": "exampleId",
+                     *           "detachedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedBy": "example",
+                     *           "detachedCardId": "exampleId",
+                     *           "lastErrorCode": "example",
+                     *           "materializeAt": "2026-07-29T10:00:00Z",
+                     *           "materializedAt": "2026-07-29T10:00:00Z",
+                     *           "occurrenceKey": "example",
+                     *           "revision": "\"example-revision\"",
+                     *           "scheduledFor": "2026-07-29T10:00:00Z",
+                     *           "scheduledForLocal": "example",
+                     *           "seriesId": "exampleId",
+                     *           "state": "planned",
+                     *           "timeZone": "Europe/Berlin",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrenceOccurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceOccurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    clearTaskRecurrenceOccurrenceOverride: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence occurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrenceOccurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+                /** @description Stable occurrence Key used to identify the target within the authenticated workspace. */
+                occurrenceKey: components["parameters"]["TaskRecurrenceOccurrenceKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceOccurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attempts": 0,
+                     *           "cardId": "exampleId",
+                     *           "definitionVersionId": "exampleId",
+                     *           "detachedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedBy": "example",
+                     *           "detachedCardId": "exampleId",
+                     *           "lastErrorCode": "example",
+                     *           "materializeAt": "2026-07-29T10:00:00Z",
+                     *           "materializedAt": "2026-07-29T10:00:00Z",
+                     *           "occurrenceKey": "example",
+                     *           "revision": "\"example-revision\"",
+                     *           "scheduledFor": "2026-07-29T10:00:00Z",
+                     *           "scheduledForLocal": "example",
+                     *           "seriesId": "exampleId",
+                     *           "state": "planned",
+                     *           "timeZone": "Europe/Berlin",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrenceOccurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceOccurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    retryTaskRecurrenceOccurrence: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong task-recurrence occurrence ETag. Wildcards, weak validators, lists, and surrounding whitespace are rejected. */
+                "If-Match": components["parameters"]["IfMatchTaskRecurrenceOccurrence"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+                /** @description Stable occurrence Key used to identify the target within the authenticated workspace. */
+                occurrenceKey: components["parameters"]["TaskRecurrenceOccurrenceKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceOccurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "attempts": 0,
+                     *           "cardId": "exampleId",
+                     *           "definitionVersionId": "exampleId",
+                     *           "detachedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedBy": "example",
+                     *           "detachedCardId": "exampleId",
+                     *           "lastErrorCode": "example",
+                     *           "materializeAt": "2026-07-29T10:00:00Z",
+                     *           "materializedAt": "2026-07-29T10:00:00Z",
+                     *           "occurrenceKey": "example",
+                     *           "revision": "\"example-revision\"",
+                     *           "scheduledFor": "2026-07-29T10:00:00Z",
+                     *           "scheduledForLocal": "example",
+                     *           "seriesId": "exampleId",
+                     *           "state": "planned",
+                     *           "timeZone": "Europe/Berlin",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrenceOccurrence"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceOccurrence"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    recheckTaskRecurrence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The credential-owned asynchronous recheck was accepted. */
+            202: {
+                headers: {
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "errorCode": "example",
+                     *           "operationType": "catchUp",
+                     *           "seriesId": "exampleId",
+                     *           "status": "pending",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrenceOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceOperation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    submitTaskRecurrenceEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        /** @description JSON payload used to submit an event to a task recurrence. The server validates this payload before applying any change. */
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "eventId": "exampleId",
+                 *       "eventType": "example",
+                 *       "occurredAt": "2026-07-29T10:00:00Z",
+                 *       "schemaVersion": 1,
+                 *       "sourceId": "exampleId",
+                 *       "causationId": "exampleId",
+                 *       "correlationId": "exampleId",
+                 *       "payload": {}
+                 *     }
+                 */
+                "application/json": components["schemas"]["TaskRecurrenceEventSubmit"];
+            };
+        };
+        responses: {
+            /** @description The idempotent external event was accepted for recurrence evaluation. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "acceptedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrenceEvent"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceEvent"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            /** @description The external event payload exceeds the 64 KiB boundary. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    getTaskRecurrenceOperation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "errorCode": "example",
+                     *           "operationType": "catchUp",
+                     *           "seriesId": "exampleId",
+                     *           "status": "pending",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrenceOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceOperation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    cancelTaskRecurrenceOperation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authorized recurrence resource. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["TaskRecurrenceETag"];
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "completedAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "errorCode": "example",
+                     *           "operationType": "catchUp",
+                     *           "seriesId": "exampleId",
+                     *           "status": "pending",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "taskRecurrenceOperation"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["TaskRecurrenceOperation"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
