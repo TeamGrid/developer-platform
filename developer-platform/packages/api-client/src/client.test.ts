@@ -45,6 +45,7 @@ function taskResource(overrides: Record<string, unknown> = {}) {
       plannedMinutes: null,
       plannedStartAt: null,
       projectId: null,
+      recurrence: null,
       serviceId: null,
       subscriberIds: [],
       subtasksCount: 0,

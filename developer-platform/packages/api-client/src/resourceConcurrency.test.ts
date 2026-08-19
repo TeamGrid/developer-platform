@@ -44,6 +44,7 @@ function task() {
       plannedMinutes: null,
       plannedStartAt: null,
       projectId: null,
+      recurrence: null,
       serviceId: null,
       subscriberIds: [],
       subtasksCount: 0,
@@ -138,6 +139,35 @@ describe('core resource runtime contract', () => {
             },
           ],
           subtasksCount: 1,
+        },
+      }),
+    ).toBe(false)
+  })
+
+  it('accepts documented recurrence metadata and rejects response drift', () => {
+    const current = task()
+    expect(
+      taskValidator({
+        ...current,
+        attributes: {
+          ...current.attributes,
+          recurrence: {
+            definitionVersionId: 'definition-1',
+            generatedAt: now,
+            occurrenceId: 'occurrence-1',
+            occurrenceKey: '2026-07-19T10:00:00.000Z',
+            scheduledFor: now,
+            seriesId: 'series-1',
+          },
+        },
+      }),
+    ).toBe(true)
+    expect(
+      taskValidator({
+        ...current,
+        attributes: {
+          ...current.attributes,
+          recurrence: { seriesId: 'series-1' },
         },
       }),
     ).toBe(false)

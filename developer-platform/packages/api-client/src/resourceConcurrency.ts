@@ -76,6 +76,26 @@ function stringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string')
 }
 
+function taskRecurrenceMetadata(value: unknown): boolean {
+  return (
+    value === null ||
+    (hasExactKeys(value, [
+      'definitionVersionId',
+      'generatedAt',
+      'occurrenceId',
+      'occurrenceKey',
+      'scheduledFor',
+      'seriesId',
+    ]) &&
+      nullableId(value.definitionVersionId) &&
+      nullableDate(value.generatedAt) &&
+      nullableId(value.occurrenceId) &&
+      nullableId(value.occurrenceKey) &&
+      nullableDate(value.scheduledFor) &&
+      nullableId(value.seriesId))
+  )
+}
+
 function exactResource(
   value: unknown,
   type: 'project' | 'projectSharing' | 'projectTemplate' | 'task',
@@ -124,6 +144,7 @@ export const taskValidator = (value: unknown): value is Task =>
         'plannedMinutes',
         'plannedStartAt',
         'projectId',
+        'recurrence',
         'serviceId',
         'subscriberIds',
         'subtasksCount',
@@ -169,6 +190,7 @@ export const taskValidator = (value: unknown): value is Task =>
       finiteNumberOrNull(attributes.plannedMinutes) &&
       nullableDate(attributes.plannedStartAt) &&
       nullableId(attributes.projectId) &&
+      taskRecurrenceMetadata(attributes.recurrence) &&
       nullableId(attributes.serviceId) &&
       stringArray(attributes.subscriberIds) &&
       Number.isSafeInteger(attributes.subtasksCount) &&
