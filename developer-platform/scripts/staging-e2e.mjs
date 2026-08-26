@@ -64,6 +64,7 @@ let exportId
 let customFieldDefinitionId
 let projectTemplateId
 let sourceProjectId
+let sourceListId
 let instantiatedProjectId
 let webhookReceiver
 let webhookReceiverWasStarted = false
@@ -171,6 +172,10 @@ async function archiveProjectTemplate(id) {
   return client.projectTemplates.archive(id, {
     ifMatch: /** @type {any} */ (current.transport.headers.etag),
   })
+}
+
+async function archiveList(id) {
+  return client.lists.archive(id)
 }
 
 async function archiveTask(id) {
@@ -304,7 +309,7 @@ try {
   ])
   assert(projects.meta.requestId)
   assert(contacts.meta.requestId)
-  assert(users.data.length > 0, 'Staging workspace requires at least one user')
+  assert(users.data.length >= 2, 'Staging workspace requires at least two users')
 
   const invalidToken = `${token.slice(0, -1)}${token.endsWith('0') ? '1' : '0'}`
   const invalidClient = new TeamGridClient({ baseUrl, retries: 0, token: invalidToken })
@@ -354,23 +359,36 @@ try {
   }, { idempotencyKey: `staging-e2e-project-${runId}` })
   sourceProjectId = sourceProject.data.id
 
+  const sourceListName = `Developer Platform staging list ${runId}`
+  const sourceList = await client.lists.create({
+    name: sourceListName,
+    parentId: sourceProjectId,
+    type: 'tasks',
+  }, { idempotencyKey: `staging-e2e-list-${runId}` })
+  sourceListId = sourceList.data.id
+
   const idempotencyKey = `staging-e2e-task-${runId}`
+  const sourceAssigneeIds = users.data.slice(0, 2).map(user => user.id)
+  const sourcePrimaryAssigneeId = sourceAssigneeIds[1]
   const taskInput = {
-    assigneeId: users.data[0].id,
+    assigneeIds: sourceAssigneeIds,
     description: `Developer Platform staging smoke ${runId}`,
+    listId: sourceListId,
     name: `Developer Platform staging smoke ${runId}`,
     plannedMinutes: 15,
+    primaryAssigneeId: sourcePrimaryAssigneeId,
     projectId: sourceProjectId,
   }
   const createdTask = await client.tasks.create(taskInput, { idempotencyKey })
   taskId = createdTask.data.id
-  assert.deepEqual(createdTask.data.attributes.assigneeIds, [users.data[0].id])
-  assert.equal(createdTask.data.attributes.primaryAssigneeId, users.data[0].id)
-  assert.equal(createdTask.data.attributes.assigneeId, users.data[0].id)
+  assert.deepEqual(createdTask.data.attributes.assigneeIds, sourceAssigneeIds)
+  assert.equal(createdTask.data.attributes.primaryAssigneeId, sourcePrimaryAssigneeId)
+  assert.equal(createdTask.data.attributes.assigneeId, sourcePrimaryAssigneeId)
+  assert.equal(createdTask.data.attributes.listId, sourceListId)
   const replayedTask = await client.tasks.create(taskInput, { idempotencyKey })
   assert.equal(replayedTask.data.id, taskId)
-  assert.deepEqual(replayedTask.data.attributes.assigneeIds, [users.data[0].id])
-  assert.equal(replayedTask.data.attributes.primaryAssigneeId, users.data[0].id)
+  assert.deepEqual(replayedTask.data.attributes.assigneeIds, sourceAssigneeIds)
+  assert.equal(replayedTask.data.attributes.primaryAssigneeId, sourcePrimaryAssigneeId)
   await expectApiError(
     () => client.tasks.create({ ...taskInput, name: `${taskInput.name} conflict` }, { idempotencyKey }),
     409,
@@ -404,8 +422,8 @@ try {
   assert.equal(updatedTask.data.attributes.name, `${taskInput.name} updated`)
   const readTask = await client.tasks.get(taskId)
   assert.equal(readTask.data.id, taskId)
-  assert.deepEqual(readTask.data.attributes.assigneeIds, [users.data[0].id])
-  assert.equal(readTask.data.attributes.primaryAssigneeId, users.data[0].id)
+  assert.deepEqual(readTask.data.attributes.assigneeIds, sourceAssigneeIds)
+  assert.equal(readTask.data.attributes.primaryAssigneeId, sourcePrimaryAssigneeId)
 
   const exportFileName = `staging-private-export-${runId}`
   const createdExport = await client.exports.create({
@@ -517,6 +535,33 @@ try {
   )
   assert.equal(completedInstantiation.data.attributes.state, 'succeeded')
   instantiatedProjectId = completedInstantiation.data.attributes.projectId
+  const [instantiatedLists, instantiatedTasks] = await Promise.all([
+    client.lists.list({
+      archived: false,
+      limit: 100,
+      parentId: instantiatedProjectId,
+      type: 'tasks',
+    }),
+    client.tasks.list({
+      archived: false,
+      limit: 100,
+      projectId: instantiatedProjectId,
+    }),
+  ])
+  const instantiatedList = instantiatedLists.data.find(
+    list => list.attributes.name === sourceListName,
+  )
+  assert(instantiatedList, 'Instantiated project list was not visible after activation')
+  const instantiatedTaskName = `${taskInput.name} updated`
+  const matchingInstantiatedTasks = instantiatedTasks.data.filter(
+    task => task.attributes.name === instantiatedTaskName,
+  )
+  assert.equal(matchingInstantiatedTasks.length, 1)
+  const instantiatedTask = matchingInstantiatedTasks[0]
+  assert.equal(instantiatedTask.attributes.listId, instantiatedList.id)
+  assert.deepEqual(instantiatedTask.attributes.assigneeIds, sourceAssigneeIds)
+  assert.equal(instantiatedTask.attributes.primaryAssigneeId, sourcePrimaryAssigneeId)
+  assert.equal(instantiatedTask.attributes.assigneeId, sourcePrimaryAssigneeId)
 
   const endAt = new Date()
   const startAt = new Date(endAt.getTime() - 5 * 60 * 1000)
@@ -606,6 +651,12 @@ await reconcileResourceCleanup({
   id: taskId,
   label: 'task',
   verify: () => verifyArchived(() => client.tasks.get(taskId)),
+}, cleanupResources, cleanupFailures)
+await reconcileResourceCleanup({
+  cleanup: () => archiveList(sourceListId),
+  id: sourceListId,
+  label: 'sourceList',
+  verify: () => verifyArchived(() => client.lists.get(sourceListId)),
 }, cleanupResources, cleanupFailures)
 await reconcileResourceCleanup({
   cleanup: () => archiveProject(instantiatedProjectId),
