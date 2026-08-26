@@ -13,7 +13,7 @@ describe('conformance plan command', () => {
     const plan = JSON.parse(rendered)
 
     expect(plan).toMatchObject({
-      contractVersion: '1.1.0',
+      contractVersion: '1.2.0',
       mode: 'plan',
       summary: { total: 324 },
     })

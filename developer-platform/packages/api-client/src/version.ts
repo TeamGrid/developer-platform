@@ -1,1 +1,1 @@
-export const apiClientVersion = '1.1.0'
+export const apiClientVersion = '1.2.0'

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "contractVersion": "1.1.0",
+  "contractVersion": "1.2.0",
   "artifacts": [
     {
       "bytes": 602,
@@ -45,10 +45,10 @@
       "sha256": "902adb098fa9c7079c4d77b409237549d96399a8da6fc342f95f397f59c2d7ff"
     },
     {
-      "bytes": 1490529,
+      "bytes": 1499412,
       "id": "openapi-v1",
       "path": "openapi/v1.json",
-      "sha256": "ac6e7c1582cba74a0f3fb89e400f20ed86c403896e7d1b5a276f264b0eef780f"
+      "sha256": "776f9739901adc7720b9ce6f8bfb137aeb83b56d56a43b9dbc1f6c4b0cd87285"
     }
   ],
   "summary": {

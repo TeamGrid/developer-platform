@@ -19,13 +19,13 @@ and Windows. CI qualifies both Node boundaries on all three operating systems.
 Persistent CLI profiles use macOS Keychain, Linux Secret Service, or the native
 Windows Credential Manager.
 
-The stable 1.1.0 release is prepared for npm through the default `latest`
+The stable 1.2.0 release is prepared for npm through the default `latest`
 channel:
 
 ```sh
-npm install @teamgrid/api-client@1.1.0
-npm install --global @teamgrid/cli@1.1.0
-npm install --global @teamgrid/mcp-server@1.1.0
+npm install @teamgrid/api-client@1.2.0
+npm install --global @teamgrid/cli@1.2.0
+npm install --global @teamgrid/mcp-server@1.2.0
 ```
 
 Use the exact version shown above in reproducible deployments. Unpinned

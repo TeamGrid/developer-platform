@@ -19,6 +19,7 @@ function taskResource(overrides: Record<string, unknown> = {}) {
       archived: false,
       archivedAt: null,
       assigneeId: null,
+      assigneeIds: [],
       billable: null,
       completed: false,
       completedAt: null,
@@ -44,6 +45,7 @@ function taskResource(overrides: Record<string, unknown> = {}) {
       plannedEndAt: null,
       plannedMinutes: null,
       plannedStartAt: null,
+      primaryAssigneeId: null,
       projectId: null,
       recurrence: null,
       serviceId: null,
@@ -467,7 +469,7 @@ describe('TeamGrid API client', () => {
       expect(headers.get('authorization')).toBe(`Bearer ${token}`)
       expect(headers.get('x-request-id')).toBe('client-request')
       expect(headers.get('x-teamgrid-client')).toBe('@teamgrid/api-client')
-      expect(headers.get('x-teamgrid-client-version')).toBe('1.1.0')
+      expect(headers.get('x-teamgrid-client-version')).toBe('1.2.0')
       return json(taskPage(null), 200, {
         'x-ratelimit-limit': '100',
         'x-ratelimit-remaining': '99',

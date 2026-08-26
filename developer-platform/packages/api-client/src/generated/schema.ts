@@ -1203,7 +1203,7 @@ export interface paths {
         put?: never;
         /**
          * Move or reorder a task
-         * @description Atomically changes assignment and ordering within one target task container. The neighboring task ids are validated in the same workspace and container.
+         * @description Reorders a task in an existing assignee, personal-list, or project-list placement. For assignee and personal-list axes, assigneeId must already be assigned to the task; change assignments through the task update endpoint. Neighboring task ids are validated in the same workspace and placement container.
          */
         post: operations["moveTask"];
         delete?: never;
@@ -3455,7 +3455,7 @@ export interface components {
                  * @description The contract version associated with this api version data.
                  * @constant
                  */
-                contractVersion: "1.1.0";
+                contractVersion: "1.2.0";
                 /** @description The deprecations associated with this api version data. */
                 deprecations: {
                     /** @description Stable TeamGrid identifier for this resource. */
@@ -4501,6 +4501,8 @@ export interface components {
                 archivedAt: string | null;
                 /** @description Identifier of the user assigned to this work item. */
                 assigneeId: string | null;
+                /** @description Ordered, unique set of users assigned to this task. A task supports at most 20 assignees. */
+                assigneeIds: string[];
                 /** @description Whether this time or service can be billed. */
                 billable: boolean | null;
                 /** @description Whether the work item is complete. */
@@ -4572,6 +4574,8 @@ export interface components {
                  * @description ISO 8601 timestamp for planned start at.
                  */
                 plannedStartAt: string | null;
+                /** @description Primary assignee used for legacy placement and assigneeId compatibility. It must be included in assigneeIds. */
+                primaryAssigneeId: string | null;
                 /** @description Identifier of the related project. */
                 projectId: string | null;
                 /** @description The recurrence associated with this task attributes. */
@@ -6362,6 +6366,8 @@ export interface components {
         TaskCreate: {
             /** @description Identifier of the user assigned to this work item. */
             assigneeId?: string | null;
+            /** @description Ordered, unique set of users assigned to this task. A task supports at most 20 assignees. */
+            assigneeIds?: string[] | null;
             /** @description Whether this time or service can be billed. */
             billable?: boolean | null;
             /** @description Identifier of the related contact. */
@@ -6396,6 +6402,8 @@ export interface components {
              * @description ISO 8601 timestamp for planned start at.
              */
             plannedStartAt?: string | null;
+            /** @description Primary assignee used for legacy placement and assigneeId compatibility. It must be included in assigneeIds. */
+            primaryAssigneeId?: string | null;
             /** @description Identifier of the related project. */
             projectId?: string | null;
             /** @description Identifier of the related service. */
@@ -6404,11 +6412,13 @@ export interface components {
             subscriberIds?: string[] | null;
             /** @description Ordered set of tag identifiers associated with this task. */
             tagIds?: string[] | null;
-        };
+        } & (unknown & unknown & unknown & unknown & unknown);
         /** @description Public API representation of task. */
         TaskUpdate: {
             /** @description Identifier of the user assigned to this work item. */
             assigneeId?: string | null;
+            /** @description Ordered, unique set of users assigned to this task. A task supports at most 20 assignees. */
+            assigneeIds?: string[] | null;
             /** @description Whether this time or service can be billed. */
             billable?: boolean | null;
             /** @description Identifier of the related contact. */
@@ -6443,6 +6453,8 @@ export interface components {
              * @description ISO 8601 timestamp for planned start at.
              */
             plannedStartAt?: string | null;
+            /** @description Primary assignee used for legacy placement and assigneeId compatibility. It must be included in assigneeIds. */
+            primaryAssigneeId?: string | null;
             /** @description Identifier of the related project. */
             projectId?: string | null;
             /** @description Identifier of the related service. */
@@ -6451,7 +6463,7 @@ export interface components {
             subscriberIds?: string[] | null;
             /** @description Ordered set of tag identifiers associated with this task. */
             tagIds?: string[] | null;
-        };
+        } & (unknown & unknown & unknown & unknown);
         /** @description Public API representation of task bulk data. */
         TaskBulkUpdateData: {
             /** @description Whether this time or service can be billed. */
@@ -6565,7 +6577,7 @@ export interface components {
         };
         /** @description Public API representation of task placement. */
         TaskPlacement: {
-            /** @description Identifier of the user assigned to this work item. */
+            /** @description Existing assignee whose independent placement is moved. Use the task update endpoint to change assignments. */
             assigneeId?: string | null;
             /**
              * @description Canonical axis value for this task placement.
@@ -9222,7 +9234,7 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "contractVersion": "1.1.0",
+                     *         "contractVersion": "1.2.0",
                      *         "deprecations": [
                      *           {}
                      *         ],
@@ -14456,14 +14468,7 @@ export interface operations {
         /** @description JSON payload used to create a task. The server validates this payload before applying any change. */
         requestBody: {
             content: {
-                /**
-                 * @example {
-                 *       "name": "Example",
-                 *       "assigneeId": "exampleId",
-                 *       "billable": false,
-                 *       "contactId": "exampleId"
-                 *     }
-                 */
+                /** @example {} */
                 "application/json": components["schemas"]["TaskCreate"];
             };
         };
@@ -14484,6 +14489,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -14509,6 +14515,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],
@@ -14548,6 +14555,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -14573,6 +14581,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],
@@ -14686,6 +14695,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -14711,6 +14721,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],
@@ -14794,13 +14805,7 @@ export interface operations {
         /** @description JSON payload used to update a task. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
-                /**
-                 * @example {
-                 *       "assigneeId": "exampleId",
-                 *       "billable": false,
-                 *       "contactId": "exampleId"
-                 *     }
-                 */
+                /** @example {} */
                 "application/json": components["schemas"]["TaskUpdate"];
             };
         };
@@ -14820,6 +14825,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -14845,6 +14851,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],
@@ -14910,6 +14917,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -14935,6 +14943,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],
@@ -15015,6 +15024,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -15040,6 +15050,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],
@@ -15079,6 +15090,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -15104,6 +15116,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],
@@ -15182,6 +15195,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -15207,6 +15221,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],
@@ -15284,6 +15299,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -15309,6 +15325,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],
@@ -15374,6 +15391,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -15399,6 +15417,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],
@@ -15464,6 +15483,7 @@ export interface operations {
                      *           "archived": false,
                      *           "archivedAt": "2026-07-29T10:00:00Z",
                      *           "assigneeId": "exampleId",
+                     *           "assigneeIds": [],
                      *           "billable": false,
                      *           "completed": false,
                      *           "completedAt": "2026-07-29T10:00:00Z",
@@ -15489,6 +15509,7 @@ export interface operations {
                      *           "plannedEndAt": "2026-07-29T10:00:00Z",
                      *           "plannedMinutes": 1,
                      *           "plannedStartAt": "2026-07-29T10:00:00Z",
+                     *           "primaryAssigneeId": "exampleId",
                      *           "projectId": "exampleId",
                      *           "serviceId": "exampleId",
                      *           "subscriberIds": [],

@@ -6,7 +6,7 @@ describe('Developer Platform conformance inventory', () => {
     const inventory = await buildConformanceInventory()
 
     expect(inventory).toMatchObject({
-      contractVersion: '1.1.0',
+      contractVersion: '1.2.0',
       schemaVersion: 1,
       summary: {
         byVersion: { v0: 87, v1: 237 },

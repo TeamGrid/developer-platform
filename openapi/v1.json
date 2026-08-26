@@ -740,7 +740,7 @@
             "additionalProperties": false,
             "properties": {
               "contractVersion": {
-                "const": "1.1.0",
+                "const": "1.2.0",
                 "type": "string",
                 "description": "The contract version associated with this api version data."
               },
@@ -3476,6 +3476,17 @@
                 ],
                 "description": "Identifier of the user assigned to this work item."
               },
+              "assigneeIds": {
+                "items": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array",
+                "uniqueItems": true,
+                "description": "Ordered, unique set of users assigned to this task. A task supports at most 20 assignees."
+              },
               "billable": {
                 "type": [
                   "boolean",
@@ -3644,6 +3655,14 @@
                 ],
                 "description": "ISO 8601 timestamp for planned start at."
               },
+              "primaryAssigneeId": {
+                "maxLength": 128,
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Primary assignee used for legacy placement and assigneeId compatibility. It must be included in assigneeIds."
+              },
               "projectId": {
                 "type": [
                   "string",
@@ -3802,6 +3821,7 @@
               "archived",
               "archivedAt",
               "assigneeId",
+              "assigneeIds",
               "billable",
               "completed",
               "completedAt",
@@ -3827,6 +3847,7 @@
               "plannedEndAt",
               "plannedMinutes",
               "plannedStartAt",
+              "primaryAssigneeId",
               "projectId",
               "recurrence",
               "serviceId",
@@ -9025,25 +9046,135 @@
       },
       "TaskCreate": {
         "additionalProperties": false,
+        "allOf": [
+          {
+            "not": {
+              "properties": {
+                "assigneeId": {
+                  "maxLength": 128,
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Identifier of the user assigned to this work item."
+                },
+                "assigneeIds": {
+                  "items": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "uniqueItems": true,
+                  "description": "Ordered, unique set of users assigned to this task. A task supports at most 20 assignees."
+                }
+              },
+              "required": [
+                "assigneeId",
+                "assigneeIds"
+              ]
+            }
+          },
+          {
+            "not": {
+              "properties": {
+                "assigneeId": {
+                  "type": "string",
+                  "description": "Identifier of the user assigned to this work item."
+                },
+                "groupId": {
+                  "type": "string",
+                  "description": "Identifier of the related workspace group."
+                }
+              },
+              "required": [
+                "assigneeId",
+                "groupId"
+              ]
+            }
+          },
+          {
+            "not": {
+              "properties": {
+                "assigneeIds": {
+                  "minItems": 1,
+                  "type": "array",
+                  "description": "Ordered, unique set of users assigned to this task. A task supports at most 20 assignees."
+                },
+                "groupId": {
+                  "type": "string",
+                  "description": "Identifier of the related workspace group."
+                }
+              },
+              "required": [
+                "assigneeIds",
+                "groupId"
+              ]
+            }
+          },
+          {
+            "not": {
+              "properties": {
+                "groupId": {
+                  "type": "string",
+                  "description": "Identifier of the related workspace group."
+                },
+                "primaryAssigneeId": {
+                  "type": "string",
+                  "description": "Primary assignee used for legacy placement and assigneeId compatibility. It must be included in assigneeIds."
+                }
+              },
+              "required": [
+                "groupId",
+                "primaryAssigneeId"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "primaryAssigneeId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "primaryAssigneeId"
+              ]
+            },
+            "then": {
+              "anyOf": [
+                {
+                  "properties": {
+                    "assigneeId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "assigneeId"
+                  ]
+                },
+                {
+                  "properties": {
+                    "assigneeIds": {
+                      "minItems": 1,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "assigneeIds"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
         "dependentRequired": {
           "descriptionFormat": [
             "description"
-          ]
-        },
-        "not": {
-          "properties": {
-            "assigneeId": {
-              "type": "string",
-              "description": "Identifier of the user assigned to this work item."
-            },
-            "groupId": {
-              "type": "string",
-              "description": "Identifier of the related workspace group."
-            }
-          },
-          "required": [
-            "assigneeId",
-            "groupId"
           ]
         },
         "properties": {
@@ -9054,6 +9185,20 @@
               "null"
             ],
             "description": "Identifier of the user assigned to this work item."
+          },
+          "assigneeIds": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 20,
+            "type": [
+              "array",
+              "null"
+            ],
+            "uniqueItems": true,
+            "description": "Ordered, unique set of users assigned to this task. A task supports at most 20 assignees."
           },
           "billable": {
             "type": [
@@ -9139,6 +9284,14 @@
               "null"
             ],
             "description": "ISO 8601 timestamp for planned start at."
+          },
+          "primaryAssigneeId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Primary assignee used for legacy placement and assigneeId compatibility. It must be included in assigneeIds."
           },
           "projectId": {
             "maxLength": 128,
@@ -9191,28 +9344,101 @@
       },
       "TaskUpdate": {
         "additionalProperties": false,
+        "allOf": [
+          {
+            "not": {
+              "properties": {
+                "assigneeId": {
+                  "maxLength": 128,
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Identifier of the user assigned to this work item."
+                },
+                "assigneeIds": {
+                  "items": {
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "uniqueItems": true,
+                  "description": "Ordered, unique set of users assigned to this task. A task supports at most 20 assignees."
+                }
+              },
+              "required": [
+                "assigneeId",
+                "assigneeIds"
+              ]
+            }
+          },
+          {
+            "not": {
+              "properties": {
+                "assigneeId": {
+                  "type": "string",
+                  "description": "Identifier of the user assigned to this work item."
+                },
+                "groupId": {
+                  "type": "string",
+                  "description": "Identifier of the related workspace group."
+                }
+              },
+              "required": [
+                "assigneeId",
+                "groupId"
+              ]
+            }
+          },
+          {
+            "not": {
+              "properties": {
+                "assigneeIds": {
+                  "minItems": 1,
+                  "type": "array",
+                  "description": "Ordered, unique set of users assigned to this task. A task supports at most 20 assignees."
+                },
+                "groupId": {
+                  "type": "string",
+                  "description": "Identifier of the related workspace group."
+                }
+              },
+              "required": [
+                "assigneeIds",
+                "groupId"
+              ]
+            }
+          },
+          {
+            "not": {
+              "properties": {
+                "groupId": {
+                  "type": "string",
+                  "description": "Identifier of the related workspace group."
+                },
+                "primaryAssigneeId": {
+                  "type": "string",
+                  "description": "Primary assignee used for legacy placement and assigneeId compatibility. It must be included in assigneeIds."
+                }
+              },
+              "required": [
+                "groupId",
+                "primaryAssigneeId"
+              ]
+            }
+          }
+        ],
         "dependentRequired": {
           "descriptionFormat": [
             "description"
           ]
         },
         "minProperties": 1,
-        "not": {
-          "properties": {
-            "assigneeId": {
-              "type": "string",
-              "description": "Identifier of the user assigned to this work item."
-            },
-            "groupId": {
-              "type": "string",
-              "description": "Identifier of the related workspace group."
-            }
-          },
-          "required": [
-            "assigneeId",
-            "groupId"
-          ]
-        },
         "properties": {
           "assigneeId": {
             "maxLength": 128,
@@ -9221,6 +9447,20 @@
               "null"
             ],
             "description": "Identifier of the user assigned to this work item."
+          },
+          "assigneeIds": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 20,
+            "type": [
+              "array",
+              "null"
+            ],
+            "uniqueItems": true,
+            "description": "Ordered, unique set of users assigned to this task. A task supports at most 20 assignees."
           },
           "billable": {
             "type": [
@@ -9306,6 +9546,14 @@
               "null"
             ],
             "description": "ISO 8601 timestamp for planned start at."
+          },
+          "primaryAssigneeId": {
+            "maxLength": 128,
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Primary assignee used for legacy placement and assigneeId compatibility. It must be included in assigneeIds."
           },
           "projectId": {
             "maxLength": 128,
@@ -9682,7 +9930,7 @@
               "string",
               "null"
             ],
-            "description": "Identifier of the user assigned to this work item."
+            "description": "Existing assignee whose independent placement is moved. Use the task update endpoint to change assignments."
           },
           "axis": {
             "enum": [
@@ -16097,7 +16345,7 @@
   "info": {
     "description": "Stable, cell-aware TeamGrid API for scoped personal-access and service-account credentials, the TeamGrid CLI, and first-party developer clients.",
     "title": "TeamGrid API v1",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "openapi": "3.1.0",
@@ -16114,7 +16362,7 @@
                 },
                 "example": {
                   "data": {
-                    "contractVersion": "1.1.0",
+                    "contractVersion": "1.2.0",
                     "deprecations": [
                       {}
                     ],
@@ -25769,12 +26017,7 @@
               "schema": {
                 "$ref": "#/components/schemas/TaskCreate"
               },
-              "example": {
-                "name": "Example",
-                "assigneeId": "exampleId",
-                "billable": false,
-                "contactId": "exampleId"
-              }
+              "example": {}
             }
           },
           "required": true,
@@ -25806,6 +26049,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -25831,6 +26075,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],
@@ -25892,6 +26137,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -25917,6 +26163,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],
@@ -26171,6 +26418,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -26196,6 +26444,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],
@@ -26273,11 +26522,7 @@
               "schema": {
                 "$ref": "#/components/schemas/TaskUpdate"
               },
-              "example": {
-                "assigneeId": "exampleId",
-                "billable": false,
-                "contactId": "exampleId"
-              }
+              "example": {}
             }
           },
           "required": true,
@@ -26309,6 +26554,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -26334,6 +26580,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],
@@ -26446,6 +26693,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -26471,6 +26719,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],
@@ -26602,6 +26851,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -26627,6 +26877,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],
@@ -26688,6 +26939,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -26713,6 +26965,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],
@@ -26851,6 +27104,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -26876,6 +27130,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],
@@ -26947,7 +27202,7 @@
         "x-teamgrid-required-scopes": [
           "tasks:write"
         ],
-        "description": "Atomically changes assignment and ordering within one target task container. The neighboring task ids are validated in the same workspace and container.",
+        "description": "Reorders a task in an existing assignee, personal-list, or project-list placement. For assignee and personal-list axes, assigneeId must already be assigned to the task; change assignments through the task update endpoint. Neighboring task ids are validated in the same workspace and placement container.",
         "x-teamgrid-resource-cas": "resource-cas-v1"
       }
     },
@@ -27004,6 +27259,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -27029,6 +27285,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],
@@ -27141,6 +27398,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -27166,6 +27424,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],
@@ -27278,6 +27537,7 @@
                       "archived": false,
                       "archivedAt": "2026-07-29T10:00:00Z",
                       "assigneeId": "exampleId",
+                      "assigneeIds": [],
                       "billable": false,
                       "completed": false,
                       "completedAt": "2026-07-29T10:00:00Z",
@@ -27303,6 +27563,7 @@
                       "plannedEndAt": "2026-07-29T10:00:00Z",
                       "plannedMinutes": 1,
                       "plannedStartAt": "2026-07-29T10:00:00Z",
+                      "primaryAssigneeId": "exampleId",
                       "projectId": "exampleId",
                       "serviceId": "exampleId",
                       "subscriberIds": [],

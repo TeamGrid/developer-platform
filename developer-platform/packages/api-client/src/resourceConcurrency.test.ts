@@ -18,6 +18,7 @@ function task() {
       archived: false,
       archivedAt: null,
       assigneeId: null,
+      assigneeIds: [],
       billable: null,
       completed: false,
       completedAt: null,
@@ -43,6 +44,7 @@ function task() {
       plannedEndAt: null,
       plannedMinutes: null,
       plannedStartAt: null,
+      primaryAssigneeId: null,
       projectId: null,
       recurrence: null,
       serviceId: null,
@@ -102,6 +104,44 @@ describe('core resource runtime contract', () => {
       taskValidator({
         ...current,
         attributes: { ...current.attributes, developerRevision: 'invalid' },
+      }),
+    ).toBe(false)
+  })
+
+  it('accepts canonical multi-assignment state and rejects inconsistent aliases', () => {
+    const current = task()
+    expect(
+      taskValidator({
+        ...current,
+        attributes: {
+          ...current.attributes,
+          assigneeId: 'user-2',
+          assigneeIds: ['user-1', 'user-2'],
+          primaryAssigneeId: 'user-2',
+        },
+      }),
+    ).toBe(true)
+    expect(
+      taskValidator({
+        ...current,
+        attributes: {
+          ...current.attributes,
+          assigneeId: 'user-1',
+          assigneeIds: ['user-1', 'user-2'],
+          primaryAssigneeId: 'user-2',
+        },
+      }),
+    ).toBe(false)
+    expect(
+      taskValidator({
+        ...current,
+        attributes: {
+          ...current.attributes,
+          assigneeId: 'user-1',
+          assigneeIds: ['user-1'],
+          groupId: 'group-1',
+          primaryAssigneeId: 'user-1',
+        },
       }),
     ).toBe(false)
   })
