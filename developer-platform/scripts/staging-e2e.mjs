@@ -364,8 +364,13 @@ try {
   }
   const createdTask = await client.tasks.create(taskInput, { idempotencyKey })
   taskId = createdTask.data.id
+  assert.deepEqual(createdTask.data.attributes.assigneeIds, [users.data[0].id])
+  assert.equal(createdTask.data.attributes.primaryAssigneeId, users.data[0].id)
+  assert.equal(createdTask.data.attributes.assigneeId, users.data[0].id)
   const replayedTask = await client.tasks.create(taskInput, { idempotencyKey })
   assert.equal(replayedTask.data.id, taskId)
+  assert.deepEqual(replayedTask.data.attributes.assigneeIds, [users.data[0].id])
+  assert.equal(replayedTask.data.attributes.primaryAssigneeId, users.data[0].id)
   await expectApiError(
     () => client.tasks.create({ ...taskInput, name: `${taskInput.name} conflict` }, { idempotencyKey }),
     409,
@@ -397,7 +402,10 @@ try {
     { ifMatch: /** @type {any} */ (createdTask.transport.headers.etag) },
   )
   assert.equal(updatedTask.data.attributes.name, `${taskInput.name} updated`)
-  assert.equal((await client.tasks.get(taskId)).data.id, taskId)
+  const readTask = await client.tasks.get(taskId)
+  assert.equal(readTask.data.id, taskId)
+  assert.deepEqual(readTask.data.attributes.assigneeIds, [users.data[0].id])
+  assert.equal(readTask.data.attributes.primaryAssigneeId, users.data[0].id)
 
   const exportFileName = `staging-private-export-${runId}`
   const createdExport = await client.exports.create({

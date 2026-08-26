@@ -118,6 +118,7 @@ export const taskValidator = (value: unknown): value is Task =>
         'archived',
         'archivedAt',
         'assigneeId',
+        'assigneeIds',
         'billable',
         'completed',
         'completedAt',
@@ -143,6 +144,7 @@ export const taskValidator = (value: unknown): value is Task =>
         'plannedEndAt',
         'plannedMinutes',
         'plannedStartAt',
+        'primaryAssigneeId',
         'projectId',
         'recurrence',
         'serviceId',
@@ -160,6 +162,17 @@ export const taskValidator = (value: unknown): value is Task =>
       typeof attributes.archived === 'boolean' &&
       nullableDate(attributes.archivedAt) &&
       nullableId(attributes.assigneeId) &&
+      Array.isArray(attributes.assigneeIds) &&
+      attributes.assigneeIds.length <= 20 &&
+      attributes.assigneeIds.every((id) => typeof id === 'string' && anyStringPattern.test(id)) &&
+      new Set(attributes.assigneeIds).size === attributes.assigneeIds.length &&
+      nullableId(attributes.primaryAssigneeId) &&
+      attributes.assigneeId === attributes.primaryAssigneeId &&
+      (attributes.assigneeIds.length === 0
+        ? attributes.primaryAssigneeId === null
+        : typeof attributes.primaryAssigneeId === 'string' &&
+          attributes.assigneeIds.includes(attributes.primaryAssigneeId)) &&
+      (attributes.groupId === null || attributes.assigneeIds.length === 0) &&
       (attributes.billable === null || typeof attributes.billable === 'boolean') &&
       typeof attributes.completed === 'boolean' &&
       nullableDate(attributes.completedAt) &&
