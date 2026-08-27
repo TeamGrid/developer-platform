@@ -28,6 +28,9 @@ const configuredWebhookUrl = String(
   process.env.TEAMGRID_WEBHOOK_SMOKE_URL || 'https://example.com/teamgrid-staging-e2e',
 ).trim()
 const verifyWebhookDelivery = process.env.TEAMGRID_E2E_WEBHOOK_DELIVERY === 'true'
+const multipleTaskAssigneesMode = String(
+  process.env.TEAMGRID_E2E_MULTIPLE_TASK_ASSIGNEES || 'disabled',
+).trim()
 const webhookReceiverMode = String(
   process.env.TEAMGRID_E2E_WEBHOOK_RECEIVER || 'webhook-site',
 ).trim()
@@ -39,6 +42,11 @@ const mcpBinary = fileURLToPath(new URL('../packages/mcp-server/dist/bin.js', im
 
 if (!token || !baseUrl) {
   throw new Error('TEAMGRID_API_TOKEN and TEAMGRID_API_BASE_URL are required.')
+}
+if (!['disabled', 'enabled'].includes(multipleTaskAssigneesMode)) {
+  throw new Error(
+    'TEAMGRID_E2E_MULTIPLE_TASK_ASSIGNEES must be disabled or enabled.',
+  )
 }
 const parsedBaseUrl = new URL(baseUrl)
 if (
@@ -368,15 +376,21 @@ try {
   sourceListId = sourceList.data.id
 
   const idempotencyKey = `staging-e2e-task-${runId}`
-  const sourceAssigneeIds = users.data.slice(0, 2).map(user => user.id)
-  const sourcePrimaryAssigneeId = sourceAssigneeIds[1]
+  const multipleTaskAssigneesEnabled = multipleTaskAssigneesMode === 'enabled'
+  const sourceAssigneeIds = users.data
+    .slice(0, multipleTaskAssigneesEnabled ? 2 : 1)
+    .map(user => user.id)
+  const sourcePrimaryAssigneeId = sourceAssigneeIds[
+    multipleTaskAssigneesEnabled ? 1 : 0
+  ]
   const taskInput = {
-    assigneeIds: sourceAssigneeIds,
+    ...(multipleTaskAssigneesEnabled
+      ? { assigneeIds: sourceAssigneeIds, primaryAssigneeId: sourcePrimaryAssigneeId }
+      : { assigneeId: sourcePrimaryAssigneeId }),
     description: `Developer Platform staging smoke ${runId}`,
     listId: sourceListId,
     name: `Developer Platform staging smoke ${runId}`,
     plannedMinutes: 15,
-    primaryAssigneeId: sourcePrimaryAssigneeId,
     projectId: sourceProjectId,
   }
   const createdTask = await client.tasks.create(taskInput, { idempotencyKey })
