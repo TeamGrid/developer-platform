@@ -49,12 +49,12 @@ const commonEvidenceKeys = [
 
 function assertCommonEvidence(
   evidence,
-  { apiRuntimeSha, developerPlatformSha, manifestSha },
+  { apiRuntimeSha, developerPlatformSha, evidenceContract, manifestSha, schemaVersion },
   description,
 ) {
   if (
-    evidence.evidenceContract !== 'teamgrid-developer-platform-deployment-evidence-v5' ||
-    evidence.schemaVersion !== 5 ||
+    evidence.evidenceContract !== evidenceContract ||
+    evidence.schemaVersion !== schemaVersion ||
     !sha40.test(String(evidence.apiTag || '')) ||
     !sha40.test(String(evidence.appTag || '')) ||
     !sha40.test(String(evidence.developerPlatformRef || '')) ||
@@ -101,7 +101,13 @@ export function verifyProductionReleaseEvidence({
   )
   assertCommonEvidence(
     usPromotionEvidence,
-    { apiRuntimeSha, developerPlatformSha, manifestSha },
+    {
+      apiRuntimeSha,
+      developerPlatformSha,
+      evidenceContract: 'teamgrid-developer-platform-deployment-evidence-v5',
+      manifestSha,
+      schemaVersion: 5,
+    },
     'US promotion evidence',
   )
   if (
@@ -122,6 +128,7 @@ export function verifyProductionReleaseEvidence({
       'automationWorkerTag',
       'jobSchedulerTag',
       'jobWorkerRuntime',
+      'meteorReactivityOrder',
       'releaseReason',
       'schedulingWorkerRuntime',
       'schedulingWorkerTag',
@@ -133,7 +140,13 @@ export function verifyProductionReleaseEvidence({
   )
   assertCommonEvidence(
     deCanaryEvidence,
-    { apiRuntimeSha, developerPlatformSha, manifestSha },
+    {
+      apiRuntimeSha,
+      developerPlatformSha,
+      evidenceContract: 'teamgrid-developer-platform-deployment-evidence-v6',
+      manifestSha,
+      schemaVersion: 6,
+    },
     'DE canary evidence',
   )
   if (
@@ -150,6 +163,9 @@ export function verifyProductionReleaseEvidence({
     !tag.test(String(deCanaryEvidence.automationWorkerTag || '')) ||
     !tag.test(String(deCanaryEvidence.schedulingWorkerTag || '')) ||
     !tag.test(String(deCanaryEvidence.jobSchedulerTag || '')) ||
+    !['oplog,polling', 'changeStreams,oplog,polling'].includes(
+      deCanaryEvidence.meteorReactivityOrder,
+    ) ||
     !['current', 'inapp', 'legacy'].includes(deCanaryEvidence.jobWorkerRuntime) ||
     !['current', 'disabled', 'legacy'].includes(deCanaryEvidence.automationWorkerRuntime) ||
     !['current', 'inapp', 'legacy'].includes(deCanaryEvidence.schedulingWorkerRuntime) ||
