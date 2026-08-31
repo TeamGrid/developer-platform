@@ -30,10 +30,13 @@ function fixtures() {
       automationWorkerTag: 'current',
       jobSchedulerTag: 'current',
       jobWorkerRuntime: 'inapp',
+      evidenceContract: 'teamgrid-developer-platform-deployment-evidence-v6',
+      meteorReactivityOrder: 'changeStreams,oplog,polling',
       releaseReason: 'Qualify Developer Platform',
       schedulingWorkerRuntime: 'inapp',
       schedulingWorkerTag: 'current',
       searchSyncRuntime: 'inapp',
+      schemaVersion: 6,
       stagingRunUrl: 'https://github.com/TeamGrid/teamgrid/actions/runs/123',
       workerTag: 'current',
     },
@@ -139,6 +142,14 @@ describe('npm production release evidence', () => {
     failed.deCanaryRun.conclusion = 'failure'
     expect(() => verifyProductionReleaseEvidence(failed)).toThrow(
       'Deploy DE production canary run metadata',
+    )
+  })
+
+  it('rejects an unknown Meteor reactivity order in DE evidence', () => {
+    const value = fixtures()
+    value.deCanaryEvidence.meteorReactivityOrder = 'polling'
+    expect(() => verifyProductionReleaseEvidence(value)).toThrow(
+      'DE and US evidence do not form one exact production promotion chain',
     )
   })
 })
