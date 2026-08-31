@@ -469,7 +469,7 @@ describe('TeamGrid API client', () => {
       expect(headers.get('authorization')).toBe(`Bearer ${token}`)
       expect(headers.get('x-request-id')).toBe('client-request')
       expect(headers.get('x-teamgrid-client')).toBe('@teamgrid/api-client')
-      expect(headers.get('x-teamgrid-client-version')).toBe('1.2.0')
+      expect(headers.get('x-teamgrid-client-version')).toBe('1.2.1')
       return json(taskPage(null), 200, {
         'x-ratelimit-limit': '100',
         'x-ratelimit-remaining': '99',
