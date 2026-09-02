@@ -43,7 +43,7 @@
     "@modelcontextprotocol/sdk": "1.30.0",
     "@teamgrid/api-client": "1.2.1",
     "@teamgrid/cli": "1.2.1",
-    "zod": "4.4.3"
+    "zod": "4.5.4"
   },
   "publishConfig": {
     "access": "public",
