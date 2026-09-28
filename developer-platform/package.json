@@ -35,11 +35,11 @@
     "node": ">=22.14 <25"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.5",
-    "@inquirer/prompts": "8.5.2",
+    "@biomejs/biome": "2.5.14",
+    "@inquirer/prompts": "8.7.2",
     "openapi-typescript": "7.13.0",
     "typescript": "5.9.3",
-    "vitest": "4.1.10"
+    "vitest": "5.0.1"
   },
   "overrides": {
     "brace-expansion": "5.0.8",
