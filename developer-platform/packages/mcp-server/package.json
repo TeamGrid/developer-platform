@@ -1,7 +1,7 @@
 {
   "name": "@teamgrid/mcp-server",
   "version": "1.2.1",
-  "description": "Optional read-only MCP adapter for the TeamGrid Developer Platform",
+  "description": "TeamGrid MCP adapter with read-only defaults and an explicit guarded work profile",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -40,10 +40,10 @@
     "node": ">=22.14 <25"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.30.0",
     "@teamgrid/api-client": "1.2.1",
     "@teamgrid/cli": "1.2.1",
-    "zod": "4.4.3"
+    "zod": "4.4.3",
+    "@modelcontextprotocol/server": "2.2.0"
   },
   "publishConfig": {
     "access": "public",

@@ -11,8 +11,8 @@ none imports Meteor runtime code.
 - `@teamgrid/cli`: `teamgrid` command for profiles, typed project, contact,
   task, time-entry, list, service, and tag workflows, signed webhook
   management, JSON/JSONL, and automation-safe exits.
-- `@teamgrid/mcp-server`: optional local stdio MCP adapter. It exposes only
-  bounded read tools and delegates every request to the same API client.
+- `@teamgrid/mcp-server`: optional local stdio MCP adapter. It uses read-only defaults, offers an explicit guarded work profile in the
+  development candidate, and delegates every request to the same API client.
 
 All three packages support Node.js 22.14 through Node.js 24 on Linux, macOS,
 and Windows. CI qualifies both Node boundaries on all three operating systems.
@@ -34,7 +34,9 @@ on the explicit `next` channel.
 
 ## Credential and routing model
 
-`teamgrid auth login` opens TeamGrid in the system browser. After normal
+Production browser login remains disabled pending qualification. Use
+`teamgrid auth login --manual` for the published package. In a qualified
+environment with browser issuance enabled, `teamgrid auth login` opens TeamGrid in the system browser. After normal
 TeamGrid sign-in, select one workspace, compare the pairing phrase shown in the
 browser and terminal, and approve the requested scopes. The owning regional
 cell issues a scoped personal credential directly to the CLI through an
@@ -196,28 +198,18 @@ hooks separately and reveals a new v2 signing secret only once.
 
 ## Optional MCP adapter
 
-MCP is intentionally downstream of API v1 and is not required for automation.
-It reads the same CLI keychain profile and offers only bounded read tools.
-The default `core` tool profile includes workspace, projects, tasks, recurring-task definitions,
-versions and occurrences, time entries, lists, and tags. `collaboration` additionally exposes contacts and
-users; `governance` adds webhooks, services, and custom-field definitions. Service reads are kept
-out of `core` because they include billing-rate data. `all` is the explicit
-union of the collaboration and governance profiles.
+The published 1.2.1 MCP package has four read-only profiles: core (22),
+collaboration (29), governance (28), and all (36). Existing profiles preserve
+these meanings in the development candidate.
 
-```json
-{
-  "mcpServers": {
-    "teamgrid": {
-      "command": "teamgrid-mcp",
-      "args": ["--profile", "default", "--tool-profile", "core"]
-    }
-  }
-}
-```
+The candidate adds `context` (34 bounded reads) and explicit `work` (41 tools,
+including seven guarded writes), plus protocol 2026-07-28 and legacy stdio
+compatibility. Writes require the confirmed workspace and either the reviewed
+revision or a stable creation idempotency key. They do not bypass API rights.
 
-No remote MCP endpoint, MCP-specific credential, session affinity, write tool, or change-feed tool
-is introduced. Custom-field values, project templates, planned work, and their operation-status
-resources remain explicitly forbidden from every MCP profile.
+See [the MCP package guide](packages/mcp-server/README.md) for exact tools,
+scopes, setup and limitations. These additions are not yet published. Browser
+login and hosted OAuth require separate environment qualification.
 
 ## Development gates
 
@@ -248,7 +240,7 @@ unexpected regression. Planning never loads a credential or contacts TeamGrid.
 The read-only phase performs only parameter-free GET requests, uses `limit=1` where supported, runs
 sequentially below the shared pre-auth limit, and retries at most two `429` responses. Operations
 that need an id, required filter, body, or mutation are recorded as blocked rather than guessed. A
-V1 run additionally proves all 236 SDK methods, all 237 CLI operation mappings, the exact 36-tool MCP allowlist, and one
+V1 run additionally proves all 236 SDK methods, all 237 CLI operation mappings, the exact 36-tool legacy MCP allowlist, and one
 live workspace request through SDK, CLI, and MCP:
 
 ```sh

@@ -71,7 +71,9 @@ export function verifySurfaceBindings({ client, cliCommands, inventory, mcpTools
     .filter((operation) => !commandSet.has(operation.surfaces.cli.command))
     .map((operation) => operation.operationId)
   const expectedMcp = operations
-    .filter((operation) => operation.surfaces.mcp.exposure === 'read')
+    .filter(
+      (operation) => operation.surfaces.mcp.exposure === 'read' && !operation.surfaces.mcp.profiles,
+    )
     .map((operation) => operation.surfaces.mcp.tool)
     .sort()
   const actualMcp = [...mcpTools].sort()
@@ -240,7 +242,9 @@ export async function executeSurfaceConformance({
         results.push(surfaceFailure('cli', 'cli_live_read_failed', operation.operationId, error))
       }
     }
-    const mcpReads = reads.filter((operation) => operation.surfaces.mcp.exposure === 'read')
+    const mcpReads = reads.filter(
+      (operation) => operation.surfaces.mcp.exposure === 'read' && !operation.surfaces.mcp.profiles,
+    )
     for (const [index, operation] of mcpReads.entries()) {
       if (index > 0 || reads.length > 0) await sleep(config.requestIntervalMs)
       try {

@@ -1,6 +1,6 @@
 # TeamGrid Developer Platform
 
-Official TypeScript SDK, command-line interface, and optional read-only MCP
+Official TypeScript SDK, command-line interface, and optional MCP
 adapter for TeamGrid API v1.
 
 The packages live in [`developer-platform/`](developer-platform/):

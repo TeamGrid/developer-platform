@@ -6,7 +6,7 @@ import {
   TeamGridClient,
 } from '../packages/api-client/dist/index.js'
 import { createProgram } from '../packages/cli/dist/index.js'
-import { createTeamGridMcpServer } from '../packages/mcp-server/dist/index.js'
+import { createTeamGridMcpServer, toolsByProfile } from '../packages/mcp-server/dist/index.js'
 
 const syntheticToken = // gitleaks:allow -- fixed-format non-secret contract fixture
   'tg_sk_v1_us_us-mnz-001_0123456789abcdef01234567_' +
@@ -378,23 +378,40 @@ const method = async () => ({ data: [], meta: {} })
 const fakeClient = new Proxy({}, {
   get: () => new Proxy({}, { get: () => method }),
 })
-const mcpServer = createTeamGridMcpServer(fakeClient, { toolProfile: 'all' })
-const mcpClient = new Client({ name: 'surface-gate', version: '1.0.0' })
-const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
-await Promise.all([mcpServer.connect(serverTransport), mcpClient.connect(clientTransport)])
-try {
-  const advertised = new Set((await mcpClient.listTools()).tools.map((tool) => tool.name))
-  const expected = new Set(
-    ledger.operationPolicy
-      .filter((operation) => operation.mcp.exposure === 'read')
-      .map((operation) => operation.mcp.tool),
-  )
-  if (JSON.stringify([...advertised].sort()) !== JSON.stringify([...expected].sort())) {
-    fail('advertised MCP tools differ from the explicit read policy')
+for (const profile of Object.keys(toolsByProfile)) {
+  const mcpServer = createTeamGridMcpServer(fakeClient, { toolProfile: profile })
+  const mcpClient = new Client({ name: 'surface-gate', version: '1.0.0' })
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
+  await Promise.all([mcpServer.connect(serverTransport), mcpClient.connect(clientTransport)])
+  try {
+    const { tools } = await mcpClient.listTools()
+    const advertised = new Set(tools.map((tool) => tool.name))
+    for (const tool of tools) {
+      const policy = ledger.operationPolicy.find((operation) => operation.mcp.tool === tool.name)?.mcp
+      if (!policy || policy.exposure === 'forbidden' || (policy.profiles && !policy.profiles.includes(profile))) {
+        fail(`${profile} advertises ${tool.name} without explicit capability permission`)
+      }
+      const write = policy.exposure === 'gated-write'
+      if (tool.annotations?.readOnlyHint !== !write || (write && profile !== 'work')) {
+        fail(`${profile}/${tool.name} has incorrect read/write metadata`)
+      }
+      if (write && !policy.requiredArguments.every((name) => tool.inputSchema.required?.includes(name))) {
+        fail(`${tool.name} lacks required workspace/revision/idempotency arguments`)
+      }
+    }
+    const expected = profile === 'all'
+      ? ledger.operationPolicy.filter((operation) => operation.mcp.exposure === 'read' && !operation.mcp.profiles).map((operation) => operation.mcp.tool)
+      : toolsByProfile[profile]
+    if (JSON.stringify([...advertised].sort()) !== JSON.stringify([...expected].sort())) {
+      fail(`${profile} differs from its explicit tool policy`)
+    }
+    for (const operation of ledger.operationPolicy.filter((operation) => operation.mcp.profiles?.includes(profile))) {
+      if (!advertised.has(operation.mcp.tool)) fail(`${profile} is missing ${operation.mcp.tool}`)
+    }
+  } finally {
+    await mcpClient.close()
+    await mcpServer.close()
   }
-} finally {
-  await mcpClient.close()
-  await mcpServer.close()
 }
 
 console.log(`${ledger.operationPolicy.length} operations have verified SDK, CLI, and MCP decisions`)

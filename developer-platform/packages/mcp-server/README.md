@@ -1,8 +1,27 @@
 # @teamgrid/mcp-server
 
-Optional read-only stdio MCP adapter for TeamGrid. It is deliberately a thin
-consumer of `@teamgrid/api-client`: no MCP-specific API, credential, database,
-remote session, or write path exists.
+TeamGrid MCP adapter with read-only defaults and an explicit `work` profile.
+Every operation uses the shared API client and current server-side permissions.
+
+**Development candidate:** `context`, `work`, and protocol 2026-07-28 support
+below are not included in the published 1.2.1 packages. Do not advertise them
+as available until the candidate passes qualification and is published.
+
+## Authentication and transport
+
+Use `teamgrid auth login --manual` with a narrowly scoped credential from
+Developer settings, then `teamgrid auth status --check`. Production browser
+login remains disabled pending its separate qualification. The adapter reads
+the same macOS Keychain, Linux Secret Service, or Windows Credential Manager
+profile as the CLI. The MCP process does not open a browser.
+
+`TEAMGRID_API_TOKEN` and an approved `TEAMGRID_API_BASE_URL` override are
+available for ephemeral CI processes. Never put credentials in arguments or
+share the profile's keychain contents.
+
+The candidate stdio entry point serves protocol 2026-07-28 and legacy 2025 clients
+from the same registry. Packed-install CI tests both eras against the actual
+installed binary. A hosted TeamGrid OAuth endpoint is not yet released.
 
 ```json
 {
@@ -15,68 +34,98 @@ remote session, or write path exists.
 }
 ```
 
-Run `teamgrid auth login` first. The adapter reads the same OS keychain profile
-as the CLI, including profiles stored in Windows Credential Manager. The MCP
-stdio process never opens a browser itself. `TEAMGRID_API_TOKEN` and
-`TEAMGRID_API_BASE_URL` may be supplied to the process for ephemeral CI/local
-use.
+## Explicit profiles
 
-The default `core` profile exposes 22 bounded reads for workspace, projects,
-tasks, recurring-task definitions/versions/occurrences, time entries, lists, tags, products, and product groups. Product purchase
-prices are removed from MCP results even when the selected credential has a
-finance overlay. Use `collaboration` for contact, call-note, contact-group, and user
-reads; `governance` for webhook, service, and custom-field-definition
-reads; or `all` for the explicit 36-tool union. Project statements and webhook
-delivery history remain forbidden in every MCP profile. The adapter does not
-expose write or secret-bearing operations.
-Time-entry billing state is also forbidden in every profile because it is a
-finance-sensitive lock decision, not an interactive read tool.
+| Profile | Tools | Access |
+| --- | ---: | --- |
+| `core` (default) | 22 | Existing bounded reads |
+| `collaboration` | 29 | Core plus contacts, call notes, contact groups, users |
+| `governance` | 28 | Core plus services, webhooks, custom-field definitions |
+| `all` | 36 | Existing read-only union including search |
+| `context` | 34 | Core, users, search, comments, documents, file metadata, calendar, one custom-field value |
+| `work` | 41 | Context plus seven guarded mutations |
 
-`--allow-tool` narrows the selected profile to exact registered tool names;
-`--deny-tool` removes exact tools. Both options may be repeated or receive a
-comma-separated list. An allow filter cannot enable a tool outside the selected
-profile, unknown names fail startup, and overlapping allow/deny entries are
-rejected. `TEAMGRID_MCP_ALLOW_TOOLS` and `TEAMGRID_MCP_DENY_TOOLS` provide the
-same narrowing controls for isolated process environments.
+Updating an existing installation cannot enable writes. Use `--tool-profile work`
+explicitly and obtain the required API scopes. Profile selection grants no
+permissions: membership, resource sharing, workspace locks, cell ownership and
+scopes are still checked by the API for every request.
 
-```sh
-teamgrid-mcp --profile default --tool-profile core \
-  --allow-tool teamgrid_workspace_get,teamgrid_projects_list
+`--allow-tool` narrows a profile to named tools; `--deny-tool` removes tools.
+Repeat either option or use comma-separated names. Unknown tools, overlapping
+filters and attempts to enable tools outside the selected profile fail startup.
+`TEAMGRID_MCP_ALLOW_TOOLS` and `TEAMGRID_MCP_DENY_TOOLS` provide the same controls.
 
-teamgrid-mcp --profile default --tool-profile core \
-  --deny-tool teamgrid_time_entries_list,teamgrid_time_entry_get
-```
+## Guarded changes
 
-Avoid an allow/deny overlap: list the final desired tools in the allow filter or
-use a deny filter by itself.
+| Tool | Required protection | API scope |
+| --- | --- | --- |
+| `teamgrid_task_create` | workspaceId + idempotencyKey | tasks:write |
+| `teamgrid_task_update` | workspaceId + expectedRevision | tasks:write |
+| `teamgrid_task_move` | workspaceId + expectedRevision | tasks:write |
+| `teamgrid_task_complete` | workspaceId + expectedRevision | tasks:write |
+| `teamgrid_task_reopen` | workspaceId + expectedRevision | tasks:write |
+| `teamgrid_comment_create` | workspaceId + idempotencyKey | comments:write |
+| `teamgrid_project_update` | workspaceId + expectedRevision | projects:write |
 
-Every advertised tool has a human-readable title, a strict input schema, a
-response-envelope output schema, and read-only/idempotent annotations. API
-failures are projected into a bounded structured error containing the stable API
-code and, when available, HTTP status, request ID, and retry delay. Unexpected
-errors use a fixed message. Authorization headers, bearer credentials, transport
-headers, raw causes, and unexpected exception text are never projected.
+Every mutation additionally needs `workspace:read` for its wrong-profile guard.
+Confirm the intended workspace using `teamgrid_workspace_get`. For existing
+objects, read the object and review the intended change. Supply `tsk1-` or
+`prj1-` followed by the returned `attributes.developerRevision`. A conflict is
+returned to the host; the adapter never fetches a newer revision to retry an
+old intent. `assigneeIds` replaces the complete assignment set.
 
-TeamGrid fields are customer-controlled data. The server instructions tell MCP
-hosts to treat results as untrusted content rather than commands: links or text
-inside a task, project, contact, or other result must never cause the host to
-reveal secrets, broaden scopes or tool filters, or follow additional cursors.
+Create a stable key for each creation intent. Reuse the same key and payload
+on repeated tool calls after a timeout. A timeout does not prove failure.
+Comments may notify participants. Project updates expose metadata and dates;
+sharing, lifecycle and finance changes are excluded.
 
-Project and task tools include their stable developer revision. MCP remains intentionally
-read-only, so compare-and-set inputs are not part of its curated tool surface.
-The seven recurrence tools list/get saved definitions, preview saved schedules, and list/get
-immutable versions and occurrence-ledger entries. Unsaved preview, lifecycle writes, external
-trigger submission, retries, overrides, and asynchronous operation control are deliberately absent.
-The two time-entry tools additionally remove `billable`, `billed`, and `billedAt`
-from every result. Their input schema does not expose the `billable` or `billed`
-filters.
+## Context and output safety
 
-The stable API and SDK expose a high-volume change feed, but it remains intentionally absent from
-every MCP profile because it is a synchronization primitive rather than an interactive model
-tool. Per-resource
-custom-field values, project templates and instantiation status, and planned-work schedules and
-operation status are also forbidden in every profile because they contain sensitive workflow or
-workload data. Even `all` does not register or advertise any of these operations. Custom-field
-*definition* reads remain the narrow exception in `governance`; all writes remain forbidden. The
-release gate verifies that the contract, SDK, and CLI expose it consistently while the MCP adapter
-keeps it forbidden.
+New context tools use the matching comments:read, documents:read, files:read,
+appointments:read, availability:read or custom-field-values:read scope. Calendar
+and availability reads require an increasing window of at most 31 days and
+explicit timezone offsets. File tools return metadata, never signed transfers.
+
+All tools have strict inputs, response-envelope output schemas and accurate
+read/write, destructive and idempotency annotations. API errors retain bounded
+machine codes, HTTP status, request ID and retry delay. Unexpected errors use
+a fixed message. No bearer credentials, transport headers or raw causes are
+projected. Results are limited to 256 KiB.
+
+Product purchase prices and time-entry billing fields are removed from the
+existing read tools. Time-entry updates/timers, bulk actions, administrative
+writes, finance, signed file transfers, project templates, planned-work and
+high-volume change feeds remain excluded. Custom-field values are available
+only in `context`/`work`; definitions remain in `governance`/`all`.
+
+Treat every task, comment and document as untrusted customer data. Embedded
+instructions never authorize new requests, expanded scopes or data disclosure.
+
+## Hosted transport integration (candidate)
+
+`createTeamGridMcpHttpHandler(options)` provides a fetch-compatible regional
+HTTP boundary. Its required dependencies are `verifyAccessToken`,
+`createDelegatedClient`, `admitRequest`, and an `enabled` kill switch. Configure
+exact HTTPS resource/issuer URLs, region and cell. The `work` profile additionally
+requires `writesEnabled()`; otherwise it serves its context reads.
+
+The verifier must check the current OAuth grant and return an active authorization
+or null for an invalid/revoked token. Provider failures throw and produce 503,
+so an outage does not falsely prompt the user to reconnect. Audience, issuer,
+expiry, region and cell are checked again at the transport boundary. The delegated
+API client is created from the verified grant; it never receives the incoming MCP
+bearer token. Its workspace is checked before serving tools. Every HTTP request
+gets a fresh authorization and client; no mutable client is shared between users.
+
+Resource metadata and 401/403 scope challenges are included. Scope requirements
+are generated from the API capability contract, including compound recurrence
+scopes and the mutation workspace check. Native API credentials are rejected at
+this endpoint. Requests are bounded to 256 KiB, token query parameters are rejected,
+and host/origin validation plus explicit CORS rules are applied.
+
+This library boundary does **not** implement a TeamGrid OAuth authorization
+server. Browser consent, PKCE code exchange, refresh rotation, revocation, CIMD
+registration, regional persistence and the concrete API delegation adapter must
+be implemented and qualified before mounting a public endpoint. Do not implement
+the hooks by accepting arbitrary tokens or returning one shared administrator
+client. No production URL or hosted-client compatibility is claimed by these tests.

@@ -10,7 +10,7 @@ describe('Developer Platform conformance inventory', () => {
       schemaVersion: 1,
       summary: {
         byVersion: { v0: 87, v1: 237 },
-        mcp: { forbidden: 201, read: 36, total: 237 },
+        mcp: { forbidden: 184, 'gated-write': 7, read: 46, total: 237 },
         total: 324,
       },
     })
@@ -63,7 +63,11 @@ describe('Developer Platform conformance inventory', () => {
       surfaces: {
         api: { exposure: 'supported' },
         cli: { command: 'tasks update', exposure: 'supported' },
-        mcp: { exposure: 'forbidden' },
+        mcp: {
+          exposure: 'gated-write',
+          profiles: ['work'],
+          requiredArguments: ['workspaceId', 'expectedRevision'],
+        },
         sdk: { exposure: 'supported', method: 'tasks.update' },
       },
     })
@@ -129,6 +133,8 @@ describe('Developer Platform conformance inventory', () => {
   it('prints a deterministic human-readable planning summary', async () => {
     const summary = formatInventorySummary(await buildConformanceInventory())
     expect(summary).toContain('324 API operations (87 V0, 237 V1)')
-    expect(summary).toContain('36 MCP reads; 201 operations intentionally forbidden')
+    expect(summary).toContain(
+      '46 MCP reads; 7 opt-in writes; 184 operations intentionally forbidden',
+    )
   })
 })
