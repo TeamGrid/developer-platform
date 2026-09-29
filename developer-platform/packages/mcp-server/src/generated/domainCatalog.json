@@ -1256,6 +1256,68 @@
       "openWorldHint": false
     }
   },
+  "teamgrid_comment_update": {
+    "operationId": "updateComment",
+    "sdk": "comments.update",
+    "method": "PATCH",
+    "path": "/comments/{id}",
+    "domain": "content-write",
+    "write": true,
+    "concurrency": "conditional",
+    "idempotency": false,
+    "coreCas": false,
+    "description": "Edit a comment. Changes the selected workspace under current API permissions. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people.",
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "Workspace returned by teamgrid_workspace_get and selected for this exact action."
+        },
+        "id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "expectedRevision": {
+          "pattern": "^\"cmt1-[a-f0-9]{64}\"$",
+          "type": "string",
+          "description": "Exact strong ETag (including quotes) from the read reviewed for this action. Never replace it automatically after a conflict."
+        },
+        "data": {
+          "additionalProperties": false,
+          "properties": {
+            "text": {
+              "maxLength": 10000,
+              "minLength": 1,
+              "type": "string",
+              "description": "The text associated with this comment."
+            }
+          },
+          "required": [
+            "text"
+          ],
+          "type": "object",
+          "description": "Public API representation of comment."
+        }
+      },
+      "required": [
+        "workspaceId",
+        "id",
+        "expectedRevision",
+        "data"
+      ]
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    }
+  },
   "teamgrid_comment_restore": {
     "operationId": "restoreComment",
     "sdk": "comments.restore",

@@ -126,6 +126,10 @@ export const toolScopes = {
     "comments:write",
     "workspace:read"
   ],
+  "teamgrid_comment_update": [
+    "comments:write",
+    "workspace:read"
+  ],
   "teamgrid_comments_list": [
     "comments:read"
   ],

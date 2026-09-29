@@ -44,7 +44,7 @@ installed binary. A hosted TeamGrid OAuth endpoint is not yet released.
 | `all` | 36 | Existing read-only union including search |
 | `context` | 34 | Core, users, search, comments, documents, file metadata, calendar, one custom-field value |
 | `work` | 41 | Context plus seven guarded mutations |
-| `full` | 207 | 84 reads and 123 writes across all reviewed business domains |
+| `full` | 208 | 84 reads and 124 writes across all reviewed business domains |
 | `tasks-write` | 39 | Tasks, subtasks, bulk updates and recurrence lifecycle |
 | `projects-write` | 20 | Projects, sharing, lifecycle and templates |
 | `schedule-write` | 18 | Appointments, absences, availability and planned work |

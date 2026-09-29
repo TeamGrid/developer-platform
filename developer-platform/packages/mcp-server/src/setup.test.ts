@@ -1,3 +1,4 @@
+import { normalizeBrowserAuthorizationScopes } from '@teamgrid/cli'
 import { describe, expect, it, vi } from 'vitest'
 import { parseMcpArguments } from './config.js'
 import { checkMcpAccess, describeMcpAccess } from './setup.js'
@@ -11,6 +12,17 @@ describe('human MCP setup diagnostics', () => {
     expect(plan.browserLogin.blockedScopes).toEqual(['task-recurrences:read'])
     expect(plan.requiredScopes).toContain('task-recurrences:read')
   })
+
+  it.each(['context', 'work'] as const)(
+    'requires step-up for the complete %s browser preset',
+    (toolProfile) => {
+      const plan = describeMcpAccess({ toolProfile })
+      expect(() => normalizeBrowserAuthorizationScopes({ preset: `mcp-${toolProfile}` })).toThrow(
+        'sensitive scopes',
+      )
+      expect(plan.browserLogin.blockedScopes).toEqual(['task-recurrences:read'])
+    },
+  )
 
   it('derives exact narrowed write scopes and preserves the workspace requirement', () => {
     const plan = describeMcpAccess({

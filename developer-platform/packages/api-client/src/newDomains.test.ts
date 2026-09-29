@@ -238,6 +238,36 @@ const group = {
 } as const
 
 describe('final TeamGrid SDK domains', () => {
+  it('requests bounded search metadata and rejects a contradictory result count', async () => {
+    let returned = 0
+    const fetch = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      expect(new Headers(init?.headers).get('x-teamgrid-response-features')).toBe(
+        'bounded-search-v1',
+      )
+      return Response.json({
+        data: [],
+        meta: {
+          requestId: 'search-test',
+          search: {
+            complete: false,
+            indexed: true,
+            limit: 5,
+            returned,
+            continuation: 'narrow-query-or-list',
+            verification: 'read-by-id',
+          },
+        },
+      })
+    })
+    const client = new TeamGridClient({ fetch, token })
+    const result = await client.search.query({ term: 'missing', types: ['tasks'], limit: 5 })
+    expect(result.meta).toMatchObject({ search: { complete: false, returned: 0 } })
+    returned = 1
+    await expect(
+      client.search.query({ term: 'missing', types: ['tasks'], limit: 5 }),
+    ).rejects.toThrow()
+  })
+
   it('covers calendar, collaboration, document, and file operation surfaces', async () => {
     const calls = new Set<string>()
     const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -280,6 +310,10 @@ describe('final TeamGrid SDK domains', () => {
       }
       if (url.pathname.endsWith('/download-intent')) {
         return resource(transferIntent('download'), 201)
+      }
+      if (url.pathname === '/v1/comments/comment-1' && method === 'PATCH') {
+        expect(new Headers(init?.headers).get('if-match')).toBe(`"${commentRevision}"`)
+        expect(JSON.parse(String(init?.body))).toEqual({ text: 'Corrected' })
       }
       const root = url.pathname.split('/')[2]
       const responseData =
@@ -329,6 +363,7 @@ describe('final TeamGrid SDK domains', () => {
     await client.comments.list({ targetId: 'task-1', targetType: 'task' })
     await client.comments.create({ targetId: 'task-1', targetType: 'task', text: 'Hello' })
     await client.comments.get('comment-1')
+    await client.comments.update('comment-1', { text: 'Corrected' }, { ifMatch: commentRevision })
     await client.comments.archive('comment-1', { ifMatch: commentRevision })
     await client.comments.restore('comment-1', { ifMatch: commentRevision })
     await client.documents.list()

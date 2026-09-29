@@ -733,6 +733,63 @@
         "type": "object",
         "description": "Public API representation of meta."
       },
+      "SearchResponseMeta": {
+        "additionalProperties": false,
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "Unique identifier assigned to the API request for tracing and support."
+          },
+          "search": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "complete": {
+                "const": false,
+                "description": "The complete associated with this search meta search."
+              },
+              "indexed": {
+                "const": true,
+                "description": "The indexed associated with this search meta search."
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 50,
+                "description": "Maximum number of records requested or returned for this page."
+              },
+              "returned": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 50,
+                "description": "The returned associated with this search meta search."
+              },
+              "continuation": {
+                "const": "narrow-query-or-list",
+                "description": "The continuation associated with this search meta search."
+              },
+              "verification": {
+                "const": "read-by-id",
+                "description": "The verification associated with this search meta search."
+              }
+            },
+            "required": [
+              "complete",
+              "indexed",
+              "limit",
+              "returned",
+              "continuation",
+              "verification"
+            ],
+            "description": "The search associated with this search meta."
+          }
+        },
+        "required": [
+          "requestId"
+        ],
+        "type": "object",
+        "description": "Public API representation of search meta."
+      },
       "ApiVersionEnvelope": {
         "additionalProperties": false,
         "properties": {
@@ -927,6 +984,51 @@
                 "type": "string",
                 "description": "Identifier of the owning TeamGrid application cell."
               },
+              "context": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "identityKind": {
+                    "type": "string",
+                    "enum": [
+                      "personal",
+                      "delegated",
+                      "service",
+                      "unknown"
+                    ],
+                    "description": "Canonical identity kind value for this workspace attributes context."
+                  },
+                  "subjectUserId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "The subject user id associated with this workspace attributes context."
+                  },
+                  "timeZone": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "The time zone associated with this workspace attributes context."
+                  },
+                  "timeZoneSource": {
+                    "type": "string",
+                    "enum": [
+                      "user-profile",
+                      "unspecified"
+                    ],
+                    "description": "Canonical time zone source value for this workspace attributes context."
+                  }
+                },
+                "required": [
+                  "identityKind",
+                  "subjectUserId",
+                  "timeZone",
+                  "timeZoneSource"
+                ],
+                "description": "Verified current identity and profile timezone. Service and unknown identities have no human subject. An unspecified timezone must be supplied by the user."
+              },
               "currency": {
                 "type": [
                   "string",
@@ -952,6 +1054,7 @@
             },
             "required": [
               "cellId",
+              "context",
               "currency",
               "name",
               "region",
@@ -1763,6 +1866,22 @@
         "required": [
           "targetId",
           "targetType",
+          "text"
+        ],
+        "type": "object",
+        "description": "Public API representation of comment."
+      },
+      "CommentUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "type": "string",
+            "description": "The text associated with this comment."
+          }
+        },
+        "required": [
           "text"
         ],
         "type": "object",
@@ -16712,6 +16831,7 @@
                   "data": {
                     "attributes": {
                       "cellId": "exampleId",
+                      "context": {},
                       "currency": "EUR",
                       "name": "Example",
                       "region": "example",
@@ -18897,6 +19017,140 @@
       }
     },
     "/comments/{id}": {
+      "patch": {
+        "operationId": "updateComment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "$ref": "#/components/parameters/IfMatchComment"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentUpdate"
+              },
+              "example": {
+                "text": "example"
+              }
+            }
+          },
+          "required": true,
+          "description": "JSON payload used to edit a comment. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics."
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Comment"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/ResponseMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                },
+                "example": {
+                  "data": {
+                    "attributes": {
+                      "archived": false,
+                      "authorId": "exampleId",
+                      "createdAt": "2026-07-29T10:00:00Z",
+                      "revision": "\"example-revision\"",
+                      "target": {},
+                      "text": "example",
+                      "updatedAt": "2026-07-29T10:00:00Z"
+                    },
+                    "id": "exampleId",
+                    "type": "comment"
+                  },
+                  "meta": {
+                    "requestId": "exampleId"
+                  }
+                }
+              }
+            },
+            "description": "The request to edit a comment succeeded. The response contains the canonical public result and request metadata.",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/CommentETag"
+              },
+              "Idempotency-Replayed": {
+                "description": "Whether the resource already had the requested lifecycle state.",
+                "schema": {
+                  "enum": [
+                    "false",
+                    "true"
+                  ],
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "502": {
+            "$ref": "#/components/responses/BadGateway"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Edit a comment",
+        "tags": [
+          "Collaboration"
+        ],
+        "x-teamgrid-required-scopes": [
+          "comments:write"
+        ],
+        "description": "Updates plain text and canonical active-member mentions under current owner/role permissions and an exact revision. Preserves attachments, reactions and edit history. Editing does not resend notifications.",
+        "x-teamgrid-conditional-scopes": [
+          "contacts:read",
+          "projects:read",
+          "tasks:read"
+        ]
+      },
       "delete": {
         "operationId": "archiveComment",
         "parameters": [
@@ -36719,8 +36973,20 @@
     },
     "/search": {
       "post": {
-        "description": "Searches only the requested, scope-authorized product domains in the owning cell. Results are bounded, metadata-only, tenant-filtered and sharing-filtered.",
+        "description": "Searches only the requested, scope-authorized product domains in the owning cell. Results are bounded, metadata-only, tenant-filtered and sharing-filtered. meta.search.complete is always false: even a short or empty index result does not prove completeness. Narrow ambiguous searches or use resource list pagination for complete reports. Verify recent writes by their returned IDs because indexing can lag.",
         "operationId": "searchResources",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-TeamGrid-Response-Features",
+            "required": false,
+            "schema": {
+              "const": "bounded-search-v1",
+              "type": "string"
+            },
+            "description": "Opt in to explicit bounded-search metadata. Omitted for compatibility with older strict SDK response validators."
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -36753,7 +37019,7 @@
                       "type": "array"
                     },
                     "meta": {
-                      "$ref": "#/components/schemas/ResponseMeta"
+                      "$ref": "#/components/schemas/SearchResponseMeta"
                     }
                   },
                   "required": [
@@ -36771,7 +37037,15 @@
                     }
                   ],
                   "meta": {
-                    "requestId": "exampleId"
+                    "requestId": "exampleId",
+                    "search": {
+                      "complete": false,
+                      "indexed": true,
+                      "limit": 1,
+                      "returned": 0,
+                      "continuation": "narrow-query-or-list",
+                      "verification": "read-by-id"
+                    }
                   }
                 }
               }

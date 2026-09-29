@@ -521,7 +521,7 @@ describe('complete domain MCP', () => {
 
   it('includes all writes and exact compound scopes in setup diagnostics', () => {
     const plan = describeMcpAccess({ toolProfile: 'full' })
-    expect(plan.tools).toHaveLength(207)
+    expect(plan.tools).toHaveLength(208)
     expect(plan.writeTools).toHaveLength(
       domainToolNames.filter((n) => domainCatalog[n].write).length,
     )

@@ -2,7 +2,7 @@
 
 Generated from the reviewed canonical API contract. Not a publication or live qualification claim.
 
-The full profile contains 207 tools: 84 reads and 123 writes. 30 API operations use other connection or transfer surfaces.
+The full profile contains 208 tools: 84 reads and 124 writes. 30 API operations use other connection or transfer surfaces.
 
 All writes require workspaceId and current API authorization. Conditional tools accept the exact quoted meta.etag returned by the preceding read. Per-item revision uses data.items[].revision. Unconditional means the API has no revision precondition. Idempotency keys protect repetition of one intent, not concurrent edits.
 
@@ -45,6 +45,7 @@ Domain profiles include their listed tools plus workspace, user, task/project lo
 | `teamgrid_comment_create` | content-write | write | unconditional | yes |
 | `teamgrid_comment_get` | content-write | read | read | — |
 | `teamgrid_comment_restore` | content-write | write | conditional | — |
+| `teamgrid_comment_update` | content-write | write | conditional | — |
 | `teamgrid_comments_list` | content-write | read | read | — |
 | `teamgrid_contact_create` | crm-write | write | unconditional | yes |
 | `teamgrid_contact_get` | crm-write | read | read | — |

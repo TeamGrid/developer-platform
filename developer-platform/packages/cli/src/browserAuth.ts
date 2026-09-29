@@ -36,6 +36,49 @@ const dailyWorkScopes = Object.freeze([
   'comments:write',
 ])
 
+const mcpContextScopes = Object.freeze([
+  'appointments:read',
+  'availability:read',
+  'comments:read',
+  'custom-field-values:read',
+  'documents:read',
+  'files:read',
+  'lists:read',
+  'product-groups:read',
+  'products:read',
+  'projects:read',
+  'search:read',
+  'tags:read',
+  'task-recurrences:read',
+  'tasks:read',
+  'time-entries:read',
+  'users:read',
+  'workspace:read',
+])
+
+const mcpWorkScopes = Object.freeze([
+  'appointments:read',
+  'availability:read',
+  'comments:read',
+  'comments:write',
+  'custom-field-values:read',
+  'documents:read',
+  'files:read',
+  'lists:read',
+  'product-groups:read',
+  'products:read',
+  'projects:read',
+  'projects:write',
+  'search:read',
+  'tags:read',
+  'task-recurrences:read',
+  'tasks:read',
+  'tasks:write',
+  'time-entries:read',
+  'users:read',
+  'workspace:read',
+])
+
 export const sensitiveBrowserAuthorizationScopes = Object.freeze([
   'absences:admin:write',
   'absences:delegated:read',
@@ -115,7 +158,7 @@ const pairingWords = Object.freeze([
   'zephyr',
 ])
 
-export type CliAuthorizationScopePreset = 'daily-work' | 'read-only'
+export type CliAuthorizationScopePreset = 'daily-work' | 'read-only' | 'mcp-context' | 'mcp-work'
 
 export type BrowserLoginOptions = {
   apiBaseUrl?: string
@@ -228,11 +271,15 @@ export function normalizeBrowserAuthorizationScopes({
 }) {
   const values = scopes?.length
     ? scopes
-    : preset === 'daily-work'
-      ? dailyWorkScopes
-      : preset === 'read-only'
-        ? readOnlyScopes
-        : []
+    : preset === 'mcp-context'
+      ? mcpContextScopes
+      : preset === 'mcp-work'
+        ? mcpWorkScopes
+        : preset === 'daily-work'
+          ? dailyWorkScopes
+          : preset === 'read-only'
+            ? readOnlyScopes
+            : []
   const normalized = Array.from(new Set(values))
   if (
     normalized.length < 1 ||

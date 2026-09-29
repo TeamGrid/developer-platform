@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks'
 import { createMcpHandler } from '@modelcontextprotocol/server'
 import type { TeamGridClient } from '@teamgrid/api-client'
 import { z } from 'zod'
@@ -41,8 +42,32 @@ export type McpHttpOptions = {
   /** Verify signature/opaque token, current grant, revocation and audience. No caching here. */
   verifyAccessToken: (token: string, signal: AbortSignal) => Promise<unknown>
   /** Exchange the verified grant for a distinct, scoped API delegation. Never forward the MCP token. */
-  createDelegatedClient: (authorization: McpAuthorization) => Promise<TeamGridClient>
+  createDelegatedClient: (
+    authorization: McpAuthorization,
+    signal: AbortSignal,
+  ) => Promise<TeamGridClient>
+  /** Entire admission, verification and delegation budget; maximum 30 seconds. */
+  requestTimeoutMs?: number
   now?: () => number
+}
+
+/** Bound even injected adapters that do not cooperate with cancellation. */
+function withinSignal<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const abort = () => reject(signal.reason ?? new Error('Request interrupted'))
+    signal.addEventListener('abort', abort, { once: true })
+    promise.then(
+      (value) => {
+        signal.removeEventListener('abort', abort)
+        resolve(value)
+      },
+      (error) => {
+        signal.removeEventListener('abort', abort)
+        reject(error)
+      },
+    )
+    if (signal.aborted) abort()
+  })
 }
 
 function httpsUrl(value: string) {
@@ -64,6 +89,10 @@ function httpsUrl(value: string) {
 
 /** Transport boundary only. A qualified regional OAuth provider must supply verification and delegation. */
 export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
+  const timeoutMs = options.requestTimeoutMs ?? 30_000
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30_000)
+    throw new Error('HTTP request timeout must be 1–30000 milliseconds.')
+  const requestSignals = new AsyncLocalStorage<AbortSignal>()
   const resource = httpsUrl(options.resourceUrl)
   const issuer = httpsUrl(options.issuerUrl)
   const profile = parseMcpToolProfile(options.toolProfile)
@@ -80,8 +109,14 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
     async (context) => {
       const authorization = authorizationSchema.parse(context.authInfo?.extra?.authorization)
       try {
-        const client = await options.createDelegatedClient(Object.freeze(authorization))
-        const workspace = await client.workspace.get()
+        const signal = requestSignals.getStore()
+        if (!signal) throw new Error('Missing request lifetime')
+        const client = await withinSignal(
+          options.createDelegatedClient(Object.freeze(authorization), signal),
+          signal,
+        )
+        signal.throwIfAborted()
+        const workspace = await withinSignal(client.workspace.get({ signal }), signal)
         if (workspace.data.id !== authorization.workspaceId)
           throw new Error('Wrong delegation workspace')
         return createTeamGridMcpServer(client, {
@@ -134,7 +169,7 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
     if (url.pathname !== resource.pathname && url.pathname !== metadataUrl.pathname)
       return response(404, 'not_found')
     if (!options.enabled()) return response(503, 'remote_mcp_disabled')
-    if (!(await options.admitRequest(request)))
+    if (!(await withinSignal(options.admitRequest(request), request.signal)))
       return new Response(null, {
         status: 429,
         headers: { 'Retry-After': '30', 'Cache-Control': 'no-store' },
@@ -165,7 +200,10 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
       return response(401, 'invalid_token', 'invalid_token')
     // Verifier outages are 503, not an invalid-token prompt that encourages
     // users to create another connection. Invalid/revoked tokens return null.
-    const verified = await options.verifyAccessToken(bearer[1] as string, request.signal)
+    const verified = await withinSignal(
+      options.verifyAccessToken(bearer[1] as string, request.signal),
+      request.signal,
+    )
     const parsed = authorizationSchema.safeParse(verified)
     if (!parsed.success) return response(401, 'invalid_token', 'invalid_token')
     const authorization = parsed.data
@@ -205,11 +243,19 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
   return {
     close: () => handler.close(),
     fetch: async (request: Request) => {
+      const deadline = new AbortController()
+      const signal = AbortSignal.any([request.signal, deadline.signal])
+      const timer = setTimeout(() => deadline.abort(), timeoutMs)
+      timer.unref?.()
       let result: Response
       try {
-        result = await dispatch(request)
+        result = await requestSignals.run(signal, () =>
+          withinSignal(dispatch(new Request(request, { signal })), signal),
+        )
       } catch {
-        result = response(503, 'temporarily_unavailable')
+        result = response(503, signal.aborted ? 'request_interrupted' : 'temporarily_unavailable')
+      } finally {
+        clearTimeout(timer)
       }
       const headers = new Headers(result.headers)
       headers.set('Cache-Control', 'no-store')

@@ -63,6 +63,28 @@ function request(token?: string, url = resourceUrl, headers: Record<string, stri
 }
 
 describe('regional HTTP MCP authorization boundary', () => {
+  it.each(['admitRequest', 'verifyAccessToken', 'createDelegatedClient'] as const)(
+    'bounds an unresponsive %s adapter and aborts its request lifetime',
+    async (hook) => {
+      let signal: AbortSignal | undefined
+      const never = vi.fn((first: unknown, second?: AbortSignal) => {
+        signal = first instanceof Request ? first.signal : second
+        return new Promise<never>(() => {})
+      })
+      const { handler } = setup({ [hook]: never, requestTimeoutMs: 20 })
+      try {
+        const started = Date.now()
+        const result = await handler.fetch(request('opaque-access-token'))
+        expect(result.status).toBe(503)
+        expect(Date.now() - started).toBeLessThan(1000)
+        expect(signal?.aborted).toBe(true)
+        expect(await result.text()).not.toContain('opaque-access-token')
+      } finally {
+        await handler.close()
+      }
+    },
+  )
+
   it('publishes resource metadata and challenges missing authorization', async () => {
     const { handler, createDelegatedClient } = setup()
     try {

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "registryVersion": "developer-action-policy-v7",
-  "registrySha256": "5cacc2b633d15266522be1e52169483bf68141766cd1fd7c829e854b38198f0b",
-  "actionPolicyCount": 237,
-  "authenticatedActionPolicyCount": 235,
+  "registryVersion": "developer-action-policy-v8",
+  "registrySha256": "a2b226ece03174790018244ee94fbf6eb39011bba1eb4af8172b252aa732c2f5",
+  "actionPolicyCount": 238,
+  "authenticatedActionPolicyCount": 236,
   "principalPolicyFamilyIds": [
     "administration",
     "automation",
@@ -18,5 +18,5 @@
     "search-export",
     "work-management"
   ],
-  "operationBindingCatalogSha256": "d03b64ff07750414f38688d279b5c4213544ade60e61f66a2eb5f2c1c4d09f0b"
+  "operationBindingCatalogSha256": "c3d2863f459e3bfaca60c08cacb54021f0dc449f61f99bc160760862af07d536"
 }

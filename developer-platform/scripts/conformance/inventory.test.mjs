@@ -9,9 +9,9 @@ describe('Developer Platform conformance inventory', () => {
       contractVersion: '1.2.0',
       schemaVersion: 1,
       summary: {
-        byVersion: { v0: 87, v1: 237 },
-        mcp: { forbidden: 30, 'gated-write': 123, read: 84, total: 237 },
-        total: 324,
+        byVersion: { v0: 87, v1: 238 },
+        mcp: { forbidden: 30, 'gated-write': 124, read: 84, total: 238 },
+        total: 325,
       },
     })
     expect(inventory.inventoryDigest).toMatch(/^[a-f0-9]{64}$/)
@@ -132,9 +132,9 @@ describe('Developer Platform conformance inventory', () => {
 
   it('prints a deterministic human-readable planning summary', async () => {
     const summary = formatInventorySummary(await buildConformanceInventory())
-    expect(summary).toContain('324 API operations (87 V0, 237 V1)')
+    expect(summary).toContain('325 API operations (87 V0, 238 V1)')
     expect(summary).toContain(
-      '84 MCP reads; 123 opt-in writes; 30 operations intentionally forbidden',
+      '84 MCP reads; 124 opt-in writes; 30 operations intentionally forbidden',
     )
   })
 })

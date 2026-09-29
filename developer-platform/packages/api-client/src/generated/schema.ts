@@ -313,7 +313,11 @@ export interface paths {
         delete: operations["archiveComment"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Edit a comment
+         * @description Updates plain text and canonical active-member mentions under current owner/role permissions and an exact revision. Preserves attachments, reactions and edit history. Editing does not resend notifications.
+         */
+        patch: operations["updateComment"];
         trace?: never;
     };
     "/comments/{id}/restore": {
@@ -2311,7 +2315,7 @@ export interface paths {
         put?: never;
         /**
          * Search authorized TeamGrid resources
-         * @description Searches only the requested, scope-authorized product domains in the owning cell. Results are bounded, metadata-only, tenant-filtered and sharing-filtered.
+         * @description Searches only the requested, scope-authorized product domains in the owning cell. Results are bounded, metadata-only, tenant-filtered and sharing-filtered. meta.search.complete is always false: even a short or empty index result does not prove completeness. Narrow ambiguous searches or use resource list pagination for complete reports. Verify recent writes by their returned IDs because indexing can lag.
          */
         post: operations["searchResources"];
         delete?: never;
@@ -3447,6 +3451,38 @@ export interface components {
             /** @description Unique identifier assigned to the API request for tracing and support. */
             requestId: string;
         };
+        /** @description Public API representation of search meta. */
+        SearchResponseMeta: {
+            /** @description Unique identifier assigned to the API request for tracing and support. */
+            requestId: string;
+            /** @description The search associated with this search meta. */
+            search?: {
+                /**
+                 * @description The complete associated with this search meta search.
+                 * @constant
+                 */
+                complete: false;
+                /**
+                 * @description The indexed associated with this search meta search.
+                 * @constant
+                 */
+                indexed: true;
+                /** @description Maximum number of records requested or returned for this page. */
+                limit: number;
+                /** @description The returned associated with this search meta search. */
+                returned: number;
+                /**
+                 * @description The continuation associated with this search meta search.
+                 * @constant
+                 */
+                continuation: "narrow-query-or-list";
+                /**
+                 * @description The verification associated with this search meta search.
+                 * @constant
+                 */
+                verification: "read-by-id";
+            };
+        };
         /** @description Public API representation of api version. */
         ApiVersionEnvelope: {
             /** @description Response data for the completed request. */
@@ -3544,6 +3580,23 @@ export interface components {
             attributes: {
                 /** @description Identifier of the owning TeamGrid application cell. */
                 cellId: string;
+                /** @description Verified current identity and profile timezone. Service and unknown identities have no human subject. An unspecified timezone must be supplied by the user. */
+                context: {
+                    /**
+                     * @description Canonical identity kind value for this workspace attributes context.
+                     * @enum {string}
+                     */
+                    identityKind: "personal" | "delegated" | "service" | "unknown";
+                    /** @description The subject user id associated with this workspace attributes context. */
+                    subjectUserId: string | null;
+                    /** @description The time zone associated with this workspace attributes context. */
+                    timeZone: string | null;
+                    /**
+                     * @description Canonical time zone source value for this workspace attributes context.
+                     * @enum {string}
+                     */
+                    timeZoneSource: "user-profile" | "unspecified";
+                };
                 /** @description ISO 4217 currency code used for monetary values. */
                 currency: string | null;
                 /** @description Human-readable name of the resource. */
@@ -3908,6 +3961,11 @@ export interface components {
              * @enum {string}
              */
             targetType: "contact" | "project" | "task";
+            /** @description The text associated with this comment. */
+            text: string;
+        };
+        /** @description Public API representation of comment. */
+        CommentUpdate: {
             /** @description The text associated with this comment. */
             text: string;
         };
@@ -9410,6 +9468,7 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "cellId": "exampleId",
+                     *           "context": {},
                      *           "currency": "EUR",
                      *           "name": "Example",
                      *           "region": "example",
@@ -10596,6 +10655,79 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description The request to archive a comment succeeded. The response contains the canonical public result and request metadata. */
+            200: {
+                headers: {
+                    ETag: components["headers"]["CommentETag"];
+                    /** @description Whether the resource already had the requested lifecycle state. */
+                    "Idempotency-Replayed"?: "false" | "true";
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "data": {
+                     *         "attributes": {
+                     *           "archived": false,
+                     *           "authorId": "exampleId",
+                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "\"example-revision\"",
+                     *           "target": {},
+                     *           "text": "example",
+                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *         },
+                     *         "id": "exampleId",
+                     *         "type": "comment"
+                     *       },
+                     *       "meta": {
+                     *         "requestId": "exampleId"
+                     *       }
+                     *     }
+                     */
+                    "application/json": {
+                        data: components["schemas"]["Comment"];
+                        meta: components["schemas"]["ResponseMeta"];
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
+            429: components["responses"]["RateLimited"];
+            502: components["responses"]["BadGateway"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    updateComment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Exactly one latest strong comment ETag. Wildcards, weak validators, and lists are rejected. */
+                "If-Match": components["parameters"]["IfMatchComment"];
+            };
+            path: {
+                /** @description Stable identifier of the resource in the authenticated workspace. */
+                id: components["parameters"]["ResourceId"];
+            };
+            cookie?: never;
+        };
+        /** @description JSON payload used to edit a comment. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "text": "example"
+                 *     }
+                 */
+                "application/json": components["schemas"]["CommentUpdate"];
+            };
+        };
+        responses: {
+            /** @description The request to edit a comment succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
                     ETag: components["headers"]["CommentETag"];
@@ -20619,7 +20751,10 @@ export interface operations {
     searchResources: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Opt in to explicit bounded-search metadata. Omitted for compatibility with older strict SDK response validators. */
+                "X-TeamGrid-Response-Features"?: "bounded-search-v1";
+            };
             path?: never;
             cookie?: never;
         };
@@ -20655,13 +20790,21 @@ export interface operations {
                      *         }
                      *       ],
                      *       "meta": {
-                     *         "requestId": "exampleId"
+                     *         "requestId": "exampleId",
+                     *         "search": {
+                     *           "complete": false,
+                     *           "indexed": true,
+                     *           "limit": 1,
+                     *           "returned": 0,
+                     *           "continuation": "narrow-query-or-list",
+                     *           "verification": "read-by-id"
+                     *         }
                      *       }
                      *     }
                      */
                     "application/json": {
                         data: components["schemas"]["SearchResult"][];
-                        meta: components["schemas"]["ResponseMeta"];
+                        meta: components["schemas"]["SearchResponseMeta"];
                     };
                 };
             };

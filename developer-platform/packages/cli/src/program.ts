@@ -868,7 +868,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     .option('--replace', 'replace an existing local profile without revoking its prior credential')
     .addOption(
       new Option('--preset <preset>', 'browser-login permission preset')
-        .choices(['read-only', 'daily-work'])
+        .choices(['read-only', 'daily-work', 'mcp-context', 'mcp-work'])
         .default('read-only'),
     )
     .option(
@@ -882,7 +882,7 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
       options: {
         browser: boolean
         manual?: boolean
-        preset: 'daily-work' | 'read-only'
+        preset: 'daily-work' | 'read-only' | 'mcp-context' | 'mcp-work'
         replace?: boolean
         scope: string[]
         tokenStdin?: boolean
@@ -3153,6 +3153,25 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
     })
 
   const comments = program.command('comments').description('read and manage target comments')
+  comments
+    .command('update <id>')
+    .requiredOption('--data <json>', 'comment update JSON or @file')
+    .requiredOption('--if-match <etag>', 'exact quoted ETag from the reviewed comment')
+    .action(async function action(
+      id: string,
+      options: { data: string; ifMatch: string },
+      command: Command,
+    ) {
+      const client = await loadClient(command)
+      outputData(
+        command,
+        (
+          await client.comments.update(id, (await readJsonObject(options.data, input)) as never, {
+            ifMatch: options.ifMatch as never,
+          })
+        ).data,
+      )
+    })
   addListOptions(comments.command('list'), 100)
     .option('--archived <boolean>', 'return archived comments', booleanValue)
     .addOption(

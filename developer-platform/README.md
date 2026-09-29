@@ -207,7 +207,7 @@ collaboration (29), governance (28), and all (36). Existing profiles preserve
 these meanings in the development candidate.
 
 The candidate adds `context` (34 bounded reads) and explicit `work` (41 tools,
-including seven guarded writes), `full` (207 tools: 84 reads and 123 writes), and
+including seven guarded writes), `full` (208 tools: 84 reads and 124 writes), and
 11 domain write profiles, plus protocol 2026-07-28 and legacy stdio compatibility.
 Writes require the confirmed workspace. Conditional writes use a reviewed ETag;
 replay-safe creates use a stable intent key. Actions without those API contracts
@@ -240,7 +240,7 @@ npm run conformance:plan
 ```
 
 The plan reads the immutable contract set and produces a deterministic inventory of all 87 V0 and
-237 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
+238 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
 execution binding, CAS precondition, and idempotency requirement. V0 compatibility statuses and the
 V0-to-V1 migration map remain explicit, so a documented unavailable route is not confused with an
 unexpected regression. Planning never loads a credential or contacts TeamGrid.
@@ -248,7 +248,7 @@ unexpected regression. Planning never loads a credential or contacts TeamGrid.
 The read-only phase performs only parameter-free GET requests, uses `limit=1` where supported, runs
 sequentially below the shared pre-auth limit, and retries at most two `429` responses. Operations
 that need an id, required filter, body, or mutation are recorded as blocked rather than guessed. A
-V1 run additionally proves all 236 SDK methods, all 237 CLI operation mappings, the exact 36-tool legacy MCP allowlist, and one
+V1 run additionally proves all 237 SDK methods, all 238 CLI operation mappings, the exact 36-tool legacy MCP allowlist, and one
 live workspace request through SDK, CLI, and MCP:
 
 ```sh
@@ -346,7 +346,7 @@ the exact repository, commit, manifest size, and manifest digest in
 working tree.
 
 The mirrored manifest also contains `developer-action-policy-registry.json`.
-It pins the App/API authorization registry version, SHA-256 identity, all 237
+It pins the App/API authorization registry version, SHA-256 identity, all 238
 action policies, and 12 principal-policy rollout families. SDK, CLI, and MCP do
 not evaluate or broaden this policy locally; every request remains subject to
 the owning App cell's authorization decision.

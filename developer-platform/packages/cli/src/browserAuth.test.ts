@@ -367,6 +367,10 @@ describe('TeamGrid CLI browser authorization', () => {
       .sort()
 
     expect([...sensitiveBrowserAuthorizationScopes].sort()).toEqual(contractSensitiveScopes)
+    // Recurrence reads retain task sharing and current-user checks; mutations remain step-up only.
+    expect(normalizeBrowserAuthorizationScopes({ scopes: ['task-recurrences:read'] })).toEqual([
+      'task-recurrences:read',
+    ])
     expect(() =>
       normalizeBrowserAuthorizationScopes({
         scopes: ['workspace:read', 'members:read'],

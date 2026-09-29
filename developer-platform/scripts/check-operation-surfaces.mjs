@@ -187,6 +187,7 @@ const expectedIndependentIfMatchOperationIds = [
   'updateAbsence',
   'updateAppointment',
   'updateAutomationDefinition',
+  'updateComment',
   'updateDocument',
   'updateGroup',
   'updateMemberRole',

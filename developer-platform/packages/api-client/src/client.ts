@@ -105,6 +105,7 @@ import type {
   CommentCreate,
   CommentListOptions,
   CommentMutationOptions,
+  CommentUpdate,
   Contact,
   ContactCreate,
   ContactGroup,
@@ -1734,6 +1735,17 @@ export class TeamGridClient {
         ),
     }
     this.comments = {
+      update: (id: string, data: CommentUpdate, options: CommentMutationOptions) => {
+        const { ifMatch, ...requestOptions } = options
+        return this.#strictResource(
+          `/comments/${encodeURIComponent(id)}`,
+          commentValidator,
+          'comment update',
+          { ...requestOptions, body: data, ifMatch: strongCommentEtag(ifMatch), method: 'PATCH' },
+          200,
+          (item) => item.attributes.revision,
+        )
+      },
       archive: (id: string, options: CommentMutationOptions) => {
         const { ifMatch, ...requestOptions } = options
         return this.#strictResource(
@@ -4239,6 +4251,7 @@ export class TeamGridClient {
       'x-request-id': requestId,
     })
     if (this.#requireResourceCas) headers.set('x-teamgrid-resource-cas', 'required-v1')
+    if (path === '/search') headers.set('x-teamgrid-response-features', 'bounded-search-v1')
     if (options.body !== undefined) headers.set('content-type', 'application/json')
     if (options.idempotencyKey) headers.set('idempotency-key', options.idempotencyKey)
     if (options.ifMatch) headers.set('if-match', options.ifMatch)

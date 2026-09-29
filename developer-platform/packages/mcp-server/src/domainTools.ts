@@ -6,6 +6,7 @@ import { projectDocumentContent } from './documentContent.js'
 import generatedCatalog from './generated/domainCatalog.json' with { type: 'json' }
 import { type DomainToolName, domainDispatch, domainToolNames } from './generated/domainDispatch.js'
 import type { RegisterTeamGridTool } from './registration.js'
+import { boundedSearchMetadata } from './searchCompleteness.js'
 
 type DomainDefinition = {
   operationId: string
@@ -194,6 +195,14 @@ export async function executeDomainTool(
       meta: {
         ...(response.meta as Record<string, unknown>),
         ...projected.meta,
+        ...(operation.sdk === 'search.query'
+          ? {
+              search: boundedSearchMetadata(
+                response.data,
+                (input.data as Record<string, unknown> | undefined)?.limit,
+              ),
+            }
+          : {}),
         ...(etag && /^"[\x21\x23-\x7e]{1,256}"$/.test(etag) ? { etag } : {}),
       },
     }

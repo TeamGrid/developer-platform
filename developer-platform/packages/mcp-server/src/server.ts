@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { domainCatalog, registerDomainTools } from './domainTools.js'
 import type { RegisterTeamGridTool } from './registration.js'
 import { toolScopeChallenge } from './scopeRequirements.js'
+import { boundedSearchMetadata } from './searchCompleteness.js'
 import { enabledMcpTools, type McpToolName, type McpToolProfile } from './toolProfiles.js'
 import { registerWorkTools } from './workTools.js'
 
@@ -332,11 +333,17 @@ export function createReadOnlyHandlers(client: TeamGridClient): ReadOnlyHandlers
       limit?: number
       productGroupId?: string
     }) => withoutProductPurchasePrices(await client.products.list(input)),
-    searchQuery: (input: {
+    searchQuery: async (input: {
       limit?: number
       term: string
       types: readonly (typeof searchResourceTypes)[number][]
-    }) => client.search.query(input),
+    }) => {
+      const value = await client.search.query(input)
+      return {
+        ...value,
+        meta: { ...value.meta, search: boundedSearchMetadata(value.data, input.limit) },
+      }
+    },
     projectGet: (input: { id: string }) => client.projects.get(input.id),
     projectsList: (input: {
       archived?: boolean
