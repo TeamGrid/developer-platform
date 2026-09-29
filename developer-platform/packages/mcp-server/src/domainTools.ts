@@ -1,6 +1,6 @@
 import type { StandardSchemaWithJSON } from '@modelcontextprotocol/server'
 import { type TeamGridClient, TeamGridClientError } from '@teamgrid/api-client'
-import { Ajv2020 } from 'ajv/dist/2020.js'
+import { Ajv2020, type ValidateFunction } from 'ajv/dist/2020.js'
 import { fullFormats } from 'ajv-formats/dist/formats.js'
 import { projectDocumentContent } from './documentContent.js'
 import { maximumMcpResourceBytes, privateResourceUri } from './fileResources.js'
@@ -113,7 +113,9 @@ export function domainInputSchema(
   const cached = schemas.get(name)
   if (cached) return cached
   const schema = catalog[name].inputSchema
-  const validate = ajv.compile(schema)
+  // Discovery registers the whole catalog, but a session uses only a fraction
+  // of it. Compile on first validation and reuse across requests and sessions.
+  let validate: ValidateFunction | undefined
   const result: StandardSchemaWithJSON<Record<string, unknown>> = {
     '~standard': {
       version: 1,
@@ -130,6 +132,7 @@ export function domainInputSchema(
         ) {
           return { issues: [{ message: 'Input exceeds the bounded JSON contract.' }] }
         }
+        validate ??= ajv.compile(schema)
         if (!validate(value)) {
           // Error messages describe schema failures without echoing customer data.
           return {
@@ -190,18 +193,20 @@ export function domainOutputSchema(
     }
   }
   const schema = { ...catalog[name].outputSchema, $defs: definitions }
-  const validate = ajv.compile(schema)
+  let validate: ValidateFunction | undefined
   const result: StandardSchemaWithJSON<Record<string, unknown>> = {
     '~standard': {
       version: 1,
       vendor: 'teamgrid-reviewed-openapi',
       jsonSchema: { input: () => schema, output: () => schema },
-      validate: (value) =>
-        validate(value)
+      validate: (value) => {
+        validate ??= ajv.compile(schema)
+        return validate(value)
           ? { value: value as Record<string, unknown> }
           : {
               issues: [{ message: 'The API result does not match the operation output contract.' }],
-            },
+            }
+      },
     },
   }
   outputSchemas.set(cacheKey, result)
