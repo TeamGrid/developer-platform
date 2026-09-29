@@ -1,3 +1,4 @@
+import { listAllMcpTools } from './lib/mcp-tool-discovery.mjs'
 import { spawnSync } from 'node:child_process'
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -117,7 +118,7 @@ try {
       })
       try {
         await client.connect(transport)
-        const { tools } = await client.listTools()
+        const { tools } = await listAllMcpTools(client)
         if (client.getProtocolEra() !== era || tools.length !== count || (profile === 'core' && tools.some((tool) => tool.annotations?.readOnlyHint !== true))) {
           throw new Error(`Packed MCP discovery differs for ${era}/${profile}.`)
         }

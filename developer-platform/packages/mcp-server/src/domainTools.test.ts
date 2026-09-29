@@ -96,8 +96,23 @@ describe('complete domain MCP', () => {
   it('advertises every reviewed tool with executable strict schemas and truthful mutation metadata', async () => {
     const c = await connected()
     try {
-      const { tools } = await c.client.listTools()
+      const tools = []
+      let cursor: string | undefined
+      do {
+        const page = await c.client.listTools(cursor ? { cursor } : undefined)
+        expect(Buffer.byteLength(JSON.stringify(page))).toBeLessThan(256 * 1024)
+        expect(page.tools.length).toBeLessThanOrEqual(50)
+        tools.push(...page.tools)
+        cursor = page.nextCursor
+      } while (cursor)
       expect(tools.map((t) => t.name).sort()).toEqual([...domainToolNames].sort())
+      expect(new Set(tools.map((tool) => tool.name)).size).toBe(tools.length)
+      await expect(c.client.listTools({ cursor: `tgtools1.${'0'.repeat(64)}.50` })).rejects.toThrow(
+        'cursor is invalid or expired',
+      )
+      await expect(c.client.listTools({ cursor: 'not-a-cursor' })).rejects.toThrow(
+        'cursor is invalid or expired',
+      )
       for (const tool of tools) {
         const entry = domainCatalog[tool.name as keyof typeof domainCatalog]
         expect(tool.inputSchema.additionalProperties).toBe(false)

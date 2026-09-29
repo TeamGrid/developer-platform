@@ -1,3 +1,4 @@
+import { listAllMcpTools } from './lib/mcp-tool-discovery.mjs'
 import { readFile } from 'node:fs/promises'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
@@ -366,7 +367,7 @@ for (const profile of Object.keys(toolsByProfile)) {
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
   await Promise.all([mcpServer.connect(serverTransport), mcpClient.connect(clientTransport)])
   try {
-    const { tools } = await mcpClient.listTools()
+    const { tools } = await listAllMcpTools(mcpClient)
     const advertised = new Set(tools.map((tool) => tool.name))
     for (const tool of tools) {
       const policy = ledger.operationPolicy.find((operation) => operation.mcp.tool === tool.name)?.mcp

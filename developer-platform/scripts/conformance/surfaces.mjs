@@ -1,6 +1,7 @@
 import { Writable } from 'node:stream'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
+import { listAllMcpTools } from '../lib/mcp-tool-discovery.mjs'
 import { evidenceResult } from './evidence.mjs'
 
 function commandPaths(command, prefix = []) {
@@ -108,7 +109,7 @@ async function loadDefaultRuntime(config) {
   const mcpClient = new Client({ name: 'teamgrid-conformance', version: '1.0.0' })
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
   await Promise.all([server.connect(serverTransport), mcpClient.connect(clientTransport)])
-  const mcpTools = (await mcpClient.listTools()).tools.map((tool) => tool.name)
+  const mcpTools = (await listAllMcpTools(mcpClient)).tools.map((tool) => tool.name)
 
   return {
     cliCommands: commandPaths(program),

@@ -1,3 +1,4 @@
+import { listAllMcpTools } from './lib/mcp-tool-discovery.mjs'
 import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
@@ -106,7 +107,7 @@ async function runBinarySmokes(expectedWorkspaceId) {
   const mcp = new McpClient({ name: 'teamgrid-staging-e2e', version: '1.0.0' })
   await mcp.connect(transport)
   try {
-    const tools = await mcp.listTools()
+    const tools = await listAllMcpTools(mcp)
     const names = tools.tools.map(tool => tool.name)
     assert(names.includes('teamgrid_workspace_get'))
     assert(names.every(name => !/(change|custom_field_value|planned_work|project_template)/i.test(name)))

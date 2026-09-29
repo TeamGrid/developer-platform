@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
-import { McpServer } from '@modelcontextprotocol/server'
+import { McpServer, type RegisteredTool } from '@modelcontextprotocol/server'
 import {
   type RequestOptions,
   redactDeveloperSecrets,
@@ -14,6 +14,7 @@ import { domainCatalog, registerDomainTools } from './domainTools.js'
 import type { RegisterTeamGridTool } from './registration.js'
 import { toolScopeChallenge } from './scopeRequirements.js'
 import { boundedSearchMetadata } from './searchCompleteness.js'
+import { installBoundedToolDiscovery } from './toolDiscovery.js'
 import { enabledMcpTools, type McpToolName, type McpToolProfile } from './toolProfiles.js'
 import { registerWorkTools } from './workTools.js'
 
@@ -445,6 +446,7 @@ export function createTeamGridMcpServer(
   )
   const handlers = createReadOnlyHandlers(client)
   const enabledTools = new Set(enabledMcpTools(toolProfile, { allowTools, denyTools }))
+  const registrations = new Map<string, RegisteredTool>()
   const registerTool: RegisterTeamGridTool = (name, config, callback) => {
     const safeCallback = (async (...args: unknown[]) => {
       const extra = args[1] as { mcpReq?: { signal?: AbortSignal } } | undefined
@@ -493,12 +495,14 @@ export function createTeamGridMcpServer(
       },
       safeCallback,
     )
+    registrations.set(name, registration)
     if (!enabledTools.has(name)) registration.disable()
     return registration
   }
 
   if (['full', 'work', 'context'].includes(toolProfile) || toolProfile.endsWith('-write')) {
     registerDomainTools(registerTool, client, toolResult)
+    installBoundedToolDiscovery(server, registrations)
     return server
   }
 
@@ -928,5 +932,6 @@ export function createTeamGridMcpServer(
     async (input) => toolResult(await handlers.webhookGet(input)),
   )
   registerWorkTools(registerTool, client, toolResult)
+  installBoundedToolDiscovery(server, registrations)
   return server
 }
