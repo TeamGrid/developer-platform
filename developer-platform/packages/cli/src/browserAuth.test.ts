@@ -204,7 +204,13 @@ describe('TeamGrid CLI browser authorization', () => {
         cellId: 'de-nbg-001',
         region: 'de',
       })
-      expect((await validRequest).status).toBe(200)
+      const response = await validRequest
+      expect(response.status).toBe(200)
+      const html = await response.text()
+      expect(html).toContain('Authorization received')
+      expect(html).toContain('final result')
+      expect(html).not.toContain('is connected')
+      expect(html).not.toContain('b'.repeat(43))
     } finally {
       await callbackServer.close()
     }

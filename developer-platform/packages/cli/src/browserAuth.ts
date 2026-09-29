@@ -413,8 +413,8 @@ export async function startCliBrowserCallbackServer(
     })
     response.end(
       safeCallbackHtml(
-        'TeamGrid CLI is connected',
-        'You can close this page and return to your terminal.',
+        'Authorization received',
+        'Return to your terminal. The CLI still needs to finish the connection and save it securely. Check the terminal for the final result.',
       ),
     )
     resolveCallback({ authorizationCode, cellId, region })
