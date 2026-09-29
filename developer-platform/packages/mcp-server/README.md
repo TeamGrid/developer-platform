@@ -81,6 +81,13 @@ flags in a terminal, not in the MCP host's server arguments.
 
 ## Guarded changes
 
+The new write profile is not release-qualified. As of 2026-09-29 the App can
+ignore `expectedRevision` while its resource-revision gates are closed. Sending
+an ETag therefore does not establish lost-update protection. Do not publish or
+enable this profile before server-side CAS, stale-revision rejection, concurrent
+writers and service writes in prepared workspaces pass in each target cell.
+The Staging read-path correction does not activate CAS or qualify writes.
+
 | Tool | Required protection | API scope |
 | --- | --- | --- |
 | `teamgrid_task_create` | workspaceId + idempotencyKey | tasks:write |

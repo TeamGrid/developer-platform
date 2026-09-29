@@ -171,7 +171,10 @@ operation control.
 GET requests and POST requests with an idempotency key are retried for bounded transient failures.
 Tasks, projects, and project templates expose developer revisions and strong ETags. Every update,
 archive, restore, completion, reopen, lifecycle start, and template instantiation requires the
-latest revision through `If-Match`, preventing silent overwrites. Other PUT, PATCH, and DELETE
+latest revision through `If-Match`. Protection against stale writes additionally requires
+a qualified server-side CAS rollout; a header alone does not prove enforcement. Current
+pre-CAS cells may discard the expected revision. New MCP writes remain release-blocked
+until conflict handling is qualified in each target cell. Other PUT, PATCH, and DELETE
 requests are not automatically retried. Errors do not retain or print the bearer credential.
 Time-entry billed state has its own finance-sensitive scope and strong revision; it is available
 through API, SDK, and CLI, but intentionally absent from every read-only MCP profile.
