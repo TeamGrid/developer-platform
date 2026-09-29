@@ -1,4 +1,5 @@
 import type { ScopeChallengeHandler } from '@modelcontextprotocol/server'
+import { TeamGridApiError, type TeamGridClient } from '@teamgrid/api-client'
 import type { McpToolName } from './toolProfiles.js'
 import { toolScopes } from './toolScopes.js'
 
@@ -54,10 +55,65 @@ export function requiredToolScopes(name: McpToolName, arguments_: unknown): [str
   return [...scopes].sort() as [string, ...string[]]
 }
 
-export function toolScopeChallenge(name: McpToolName): ScopeChallengeHandler {
-  return ({ request, authInfo }) => {
+const commentById = new Set([
+  'teamgrid_comment_get',
+  'teamgrid_comment_update',
+  'teamgrid_comment_archive',
+  'teamgrid_comment_restore',
+])
+const resourceReadScopes = new Set([
+  'tasks:read',
+  'projects:read',
+  'contacts:read',
+  'audit:read',
+  'task-recurrences:read',
+  'time-entries:read',
+])
+
+/** Only a closed, backend-issued challenge can add resource-derived read scopes. */
+export function resourceScopeChallenge(error: unknown): string[] {
+  if (
+    !(error instanceof TeamGridApiError) ||
+    error.status !== 403 ||
+    error.errors[0]?.code !== 'insufficient_scope'
+  )
+    return []
+  const challenge = error.transport?.headers['www-authenticate']
+  const match = /^Bearer error="insufficient_scope", scope="([a-z:-]+(?: [a-z:-]+)*)"$/.exec(
+    challenge ?? '',
+  )
+  const scopes = match?.[1]?.split(' ') ?? []
+  return scopes.length > 0 &&
+    scopes.length <= 8 &&
+    scopes.every((scope) => resourceReadScopes.has(scope))
+    ? [...new Set(scopes)]
+    : []
+}
+
+export function toolScopeChallenge(
+  name: McpToolName,
+  client?: TeamGridClient,
+): ScopeChallengeHandler {
+  return async ({ request, authInfo }) => {
     if (!authInfo) return undefined
     const scopes = requiredToolScopes(name, request.params?.arguments)
-    return scopes.some((scope) => !authInfo.scopes.includes(scope)) ? { scopes } : undefined
+    // A reviewed comment write needs its current target and version first.
+    if (commentById.has(name) && !scopes.includes('comments:read')) scopes.push('comments:read')
+    if (scopes.some((scope) => !authInfo.scopes.includes(scope))) return { scopes }
+    if (!client || (!commentById.has(name) && name !== 'teamgrid_export_get')) return undefined
+    const id = object(request.params?.arguments).id
+    if (typeof id !== 'string' || !/^[A-Za-z0-9_.:-]{1,128}$/.test(id)) return undefined
+    try {
+      const options = { signal: AbortSignal.timeout(5000) }
+      if (commentById.has(name)) await client.comments.get(id, options)
+      else await client.exports.get(id, options)
+    } catch (error) {
+      const additional = resourceScopeChallenge(error)
+      if (additional.some((scope) => !authInfo.scopes.includes(scope))) {
+        return { scopes: [...new Set([...scopes, ...additional])].sort() as [string, ...string[]] }
+      }
+      // Roles, sharing, missing resources and outages are reported by the normal tool path.
+    }
+    return undefined
   }
 }

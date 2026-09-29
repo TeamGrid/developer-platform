@@ -85,10 +85,11 @@ teamgrid-mcp --check --profile default --tool-profile content-write
 
 `--explain-scopes` does not access credentials or contact TeamGrid. It respects
 the same profile and allow/deny filters as the server, lists exact required
-scopes, identifies write tools and explains scopes that browser login cannot
-currently grant. In particular, full profiles include `task-recurrences:read`,
-which still needs a narrowly scoped manual credential or an explicitly reduced
-tool selection. It never silently removes those tools or permissions.
+scopes, identifies write tools and marks sensitive scopes that require an additional
+passkey confirmation. The candidate browser flow supports these scopes when its
+cell gates and passkey confirmation are qualified. Published 1.2.1 still requires
+a narrowly scoped manual credential for sensitive scopes. The report never
+silently removes tools or permissions.
 
 `--check` reads the current server credential context and verifies Workspace
 access. Missing scopes produce a nonzero exit code and list the affected tools.
@@ -228,3 +229,18 @@ registration, regional persistence and the concrete API delegation adapter must
 be implemented and qualified before mounting a public endpoint. Do not implement
 the hooks by accepting arbitrary tokens or returning one shared administrator
 client. No production URL or hosted-client compatibility is claimed by these tests.
+
+
+## Hosted runtime and private resources (candidate)
+
+The `teamgrid-mcp-http` entry point and immutable container integrate the regional
+OAuth provider, request admission, distinct API delegation, bounded requests,
+readiness and safe request correlation. See the
+[hosted runtime contract](../../hosting/README.md) for exact configuration and
+release requirements. No public hosted endpoint is released yet.
+
+File/export lookups return a `meta.privateResource` URI when that profile exposes
+the corresponding tool. `resources/read` reauthorizes and delivers at most 1 MiB;
+private transfer URLs stay internal. Larger downloads use an independently
+authorized App or CLI transfer flow. A separate login cannot access exports
+owned by another OAuth grant. Uploads use the existing App/CLI/SDK transfer path.

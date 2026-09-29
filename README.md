@@ -18,12 +18,15 @@ credential handling, regional routing, and development instructions.
 
 ## Install
 
-The stable 1.2.1 release is prepared for the default `latest` dist-tag:
+The 1.2.2 release candidate is prepared for the default `latest` dist-tag:
+
+Version 1.2.2 is not published yet; 1.2.1 remains the public release.
+The commands below apply after qualification and publication.
 
 ```sh
-npm install @teamgrid/api-client@1.2.1
-npm install --global @teamgrid/cli@1.2.1
-npm install --global @teamgrid/mcp-server@1.2.1
+npm install @teamgrid/api-client@1.2.2
+npm install --global @teamgrid/cli@1.2.2
+npm install --global @teamgrid/mcp-server@1.2.2
 ```
 
 ## Security

@@ -3,12 +3,12 @@ import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { TeamGridApiError, type TeamGridClient } from '@teamgrid/api-client'
 import { describe, expect, it, vi } from 'vitest'
 import { domainCatalog, domainInputSchema, domainToolNames } from './domainTools.js'
+import { responseFixture } from './fixtures.testSupport.js'
 import { createTeamGridMcpServer } from './server.js'
 import { describeMcpAccess } from './setup.js'
 
 const revision = (prefix: string) => `"${prefix}-${'a'.repeat(64)}"`
 const workspaceId = 'workspace-a'
-const envelope = { data: { id: 'result', type: 'test', attributes: {} }, meta: {} }
 async function connected() {
   const calls = new Map<string, ReturnType<typeof vi.fn>>()
   const api = new Proxy(
@@ -26,7 +26,13 @@ async function connected() {
                   vi
                     .fn()
                     .mockResolvedValue(
-                      key === 'workspace.get' ? { data: { id: workspaceId }, meta: {} } : envelope,
+                      key === 'tags.archive'
+                        ? { status: 204, headers: {} }
+                        : responseFixture(
+                            Object.values(domainCatalog).find((entry) => entry.sdk === key)
+                              ?.operationId ?? '',
+                            key === 'workspace.get' ? workspaceId : undefined,
+                          ),
                     ),
                 )
               return calls.get(key)
@@ -138,7 +144,11 @@ describe('complete domain MCP', () => {
       await c.client.callTool({ name: 'teamgrid_document_get', arguments: { id: 'doc1' } })
       const content = 'Hello 🦊\n'.repeat(40000)
       const response = {
-        data: { id: 'doc1', type: 'document', attributes: { name: 'Large', content } },
+        data: {
+          id: 'doc1',
+          type: 'document',
+          attributes: { ...responseFixture('getDocument').data.attributes, name: 'Large', content },
+        },
         meta: { requestId: 'document-read' },
         transport: { headers: { etag: '"doc1-version-1"' } },
       }
@@ -412,7 +422,10 @@ describe('complete domain MCP', () => {
         data: {
           id: 'hook1',
           type: 'webhook',
-          attributes: { signingSecret: 'private-signing-secret', revision: 'r1' },
+          attributes: {
+            ...responseFixture('getWebhook').data.attributes,
+            signingSecret: 'private-signing-secret',
+          },
         },
         meta: { requestId: 'request1' },
         transport: {
@@ -428,7 +441,11 @@ describe('complete domain MCP', () => {
         arguments: { id: 'hook1' },
       })
       expect(result.structuredContent).toEqual({
-        data: { id: 'hook1', type: 'webhook', attributes: { revision: 'r1' } },
+        data: {
+          id: 'hook1',
+          type: 'webhook',
+          attributes: responseFixture('getWebhook').data.attributes,
+        },
         meta: { requestId: 'request1', etag: revision('whk1') },
       })
       expect(JSON.stringify(result)).not.toMatch(/private|transport|signingSecret/)
@@ -549,6 +566,7 @@ describe('complete domain MCP', () => {
         'documents:write',
       ]),
     )
-    expect(plan.browserLogin.supported).toBe(false)
+    expect(plan.browserLogin.supported).toBe(true)
+    expect(plan.browserLogin.requiresPasskey).toBe(true)
   })
 })

@@ -10,7 +10,9 @@ import {
   TeamGridClientError,
 } from '@teamgrid/api-client'
 import { z } from 'zod'
-import { domainCatalog, registerDomainTools } from './domainTools.js'
+import { domainCatalog, domainOutputSchema, registerDomainTools } from './domainTools.js'
+import { registerPrivateFileResources } from './fileResources.js'
+import { mutationErrorOutcome } from './outcomes.js'
 import type { RegisterTeamGridTool } from './registration.js'
 import { toolScopeChallenge } from './scopeRequirements.js'
 import { boundedSearchMetadata } from './searchCompleteness.js'
@@ -27,29 +29,6 @@ const readOnlyAnnotations = Object.freeze({
   openWorldHint: false,
   readOnlyHint: true,
 })
-const responseEnvelopeOutput = z
-  .object({
-    data: z.json().optional(),
-    error: z
-      .object({
-        code: z.string(),
-        detail: z.string(),
-        requestId: z.string().optional(),
-        retryAfterMs: z.number().nonnegative().optional(),
-        status: z.number().int().min(100).max(599).optional(),
-      })
-      .strict()
-      .optional(),
-    meta: z.record(z.string(), z.json()).optional(),
-  })
-  .loose()
-  .refine(
-    (value) => Boolean(value.error) || (value.data !== undefined && value.meta !== undefined),
-    {
-      message: 'Expected a TeamGrid response envelope or projected error.',
-    },
-  )
-
 const listInput = {
   cursor: z.string().max(512).optional(),
   limit: z.number().int().min(1).max(100).optional(),
@@ -87,6 +66,18 @@ const searchInput = z
   .strict()
 
 function toolResult(value: unknown) {
+  if (value && typeof value === 'object' && 'data' in value && 'meta' in value) {
+    const transport =
+      'transport' in value ? (value.transport as { headers?: Record<string, string> }) : undefined
+    const etag = transport?.headers?.etag
+    value = {
+      data: value.data,
+      meta: {
+        ...(value.meta as Record<string, unknown>),
+        ...(etag && /^"[\x21\x23-\x7e]{1,256}"$/.test(etag) ? { etag } : {}),
+      },
+    }
+  }
   const text = JSON.stringify(value)
   if (Buffer.byteLength(text, 'utf8') > maxToolResultBytes) {
     const error = {
@@ -150,7 +141,7 @@ function toolTitle(name: string) {
   return `${resource} in TeamGrid`
 }
 
-function toolError(error: unknown) {
+function toolError(error: unknown, outcome?: 'failed' | 'unknown') {
   const apiDocument = error instanceof TeamGridApiError ? error.errors[0] : undefined
   const code =
     error instanceof TeamGridApiError
@@ -179,6 +170,7 @@ function toolError(error: unknown) {
       ? Number(error.retryAfterMs)
       : undefined
   const result = {
+    ...(outcome ? { meta: { outcome } } : {}),
     error: {
       code,
       detail,
@@ -446,6 +438,7 @@ export function createTeamGridMcpServer(
   )
   const handlers = createReadOnlyHandlers(client)
   const enabledTools = new Set(enabledMcpTools(toolProfile, { allowTools, denyTools }))
+  registerPrivateFileResources(server, client, enabledTools, requireGrantedScopes)
   const registrations = new Map<string, RegisteredTool>()
   const registerTool: RegisterTeamGridTool = (name, config, callback) => {
     const safeCallback = (async (...args: unknown[]) => {
@@ -465,6 +458,7 @@ export function createTeamGridMcpServer(
         30_000,
       )
       const requestId = `mcp-${randomUUID()}`
+      let dispatched = false
       try {
         return await execution.run({ signal, requestId }, async () => {
           signal.throwIfAborted()
@@ -477,10 +471,27 @@ export function createTeamGridMcpServer(
               )
             }
           }
-          return await Reflect.apply(callback, undefined, args)
+          dispatched = true
+          const result = await Reflect.apply(callback, undefined, args)
+          if (!result.isError) {
+            const schema = domainOutputSchema(
+              name,
+              ['core', 'collaboration', 'governance', 'all'].includes(toolProfile),
+            )
+            const checked = await schema['~standard'].validate(result.structuredContent)
+            if (checked.issues)
+              throw new TeamGridClientError(
+                'invalid_api_response',
+                'The API result did not match its response contract. For a mutation, completion is unconfirmed; inspect the target before retrying.',
+              )
+          }
+          return result
         })
       } catch (error) {
-        return toolError(error)
+        return toolError(
+          error,
+          domainCatalog[name].write ? mutationErrorOutcome(error, dispatched) : undefined,
+        )
       } finally {
         clearTimeout(timer)
       }
@@ -489,9 +500,12 @@ export function createTeamGridMcpServer(
       name,
       {
         ...config,
-        outputSchema: responseEnvelopeOutput,
+        outputSchema: domainOutputSchema(
+          name,
+          ['core', 'collaboration', 'governance', 'all'].includes(toolProfile),
+        ),
         title: toolTitle(name),
-        ...(requireGrantedScopes ? { scopeChallenge: toolScopeChallenge(name) } : {}),
+        ...(requireGrantedScopes ? { scopeChallenge: toolScopeChallenge(name, client) } : {}),
       },
       safeCallback,
     )

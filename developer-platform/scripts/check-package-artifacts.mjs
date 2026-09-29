@@ -19,7 +19,7 @@ const packages = [
   {
     maxUnpackedSize: 1_500_000,
     name: '@teamgrid/mcp-server',
-    requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js', 'COVERAGE.md', 'dist/generated/domainCatalog.json'],
+    requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js', 'COVERAGE.md', 'dist/httpBin.js', 'dist/generated/domainCatalog.json', 'dist/generated/outputDefinitions.json'],
   },
 ]
 

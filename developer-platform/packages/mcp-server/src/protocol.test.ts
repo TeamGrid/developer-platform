@@ -2,6 +2,7 @@ import { Client, InMemoryTransport } from '@modelcontextprotocol/client'
 import { Client as LegacyClient } from '@modelcontextprotocol/sdk/client/index.js'
 import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { describe, expect, it } from 'vitest'
+import { responseFixture } from './fixtures.testSupport.js'
 import { createTeamGridMcpServer } from './server.js'
 
 describe('MCP wire protocol compatibility', () => {
@@ -13,7 +14,7 @@ describe('MCP wire protocol compatibility', () => {
         () =>
           createTeamGridMcpServer({
             workspace: {
-              get: async () => ({ data: { id: 'workspace-1', type: 'workspace' }, meta: {} }),
+              get: async () => responseFixture('getWorkspace', 'workspace-1'),
             },
           } as never),
         { transport: serverTransport },

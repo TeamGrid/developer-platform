@@ -1,13 +1,14 @@
 import { Client, InMemoryTransport } from '@modelcontextprotocol/client'
 import { TeamGridApiError } from '@teamgrid/api-client'
 import { describe, expect, it, vi } from 'vitest'
+import { responseFixture } from './fixtures.testSupport.js'
 import { createTeamGridMcpServer } from './server.js'
 import { enabledMcpTools, type McpToolProfile } from './toolProfiles.js'
 import { workWriteTools } from './workTools.js'
 
 const revision = `"tsk1-${'a'.repeat(64)}"`
 function fixture(workspaceId = 'workspace-1') {
-  const resource = async () => ({ data: { id: 'task-1' }, meta: {} })
+  const resource = async () => responseFixture('getTask', 'task-1')
   return {
     comments: { create: vi.fn(resource), list: vi.fn(resource) },
     appointments: { list: vi.fn(resource) },

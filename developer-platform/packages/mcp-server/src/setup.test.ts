@@ -4,12 +4,13 @@ import { parseMcpArguments } from './config.js'
 import { checkMcpAccess, describeMcpAccess } from './setup.js'
 
 describe('human MCP setup diagnostics', () => {
-  it('explains the sensitive browser-login gap without silently narrowing the profile', () => {
+  it('explains required passkey confirmation without silently narrowing the profile', () => {
     const plan = describeMcpAccess({ toolProfile: 'core' })
     expect(plan.tools).toHaveLength(22)
     expect(plan.writeTools).toEqual([])
-    expect(plan.browserLogin.supported).toBe(false)
-    expect(plan.browserLogin.blockedScopes).toEqual(['task-recurrences:read'])
+    expect(plan.browserLogin.supported).toBe(true)
+    expect(plan.browserLogin.confirmationScopes).toEqual(['task-recurrences:read'])
+    expect(plan.browserLogin.requiresPasskey).toBe(true)
     expect(plan.requiredScopes).toContain('task-recurrences:read')
   })
 
@@ -17,10 +18,11 @@ describe('human MCP setup diagnostics', () => {
     'requires step-up for the complete %s browser preset',
     (toolProfile) => {
       const plan = describeMcpAccess({ toolProfile })
-      expect(() => normalizeBrowserAuthorizationScopes({ preset: `mcp-${toolProfile}` })).toThrow(
-        'sensitive scopes',
+      expect(normalizeBrowserAuthorizationScopes({ preset: `mcp-${toolProfile}` })).toEqual(
+        expect.arrayContaining(plan.requiredScopes),
       )
-      expect(plan.browserLogin.blockedScopes).toEqual(['task-recurrences:read'])
+      expect(plan.browserLogin.confirmationScopes).toEqual(['task-recurrences:read'])
+      expect(plan.browserLogin.requiresPasskey).toBe(true)
     },
   )
 

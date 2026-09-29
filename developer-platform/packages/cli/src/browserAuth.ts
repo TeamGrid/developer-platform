@@ -291,15 +291,6 @@ export function normalizeBrowserAuthorizationScopes({
       'Browser login requires 1–100 unique valid TeamGrid scopes.',
     )
   }
-  const sensitive = normalized.filter((scope) => sensitiveScopeSet.has(scope))
-  if (sensitive.length > 0) {
-    return invalid(
-      'browser_sensitive_scopes_unavailable',
-      `Browser login cannot request sensitive scopes yet (${sensitive.join(', ')}). ` +
-        'Create a narrowly scoped personal credential in the TeamGrid Developer Center and use ' +
-        "'teamgrid auth login --manual' instead.",
-    )
-  }
   return normalized
 }
 
@@ -742,6 +733,11 @@ export async function loginWithSystemBrowser(
       state,
     })
     options.writeStatus(`Pairing phrase: ${pairing}`)
+    if (scopes.some((scope) => sensitiveScopeSet.has(scope))) {
+      options.writeStatus(
+        'These permissions require confirmation with your TeamGrid passkey in the browser.',
+      )
+    }
     if (options.noBrowser) {
       options.writeStatus(`Open this URL in your browser:\n${authorizationUrl}`)
     } else {

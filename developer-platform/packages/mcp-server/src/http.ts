@@ -4,12 +4,26 @@ import type { TeamGridClient } from '@teamgrid/api-client'
 import { z } from 'zod'
 import { domainWriteTools } from './domainTools.js'
 import { createTeamGridMcpServer } from './server.js'
-import { enabledMcpTools, type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
-import { toolScopes } from './toolScopes.js'
+import { type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
 import { workWriteTools } from './workTools.js'
 
+/** Safe transport signal: keep the provider's wait time without prompting another login. */
+export class McpRateLimitError extends Error {
+  readonly retryAfter: string
+
+  constructor(value: string | null = null) {
+    super('MCP request quota exceeded.')
+    this.retryAfter =
+      value &&
+      value.length <= 128 &&
+      (/^\d+$/.test(value) || /^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/.test(value))
+        ? value
+        : '60'
+  }
+}
+
 const identifier = z.string().min(1).max(128)
-const authorizationSchema = z
+export const authorizationSchema = z
   .object({
     active: z.literal(true),
     audience: z.string().url(),
@@ -172,7 +186,7 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
     if (!(await withinSignal(options.admitRequest(request), request.signal)))
       return new Response(null, {
         status: 429,
-        headers: { 'Retry-After': '30', 'Cache-Control': 'no-store' },
+        headers: { 'Retry-After': '60', 'Cache-Control': 'no-store' },
       })
     if (request.method === 'OPTIONS') return new Response(null, { status: 204 })
     if (url.pathname === metadataUrl.pathname) {
@@ -180,15 +194,8 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
       return Response.json({
         resource: resource.href,
         authorization_servers: [issuer.href],
-        scopes_supported: [
-          ...new Set(
-            enabledMcpTools(profile, {
-              ...(!options.writesEnabled?.()
-                ? { denyTools: [...workWriteTools, ...domainWriteTools] }
-                : {}),
-            }).flatMap((name) => toolScopes[name]),
-          ),
-        ].sort(),
+        // Initial consent stays minimal; tool challenges request additional scopes when needed.
+        scopes_supported: ['workspace:read'],
         bearer_methods_supported: ['header'],
       })
     }
@@ -252,8 +259,17 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
         result = await requestSignals.run(signal, () =>
           withinSignal(dispatch(new Request(request, { signal })), signal),
         )
-      } catch {
-        result = response(503, signal.aborted ? 'request_interrupted' : 'temporarily_unavailable')
+      } catch (error) {
+        result =
+          error instanceof McpRateLimitError && !signal.aborted
+            ? Response.json(
+                { error: 'rate_limited' },
+                {
+                  status: 429,
+                  headers: { 'Retry-After': error.retryAfter },
+                },
+              )
+            : response(503, signal.aborted ? 'request_interrupted' : 'temporarily_unavailable')
       } finally {
         clearTimeout(timer)
       }
@@ -271,7 +287,7 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
         )
         headers.set(
           'Access-Control-Expose-Headers',
-          'WWW-Authenticate, Retry-After, MCP-Protocol-Version',
+          'WWW-Authenticate, Retry-After, MCP-Protocol-Version, X-Request-Id',
         )
       }
       return new Response(result.body, { status: result.status, headers })

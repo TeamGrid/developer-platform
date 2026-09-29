@@ -1,5 +1,6 @@
 import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
 import { describe, expect, it, vi } from 'vitest'
+import { responseFixture } from './fixtures.testSupport.js'
 import { createTeamGridMcpHttpHandler, type McpAuthorization, type McpHttpOptions } from './http.js'
 
 const resourceUrl = 'https://mcp.de.example.test/mcp'
@@ -23,10 +24,7 @@ function setup(overrides: Partial<McpHttpOptions> = {}) {
     async (authorization: McpAuthorization) =>
       ({
         workspace: {
-          get: async () => ({
-            data: { id: authorization.workspaceId, type: 'workspace' },
-            meta: {},
-          }),
+          get: async () => responseFixture('getWorkspace', authorization.workspaceId),
         },
         tasks: { create: vi.fn(async () => ({ data: { id: 'task-1' }, meta: {} })) },
       }) as never,
@@ -98,7 +96,7 @@ describe('regional HTTP MCP authorization boundary', () => {
         new Request('https://mcp.de.example.test/.well-known/oauth-protected-resource/mcp'),
       )
       const discovery = (await metadata.json()) as { scopes_supported: string[] }
-      expect(discovery.scopes_supported.some((scope) => /:write|:run/.test(scope))).toBe(false)
+      expect(discovery.scopes_supported).toEqual(['workspace:read'])
       expect(discovery).toMatchObject({
         resource: resourceUrl,
         authorization_servers: [issuerUrl],
@@ -356,8 +354,8 @@ describe('regional HTTP MCP authorization boundary', () => {
           ),
         )
         expect(responses.map((r) => r.structuredContent)).toEqual([
-          { data: { id: 'workspace-a', type: 'workspace' }, meta: {} },
-          { data: { id: 'workspace-b', type: 'workspace' }, meta: {} },
+          responseFixture('getWorkspace', 'workspace-a'),
+          responseFixture('getWorkspace', 'workspace-b'),
         ])
         const tools = await clients[0]?.client.listTools()
         expect(tools?.tools).toHaveLength(readCount)

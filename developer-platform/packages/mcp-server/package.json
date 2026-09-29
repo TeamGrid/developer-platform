@@ -1,6 +1,6 @@
 {
   "name": "@teamgrid/mcp-server",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "TeamGrid MCP adapter with read-only defaults and explicit domain write profiles",
   "license": "MIT",
   "repository": {
@@ -24,7 +24,8 @@
     "COVERAGE.md"
   ],
   "bin": {
-    "teamgrid-mcp": "dist/bin.js"
+    "teamgrid-mcp": "dist/bin.js",
+    "teamgrid-mcp-http": "dist/httpBin.js"
   },
   "exports": {
     ".": {
@@ -34,7 +35,7 @@
   },
   "scripts": {
     "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
-    "postbuild": "node -e \"const fs=require('node:fs'); fs.chmodSync('dist/bin.js', 0o755); const file='dist/generated/domainCatalog.json'; fs.writeFileSync(file, JSON.stringify(JSON.parse(fs.readFileSync(file, 'utf8'))))\"",
+    "postbuild": "node -e \"const fs=require('node:fs'); fs.chmodSync('dist/bin.js', 0o755); fs.chmodSync('dist/httpBin.js', 0o755); for (const name of ['domainCatalog','outputDefinitions']) { const file='dist/generated/'+name+'.json'; fs.writeFileSync(file, JSON.stringify(JSON.parse(fs.readFileSync(file, 'utf8')))); }\"",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "engines": {
@@ -42,8 +43,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.2.0",
-    "@teamgrid/api-client": "1.2.1",
-    "@teamgrid/cli": "1.2.1",
+    "@teamgrid/api-client": "1.2.2",
+    "@teamgrid/cli": "1.2.2",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
     "zod": "4.4.3"

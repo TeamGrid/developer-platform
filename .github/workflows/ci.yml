@@ -71,3 +71,39 @@ jobs:
       - name: Audit production dependencies
         if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         run: npm audit --omit=dev --audit-level=high
+
+  hosted-image:
+    name: Verify hosted MCP image
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Build the immutable hosted runtime
+        env:
+          SOURCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          docker build --file developer-platform/hosting/Dockerfile \
+            --build-arg SOURCE_REVISION="$SOURCE_REVISION" \
+            --tag "ghcr.io/teamgrid/teamgrid-mcp:$SOURCE_REVISION" .
+      - name: Exercise the image with disabled synthetic configuration
+        env:
+          SOURCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: bash developer-platform/hosting/smoke-image.sh "ghcr.io/teamgrid/teamgrid-mcp:$SOURCE_REVISION"
+      - name: Publish only the verified protected-main image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY_USER: ${{ github.actor }}
+          SOURCE_REVISION: ${{ github.sha }}
+        run: |
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$REGISTRY_USER" --password-stdin
+          docker push "ghcr.io/teamgrid/teamgrid-mcp:$SOURCE_REVISION"
+          docker logout ghcr.io

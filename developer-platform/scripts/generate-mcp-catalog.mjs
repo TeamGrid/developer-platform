@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
+import { mcpOutputSchema } from './mcp-output-schema.mjs'
 
 const root = new URL('../', import.meta.url)
 const read = async (path) => JSON.parse(await readFile(new URL(path, root), 'utf8'))
@@ -34,6 +35,7 @@ function resolve(value, stack = []) {
     .map(([key, item]) => [key, resolve(item, stack)]))
 }
 const catalog = {}
+const sharedOutputDefinitions = {}
 const dispatch = []
 for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')) {
   cyclicRefs = new Set()
@@ -119,11 +121,17 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
   if (write && (entry.sdk.startsWith('automation') || entry.sdk.startsWith('taskRecurrence'))) description += ' Changes can affect future automated actions; inspect the definition and schedule first.'
   if (write && (entry.mcp.domain === 'admin-write' || entry.operationId === 'replaceProjectSharing')) description += ' Administrative action: review the exact target and access impact with the user.'
   if (operation.responses?.['202']) description += ' Acceptance is not completion. Use the corresponding operation-get tool to inspect the returned operation until terminal.'
+  const { $defs: outputDefinitions, ...outputSchema } = mcpOutputSchema(api, operation)
+  for (const [name, schema] of Object.entries(outputDefinitions || {})) {
+    if (sharedOutputDefinitions[name] && JSON.stringify(sharedOutputDefinitions[name]) !== JSON.stringify(schema))
+      throw Error(`Conflicting output definition ${name}`)
+    sharedOutputDefinitions[name] = schema
+  }
   catalog[entry.mcp.tool] = {
     operationId: entry.operationId, sdk: entry.sdk, method: entry.method, path: entry.path,
     domain: entry.mcp.domain, write, concurrency, idempotency: idempotent,
     coreCas: operation['x-teamgrid-resource-cas'] === 'resource-cas-v1' || entry.operationId === 'bulkUpdateTasks',
-    description, inputSchema: shape,
+    description, inputSchema: shape, outputSchema,
     annotations: { readOnlyHint: !write, destructiveHint: write && !/^create/.test(entry.operationId),
       idempotentHint: !write || idempotent || Boolean(ifMatch),
       openWorldHint: entry.sdk.startsWith('webhooks.') || entry.sdk.startsWith('automation') || entry.sdk.startsWith('invitations.') },
@@ -146,6 +154,7 @@ const coverage = [
   ...excluded.map((entry) => `| \`${entry.operationId}\` | ${entry.mcp.reason} |`), '',
 ].join('\n')
 for (const [path, content] of [
+  ['packages/mcp-server/src/generated/outputDefinitions.json', `${JSON.stringify(sharedOutputDefinitions, null, 2)}\n`],
   ['packages/mcp-server/src/generated/domainCatalog.json', `${JSON.stringify(catalog, null, 2)}\n`],
   ['packages/mcp-server/src/generated/domainDispatch.ts', source],
   ['packages/mcp-server/COVERAGE.md', coverage],

@@ -42,6 +42,7 @@ import {
   maximumCliExportBytes,
   writeExportDownload,
 } from './exportDownload.js'
+import { downloadPrivateFile } from './fileTransfer.js'
 import { readJsonObject, readStdin } from './input.js'
 import { type OutputMode, sanitizeTerminalText, writeJsonLines, writeOutput } from './output.js'
 import { revealWebhookSecret } from './webhookSecretOutput.js'
@@ -70,7 +71,6 @@ type CliClient = TeamGridClient
 
 const localUsageErrorCodes = new Set([
   'authentication_required',
-  'browser_sensitive_scopes_unavailable',
   'confirmation_required',
   'credential_expired',
   'input_too_large',
@@ -3362,6 +3362,26 @@ export function createProgram(dependencies: ProgramDependencies = {}) {
         command,
         (await client.files.restore(id, { ifMatch: options.ifMatch as never })).data,
       )
+    })
+  files
+    .command('download <id>')
+    .requiredOption('--file <path>', 'create a private output file without overwriting')
+    .option(
+      '--max-bytes <number>',
+      'download safety limit, maximum 50 MiB',
+      integerInRange(1, maximumCliExportBytes, 'Maximum file bytes'),
+      maximumCliExportBytes,
+    )
+    .action(async function action(id: string, options, command: Command) {
+      const client = await loadClient(command)
+      const download = await downloadPrivateFile(client, id, { maxBytes: options.maxBytes })
+      const written = await writeExportDownload({
+        download,
+        file: options.file,
+        maximumBytes: options.maxBytes,
+        output: output as Writable & { isTTY?: boolean },
+      })
+      outputData(command, written)
     })
   files.command('download-intent <id>').action(async function action(
     id: string,

@@ -3,8 +3,11 @@ import { type TeamGridClient, TeamGridClientError } from '@teamgrid/api-client'
 import { Ajv2020 } from 'ajv/dist/2020.js'
 import { fullFormats } from 'ajv-formats/dist/formats.js'
 import { projectDocumentContent } from './documentContent.js'
+import { maximumMcpResourceBytes, privateResourceUri } from './fileResources.js'
 import generatedCatalog from './generated/domainCatalog.json' with { type: 'json' }
 import { type DomainToolName, domainDispatch, domainToolNames } from './generated/domainDispatch.js'
+import generatedOutputDefinitions from './generated/outputDefinitions.json' with { type: 'json' }
+import { operationOutcome } from './outcomes.js'
 import type { RegisterTeamGridTool } from './registration.js'
 import { boundedSearchMetadata } from './searchCompleteness.js'
 
@@ -25,6 +28,7 @@ type DomainDefinition = {
     required: string[]
     [key: string]: unknown
   }
+  outputSchema: Record<string, unknown>
   annotations: {
     readOnlyHint: boolean
     destructiveHint: boolean
@@ -147,6 +151,63 @@ export function domainInputSchema(
   return result
 }
 
+const outputSchemas = new Map<string, StandardSchemaWithJSON<Record<string, unknown>>>()
+export function domainOutputSchema(
+  name: DomainToolName,
+  legacyReadProjection = false,
+): StandardSchemaWithJSON<Record<string, unknown>> {
+  const cacheKey = `${name}:${legacyReadProjection}`
+  const cached = outputSchemas.get(cacheKey)
+  if (cached) return cached
+  const definitions: Record<string, unknown> = {}
+  const shared = generatedOutputDefinitions as Record<string, unknown>
+  function collect(value: unknown): void {
+    if (!value || typeof value !== 'object') return
+    if ('$ref' in value && typeof value.$ref === 'string') {
+      const key = value.$ref.replace('#/$defs/', '')
+      if (!(key in shared)) throw new Error('Unknown output definition.')
+      if (!(key in definitions)) {
+        definitions[key] = shared[key]
+        collect(shared[key])
+      }
+    }
+    for (const child of Object.values(value)) collect(child)
+  }
+  collect(catalog[name].outputSchema)
+  if (legacyReadProjection) {
+    for (const [name, fields] of Object.entries({
+      Product: ['purchasePrice'],
+      TimeEntry: ['billable', 'billed', 'billedAt'],
+    })) {
+      if (!definitions[name]) continue
+      const definition = structuredClone(definitions[name]) as {
+        properties: { attributes: { properties: Record<string, unknown>; required?: string[] } }
+      }
+      const attrs = definition.properties.attributes
+      for (const field of fields) delete attrs.properties[field]
+      if (attrs.required) attrs.required = attrs.required.filter((field) => !fields.includes(field))
+      definitions[name] = definition
+    }
+  }
+  const schema = { ...catalog[name].outputSchema, $defs: definitions }
+  const validate = ajv.compile(schema)
+  const result: StandardSchemaWithJSON<Record<string, unknown>> = {
+    '~standard': {
+      version: 1,
+      vendor: 'teamgrid-reviewed-openapi',
+      jsonSchema: { input: () => schema, output: () => schema },
+      validate: (value) =>
+        validate(value)
+          ? { value: value as Record<string, unknown> }
+          : {
+              issues: [{ message: 'The API result does not match the operation output contract.' }],
+            },
+    },
+  }
+  outputSchemas.set(cacheKey, result)
+  return result
+}
+
 export async function executeDomainTool(
   client: TeamGridClient,
   name: DomainToolName,
@@ -195,6 +256,23 @@ export async function executeDomainTool(
       meta: {
         ...(response.meta as Record<string, unknown>),
         ...projected.meta,
+        ...operationOutcome(response.data, operation.write),
+        ...((operation.sdk === 'files.get' || operation.sdk === 'exports.get') &&
+        response.data &&
+        typeof response.data === 'object' &&
+        'id' in response.data &&
+        typeof response.data.id === 'string'
+          ? {
+              privateResource: {
+                uri: privateResourceUri(
+                  operation.sdk === 'files.get' ? 'files' : 'exports',
+                  response.data.id,
+                ),
+                maxBytes: maximumMcpResourceBytes,
+                readMethod: 'resources/read',
+              },
+            }
+          : {}),
         ...(operation.sdk === 'search.query'
           ? {
               search: boundedSearchMetadata(
@@ -224,7 +302,7 @@ export async function executeDomainTool(
       type: 'operationResult',
       attributes: { completed: true, operation: operation.operationId },
     },
-    meta: {},
+    meta: { outcome: 'completed' },
   }
 }
 

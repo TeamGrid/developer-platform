@@ -9294,16 +9294,30 @@ export interface operations {
                      *       "data": {
                      *         "contractVersion": "1.2.0",
                      *         "deprecations": [
-                     *           {}
+                     *           {
+                     *             "id": "exampleId",
+                     *             "message": "example",
+                     *             "replacement": null,
+                     *             "sunsetAt": null
+                     *           }
                      *         ],
                      *         "documentation": "https://example.com/teamgrid",
-                     *         "manifestSha256": "example",
-                     *         "region": "example",
+                     *         "manifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *         "region": null,
                      *         "status": "operational",
                      *         "supportedClients": {
-                     *           "cli": {},
-                     *           "mcp": {},
-                     *           "sdk": {}
+                     *           "cli": {
+                     *             "minimumVersion": "1.0.0",
+                     *             "supportedMajor": 1
+                     *           },
+                     *           "mcp": {
+                     *             "minimumVersion": "1.0.0",
+                     *             "supportedMajor": 1
+                     *           },
+                     *           "sdk": {
+                     *             "minimumVersion": "1.0.0",
+                     *             "supportedMajor": 1
+                     *           }
                      *         },
                      *         "version": "1"
                      *       },
@@ -9330,11 +9344,11 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "authorizationCode": "example",
+                 *       "authorizationCode": "exampleaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                  *       "clientId": "teamgrid-cli",
-                 *       "codeVerifier": "example",
+                 *       "codeVerifier": "exampleaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                  *       "grantType": "authorization_code",
-                 *       "redirectUri": "example"
+                 *       "redirectUri": "http://127.0.0.1:54321/teamgrid/callback/aaaaaaaaaaaaaaaaaaaaaa"
                  *     }
                  */
                 "application/json": {
@@ -9363,8 +9377,8 @@ export interface operations {
                      *         "attributes": {
                      *           "accessToken": "example",
                      *           "cellId": "exampleId",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "grantId": "exampleId",
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "grantId": "exampleIdaaaaaaaaaaaaa",
                      *           "region": "example",
                      *           "replayed": false,
                      *           "scopes": [
@@ -9372,7 +9386,7 @@ export interface operations {
                      *           ],
                      *           "tokenType": "Bearer"
                      *         },
-                     *         "id": "exampleId",
+                     *         "id": "aaaaaaaaaaaaaaaaaaaaaaaa",
                      *         "type": "cliAuthorization"
                      *       },
                      *       "meta": {
@@ -9421,7 +9435,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "grantId": "exampleId"
+                 *       "grantId": "exampleIdaaaaaaa"
                  *     }
                  */
                 "application/json": {
@@ -9466,16 +9480,21 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "workspace",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "cellId": "exampleId",
-                     *           "context": {},
-                     *           "currency": "EUR",
-                     *           "name": "Example",
+                     *           "context": {
+                     *             "identityKind": "personal",
+                     *             "subjectUserId": null,
+                     *             "timeZone": null,
+                     *             "timeZoneSource": "user-profile"
+                     *           },
+                     *           "currency": null,
+                     *           "name": "example",
                      *           "region": "example",
-                     *           "subdomain": "example"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "workspace"
+                     *           "subdomain": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -9528,15 +9547,37 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "appointment",
                      *           "id": "exampleId",
-                     *           "type": "appointment"
+                     *           "attributes": {
+                     *             "allDay": false,
+                     *             "archived": false,
+                     *             "busy": false,
+                     *             "createdAt": null,
+                     *             "description": null,
+                     *             "end": {
+                     *               "at": "2026-10-01T09:00:00Z",
+                     *               "timeZone": null
+                     *             },
+                     *             "location": null,
+                     *             "managedBy": "provider",
+                     *             "redacted": false,
+                     *             "revision": "ap1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "start": {
+                     *               "at": "2026-10-01T09:00:00Z",
+                     *               "timeZone": null
+                     *             },
+                     *             "title": null,
+                     *             "updatedAt": null,
+                     *             "userId": "exampleId",
+                     *             "visibility": "default"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -9578,16 +9619,11 @@ export interface operations {
                 /**
                  * @example {
                  *       "end": {
-                 *         "at": "2026-07-29T10:00:00Z",
-                 *         "timeZone": "Europe/Berlin"
+                 *         "at": "2026-10-01T09:00:00Z"
                  *       },
                  *       "start": {
-                 *         "at": "2026-07-29T10:00:00Z",
-                 *         "timeZone": "Europe/Berlin"
-                 *       },
-                 *       "allDay": false,
-                 *       "busy": false,
-                 *       "description": "Example generated from the documented schema."
+                 *         "at": "2026-10-01T09:00:00Z"
+                 *       }
                  *     }
                  */
                 "application/json": components["schemas"]["AppointmentCreate"];
@@ -9606,25 +9642,31 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "appointment",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "allDay": false,
                      *           "archived": false,
                      *           "busy": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "end": {},
-                     *           "location": "example",
+                     *           "createdAt": null,
+                     *           "description": null,
+                     *           "end": {
+                     *             "at": "2026-10-01T09:00:00Z",
+                     *             "timeZone": null
+                     *           },
+                     *           "location": null,
                      *           "managedBy": "provider",
                      *           "redacted": false,
-                     *           "revision": "\"example-revision\"",
-                     *           "start": {},
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "ap1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "start": {
+                     *             "at": "2026-10-01T09:00:00Z",
+                     *             "timeZone": null
+                     *           },
+                     *           "title": null,
+                     *           "updatedAt": null,
                      *           "userId": "exampleId",
                      *           "visibility": "default"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "appointment"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -9669,25 +9711,31 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "appointment",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "allDay": false,
                      *           "archived": false,
                      *           "busy": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "end": {},
-                     *           "location": "example",
+                     *           "createdAt": null,
+                     *           "description": null,
+                     *           "end": {
+                     *             "at": "2026-10-01T09:00:00Z",
+                     *             "timeZone": null
+                     *           },
+                     *           "location": null,
                      *           "managedBy": "provider",
                      *           "redacted": false,
-                     *           "revision": "\"example-revision\"",
-                     *           "start": {},
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "ap1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "start": {
+                     *             "at": "2026-10-01T09:00:00Z",
+                     *             "timeZone": null
+                     *           },
+                     *           "title": null,
+                     *           "updatedAt": null,
                      *           "userId": "exampleId",
                      *           "visibility": "default"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "appointment"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -9737,25 +9785,31 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "appointment",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "allDay": false,
                      *           "archived": false,
                      *           "busy": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "end": {},
-                     *           "location": "example",
+                     *           "createdAt": null,
+                     *           "description": null,
+                     *           "end": {
+                     *             "at": "2026-10-01T09:00:00Z",
+                     *             "timeZone": null
+                     *           },
+                     *           "location": null,
                      *           "managedBy": "provider",
                      *           "redacted": false,
-                     *           "revision": "\"example-revision\"",
-                     *           "start": {},
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "ap1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "start": {
+                     *             "at": "2026-10-01T09:00:00Z",
+                     *             "timeZone": null
+                     *           },
+                     *           "title": null,
+                     *           "updatedAt": null,
                      *           "userId": "exampleId",
                      *           "visibility": "default"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "appointment"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -9798,9 +9852,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "allDay": false,
-                 *       "busy": false,
-                 *       "description": "Example generated from the documented schema."
+                 *       "allDay": false
                  *     }
                  */
                 "application/json": components["schemas"]["AppointmentUpdate"];
@@ -9818,25 +9870,31 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "appointment",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "allDay": false,
                      *           "archived": false,
                      *           "busy": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "end": {},
-                     *           "location": "example",
+                     *           "createdAt": null,
+                     *           "description": null,
+                     *           "end": {
+                     *             "at": "2026-10-01T09:00:00Z",
+                     *             "timeZone": null
+                     *           },
+                     *           "location": null,
                      *           "managedBy": "provider",
                      *           "redacted": false,
-                     *           "revision": "\"example-revision\"",
-                     *           "start": {},
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "ap1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "start": {
+                     *             "at": "2026-10-01T09:00:00Z",
+                     *             "timeZone": null
+                     *           },
+                     *           "title": null,
+                     *           "updatedAt": null,
                      *           "userId": "exampleId",
                      *           "visibility": "default"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "appointment"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -9889,25 +9947,31 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "appointment",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "allDay": false,
                      *           "archived": false,
                      *           "busy": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "end": {},
-                     *           "location": "example",
+                     *           "createdAt": null,
+                     *           "description": null,
+                     *           "end": {
+                     *             "at": "2026-10-01T09:00:00Z",
+                     *             "timeZone": null
+                     *           },
+                     *           "location": null,
                      *           "managedBy": "provider",
                      *           "redacted": false,
-                     *           "revision": "\"example-revision\"",
-                     *           "start": {},
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "revision": "ap1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "start": {
+                     *             "at": "2026-10-01T09:00:00Z",
+                     *             "timeZone": null
+                     *           },
+                     *           "title": null,
+                     *           "updatedAt": null,
                      *           "userId": "exampleId",
                      *           "visibility": "default"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "appointment"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -9964,15 +10028,24 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "absence",
                      *           "id": "exampleId",
-                     *           "type": "absence"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "archivedAt": null,
+                     *             "createdAt": null,
+                     *             "end": "2026-10-01T09:00:00Z",
+                     *             "reason": null,
+                     *             "revision": "ab1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "start": "2026-10-01T09:00:00Z",
+                     *             "userId": "exampleId"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -10013,10 +10086,8 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "end": "2026-07-29T10:00:00Z",
-                 *       "start": "2026-07-29T10:00:00Z",
-                 *       "reason": "example",
-                 *       "userId": "exampleId"
+                 *       "end": "2026-10-01T09:00:00Z",
+                 *       "start": "2026-10-01T09:00:00Z"
                  *     }
                  */
                 "application/json": components["schemas"]["AbsenceCreate"];
@@ -10035,18 +10106,18 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "absence",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "end": "2026-07-29T10:00:00Z",
-                     *           "reason": "example",
-                     *           "revision": "\"example-revision\"",
-                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "archivedAt": null,
+                     *           "createdAt": null,
+                     *           "end": "2026-10-01T09:00:00Z",
+                     *           "reason": null,
+                     *           "revision": "ab1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "start": "2026-10-01T09:00:00Z",
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "absence"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10091,18 +10162,18 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "absence",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "end": "2026-07-29T10:00:00Z",
-                     *           "reason": "example",
-                     *           "revision": "\"example-revision\"",
-                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "archivedAt": null,
+                     *           "createdAt": null,
+                     *           "end": "2026-10-01T09:00:00Z",
+                     *           "reason": null,
+                     *           "revision": "ab1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "start": "2026-10-01T09:00:00Z",
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "absence"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10152,18 +10223,18 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "absence",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "end": "2026-07-29T10:00:00Z",
-                     *           "reason": "example",
-                     *           "revision": "\"example-revision\"",
-                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "archivedAt": null,
+                     *           "createdAt": null,
+                     *           "end": "2026-10-01T09:00:00Z",
+                     *           "reason": null,
+                     *           "revision": "ab1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "start": "2026-10-01T09:00:00Z",
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "absence"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10206,9 +10277,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "end": "2026-07-29T10:00:00Z",
-                 *       "reason": "example",
-                 *       "start": "2026-07-29T10:00:00Z"
+                 *       "end": "2026-10-01T09:00:00Z"
                  *     }
                  */
                 "application/json": components["schemas"]["AbsenceUpdate"];
@@ -10226,18 +10295,18 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "absence",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "end": "2026-07-29T10:00:00Z",
-                     *           "reason": "example",
-                     *           "revision": "\"example-revision\"",
-                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "archivedAt": null,
+                     *           "createdAt": null,
+                     *           "end": "2026-10-01T09:00:00Z",
+                     *           "reason": null,
+                     *           "revision": "ab1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "start": "2026-10-01T09:00:00Z",
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "absence"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10290,18 +10359,18 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "absence",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "end": "2026-07-29T10:00:00Z",
-                     *           "reason": "example",
-                     *           "revision": "\"example-revision\"",
-                     *           "start": "2026-07-29T10:00:00Z",
+                     *           "archivedAt": null,
+                     *           "createdAt": null,
+                     *           "end": "2026-10-01T09:00:00Z",
+                     *           "reason": null,
+                     *           "revision": "ab1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "start": "2026-10-01T09:00:00Z",
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "absence"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10353,14 +10422,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "end": "2026-07-29T10:00:00Z",
-                     *           "start": "2026-07-29T10:00:00Z",
-                     *           "timeZone": "Europe/Berlin",
-                     *           "users": []
-                     *         },
+                     *         "type": "availability",
                      *         "id": "exampleId",
-                     *         "type": "availability"
+                     *         "attributes": {
+                     *           "end": "2026-10-01T09:00:00Z",
+                     *           "start": "2026-10-01T09:00:00Z",
+                     *           "timeZone": "Europe/Berlin",
+                     *           "users": [
+                     *             {
+                     *               "intervals": [
+                     *                 {
+                     *                   "end": "2026-10-01T09:00:00Z",
+                     *                   "start": "2026-10-01T09:00:00Z"
+                     *                 }
+                     *               ],
+                     *               "userId": "exampleId"
+                     *             }
+                     *           ]
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10418,15 +10497,23 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "activityEvent",
                      *           "id": "exampleId",
-                     *           "type": "activityEvent"
+                     *           "attributes": {
+                     *             "actorId": null,
+                     *             "eventType": "example",
+                     *             "occurredAt": "2026-10-01T09:00:00Z",
+                     *             "target": {
+                     *               "id": "exampleId",
+                     *               "type": "contact"
+                     *             }
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -10482,15 +10569,26 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "comment",
                      *           "id": "exampleId",
-                     *           "type": "comment"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "authorId": null,
+                     *             "createdAt": "2026-10-01T09:00:00Z",
+                     *             "revision": "cmt1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "target": {
+                     *               "id": "exampleId",
+                     *               "type": "contact"
+                     *             },
+                     *             "text": "example",
+                     *             "updatedAt": "2026-10-01T09:00:00Z"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -10552,17 +10650,20 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "comment",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "authorId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "revision": "\"example-revision\"",
-                     *           "target": {},
+                     *           "authorId": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "revision": "cmt1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "target": {
+                     *             "id": "exampleId",
+                     *             "type": "contact"
+                     *           },
                      *           "text": "example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "comment"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10607,17 +10708,20 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "comment",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "authorId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "revision": "\"example-revision\"",
-                     *           "target": {},
+                     *           "authorId": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "revision": "cmt1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "target": {
+                     *             "id": "exampleId",
+                     *             "type": "contact"
+                     *           },
                      *           "text": "example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "comment"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10667,17 +10771,20 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "comment",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "authorId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "revision": "\"example-revision\"",
-                     *           "target": {},
+                     *           "authorId": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "revision": "cmt1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "target": {
+                     *             "id": "exampleId",
+                     *             "type": "contact"
+                     *           },
                      *           "text": "example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "comment"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10740,17 +10847,20 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "comment",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "authorId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "revision": "\"example-revision\"",
-                     *           "target": {},
+                     *           "authorId": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "revision": "cmt1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "target": {
+                     *             "id": "exampleId",
+                     *             "type": "contact"
+                     *           },
                      *           "text": "example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "comment"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10803,17 +10913,20 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "comment",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "authorId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "revision": "\"example-revision\"",
-                     *           "target": {},
+                     *           "authorId": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "revision": "cmt1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "target": {
+                     *             "id": "exampleId",
+                     *             "type": "contact"
+                     *           },
                      *           "text": "example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "comment"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -10864,7 +10977,14 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "createdAt": null,
+                     *             "createdBy": null,
+                     *             "name": "example",
+                     *             "updatedAt": null,
+                     *             "updatedBy": null
+                     *           },
                      *           "id": "exampleId",
                      *           "type": "document"
                      *         }
@@ -10872,7 +10992,7 @@ export interface operations {
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -10914,7 +11034,7 @@ export interface operations {
                 /**
                  * @example {
                  *       "content": "example",
-                 *       "name": "Example"
+                 *       "name": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["DocumentCreate"];
@@ -10935,12 +11055,11 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdBy": "example",
-                     *           "name": "Example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedBy": "example",
-                     *           "content": "example"
+                     *           "createdAt": null,
+                     *           "createdBy": null,
+                     *           "name": "example",
+                     *           "updatedAt": null,
+                     *           "updatedBy": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "document"
@@ -10990,12 +11109,11 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdBy": "example",
-                     *           "name": "Example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedBy": "example",
-                     *           "content": "example"
+                     *           "createdAt": null,
+                     *           "createdBy": null,
+                     *           "name": "example",
+                     *           "updatedAt": null,
+                     *           "updatedBy": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "document"
@@ -11059,12 +11177,11 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdBy": "example",
-                     *           "name": "Example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedBy": "example",
-                     *           "content": "example"
+                     *           "createdAt": null,
+                     *           "createdBy": null,
+                     *           "name": "example",
+                     *           "updatedAt": null,
+                     *           "updatedBy": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "document"
@@ -11110,8 +11227,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "content": "example",
-                 *       "name": "Example"
+                 *       "content": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["DocumentUpdate"];
@@ -11131,12 +11247,11 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdBy": "example",
-                     *           "name": "Example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedBy": "example",
-                     *           "content": "example"
+                     *           "createdAt": null,
+                     *           "createdBy": null,
+                     *           "name": "example",
+                     *           "updatedAt": null,
+                     *           "updatedBy": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "document"
@@ -11194,12 +11309,11 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdBy": "example",
-                     *           "name": "Example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedBy": "example",
-                     *           "content": "example"
+                     *           "createdAt": null,
+                     *           "createdBy": null,
+                     *           "name": "example",
+                     *           "updatedAt": null,
+                     *           "updatedBy": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "document"
@@ -11257,15 +11371,38 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "file",
                      *           "id": "exampleId",
-                     *           "type": "file"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "blocked": false,
+                     *             "contentRevision": null,
+                     *             "createdAt": null,
+                     *             "createdBy": null,
+                     *             "downloadAvailable": false,
+                     *             "links": [
+                     *               {
+                     *                 "entityId": "exampleId",
+                     *                 "entityType": "comment",
+                     *                 "linkType": "attachment"
+                     *               }
+                     *             ],
+                     *             "metadataRevision": null,
+                     *             "mimeType": "example",
+                     *             "name": "example",
+                     *             "previewStatus": "example",
+                     *             "size": 0,
+                     *             "space": "contacts",
+                     *             "syncRevision": null,
+                     *             "updatedAt": null,
+                     *             "updatedBy": null
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -11317,26 +11454,32 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "file",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
                      *           "blocked": false,
-                     *           "contentRevision": 1,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdBy": "example",
+                     *           "contentRevision": null,
+                     *           "createdAt": null,
+                     *           "createdBy": null,
                      *           "downloadAvailable": false,
-                     *           "links": [],
-                     *           "metadataRevision": 1,
+                     *           "links": [
+                     *             {
+                     *               "entityId": "exampleId",
+                     *               "entityType": "comment",
+                     *               "linkType": "attachment"
+                     *             }
+                     *           ],
+                     *           "metadataRevision": null,
                      *           "mimeType": "example",
-                     *           "name": "Example",
+                     *           "name": "example",
                      *           "previewStatus": "example",
                      *           "size": 0,
                      *           "space": "contacts",
-                     *           "syncRevision": 1,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedBy": "example"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "file"
+                     *           "syncRevision": null,
+                     *           "updatedAt": null,
+                     *           "updatedBy": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -11386,26 +11529,32 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "file",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
                      *           "blocked": false,
-                     *           "contentRevision": 1,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdBy": "example",
+                     *           "contentRevision": null,
+                     *           "createdAt": null,
+                     *           "createdBy": null,
                      *           "downloadAvailable": false,
-                     *           "links": [],
-                     *           "metadataRevision": 1,
+                     *           "links": [
+                     *             {
+                     *               "entityId": "exampleId",
+                     *               "entityType": "comment",
+                     *               "linkType": "attachment"
+                     *             }
+                     *           ],
+                     *           "metadataRevision": null,
                      *           "mimeType": "example",
-                     *           "name": "Example",
+                     *           "name": "example",
                      *           "previewStatus": "example",
                      *           "size": 0,
                      *           "space": "contacts",
-                     *           "syncRevision": 1,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedBy": "example"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "file"
+                     *           "syncRevision": null,
+                     *           "updatedAt": null,
+                     *           "updatedBy": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -11448,7 +11597,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example"
+                 *       "name": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["FileRename"];
@@ -11466,26 +11615,32 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "file",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
                      *           "blocked": false,
-                     *           "contentRevision": 1,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdBy": "example",
+                     *           "contentRevision": null,
+                     *           "createdAt": null,
+                     *           "createdBy": null,
                      *           "downloadAvailable": false,
-                     *           "links": [],
-                     *           "metadataRevision": 1,
+                     *           "links": [
+                     *             {
+                     *               "entityId": "exampleId",
+                     *               "entityType": "comment",
+                     *               "linkType": "attachment"
+                     *             }
+                     *           ],
+                     *           "metadataRevision": null,
                      *           "mimeType": "example",
-                     *           "name": "Example",
+                     *           "name": "example",
                      *           "previewStatus": "example",
                      *           "size": 0,
                      *           "space": "contacts",
-                     *           "syncRevision": 1,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedBy": "example"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "file"
+                     *           "syncRevision": null,
+                     *           "updatedAt": null,
+                     *           "updatedBy": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -11538,26 +11693,32 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "file",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
                      *           "blocked": false,
-                     *           "contentRevision": 1,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdBy": "example",
+                     *           "contentRevision": null,
+                     *           "createdAt": null,
+                     *           "createdBy": null,
                      *           "downloadAvailable": false,
-                     *           "links": [],
-                     *           "metadataRevision": 1,
+                     *           "links": [
+                     *             {
+                     *               "entityId": "exampleId",
+                     *               "entityType": "comment",
+                     *               "linkType": "attachment"
+                     *             }
+                     *           ],
+                     *           "metadataRevision": null,
                      *           "mimeType": "example",
-                     *           "name": "Example",
+                     *           "name": "example",
                      *           "previewStatus": "example",
                      *           "size": 0,
                      *           "space": "contacts",
-                     *           "syncRevision": 1,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedBy": "example"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "file"
+                     *           "syncRevision": null,
+                     *           "updatedAt": null,
+                     *           "updatedBy": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -11603,9 +11764,23 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "type": "fileDownloadIntent",
                      *         "id": "exampleId",
-                     *         "type": "fileDownloadIntent"
+                     *         "attributes": {
+                     *           "file": {
+                     *             "fileName": "example",
+                     *             "mimeType": "example",
+                     *             "size": 0
+                     *           },
+                     *           "transfer": {
+                     *             "expiresAt": "2026-10-01T09:00:00Z",
+                     *             "headers": {},
+                     *             "id": "exampleId",
+                     *             "maxSize": null,
+                     *             "method": "GET",
+                     *             "url": "https://example.com/teamgrid"
+                     *           }
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -11656,7 +11831,7 @@ export interface operations {
                  *         "type": "contact"
                  *       },
                  *       "file": {
-                 *         "fileName": "Example",
+                 *         "fileName": "example",
                  *         "mimeType": "example",
                  *         "size": 0
                  *       }
@@ -11676,9 +11851,23 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "type": "fileUploadIntent",
                      *         "id": "exampleId",
-                     *         "type": "fileUploadIntent"
+                     *         "attributes": {
+                     *           "file": {
+                     *             "fileName": "example",
+                     *             "mimeType": "example",
+                     *             "size": 0
+                     *           },
+                     *           "transfer": {
+                     *             "expiresAt": "2026-10-01T09:00:00Z",
+                     *             "headers": {},
+                     *             "id": "exampleId",
+                     *             "maxSize": null,
+                     *             "method": "GET",
+                     *             "url": "https://example.com/teamgrid"
+                     *           }
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -11742,26 +11931,32 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "file",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
                      *           "blocked": false,
-                     *           "contentRevision": 1,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdBy": "example",
+                     *           "contentRevision": null,
+                     *           "createdAt": null,
+                     *           "createdBy": null,
                      *           "downloadAvailable": false,
-                     *           "links": [],
-                     *           "metadataRevision": 1,
+                     *           "links": [
+                     *             {
+                     *               "entityId": "exampleId",
+                     *               "entityType": "comment",
+                     *               "linkType": "attachment"
+                     *             }
+                     *           ],
+                     *           "metadataRevision": null,
                      *           "mimeType": "example",
-                     *           "name": "Example",
+                     *           "name": "example",
                      *           "previewStatus": "example",
                      *           "size": 0,
                      *           "space": "contacts",
-                     *           "syncRevision": 1,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedBy": "example"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "file"
+                     *           "syncRevision": null,
+                     *           "updatedAt": null,
+                     *           "updatedBy": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -11815,12 +12010,12 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "fileUploadIntent",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "replayed": false,
                      *           "state": "canceled"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "fileUploadIntent"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -11873,7 +12068,28 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "attributes": {
+                     *             "amount": null,
+                     *             "annotation": "example",
+                     *             "archived": false,
+                     *             "costCenter": [
+                     *               "example"
+                     *             ],
+                     *             "createdAt": null,
+                     *             "description": "example",
+                     *             "disabled": false,
+                     *             "financeAccount": null,
+                     *             "name": "example",
+                     *             "priceGroupIds": [
+                     *               "example"
+                     *             ],
+                     *             "productGroupId": null,
+                     *             "productNumber": null,
+                     *             "retailPrice": null,
+                     *             "taxRate": null,
+                     *             "unit": null,
+                     *             "updatedAt": null
+                     *           },
                      *           "id": "exampleId",
                      *           "type": "product"
                      *         }
@@ -11881,7 +12097,7 @@ export interface operations {
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -11921,12 +12137,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
-                 *       "amount": 0,
-                 *       "annotation": "example",
-                 *       "costCenter": [
-                 *         "example"
-                 *       ]
+                 *       "name": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["ProductCreate"];
@@ -11944,23 +12155,26 @@ export interface operations {
                      * @example {
                      *       "data": {
                      *         "attributes": {
-                     *           "amount": 0,
+                     *           "amount": null,
                      *           "annotation": "example",
                      *           "archived": false,
-                     *           "costCenter": [],
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "costCenter": [
+                     *             "example"
+                     *           ],
+                     *           "createdAt": null,
+                     *           "description": "example",
                      *           "disabled": false,
-                     *           "financeAccount": "example",
-                     *           "name": "Example",
-                     *           "priceGroupIds": [],
-                     *           "productGroupId": "exampleId",
-                     *           "productNumber": "example",
-                     *           "retailPrice": 0,
-                     *           "taxRate": 0,
-                     *           "unit": "example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "purchasePrice": 0
+                     *           "financeAccount": null,
+                     *           "name": "example",
+                     *           "priceGroupIds": [
+                     *             "example"
+                     *           ],
+                     *           "productGroupId": null,
+                     *           "productNumber": null,
+                     *           "retailPrice": null,
+                     *           "taxRate": null,
+                     *           "unit": null,
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "product"
@@ -11987,23 +12201,26 @@ export interface operations {
                      * @example {
                      *       "data": {
                      *         "attributes": {
-                     *           "amount": 0,
+                     *           "amount": null,
                      *           "annotation": "example",
                      *           "archived": false,
-                     *           "costCenter": [],
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "costCenter": [
+                     *             "example"
+                     *           ],
+                     *           "createdAt": null,
+                     *           "description": "example",
                      *           "disabled": false,
-                     *           "financeAccount": "example",
-                     *           "name": "Example",
-                     *           "priceGroupIds": [],
-                     *           "productGroupId": "exampleId",
-                     *           "productNumber": "example",
-                     *           "retailPrice": 0,
-                     *           "taxRate": 0,
-                     *           "unit": "example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "purchasePrice": 0
+                     *           "financeAccount": null,
+                     *           "name": "example",
+                     *           "priceGroupIds": [
+                     *             "example"
+                     *           ],
+                     *           "productGroupId": null,
+                     *           "productNumber": null,
+                     *           "retailPrice": null,
+                     *           "taxRate": null,
+                     *           "unit": null,
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "product"
@@ -12050,23 +12267,26 @@ export interface operations {
                      * @example {
                      *       "data": {
                      *         "attributes": {
-                     *           "amount": 0,
+                     *           "amount": null,
                      *           "annotation": "example",
                      *           "archived": false,
-                     *           "costCenter": [],
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "costCenter": [
+                     *             "example"
+                     *           ],
+                     *           "createdAt": null,
+                     *           "description": "example",
                      *           "disabled": false,
-                     *           "financeAccount": "example",
-                     *           "name": "Example",
-                     *           "priceGroupIds": [],
-                     *           "productGroupId": "exampleId",
-                     *           "productNumber": "example",
-                     *           "retailPrice": 0,
-                     *           "taxRate": 0,
-                     *           "unit": "example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "purchasePrice": 0
+                     *           "financeAccount": null,
+                     *           "name": "example",
+                     *           "priceGroupIds": [
+                     *             "example"
+                     *           ],
+                     *           "productGroupId": null,
+                     *           "productNumber": null,
+                     *           "retailPrice": null,
+                     *           "taxRate": null,
+                     *           "unit": null,
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "product"
@@ -12134,11 +12354,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "amount": 0,
-                 *       "annotation": "example",
-                 *       "costCenter": [
-                 *         "example"
-                 *       ]
+                 *       "amount": null
                  *     }
                  */
                 "application/json": components["schemas"]["ProductUpdate"];
@@ -12155,23 +12371,26 @@ export interface operations {
                      * @example {
                      *       "data": {
                      *         "attributes": {
-                     *           "amount": 0,
+                     *           "amount": null,
                      *           "annotation": "example",
                      *           "archived": false,
-                     *           "costCenter": [],
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "costCenter": [
+                     *             "example"
+                     *           ],
+                     *           "createdAt": null,
+                     *           "description": "example",
                      *           "disabled": false,
-                     *           "financeAccount": "example",
-                     *           "name": "Example",
-                     *           "priceGroupIds": [],
-                     *           "productGroupId": "exampleId",
-                     *           "productNumber": "example",
-                     *           "retailPrice": 0,
-                     *           "taxRate": 0,
-                     *           "unit": "example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "purchasePrice": 0
+                     *           "financeAccount": null,
+                     *           "name": "example",
+                     *           "priceGroupIds": [
+                     *             "example"
+                     *           ],
+                     *           "productGroupId": null,
+                     *           "productNumber": null,
+                     *           "retailPrice": null,
+                     *           "taxRate": null,
+                     *           "unit": null,
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "product"
@@ -12225,15 +12444,22 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "productGroup",
                      *           "id": "exampleId",
-                     *           "type": "productGroup"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "createdAt": null,
+                     *             "description": "example",
+                     *             "name": "example",
+                     *             "parentId": null,
+                     *             "updatedAt": null
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -12273,9 +12499,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
-                 *       "description": "Example generated from the documented schema.",
-                 *       "parentId": "exampleId"
+                 *       "name": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["ProductGroupCreate"];
@@ -12292,16 +12516,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "productGroup",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "name": "Example",
-                     *           "parentId": "exampleId",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "productGroup"
+                     *           "createdAt": null,
+                     *           "description": "example",
+                     *           "name": "example",
+                     *           "parentId": null,
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -12324,16 +12548,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "productGroup",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "name": "Example",
-                     *           "parentId": "exampleId",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "productGroup"
+                     *           "createdAt": null,
+                     *           "description": "example",
+                     *           "name": "example",
+                     *           "parentId": null,
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -12376,16 +12600,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "productGroup",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "name": "Example",
-                     *           "parentId": "exampleId",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "productGroup"
+                     *           "createdAt": null,
+                     *           "description": "example",
+                     *           "name": "example",
+                     *           "parentId": null,
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -12450,9 +12674,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "description": "Example generated from the documented schema.",
-                 *       "name": "Example",
-                 *       "parentId": "exampleId"
+                 *       "description": null
                  *     }
                  */
                 "application/json": components["schemas"]["ProductGroupUpdate"];
@@ -12468,16 +12690,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "productGroup",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "name": "Example",
-                     *           "parentId": "exampleId",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "productGroup"
+                     *           "createdAt": null,
+                     *           "description": "example",
+                     *           "name": "example",
+                     *           "parentId": null,
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -12540,15 +12762,53 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "project",
                      *           "id": "exampleId",
-                     *           "type": "project"
+                     *           "attributes": {
+                     *             "actualEndAt": null,
+                     *             "actualStartAt": null,
+                     *             "additionalContactIds": [
+                     *               "example"
+                     *             ],
+                     *             "archived": false,
+                     *             "color": null,
+                     *             "completed": false,
+                     *             "contactId": null,
+                     *             "createdAt": null,
+                     *             "createdById": null,
+                     *             "description": "example",
+                     *             "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *             "dueAt": null,
+                     *             "duplicateOfProjectId": null,
+                     *             "earliestEndAt": null,
+                     *             "earliestStartAt": null,
+                     *             "individualId": null,
+                     *             "listId": null,
+                     *             "managerId": null,
+                     *             "name": "example",
+                     *             "order": null,
+                     *             "plannedEndAt": null,
+                     *             "plannedStartAt": null,
+                     *             "schedulingOrder": null,
+                     *             "showInScheduling": false,
+                     *             "subscriberIds": [
+                     *               "example"
+                     *             ],
+                     *             "tasksCompleted": 0,
+                     *             "tasksOpen": 0,
+                     *             "tasksTotal": 0,
+                     *             "lastActivityAt": null,
+                     *             "latestEndAt": null,
+                     *             "latestStartAt": null,
+                     *             "updatedAt": null
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -12588,12 +12848,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
-                 *       "additionalContactIds": [
-                 *         "example"
-                 *       ],
-                 *       "color": "example",
-                 *       "contactId": "exampleId"
+                 *       "name": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["ProjectCreate"];
@@ -12612,43 +12867,47 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "project",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "actualEndAt": "2026-07-29T10:00:00Z",
-                     *           "actualStartAt": "2026-07-29T10:00:00Z",
-                     *           "additionalContactIds": [],
+                     *           "actualEndAt": null,
+                     *           "actualStartAt": null,
+                     *           "additionalContactIds": [
+                     *             "example"
+                     *           ],
                      *           "archived": false,
-                     *           "color": "example",
+                     *           "color": null,
                      *           "completed": false,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfProjectId": "exampleId",
-                     *           "earliestEndAt": "2026-07-29T10:00:00Z",
-                     *           "earliestStartAt": "2026-07-29T10:00:00Z",
-                     *           "individualId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "managerId": "exampleId",
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "schedulingOrder": 1,
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "dueAt": null,
+                     *           "duplicateOfProjectId": null,
+                     *           "earliestEndAt": null,
+                     *           "earliestStartAt": null,
+                     *           "individualId": null,
+                     *           "listId": null,
+                     *           "managerId": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedStartAt": null,
+                     *           "schedulingOrder": null,
                      *           "showInScheduling": false,
-                     *           "subscriberIds": [],
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "tasksCompleted": 0,
                      *           "tasksOpen": 0,
                      *           "tasksTotal": 0,
-                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
-                     *           "latestEndAt": "2026-07-29T10:00:00Z",
-                     *           "latestStartAt": "2026-07-29T10:00:00Z",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "project"
+                     *           "lastActivityAt": null,
+                     *           "latestEndAt": null,
+                     *           "latestStartAt": null,
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -12673,43 +12932,47 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "project",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "actualEndAt": "2026-07-29T10:00:00Z",
-                     *           "actualStartAt": "2026-07-29T10:00:00Z",
-                     *           "additionalContactIds": [],
+                     *           "actualEndAt": null,
+                     *           "actualStartAt": null,
+                     *           "additionalContactIds": [
+                     *             "example"
+                     *           ],
                      *           "archived": false,
-                     *           "color": "example",
+                     *           "color": null,
                      *           "completed": false,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfProjectId": "exampleId",
-                     *           "earliestEndAt": "2026-07-29T10:00:00Z",
-                     *           "earliestStartAt": "2026-07-29T10:00:00Z",
-                     *           "individualId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "managerId": "exampleId",
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "schedulingOrder": 1,
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "dueAt": null,
+                     *           "duplicateOfProjectId": null,
+                     *           "earliestEndAt": null,
+                     *           "earliestStartAt": null,
+                     *           "individualId": null,
+                     *           "listId": null,
+                     *           "managerId": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedStartAt": null,
+                     *           "schedulingOrder": null,
                      *           "showInScheduling": false,
-                     *           "subscriberIds": [],
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "tasksCompleted": 0,
                      *           "tasksOpen": 0,
                      *           "tasksTotal": 0,
-                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
-                     *           "latestEndAt": "2026-07-29T10:00:00Z",
-                     *           "latestStartAt": "2026-07-29T10:00:00Z",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "project"
+                     *           "lastActivityAt": null,
+                     *           "latestEndAt": null,
+                     *           "latestStartAt": null,
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -12754,43 +13017,47 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "project",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "actualEndAt": "2026-07-29T10:00:00Z",
-                     *           "actualStartAt": "2026-07-29T10:00:00Z",
-                     *           "additionalContactIds": [],
+                     *           "actualEndAt": null,
+                     *           "actualStartAt": null,
+                     *           "additionalContactIds": [
+                     *             "example"
+                     *           ],
                      *           "archived": false,
-                     *           "color": "example",
+                     *           "color": null,
                      *           "completed": false,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfProjectId": "exampleId",
-                     *           "earliestEndAt": "2026-07-29T10:00:00Z",
-                     *           "earliestStartAt": "2026-07-29T10:00:00Z",
-                     *           "individualId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "managerId": "exampleId",
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "schedulingOrder": 1,
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "dueAt": null,
+                     *           "duplicateOfProjectId": null,
+                     *           "earliestEndAt": null,
+                     *           "earliestStartAt": null,
+                     *           "individualId": null,
+                     *           "listId": null,
+                     *           "managerId": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedStartAt": null,
+                     *           "schedulingOrder": null,
                      *           "showInScheduling": false,
-                     *           "subscriberIds": [],
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "tasksCompleted": 0,
                      *           "tasksOpen": 0,
                      *           "tasksTotal": 0,
-                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
-                     *           "latestEndAt": "2026-07-29T10:00:00Z",
-                     *           "latestStartAt": "2026-07-29T10:00:00Z",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "project"
+                     *           "lastActivityAt": null,
+                     *           "latestEndAt": null,
+                     *           "latestStartAt": null,
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -12829,11 +13096,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "additionalContactIds": [
-                 *         "example"
-                 *       ],
-                 *       "color": "example",
-                 *       "contactId": "exampleId"
+                 *       "additionalContactIds": null
                  *     }
                  */
                 "application/json": components["schemas"]["ProjectUpdate"];
@@ -12851,43 +13114,47 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "project",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "actualEndAt": "2026-07-29T10:00:00Z",
-                     *           "actualStartAt": "2026-07-29T10:00:00Z",
-                     *           "additionalContactIds": [],
+                     *           "actualEndAt": null,
+                     *           "actualStartAt": null,
+                     *           "additionalContactIds": [
+                     *             "example"
+                     *           ],
                      *           "archived": false,
-                     *           "color": "example",
+                     *           "color": null,
                      *           "completed": false,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfProjectId": "exampleId",
-                     *           "earliestEndAt": "2026-07-29T10:00:00Z",
-                     *           "earliestStartAt": "2026-07-29T10:00:00Z",
-                     *           "individualId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "managerId": "exampleId",
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "schedulingOrder": 1,
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "dueAt": null,
+                     *           "duplicateOfProjectId": null,
+                     *           "earliestEndAt": null,
+                     *           "earliestStartAt": null,
+                     *           "individualId": null,
+                     *           "listId": null,
+                     *           "managerId": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedStartAt": null,
+                     *           "schedulingOrder": null,
                      *           "showInScheduling": false,
-                     *           "subscriberIds": [],
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "tasksCompleted": 0,
                      *           "tasksOpen": 0,
                      *           "tasksTotal": 0,
-                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
-                     *           "latestEndAt": "2026-07-29T10:00:00Z",
-                     *           "latestStartAt": "2026-07-29T10:00:00Z",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "project"
+                     *           "lastActivityAt": null,
+                     *           "latestEndAt": null,
+                     *           "latestStartAt": null,
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -12935,13 +13202,23 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "availablePermissions": [],
-                     *           "entries": [],
-                     *           "revision": "\"example-revision\""
-                     *         },
+                     *         "type": "projectSharing",
                      *         "id": "exampleId",
-                     *         "type": "projectSharing"
+                     *         "attributes": {
+                     *           "availablePermissions": [
+                     *             "example"
+                     *           ],
+                     *           "entries": [
+                     *             {
+                     *               "permissions": [
+                     *                 "example"
+                     *               ],
+                     *               "userId": null,
+                     *               "workspaceId": "exampleId"
+                     *             }
+                     *           ],
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -12982,9 +13259,7 @@ export interface operations {
                  * @example {
                  *       "entries": [
                  *         {
-                 *           "workspaceId": "exampleId",
-                 *           "permissions": [],
-                 *           "userId": "exampleId"
+                 *           "workspaceId": "exampleId"
                  *         }
                  *       ]
                  *     }
@@ -13004,13 +13279,23 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "availablePermissions": [],
-                     *           "entries": [],
-                     *           "revision": "\"example-revision\""
-                     *         },
+                     *         "type": "projectSharing",
                      *         "id": "exampleId",
-                     *         "type": "projectSharing"
+                     *         "attributes": {
+                     *           "availablePermissions": [
+                     *             "example"
+                     *           ],
+                     *           "entries": [
+                     *             {
+                     *               "permissions": [
+                     *                 "example"
+                     *               ],
+                     *               "userId": null,
+                     *               "workspaceId": "exampleId"
+                     *             }
+                     *           ],
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -13065,7 +13350,23 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "attributes": {
+                     *           "action": "archive",
+                     *           "attempts": 0,
+                     *           "checkpoints": {},
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "noOp": false,
+                     *           "projectId": "exampleId",
+                     *           "resultRevision": null,
+                     *           "sourceRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "failed",
+                     *           "updatedAt": "2026-10-01T09:00:00Z",
+                     *           "error": {
+                     *             "code": "example",
+                     *             "message": "example"
+                     *           },
+                     *           "finishedAt": "2026-10-01T09:00:00Z"
+                     *         },
                      *         "id": "exampleId",
                      *         "type": "projectLifecycleOperation"
                      *       },
@@ -13122,7 +13423,23 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "attributes": {
+                     *           "action": "archive",
+                     *           "attempts": 0,
+                     *           "checkpoints": {},
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "noOp": false,
+                     *           "projectId": "exampleId",
+                     *           "resultRevision": null,
+                     *           "sourceRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "failed",
+                     *           "updatedAt": "2026-10-01T09:00:00Z",
+                     *           "error": {
+                     *             "code": "example",
+                     *             "message": "example"
+                     *           },
+                     *           "finishedAt": "2026-10-01T09:00:00Z"
+                     *         },
                      *         "id": "exampleId",
                      *         "type": "projectLifecycleOperation"
                      *       },
@@ -13179,7 +13496,23 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "attributes": {
+                     *           "action": "archive",
+                     *           "attempts": 0,
+                     *           "checkpoints": {},
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "noOp": false,
+                     *           "projectId": "exampleId",
+                     *           "resultRevision": null,
+                     *           "sourceRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "failed",
+                     *           "updatedAt": "2026-10-01T09:00:00Z",
+                     *           "error": {
+                     *             "code": "example",
+                     *             "message": "example"
+                     *           },
+                     *           "finishedAt": "2026-10-01T09:00:00Z"
+                     *         },
                      *         "id": "exampleId",
                      *         "type": "projectLifecycleOperation"
                      *       },
@@ -13236,7 +13569,23 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "attributes": {
+                     *           "action": "archive",
+                     *           "attempts": 0,
+                     *           "checkpoints": {},
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "noOp": false,
+                     *           "projectId": "exampleId",
+                     *           "resultRevision": null,
+                     *           "sourceRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "failed",
+                     *           "updatedAt": "2026-10-01T09:00:00Z",
+                     *           "error": {
+                     *             "code": "example",
+                     *             "message": "example"
+                     *           },
+                     *           "finishedAt": "2026-10-01T09:00:00Z"
+                     *         },
                      *         "id": "exampleId",
                      *         "type": "projectLifecycleOperation"
                      *       },
@@ -13284,7 +13633,23 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "attributes": {
+                     *           "action": "archive",
+                     *           "attempts": 0,
+                     *           "checkpoints": {},
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "noOp": false,
+                     *           "projectId": "exampleId",
+                     *           "resultRevision": null,
+                     *           "sourceRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "failed",
+                     *           "updatedAt": "2026-10-01T09:00:00Z",
+                     *           "error": {
+                     *             "code": "example",
+                     *             "message": "example"
+                     *           },
+                     *           "finishedAt": "2026-10-01T09:00:00Z"
+                     *         },
                      *         "id": "exampleId",
                      *         "type": "projectLifecycleOperation"
                      *       },
@@ -13349,7 +13714,19 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "color": "#123456",
+                     *             "createdAt": null,
+                     *             "description": "example",
+                     *             "originProjectId": null,
+                     *             "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *             "snapshotVersion": 1,
+                     *             "stats": null,
+                     *             "title": "example",
+                     *             "updatedAt": null
+                     *           },
                      *           "id": "exampleId",
                      *           "type": "projectTemplate"
                      *         }
@@ -13357,7 +13734,7 @@ export interface operations {
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -13398,10 +13775,9 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "color": "example",
+                 *       "color": "#123456",
                  *       "projectId": "exampleId",
-                 *       "title": "Example TeamGrid item",
-                 *       "description": "Example generated from the documented schema."
+                 *       "title": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["ProjectTemplateCreate"];
@@ -13422,16 +13798,16 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "archived": false,
-                     *           "color": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "originProjectId": "exampleId",
+                     *           "color": "#123456",
+                     *           "createdAt": null,
+                     *           "description": "example",
+                     *           "originProjectId": null,
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
                      *           "snapshotVersion": 1,
-                     *           "stats": {},
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *           "stats": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "projectTemplate"
@@ -13461,16 +13837,16 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "archived": false,
-                     *           "color": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "originProjectId": "exampleId",
+                     *           "color": "#123456",
+                     *           "createdAt": null,
+                     *           "description": "example",
+                     *           "originProjectId": null,
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
                      *           "snapshotVersion": 1,
-                     *           "stats": {},
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *           "stats": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "projectTemplate"
@@ -13520,16 +13896,16 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "archived": false,
-                     *           "color": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "originProjectId": "exampleId",
+                     *           "color": "#123456",
+                     *           "createdAt": null,
+                     *           "description": "example",
+                     *           "originProjectId": null,
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
                      *           "snapshotVersion": 1,
-                     *           "stats": {},
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *           "stats": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "projectTemplate"
@@ -13608,9 +13984,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "color": "example",
-                 *       "description": "Example generated from the documented schema.",
-                 *       "title": "Example TeamGrid item"
+                 *       "color": "#123456"
                  *     }
                  */
                 "application/json": components["schemas"]["ProjectTemplateUpdate"];
@@ -13630,16 +14004,16 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "archived": false,
-                     *           "color": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "originProjectId": "exampleId",
+                     *           "color": "#123456",
+                     *           "createdAt": null,
+                     *           "description": "example",
+                     *           "originProjectId": null,
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
                      *           "snapshotVersion": 1,
-                     *           "stats": {},
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *           "stats": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "projectTemplate"
@@ -13695,16 +14069,16 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "archived": false,
-                     *           "color": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "originProjectId": "exampleId",
+                     *           "color": "#123456",
+                     *           "createdAt": null,
+                     *           "description": "example",
+                     *           "originProjectId": null,
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
                      *           "snapshotVersion": 1,
-                     *           "stats": {},
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
+                     *           "stats": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "projectTemplate"
@@ -13752,12 +14126,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
-                 *       "additionalContactIds": [
-                 *         "example"
-                 *       ],
-                 *       "color": "example",
-                 *       "contactId": "exampleId"
+                 *       "name": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["ProjectTemplateInstantiate"];
@@ -13777,7 +14146,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "progress": {
+                     *             "listsCompleted": 0,
+                     *             "listsTotal": 0,
+                     *             "tasksCompleted": 0,
+                     *             "tasksTotal": 0
+                     *           },
+                     *           "projectId": "exampleId",
+                     *           "resultRevision": null,
+                     *           "sourceRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "failed",
+                     *           "templateId": "exampleId",
+                     *           "updatedAt": "2026-10-01T09:00:00Z",
+                     *           "error": {
+                     *             "code": "example",
+                     *             "message": "example"
+                     *           },
+                     *           "finishedAt": "2026-10-01T09:00:00Z"
+                     *         },
                      *         "id": "exampleId",
                      *         "type": "projectTemplateInstantiation"
                      *       },
@@ -13825,7 +14213,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "progress": {
+                     *             "listsCompleted": 0,
+                     *             "listsTotal": 0,
+                     *             "tasksCompleted": 0,
+                     *             "tasksTotal": 0
+                     *           },
+                     *           "projectId": "exampleId",
+                     *           "resultRevision": null,
+                     *           "sourceRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "failed",
+                     *           "templateId": "exampleId",
+                     *           "updatedAt": "2026-10-01T09:00:00Z",
+                     *           "error": {
+                     *             "code": "example",
+                     *             "message": "example"
+                     *           },
+                     *           "finishedAt": "2026-10-01T09:00:00Z"
+                     *         },
                      *         "id": "exampleId",
                      *         "type": "projectTemplateInstantiation"
                      *       },
@@ -13892,15 +14299,21 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "plannedWork",
                      *           "id": "exampleId",
-                     *           "type": "plannedWork"
+                     *           "attributes": {
+                     *             "date": "2026-10-01T09:00:00Z",
+                     *             "minutes": 0,
+                     *             "projectId": "exampleId",
+                     *             "taskId": "exampleId",
+                     *             "userId": "exampleId"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -13948,7 +14361,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "attributes": {
+                     *           "attempts": 0,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "plannedEnd": "2026-10-01T09:00:00Z",
+                     *           "plannedStart": "2026-10-01T09:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "sourceRevision": "pw1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "failed",
+                     *           "targetRevision": "pw1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "taskId": "exampleId",
+                     *           "updatedAt": "2026-10-01T09:00:00Z",
+                     *           "userId": "exampleId",
+                     *           "error": {
+                     *             "code": "example",
+                     *             "message": "example"
+                     *           },
+                     *           "finishedAt": "2026-10-01T09:00:00Z"
+                     *         },
                      *         "id": "exampleId",
                      *         "type": "plannedWorkOperation"
                      *       },
@@ -13996,11 +14426,23 @@ export interface operations {
                      * @example {
                      *       "data": {
                      *         "attributes": {
-                     *           "items": [],
-                     *           "plannedEnd": "2026-07-29T10:00:00Z",
-                     *           "plannedStart": "2026-07-29T10:00:00Z",
+                     *           "items": [
+                     *             {
+                     *               "type": "plannedWork",
+                     *               "id": "exampleId",
+                     *               "attributes": {
+                     *                 "date": "2026-10-01T09:00:00Z",
+                     *                 "minutes": 0,
+                     *                 "projectId": "exampleId",
+                     *                 "taskId": "exampleId",
+                     *                 "userId": "exampleId"
+                     *               }
+                     *             }
+                     *           ],
+                     *           "plannedEnd": null,
+                     *           "plannedStart": null,
                      *           "projectId": "exampleId",
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "pw1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "taskId": "exampleId",
                      *           "userId": "exampleId"
                      *         },
@@ -14051,8 +14493,8 @@ export interface operations {
                  *       "dayLoads": [
                  *         0
                  *       ],
-                 *       "plannedEnd": "2026-07-29T10:00:00Z",
-                 *       "plannedStart": "2026-07-29T10:00:00Z"
+                 *       "plannedEnd": "2026-10-01T09:00:00Z",
+                 *       "plannedStart": "2026-10-01T09:00:00Z"
                  *     }
                  */
                 "application/json": components["schemas"]["PlannedWorkReplacement"];
@@ -14072,7 +14514,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
+                     *         "attributes": {
+                     *           "attempts": 0,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "plannedEnd": "2026-10-01T09:00:00Z",
+                     *           "plannedStart": "2026-10-01T09:00:00Z",
+                     *           "projectId": "exampleId",
+                     *           "sourceRevision": "pw1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "failed",
+                     *           "targetRevision": "pw1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "taskId": "exampleId",
+                     *           "updatedAt": "2026-10-01T09:00:00Z",
+                     *           "userId": "exampleId",
+                     *           "error": {
+                     *             "code": "example",
+                     *             "message": "example"
+                     *           },
+                     *           "finishedAt": "2026-10-01T09:00:00Z"
+                     *         },
                      *         "id": "exampleId",
                      *         "type": "plannedWorkOperation"
                      *       },
@@ -14141,7 +14600,22 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "attributes": {
+                     *             "amount": null,
+                     *             "archived": false,
+                     *             "comment": "example",
+                     *             "count": null,
+                     *             "createdAt": null,
+                     *             "date": null,
+                     *             "description": "example",
+                     *             "isCharge": false,
+                     *             "productId": null,
+                     *             "productNumber": null,
+                     *             "projectId": null,
+                     *             "title": "example",
+                     *             "type": "budget",
+                     *             "updatedAt": null
+                     *           },
                      *           "id": "exampleId",
                      *           "type": "projectStatement"
                      *         }
@@ -14149,7 +14623,7 @@ export interface operations {
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -14187,7 +14661,15 @@ export interface operations {
         /** @description JSON payload used to create a project statement. The server validates this payload before applying any change. */
         requestBody: {
             content: {
-                /** @example {} */
+                /**
+                 * @example {
+                 *       "date": "2026-10-01T09:00:00Z",
+                 *       "isCharge": false,
+                 *       "projectId": "exampleId",
+                 *       "title": "example",
+                 *       "type": "manual"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ProjectStatementCreate"];
             };
         };
@@ -14203,21 +14685,20 @@ export interface operations {
                      * @example {
                      *       "data": {
                      *         "attributes": {
-                     *           "amount": 0,
+                     *           "amount": null,
                      *           "archived": false,
                      *           "comment": "example",
-                     *           "count": 0,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "date": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "count": null,
+                     *           "createdAt": null,
+                     *           "date": null,
+                     *           "description": "example",
                      *           "isCharge": false,
-                     *           "productId": "exampleId",
-                     *           "productNumber": "example",
-                     *           "projectId": "exampleId",
-                     *           "title": "Example TeamGrid item",
+                     *           "productId": null,
+                     *           "productNumber": null,
+                     *           "projectId": null,
+                     *           "title": "example",
                      *           "type": "budget",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "purchasePrice": 0
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "projectStatement"
@@ -14244,21 +14725,20 @@ export interface operations {
                      * @example {
                      *       "data": {
                      *         "attributes": {
-                     *           "amount": 0,
+                     *           "amount": null,
                      *           "archived": false,
                      *           "comment": "example",
-                     *           "count": 0,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "date": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "count": null,
+                     *           "createdAt": null,
+                     *           "date": null,
+                     *           "description": "example",
                      *           "isCharge": false,
-                     *           "productId": "exampleId",
-                     *           "productNumber": "example",
-                     *           "projectId": "exampleId",
-                     *           "title": "Example TeamGrid item",
+                     *           "productId": null,
+                     *           "productNumber": null,
+                     *           "projectId": null,
+                     *           "title": "example",
                      *           "type": "budget",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "purchasePrice": 0
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "projectStatement"
@@ -14305,21 +14785,20 @@ export interface operations {
                      * @example {
                      *       "data": {
                      *         "attributes": {
-                     *           "amount": 0,
+                     *           "amount": null,
                      *           "archived": false,
                      *           "comment": "example",
-                     *           "count": 0,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "date": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "count": null,
+                     *           "createdAt": null,
+                     *           "date": null,
+                     *           "description": "example",
                      *           "isCharge": false,
-                     *           "productId": "exampleId",
-                     *           "productNumber": "example",
-                     *           "projectId": "exampleId",
-                     *           "title": "Example TeamGrid item",
+                     *           "productId": null,
+                     *           "productNumber": null,
+                     *           "projectId": null,
+                     *           "title": "example",
                      *           "type": "budget",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "purchasePrice": 0
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "projectStatement"
@@ -14387,9 +14866,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "amount": 0,
-                 *       "comment": "example",
-                 *       "count": 1
+                 *       "amount": null
                  *     }
                  */
                 "application/json": components["schemas"]["ProjectStatementUpdate"];
@@ -14406,21 +14883,20 @@ export interface operations {
                      * @example {
                      *       "data": {
                      *         "attributes": {
-                     *           "amount": 0,
+                     *           "amount": null,
                      *           "archived": false,
                      *           "comment": "example",
-                     *           "count": 0,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "date": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "count": null,
+                     *           "createdAt": null,
+                     *           "date": null,
+                     *           "description": "example",
                      *           "isCharge": false,
-                     *           "productId": "exampleId",
-                     *           "productNumber": "example",
-                     *           "projectId": "exampleId",
-                     *           "title": "Example TeamGrid item",
+                     *           "productId": null,
+                     *           "productNumber": null,
+                     *           "projectId": null,
+                     *           "title": "example",
                      *           "type": "budget",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "purchasePrice": 0
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "projectStatement"
@@ -14468,21 +14944,20 @@ export interface operations {
                      * @example {
                      *       "data": {
                      *         "attributes": {
-                     *           "amount": 0,
+                     *           "amount": null,
                      *           "archived": false,
                      *           "comment": "example",
-                     *           "count": 0,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "date": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "count": null,
+                     *           "createdAt": null,
+                     *           "date": null,
+                     *           "description": "example",
                      *           "isCharge": false,
-                     *           "productId": "exampleId",
-                     *           "productNumber": "example",
-                     *           "projectId": "exampleId",
-                     *           "title": "Example TeamGrid item",
+                     *           "productId": null,
+                     *           "productNumber": null,
+                     *           "projectId": null,
+                     *           "title": "example",
                      *           "type": "budget",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "purchasePrice": 0
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "projectStatement"
@@ -14554,15 +15029,75 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "task",
                      *           "id": "exampleId",
-                     *           "type": "task"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "archivedAt": null,
+                     *             "assigneeId": null,
+                     *             "assigneeIds": [
+                     *               "example"
+                     *             ],
+                     *             "billable": null,
+                     *             "completed": false,
+                     *             "completedAt": null,
+                     *             "completedById": null,
+                     *             "commentsCount": 0,
+                     *             "contactId": null,
+                     *             "createdAt": null,
+                     *             "createdById": null,
+                     *             "description": "example",
+                     *             "descriptionFormat": "plain-text",
+                     *             "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *             "duplicateOfTaskId": null,
+                     *             "dueAt": null,
+                     *             "filesCount": 0,
+                     *             "groupId": null,
+                     *             "listId": null,
+                     *             "listOrder": null,
+                     *             "name": "example",
+                     *             "order": null,
+                     *             "personalListId": null,
+                     *             "personalListOrder": null,
+                     *             "plannedEndAt": null,
+                     *             "plannedMinutes": null,
+                     *             "plannedStartAt": null,
+                     *             "primaryAssigneeId": null,
+                     *             "projectId": null,
+                     *             "recurrence": {
+                     *               "definitionVersionId": null,
+                     *               "generatedAt": null,
+                     *               "occurrenceId": null,
+                     *               "occurrenceKey": null,
+                     *               "scheduledFor": null,
+                     *               "seriesId": null
+                     *             },
+                     *             "serviceId": null,
+                     *             "subscriberIds": [
+                     *               "example"
+                     *             ],
+                     *             "subtasksCount": 0,
+                     *             "subtasks": [
+                     *               {
+                     *                 "id": "exampleId",
+                     *                 "title": "example",
+                     *                 "completed": false,
+                     *                 "order": null
+                     *               }
+                     *             ],
+                     *             "tagIds": [
+                     *               "example"
+                     *             ],
+                     *             "trackingActive": false,
+                     *             "updatedAt": null
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -14600,7 +15135,11 @@ export interface operations {
         /** @description JSON payload used to create a task. The server validates this payload before applying any change. */
         requestBody: {
             content: {
-                /** @example {} */
+                /**
+                 * @example {
+                 *       "name": "example"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TaskCreate"];
             };
         };
@@ -14617,48 +15156,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -14683,48 +15243,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -14759,7 +15340,13 @@ export interface operations {
                 /**
                  * @example {
                  *       "items": [
-                 *         {}
+                 *         {
+                 *           "id": "exampleId",
+                 *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                 *           "data": {
+                 *             "billable": null
+                 *           }
+                 *         }
                  *       ]
                  *     }
                  */
@@ -14776,15 +15363,92 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": [
-                     *         {}
+                     *         {
+                     *           "type": "taskBulkUpdateResult",
+                     *           "id": "exampleId",
+                     *           "attributes": {
+                     *             "status": "updated",
+                     *             "task": {
+                     *               "type": "task",
+                     *               "id": "exampleId",
+                     *               "attributes": {
+                     *                 "archived": false,
+                     *                 "archivedAt": null,
+                     *                 "assigneeId": null,
+                     *                 "assigneeIds": [
+                     *                   "example"
+                     *                 ],
+                     *                 "billable": null,
+                     *                 "completed": false,
+                     *                 "completedAt": null,
+                     *                 "completedById": null,
+                     *                 "commentsCount": 0,
+                     *                 "contactId": null,
+                     *                 "createdAt": null,
+                     *                 "createdById": null,
+                     *                 "description": "example",
+                     *                 "descriptionFormat": "plain-text",
+                     *                 "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *                 "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *                 "duplicateOfTaskId": null,
+                     *                 "dueAt": null,
+                     *                 "filesCount": 0,
+                     *                 "groupId": null,
+                     *                 "listId": null,
+                     *                 "listOrder": null,
+                     *                 "name": "example",
+                     *                 "order": null,
+                     *                 "personalListId": null,
+                     *                 "personalListOrder": null,
+                     *                 "plannedEndAt": null,
+                     *                 "plannedMinutes": null,
+                     *                 "plannedStartAt": null,
+                     *                 "primaryAssigneeId": null,
+                     *                 "projectId": null,
+                     *                 "recurrence": {
+                     *                   "definitionVersionId": null,
+                     *                   "generatedAt": null,
+                     *                   "occurrenceId": null,
+                     *                   "occurrenceKey": null,
+                     *                   "scheduledFor": null,
+                     *                   "seriesId": null
+                     *                 },
+                     *                 "serviceId": null,
+                     *                 "subscriberIds": [
+                     *                   "example"
+                     *                 ],
+                     *                 "subtasksCount": 0,
+                     *                 "subtasks": [
+                     *                   {
+                     *                     "id": "exampleId",
+                     *                     "title": "example",
+                     *                     "completed": false,
+                     *                     "order": null
+                     *                   }
+                     *                 ],
+                     *                 "tagIds": [
+                     *                   "example"
+                     *                 ],
+                     *                 "trackingActive": false,
+                     *                 "updatedAt": null
+                     *               }
+                     *             },
+                     *             "error": {
+                     *               "status": "200",
+                     *               "code": "example",
+                     *               "title": "example",
+                     *               "detail": "example"
+                     *             }
+                     *           }
+                     *         }
                      *       ],
                      *       "meta": {
                      *         "requestId": "exampleId",
                      *         "summary": {
-                     *           "conflicts": 0,
-                     *           "failed": 0,
                      *           "requested": 1,
-                     *           "updated": 0
+                     *           "updated": 0,
+                     *           "conflicts": 0,
+                     *           "failed": 0
                      *         }
                      *       }
                      *     }
@@ -14823,48 +15487,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -14937,7 +15622,11 @@ export interface operations {
         /** @description JSON payload used to update a task. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
-                /** @example {} */
+                /**
+                 * @example {
+                 *       "assigneeId": null
+                 *     }
+                 */
                 "application/json": components["schemas"]["TaskUpdate"];
             };
         };
@@ -14953,48 +15642,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15045,48 +15755,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15129,13 +15860,7 @@ export interface operations {
         /** @description JSON payload used to duplicate a task. The server validates this payload before applying any change. */
         requestBody: {
             content: {
-                /**
-                 * @example {
-                 *       "copyChecklist": true,
-                 *       "copyCustomFieldValues": true,
-                 *       "name": "Example"
-                 *     }
-                 */
+                /** @example {} */
                 "application/json": components["schemas"]["TaskDuplicate"];
             };
         };
@@ -15152,48 +15877,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15218,48 +15964,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15302,10 +16069,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "axis": "assignee",
-                 *       "assigneeId": "exampleId",
-                 *       "groupId": "exampleId",
-                 *       "listId": "exampleId"
+                 *       "axis": "assignee"
                  *     }
                  */
                 "application/json": components["schemas"]["TaskPlacement"];
@@ -15323,48 +16087,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15408,7 +16193,9 @@ export interface operations {
                 /**
                  * @example {
                  *       "subtasks": [
-                 *         {}
+                 *         {
+                 *           "title": "example"
+                 *         }
                  *       ]
                  *     }
                  */
@@ -15427,48 +16214,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15519,48 +16327,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15611,48 +16440,69 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "task",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "archivedAt": "2026-07-29T10:00:00Z",
-                     *           "assigneeId": "exampleId",
-                     *           "assigneeIds": [],
-                     *           "billable": false,
+                     *           "archivedAt": null,
+                     *           "assigneeId": null,
+                     *           "assigneeIds": [
+                     *             "example"
+                     *           ],
+                     *           "billable": null,
                      *           "completed": false,
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "completedById": "exampleId",
+                     *           "completedAt": null,
+                     *           "completedById": null,
                      *           "commentsCount": 0,
-                     *           "contactId": "exampleId",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "description": "Example generated from the documented schema.",
+                     *           "contactId": null,
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "description": "example",
                      *           "descriptionFormat": "plain-text",
-                     *           "developerRevision": "\"example-revision\"",
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "duplicateOfTaskId": "exampleId",
-                     *           "dueAt": "2026-07-29T10:00:00Z",
+                     *           "developerRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "duplicateOfTaskId": null,
+                     *           "dueAt": null,
                      *           "filesCount": 0,
-                     *           "groupId": "exampleId",
-                     *           "listId": "exampleId",
-                     *           "listOrder": 1,
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "personalListId": "exampleId",
-                     *           "personalListOrder": 1,
-                     *           "plannedEndAt": "2026-07-29T10:00:00Z",
-                     *           "plannedMinutes": 1,
-                     *           "plannedStartAt": "2026-07-29T10:00:00Z",
-                     *           "primaryAssigneeId": "exampleId",
-                     *           "projectId": "exampleId",
-                     *           "serviceId": "exampleId",
-                     *           "subscriberIds": [],
+                     *           "groupId": null,
+                     *           "listId": null,
+                     *           "listOrder": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "personalListId": null,
+                     *           "personalListOrder": null,
+                     *           "plannedEndAt": null,
+                     *           "plannedMinutes": null,
+                     *           "plannedStartAt": null,
+                     *           "primaryAssigneeId": null,
+                     *           "projectId": null,
+                     *           "recurrence": {
+                     *             "definitionVersionId": null,
+                     *             "generatedAt": null,
+                     *             "occurrenceId": null,
+                     *             "occurrenceKey": null,
+                     *             "scheduledFor": null,
+                     *             "seriesId": null
+                     *           },
+                     *           "serviceId": null,
+                     *           "subscriberIds": [
+                     *             "example"
+                     *           ],
                      *           "subtasksCount": 0,
-                     *           "subtasks": [],
-                     *           "tagIds": [],
+                     *           "subtasks": [
+                     *             {
+                     *               "id": "exampleId",
+                     *               "title": "example",
+                     *               "completed": false,
+                     *               "order": null
+                     *             }
+                     *           ],
+                     *           "tagIds": [
+                     *             "example"
+                     *           ],
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "task"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15692,8 +16542,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "userId": "exampleId",
-                 *       "at": "2026-07-29T10:00:00Z"
+                 *       "userId": "exampleId"
                  *     }
                  */
                 "application/json": components["schemas"]["TimerAction"];
@@ -15709,26 +16558,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "timeEntry",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "billable": false,
+                     *           "billable": null,
                      *           "billed": false,
-                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "billedAt": null,
                      *           "comment": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "durationMinutes": 1,
-                     *           "endAt": "2026-07-29T10:00:00Z",
-                     *           "serviceId": "exampleId",
-                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "durationMinutes": null,
+                     *           "endAt": null,
+                     *           "serviceId": null,
+                     *           "startAt": null,
                      *           "taskId": "exampleId",
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "timeEntry"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15766,8 +16615,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "userId": "exampleId",
-                 *       "at": "2026-07-29T10:00:00Z"
+                 *       "userId": "exampleId"
                  *     }
                  */
                 "application/json": components["schemas"]["TimerAction"];
@@ -15783,26 +16631,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "timeEntry",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "billable": false,
+                     *           "billable": null,
                      *           "billed": false,
-                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "billedAt": null,
                      *           "comment": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "durationMinutes": 1,
-                     *           "endAt": "2026-07-29T10:00:00Z",
-                     *           "serviceId": "exampleId",
-                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "durationMinutes": null,
+                     *           "endAt": null,
+                     *           "serviceId": null,
+                     *           "startAt": null,
                      *           "taskId": "exampleId",
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "timeEntry"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15867,15 +16715,32 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "timeEntry",
                      *           "id": "exampleId",
-                     *           "type": "timeEntry"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "billable": null,
+                     *             "billed": false,
+                     *             "billedAt": null,
+                     *             "comment": "example",
+                     *             "createdAt": null,
+                     *             "createdById": null,
+                     *             "durationMinutes": null,
+                     *             "endAt": null,
+                     *             "serviceId": null,
+                     *             "startAt": null,
+                     *             "taskId": "exampleId",
+                     *             "trackingActive": false,
+                     *             "updatedAt": null,
+                     *             "updatedById": null,
+                     *             "userId": "exampleId"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -15915,13 +16780,10 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "endAt": "2026-07-29T10:00:00Z",
-                 *       "startAt": "2026-07-29T10:00:00Z",
                  *       "taskId": "exampleId",
                  *       "userId": "exampleId",
-                 *       "billable": false,
-                 *       "comment": "example",
-                 *       "serviceId": "exampleId"
+                 *       "startAt": "2026-10-01T09:00:00Z",
+                 *       "endAt": "2026-10-01T09:00:00Z"
                  *     }
                  */
                 "application/json": components["schemas"]["TimeEntryCreate"];
@@ -15938,26 +16800,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "timeEntry",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "billable": false,
+                     *           "billable": null,
                      *           "billed": false,
-                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "billedAt": null,
                      *           "comment": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "durationMinutes": 1,
-                     *           "endAt": "2026-07-29T10:00:00Z",
-                     *           "serviceId": "exampleId",
-                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "durationMinutes": null,
+                     *           "endAt": null,
+                     *           "serviceId": null,
+                     *           "startAt": null,
                      *           "taskId": "exampleId",
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "timeEntry"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -15980,26 +16842,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "timeEntry",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "billable": false,
+                     *           "billable": null,
                      *           "billed": false,
-                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "billedAt": null,
                      *           "comment": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "durationMinutes": 1,
-                     *           "endAt": "2026-07-29T10:00:00Z",
-                     *           "serviceId": "exampleId",
-                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "durationMinutes": null,
+                     *           "endAt": null,
+                     *           "serviceId": null,
+                     *           "startAt": null,
                      *           "taskId": "exampleId",
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "timeEntry"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16042,26 +16904,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "timeEntry",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "billable": false,
+                     *           "billable": null,
                      *           "billed": false,
-                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "billedAt": null,
                      *           "comment": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "durationMinutes": 1,
-                     *           "endAt": "2026-07-29T10:00:00Z",
-                     *           "serviceId": "exampleId",
-                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "durationMinutes": null,
+                     *           "endAt": null,
+                     *           "serviceId": null,
+                     *           "startAt": null,
                      *           "taskId": "exampleId",
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "timeEntry"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16126,9 +16988,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "billable": false,
-                 *       "comment": "example",
-                 *       "endAt": "2026-07-29T10:00:00Z"
+                 *       "billable": null
                  *     }
                  */
                 "application/json": components["schemas"]["TimeEntryUpdate"];
@@ -16144,26 +17004,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "timeEntry",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "billable": false,
+                     *           "billable": null,
                      *           "billed": false,
-                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "billedAt": null,
                      *           "comment": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "durationMinutes": 1,
-                     *           "endAt": "2026-07-29T10:00:00Z",
-                     *           "serviceId": "exampleId",
-                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "durationMinutes": null,
+                     *           "endAt": null,
+                     *           "serviceId": null,
+                     *           "startAt": null,
                      *           "taskId": "exampleId",
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "timeEntry"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16209,13 +17069,13 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "timeEntryBilling",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "billed": false,
-                     *           "billedAt": "2026-07-29T10:00:00Z",
-                     *           "revision": "\"example-revision\""
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "timeEntryBilling"
+                     *           "billedAt": null,
+                     *           "revision": "tib1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16273,13 +17133,13 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "timeEntryBilling",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "billed": false,
-                     *           "billedAt": "2026-07-29T10:00:00Z",
-                     *           "revision": "\"example-revision\""
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "timeEntryBilling"
+                     *           "billedAt": null,
+                     *           "revision": "tib1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16324,26 +17184,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "timeEntry",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "billable": false,
+                     *           "billable": null,
                      *           "billed": false,
-                     *           "billedAt": "2026-07-29T10:00:00Z",
+                     *           "billedAt": null,
                      *           "comment": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "durationMinutes": 1,
-                     *           "endAt": "2026-07-29T10:00:00Z",
-                     *           "serviceId": "exampleId",
-                     *           "startAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "durationMinutes": null,
+                     *           "endAt": null,
+                     *           "serviceId": null,
+                     *           "startAt": null,
                      *           "taskId": "exampleId",
                      *           "trackingActive": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
                      *           "userId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "timeEntry"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16406,15 +17266,101 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "contact",
                      *           "id": "exampleId",
-                     *           "type": "contact"
+                     *           "attributes": {
+                     *             "addresses": [
+                     *               {
+                     *                 "address": {
+                     *                   "city": null,
+                     *                   "country": null,
+                     *                   "fullAddress": null,
+                     *                   "latitude": null,
+                     *                   "longitude": null,
+                     *                   "postalCode": null,
+                     *                   "state": null,
+                     *                   "street": null,
+                     *                   "streetNumber": null
+                     *                 },
+                     *                 "type": "example"
+                     *               }
+                     *             ],
+                     *             "archived": false,
+                     *             "birthday": null,
+                     *             "category": null,
+                     *             "companies": [
+                     *               {
+                     *                 "address": {
+                     *                   "city": null,
+                     *                   "country": null,
+                     *                   "fullAddress": null,
+                     *                   "latitude": null,
+                     *                   "longitude": null,
+                     *                   "postalCode": null,
+                     *                   "state": null,
+                     *                   "street": null,
+                     *                   "streetNumber": null
+                     *                 },
+                     *                 "companyId": null,
+                     *                 "email": null,
+                     *                 "phone": null,
+                     *                 "position": null
+                     *               }
+                     *             ],
+                     *             "companyTitle": "example",
+                     *             "createdAt": null,
+                     *             "createdById": null,
+                     *             "customerId": null,
+                     *             "emails": [
+                     *               {
+                     *                 "email": "example",
+                     *                 "type": "example"
+                     *               }
+                     *             ],
+                     *             "employeesCount": 0,
+                     *             "firstName": "example",
+                     *             "gender": null,
+                     *             "groupId": null,
+                     *             "lastActivityAt": null,
+                     *             "lastName": "example",
+                     *             "nickname": "example",
+                     *             "notes": "example",
+                     *             "parentContactId": null,
+                     *             "phoneNumbers": [
+                     *               {
+                     *                 "number": "example",
+                     *                 "type": "example"
+                     *               }
+                     *             ],
+                     *             "projectsCompleted": 0,
+                     *             "projectsOpen": 0,
+                     *             "projectsTotal": 0,
+                     *             "salutation": "example",
+                     *             "socialNetworks": [
+                     *               {
+                     *                 "type": "example",
+                     *                 "username": "example"
+                     *               }
+                     *             ],
+                     *             "tasksCompleted": 0,
+                     *             "tasksOpen": 0,
+                     *             "tasksTotal": 0,
+                     *             "type": "person",
+                     *             "updatedAt": null,
+                     *             "updatedById": null,
+                     *             "websites": [
+                     *               {
+                     *                 "type": "example",
+                     *                 "url": "https://example.com/teamgrid"
+                     *               }
+                     *             ]
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -16454,10 +17400,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "type": "company",
-                 *       "birthday": "2026-07-29T10:00:00Z",
-                 *       "category": "customer",
-                 *       "companyTitle": "Example TeamGrid item"
+                 *       "type": "company"
                  *     }
                  */
                 "application/json": components["schemas"]["ContactCreate"];
@@ -16474,42 +17417,95 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "contact",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "addresses": [],
+                     *           "addresses": [
+                     *             {
+                     *               "address": {
+                     *                 "city": null,
+                     *                 "country": null,
+                     *                 "fullAddress": null,
+                     *                 "latitude": null,
+                     *                 "longitude": null,
+                     *                 "postalCode": null,
+                     *                 "state": null,
+                     *                 "street": null,
+                     *                 "streetNumber": null
+                     *               },
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "archived": false,
-                     *           "birthday": "2026-07-29T10:00:00Z",
-                     *           "category": "example",
-                     *           "companies": [],
-                     *           "companyTitle": "Example TeamGrid item",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "customerId": "exampleId",
-                     *           "emails": [],
+                     *           "birthday": null,
+                     *           "category": null,
+                     *           "companies": [
+                     *             {
+                     *               "address": {
+                     *                 "city": null,
+                     *                 "country": null,
+                     *                 "fullAddress": null,
+                     *                 "latitude": null,
+                     *                 "longitude": null,
+                     *                 "postalCode": null,
+                     *                 "state": null,
+                     *                 "street": null,
+                     *                 "streetNumber": null
+                     *               },
+                     *               "companyId": null,
+                     *               "email": null,
+                     *               "phone": null,
+                     *               "position": null
+                     *             }
+                     *           ],
+                     *           "companyTitle": "example",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "customerId": null,
+                     *           "emails": [
+                     *             {
+                     *               "email": "example",
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "employeesCount": 0,
-                     *           "firstName": "Example",
-                     *           "gender": "example",
-                     *           "groupId": "exampleId",
-                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
-                     *           "lastName": "Example",
-                     *           "nickname": "Example",
+                     *           "firstName": "example",
+                     *           "gender": null,
+                     *           "groupId": null,
+                     *           "lastActivityAt": null,
+                     *           "lastName": "example",
+                     *           "nickname": "example",
                      *           "notes": "example",
-                     *           "parentContactId": "exampleId",
-                     *           "phoneNumbers": [],
+                     *           "parentContactId": null,
+                     *           "phoneNumbers": [
+                     *             {
+                     *               "number": "example",
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "projectsCompleted": 0,
                      *           "projectsOpen": 0,
                      *           "projectsTotal": 0,
                      *           "salutation": "example",
-                     *           "socialNetworks": [],
+                     *           "socialNetworks": [
+                     *             {
+                     *               "type": "example",
+                     *               "username": "example"
+                     *             }
+                     *           ],
                      *           "tasksCompleted": 0,
                      *           "tasksOpen": 0,
                      *           "tasksTotal": 0,
                      *           "type": "person",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
-                     *           "websites": []
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "contact"
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
+                     *           "websites": [
+                     *             {
+                     *               "type": "example",
+                     *               "url": "https://example.com/teamgrid"
+                     *             }
+                     *           ]
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16532,42 +17528,95 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "contact",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "addresses": [],
+                     *           "addresses": [
+                     *             {
+                     *               "address": {
+                     *                 "city": null,
+                     *                 "country": null,
+                     *                 "fullAddress": null,
+                     *                 "latitude": null,
+                     *                 "longitude": null,
+                     *                 "postalCode": null,
+                     *                 "state": null,
+                     *                 "street": null,
+                     *                 "streetNumber": null
+                     *               },
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "archived": false,
-                     *           "birthday": "2026-07-29T10:00:00Z",
-                     *           "category": "example",
-                     *           "companies": [],
-                     *           "companyTitle": "Example TeamGrid item",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "customerId": "exampleId",
-                     *           "emails": [],
+                     *           "birthday": null,
+                     *           "category": null,
+                     *           "companies": [
+                     *             {
+                     *               "address": {
+                     *                 "city": null,
+                     *                 "country": null,
+                     *                 "fullAddress": null,
+                     *                 "latitude": null,
+                     *                 "longitude": null,
+                     *                 "postalCode": null,
+                     *                 "state": null,
+                     *                 "street": null,
+                     *                 "streetNumber": null
+                     *               },
+                     *               "companyId": null,
+                     *               "email": null,
+                     *               "phone": null,
+                     *               "position": null
+                     *             }
+                     *           ],
+                     *           "companyTitle": "example",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "customerId": null,
+                     *           "emails": [
+                     *             {
+                     *               "email": "example",
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "employeesCount": 0,
-                     *           "firstName": "Example",
-                     *           "gender": "example",
-                     *           "groupId": "exampleId",
-                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
-                     *           "lastName": "Example",
-                     *           "nickname": "Example",
+                     *           "firstName": "example",
+                     *           "gender": null,
+                     *           "groupId": null,
+                     *           "lastActivityAt": null,
+                     *           "lastName": "example",
+                     *           "nickname": "example",
                      *           "notes": "example",
-                     *           "parentContactId": "exampleId",
-                     *           "phoneNumbers": [],
+                     *           "parentContactId": null,
+                     *           "phoneNumbers": [
+                     *             {
+                     *               "number": "example",
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "projectsCompleted": 0,
                      *           "projectsOpen": 0,
                      *           "projectsTotal": 0,
                      *           "salutation": "example",
-                     *           "socialNetworks": [],
+                     *           "socialNetworks": [
+                     *             {
+                     *               "type": "example",
+                     *               "username": "example"
+                     *             }
+                     *           ],
                      *           "tasksCompleted": 0,
                      *           "tasksOpen": 0,
                      *           "tasksTotal": 0,
                      *           "type": "person",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
-                     *           "websites": []
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "contact"
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
+                     *           "websites": [
+                     *             {
+                     *               "type": "example",
+                     *               "url": "https://example.com/teamgrid"
+                     *             }
+                     *           ]
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16615,15 +17664,33 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "callNote",
                      *           "id": "exampleId",
-                     *           "type": "callNote"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "callId": null,
+                     *             "contactIds": [
+                     *               "example"
+                     *             ],
+                     *             "content": "example",
+                     *             "createdAt": null,
+                     *             "projectIds": [
+                     *               "example"
+                     *             ],
+                     *             "taskIds": [
+                     *               "example"
+                     *             ],
+                     *             "updatedAt": null,
+                     *             "userIds": [
+                     *               "example"
+                     *             ]
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -16681,19 +17748,27 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "callNote",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "callId": "exampleId",
-                     *           "contactIds": [],
+                     *           "callId": null,
+                     *           "contactIds": [
+                     *             "example"
+                     *           ],
                      *           "content": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "projectIds": [],
-                     *           "taskIds": [],
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "userIds": []
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "callNote"
+                     *           "createdAt": null,
+                     *           "projectIds": [
+                     *             "example"
+                     *           ],
+                     *           "taskIds": [
+                     *             "example"
+                     *           ],
+                     *           "updatedAt": null,
+                     *           "userIds": [
+                     *             "example"
+                     *           ]
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16716,19 +17791,27 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "callNote",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "callId": "exampleId",
-                     *           "contactIds": [],
+                     *           "callId": null,
+                     *           "contactIds": [
+                     *             "example"
+                     *           ],
                      *           "content": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "projectIds": [],
-                     *           "taskIds": [],
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "userIds": []
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "callNote"
+                     *           "createdAt": null,
+                     *           "projectIds": [
+                     *             "example"
+                     *           ],
+                     *           "taskIds": [
+                     *             "example"
+                     *           ],
+                     *           "updatedAt": null,
+                     *           "userIds": [
+                     *             "example"
+                     *           ]
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16771,19 +17854,27 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "callNote",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "callId": "exampleId",
-                     *           "contactIds": [],
+                     *           "callId": null,
+                     *           "contactIds": [
+                     *             "example"
+                     *           ],
                      *           "content": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "projectIds": [],
-                     *           "taskIds": [],
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "userIds": []
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "callNote"
+                     *           "createdAt": null,
+                     *           "projectIds": [
+                     *             "example"
+                     *           ],
+                     *           "taskIds": [
+                     *             "example"
+                     *           ],
+                     *           "updatedAt": null,
+                     *           "userIds": [
+                     *             "example"
+                     *           ]
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16854,19 +17945,27 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "callNote",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "callId": "exampleId",
-                     *           "contactIds": [],
+                     *           "callId": null,
+                     *           "contactIds": [
+                     *             "example"
+                     *           ],
                      *           "content": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "projectIds": [],
-                     *           "taskIds": [],
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "userIds": []
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "callNote"
+                     *           "createdAt": null,
+                     *           "projectIds": [
+                     *             "example"
+                     *           ],
+                     *           "taskIds": [
+                     *             "example"
+                     *           ],
+                     *           "updatedAt": null,
+                     *           "userIds": [
+                     *             "example"
+                     *           ]
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -16915,15 +18014,21 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "contactGroup",
                      *           "id": "exampleId",
-                     *           "type": "contactGroup"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "createdAt": null,
+                     *             "parentId": null,
+                     *             "title": "example",
+                     *             "updatedAt": null
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -16963,8 +18068,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "title": "Example TeamGrid item",
-                 *       "parentId": "exampleId"
+                 *       "title": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["ContactGroupCreate"];
@@ -16981,15 +18085,15 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "contactGroup",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "parentId": "exampleId",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "contactGroup"
+                     *           "createdAt": null,
+                     *           "parentId": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17012,15 +18116,15 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "contactGroup",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "parentId": "exampleId",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "contactGroup"
+                     *           "createdAt": null,
+                     *           "parentId": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17063,15 +18167,15 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "contactGroup",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "parentId": "exampleId",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "contactGroup"
+                     *           "createdAt": null,
+                     *           "parentId": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17136,8 +18240,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "parentId": "exampleId",
-                 *       "title": "Example TeamGrid item"
+                 *       "parentId": null
                  *     }
                  */
                 "application/json": components["schemas"]["ContactGroupUpdate"];
@@ -17153,15 +18256,15 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "contactGroup",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "parentId": "exampleId",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "contactGroup"
+                     *           "createdAt": null,
+                     *           "parentId": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17205,15 +18308,15 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "contactGroup",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "parentId": "exampleId",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "contactGroup"
+                     *           "createdAt": null,
+                     *           "parentId": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17257,42 +18360,95 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "contact",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "addresses": [],
+                     *           "addresses": [
+                     *             {
+                     *               "address": {
+                     *                 "city": null,
+                     *                 "country": null,
+                     *                 "fullAddress": null,
+                     *                 "latitude": null,
+                     *                 "longitude": null,
+                     *                 "postalCode": null,
+                     *                 "state": null,
+                     *                 "street": null,
+                     *                 "streetNumber": null
+                     *               },
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "archived": false,
-                     *           "birthday": "2026-07-29T10:00:00Z",
-                     *           "category": "example",
-                     *           "companies": [],
-                     *           "companyTitle": "Example TeamGrid item",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "customerId": "exampleId",
-                     *           "emails": [],
+                     *           "birthday": null,
+                     *           "category": null,
+                     *           "companies": [
+                     *             {
+                     *               "address": {
+                     *                 "city": null,
+                     *                 "country": null,
+                     *                 "fullAddress": null,
+                     *                 "latitude": null,
+                     *                 "longitude": null,
+                     *                 "postalCode": null,
+                     *                 "state": null,
+                     *                 "street": null,
+                     *                 "streetNumber": null
+                     *               },
+                     *               "companyId": null,
+                     *               "email": null,
+                     *               "phone": null,
+                     *               "position": null
+                     *             }
+                     *           ],
+                     *           "companyTitle": "example",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "customerId": null,
+                     *           "emails": [
+                     *             {
+                     *               "email": "example",
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "employeesCount": 0,
-                     *           "firstName": "Example",
-                     *           "gender": "example",
-                     *           "groupId": "exampleId",
-                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
-                     *           "lastName": "Example",
-                     *           "nickname": "Example",
+                     *           "firstName": "example",
+                     *           "gender": null,
+                     *           "groupId": null,
+                     *           "lastActivityAt": null,
+                     *           "lastName": "example",
+                     *           "nickname": "example",
                      *           "notes": "example",
-                     *           "parentContactId": "exampleId",
-                     *           "phoneNumbers": [],
+                     *           "parentContactId": null,
+                     *           "phoneNumbers": [
+                     *             {
+                     *               "number": "example",
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "projectsCompleted": 0,
                      *           "projectsOpen": 0,
                      *           "projectsTotal": 0,
                      *           "salutation": "example",
-                     *           "socialNetworks": [],
+                     *           "socialNetworks": [
+                     *             {
+                     *               "type": "example",
+                     *               "username": "example"
+                     *             }
+                     *           ],
                      *           "tasksCompleted": 0,
                      *           "tasksOpen": 0,
                      *           "tasksTotal": 0,
                      *           "type": "person",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
-                     *           "websites": []
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "contact"
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
+                     *           "websites": [
+                     *             {
+                     *               "type": "example",
+                     *               "url": "https://example.com/teamgrid"
+                     *             }
+                     *           ]
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17328,9 +18484,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "birthday": "2026-07-29T10:00:00Z",
-                 *       "category": "customer",
-                 *       "companyTitle": "Example TeamGrid item"
+                 *       "birthday": null
                  *     }
                  */
                 "application/json": components["schemas"]["ContactUpdate"];
@@ -17346,42 +18500,95 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "contact",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "addresses": [],
+                     *           "addresses": [
+                     *             {
+                     *               "address": {
+                     *                 "city": null,
+                     *                 "country": null,
+                     *                 "fullAddress": null,
+                     *                 "latitude": null,
+                     *                 "longitude": null,
+                     *                 "postalCode": null,
+                     *                 "state": null,
+                     *                 "street": null,
+                     *                 "streetNumber": null
+                     *               },
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "archived": false,
-                     *           "birthday": "2026-07-29T10:00:00Z",
-                     *           "category": "example",
-                     *           "companies": [],
-                     *           "companyTitle": "Example TeamGrid item",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "createdById": "exampleId",
-                     *           "customerId": "exampleId",
-                     *           "emails": [],
+                     *           "birthday": null,
+                     *           "category": null,
+                     *           "companies": [
+                     *             {
+                     *               "address": {
+                     *                 "city": null,
+                     *                 "country": null,
+                     *                 "fullAddress": null,
+                     *                 "latitude": null,
+                     *                 "longitude": null,
+                     *                 "postalCode": null,
+                     *                 "state": null,
+                     *                 "street": null,
+                     *                 "streetNumber": null
+                     *               },
+                     *               "companyId": null,
+                     *               "email": null,
+                     *               "phone": null,
+                     *               "position": null
+                     *             }
+                     *           ],
+                     *           "companyTitle": "example",
+                     *           "createdAt": null,
+                     *           "createdById": null,
+                     *           "customerId": null,
+                     *           "emails": [
+                     *             {
+                     *               "email": "example",
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "employeesCount": 0,
-                     *           "firstName": "Example",
-                     *           "gender": "example",
-                     *           "groupId": "exampleId",
-                     *           "lastActivityAt": "2026-07-29T10:00:00Z",
-                     *           "lastName": "Example",
-                     *           "nickname": "Example",
+                     *           "firstName": "example",
+                     *           "gender": null,
+                     *           "groupId": null,
+                     *           "lastActivityAt": null,
+                     *           "lastName": "example",
+                     *           "nickname": "example",
                      *           "notes": "example",
-                     *           "parentContactId": "exampleId",
-                     *           "phoneNumbers": [],
+                     *           "parentContactId": null,
+                     *           "phoneNumbers": [
+                     *             {
+                     *               "number": "example",
+                     *               "type": "example"
+                     *             }
+                     *           ],
                      *           "projectsCompleted": 0,
                      *           "projectsOpen": 0,
                      *           "projectsTotal": 0,
                      *           "salutation": "example",
-                     *           "socialNetworks": [],
+                     *           "socialNetworks": [
+                     *             {
+                     *               "type": "example",
+                     *               "username": "example"
+                     *             }
+                     *           ],
                      *           "tasksCompleted": 0,
                      *           "tasksOpen": 0,
                      *           "tasksTotal": 0,
                      *           "type": "person",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "updatedById": "exampleId",
-                     *           "websites": []
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "contact"
+                     *           "updatedAt": null,
+                     *           "updatedById": null,
+                     *           "websites": [
+                     *             {
+                     *               "type": "example",
+                     *               "url": "https://example.com/teamgrid"
+                     *             }
+                     *           ]
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17428,15 +18635,22 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "user",
                      *           "id": "exampleId",
-                     *           "type": "user"
+                     *           "attributes": {
+                     *             "disabled": false,
+                     *             "displayName": "example",
+                     *             "email": null,
+                     *             "firstName": "example",
+                     *             "lastName": "example",
+                     *             "roleId": null
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -17491,15 +18705,23 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "list",
                      *           "id": "exampleId",
-                     *           "type": "list"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "createdAt": null,
+                     *             "name": "example",
+                     *             "order": null,
+                     *             "parentId": null,
+                     *             "type": "tasks",
+                     *             "updatedAt": null
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -17539,9 +18761,8 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
-                 *       "type": "tasks",
-                 *       "parentId": "exampleId"
+                 *       "name": "example",
+                 *       "type": "tasks"
                  *     }
                  */
                 "application/json": components["schemas"]["ListCreate"];
@@ -17558,17 +18779,17 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "list",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "parentId": "exampleId",
+                     *           "createdAt": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "parentId": null,
                      *           "type": "tasks",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "list"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17591,17 +18812,17 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "list",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "parentId": "exampleId",
+                     *           "createdAt": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "parentId": null,
                      *           "type": "tasks",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "list"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17644,17 +18865,17 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "list",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "parentId": "exampleId",
+                     *           "createdAt": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "parentId": null,
                      *           "type": "tasks",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "list"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17719,7 +18940,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example"
+                 *       "name": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["ListUpdate"];
@@ -17735,17 +18956,17 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "list",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "parentId": "exampleId",
+                     *           "createdAt": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "parentId": null,
                      *           "type": "tasks",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "list"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17789,17 +19010,17 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "list",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "order": 1,
-                     *           "parentId": "exampleId",
+                     *           "createdAt": null,
+                     *           "name": "example",
+                     *           "order": null,
+                     *           "parentId": null,
                      *           "type": "tasks",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "list"
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17848,15 +19069,22 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "service",
                      *           "id": "exampleId",
-                     *           "type": "service"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "billable": false,
+                     *             "billingRate": null,
+                     *             "createdAt": null,
+                     *             "title": "example",
+                     *             "updatedAt": null
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -17896,9 +19124,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "title": "Example TeamGrid item",
-                 *       "billable": false,
-                 *       "billingRate": 0
+                 *       "title": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["ServiceCreate"];
@@ -17915,16 +19141,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "service",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
                      *           "billable": false,
-                     *           "billingRate": 1,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "service"
+                     *           "billingRate": null,
+                     *           "createdAt": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17947,16 +19173,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "service",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
                      *           "billable": false,
-                     *           "billingRate": 1,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "service"
+                     *           "billingRate": null,
+                     *           "createdAt": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -17999,16 +19225,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "service",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
                      *           "billable": false,
-                     *           "billingRate": 1,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "service"
+                     *           "billingRate": null,
+                     *           "createdAt": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -18073,9 +19299,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "billable": false,
-                 *       "billingRate": 0,
-                 *       "title": "Example TeamGrid item"
+                 *       "billable": false
                  *     }
                  */
                 "application/json": components["schemas"]["ServiceUpdate"];
@@ -18091,16 +19315,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "service",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
                      *           "billable": false,
-                     *           "billingRate": 1,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "service"
+                     *           "billingRate": null,
+                     *           "createdAt": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -18144,16 +19368,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "service",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
                      *           "billable": false,
-                     *           "billingRate": 1,
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "service"
+                     *           "billingRate": null,
+                     *           "createdAt": null,
+                     *           "title": "example",
+                     *           "updatedAt": null
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -18202,15 +19426,22 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "tag",
                      *           "id": "exampleId",
-                     *           "type": "tag"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "color": "#123456",
+                     *             "createdAt": null,
+                     *             "name": "example",
+                     *             "updatedAt": null,
+                     *             "usage": 0
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -18250,8 +19481,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
-                 *       "color": "example"
+                 *       "name": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["TagCreate"];
@@ -18268,16 +19498,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "tag",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "color": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "color": "#123456",
+                     *           "createdAt": null,
+                     *           "name": "example",
+                     *           "updatedAt": null,
                      *           "usage": 0
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "tag"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -18300,16 +19530,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "tag",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "color": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "color": "#123456",
+                     *           "createdAt": null,
+                     *           "name": "example",
+                     *           "updatedAt": null,
                      *           "usage": 0
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "tag"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -18352,16 +19582,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "tag",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "color": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "color": "#123456",
+                     *           "createdAt": null,
+                     *           "name": "example",
+                     *           "updatedAt": null,
                      *           "usage": 0
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "tag"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -18426,8 +19656,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "color": "example",
-                 *       "name": "Example"
+                 *       "color": "#123456"
                  *     }
                  */
                 "application/json": components["schemas"]["TagUpdate"];
@@ -18443,16 +19672,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "tag",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "color": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "color": "#123456",
+                     *           "createdAt": null,
+                     *           "name": "example",
+                     *           "updatedAt": null,
                      *           "usage": 0
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "tag"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -18496,16 +19725,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "tag",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "color": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "color": "#123456",
+                     *           "createdAt": null,
+                     *           "name": "example",
+                     *           "updatedAt": null,
                      *           "usage": 0
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "tag"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -18560,7 +19789,21 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "compatibility": "invalid",
+                     *             "configuration": {
+                     *               "type": "contact"
+                     *             },
+                     *             "createdAt": null,
+                     *             "defaultEnabled": false,
+                     *             "description": "example",
+                     *             "fieldType": "contact",
+                     *             "required": false,
+                     *             "targetType": "contact",
+                     *             "title": "example",
+                     *             "updatedAt": null
+                     *           },
                      *           "id": "exampleId",
                      *           "type": "customFieldDefinition"
                      *         }
@@ -18568,7 +19811,7 @@ export interface operations {
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -18608,12 +19851,12 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "title": "Example TeamGrid item",
+                 *       "configuration": {
+                 *         "type": "contact"
+                 *       },
                  *       "fieldType": "contact",
                  *       "targetType": "contact",
-                 *       "defaultEnabled": false,
-                 *       "description": "Example generated from the documented schema.",
-                 *       "required": false
+                 *       "title": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["CustomFieldDefinitionCreate"];
@@ -18633,16 +19876,17 @@ export interface operations {
                      *         "attributes": {
                      *           "archived": false,
                      *           "compatibility": "invalid",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "configuration": {
+                     *             "type": "contact"
+                     *           },
+                     *           "createdAt": null,
                      *           "defaultEnabled": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "fieldType": "contact",
                      *           "required": false,
                      *           "targetType": "contact",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "legacyTargetType": "example",
-                     *           "legacyType": "example"
+                     *           "title": "example",
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "customFieldDefinition"
@@ -18671,16 +19915,17 @@ export interface operations {
                      *         "attributes": {
                      *           "archived": false,
                      *           "compatibility": "invalid",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "configuration": {
+                     *             "type": "contact"
+                     *           },
+                     *           "createdAt": null,
                      *           "defaultEnabled": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "fieldType": "contact",
                      *           "required": false,
                      *           "targetType": "contact",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "legacyTargetType": "example",
-                     *           "legacyType": "example"
+                     *           "title": "example",
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "customFieldDefinition"
@@ -18729,16 +19974,17 @@ export interface operations {
                      *         "attributes": {
                      *           "archived": false,
                      *           "compatibility": "invalid",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "configuration": {
+                     *             "type": "contact"
+                     *           },
+                     *           "createdAt": null,
                      *           "defaultEnabled": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "fieldType": "contact",
                      *           "required": false,
                      *           "targetType": "contact",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "legacyTargetType": "example",
-                     *           "legacyType": "example"
+                     *           "title": "example",
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "customFieldDefinition"
@@ -18806,8 +20052,9 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "defaultEnabled": false,
-                 *       "description": "Example generated from the documented schema."
+                 *       "configuration": {
+                 *         "type": "contact"
+                 *       }
                  *     }
                  */
                 "application/json": components["schemas"]["CustomFieldDefinitionUpdate"];
@@ -18826,16 +20073,17 @@ export interface operations {
                      *         "attributes": {
                      *           "archived": false,
                      *           "compatibility": "invalid",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "configuration": {
+                     *             "type": "contact"
+                     *           },
+                     *           "createdAt": null,
                      *           "defaultEnabled": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "fieldType": "contact",
                      *           "required": false,
                      *           "targetType": "contact",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "legacyTargetType": "example",
-                     *           "legacyType": "example"
+                     *           "title": "example",
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "customFieldDefinition"
@@ -18885,16 +20133,17 @@ export interface operations {
                      *         "attributes": {
                      *           "archived": false,
                      *           "compatibility": "invalid",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "configuration": {
+                     *             "type": "contact"
+                     *           },
+                     *           "createdAt": null,
                      *           "defaultEnabled": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "fieldType": "contact",
                      *           "required": false,
                      *           "targetType": "contact",
-                     *           "title": "Example TeamGrid item",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
-                     *           "legacyTargetType": "example",
-                     *           "legacyType": "example"
+                     *           "title": "example",
+                     *           "updatedAt": null
                      *         },
                      *         "id": "exampleId",
                      *         "type": "customFieldDefinition"
@@ -18956,8 +20205,15 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
-                     *           "id": "exampleId",
+                     *           "attributes": {
+                     *             "fieldId": "exampleId",
+                     *             "fieldType": "contact",
+                     *             "resourceId": "exampleId",
+                     *             "revision": "cfv1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "state": "invalid",
+                     *             "targetType": "contact"
+                     *           },
+                     *           "id": "cfv_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "type": "customFieldValue"
                      *         }
                      *       ],
@@ -19009,8 +20265,15 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
-                     *         "id": "exampleId",
+                     *         "attributes": {
+                     *           "fieldId": "exampleId",
+                     *           "fieldType": "contact",
+                     *           "resourceId": "exampleId",
+                     *           "revision": "cfv1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "invalid",
+                     *           "targetType": "contact"
+                     *         },
+                     *         "id": "cfv_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *         "type": "customFieldValue"
                      *       },
                      *       "meta": {
@@ -19074,8 +20337,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
-                     *         "id": "exampleId",
+                     *         "attributes": {
+                     *           "fieldId": "exampleId",
+                     *           "fieldType": "contact",
+                     *           "replayed": false,
+                     *           "resourceId": "exampleId",
+                     *           "revision": "cfv1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "invalid",
+                     *           "targetType": "contact"
+                     *         },
+                     *         "id": "cfv_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *         "type": "customFieldValue"
                      *       },
                      *       "meta": {
@@ -19131,8 +20402,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {},
-                     *         "id": "exampleId",
+                     *         "attributes": {
+                     *           "fieldId": "exampleId",
+                     *           "fieldType": "contact",
+                     *           "replayed": false,
+                     *           "resourceId": "exampleId",
+                     *           "revision": "cfv1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "invalid",
+                     *           "targetType": "contact"
+                     *         },
+                     *         "id": "cfv_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *         "type": "customFieldValue"
                      *       },
                      *       "meta": {
@@ -19204,15 +20483,29 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "auditEvent",
                      *           "id": "exampleId",
-                     *           "type": "auditEvent"
+                     *           "attributes": {
+                     *             "actorId": null,
+                     *             "actorType": "user",
+                     *             "cellId": "exampleId",
+                     *             "createdAt": null,
+                     *             "credentialId": null,
+                     *             "eventType": "example",
+                     *             "metadata": {},
+                     *             "outcome": "success",
+                     *             "region": "example",
+                     *             "requestId": null,
+                     *             "source": "teamgrid-app",
+                     *             "targetId": null,
+                     *             "targetType": null
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId",
                      *         "retentionDays": 30
@@ -19264,15 +20557,25 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "webhook",
                      *           "id": "exampleId",
-                     *           "type": "webhook"
+                     *           "attributes": {
+                     *             "actions": [
+                     *               "example"
+                     *             ],
+                     *             "disabled": false,
+                     *             "failCount": 0,
+                     *             "lastStatus": null,
+                     *             "url": "https://example.com/teamgrid",
+                     *             "version": 1,
+                     *             "revision": "whk1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -19334,18 +20637,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "webhook",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "actions": [],
+                     *           "actions": [
+                     *             "example"
+                     *           ],
                      *           "disabled": false,
                      *           "failCount": 0,
-                     *           "lastStatus": 100,
+                     *           "lastStatus": null,
                      *           "url": "https://example.com/teamgrid",
                      *           "version": 1,
-                     *           "revision": "\"example-revision\"",
-                     *           "signingSecret": "store-this-example-secret-securely"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "webhook"
+                     *           "revision": "whk1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -19370,18 +20674,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "webhook",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "actions": [],
+                     *           "actions": [
+                     *             "example"
+                     *           ],
                      *           "disabled": false,
                      *           "failCount": 0,
-                     *           "lastStatus": 100,
+                     *           "lastStatus": null,
                      *           "url": "https://example.com/teamgrid",
                      *           "version": 1,
-                     *           "revision": "\"example-revision\"",
-                     *           "signingSecret": "store-this-example-secret-securely"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "webhook"
+                     *           "revision": "whk1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -19433,7 +20738,29 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "attributes": {
+                     *             "attemptCount": 1,
+                     *             "attempts": [
+                     *               {
+                     *                 "attempt": 1,
+                     *                 "errorCode": "http_error",
+                     *                 "finishedAt": null,
+                     *                 "startedAt": "2026-10-01T09:00:00Z",
+                     *                 "state": "delivering",
+                     *                 "statusCode": null,
+                     *                 "transportCode": null
+                     *               }
+                     *             ],
+                     *             "collection": "example",
+                     *             "completedAt": null,
+                     *             "createdAt": "2026-10-01T09:00:00Z",
+                     *             "deliveryId": "exampleId",
+                     *             "event": "example",
+                     *             "resourceId": null,
+                     *             "state": "delivering",
+                     *             "updatedAt": "2026-10-01T09:00:00Z",
+                     *             "webhookId": "exampleId"
+                     *           },
                      *           "id": "exampleId",
                      *           "type": "webhookDelivery"
                      *         }
@@ -19441,7 +20768,7 @@ export interface operations {
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -19490,15 +20817,25 @@ export interface operations {
                      *       "data": {
                      *         "attributes": {
                      *           "attemptCount": 1,
-                     *           "attempts": [],
+                     *           "attempts": [
+                     *             {
+                     *               "attempt": 1,
+                     *               "errorCode": "http_error",
+                     *               "finishedAt": null,
+                     *               "startedAt": "2026-10-01T09:00:00Z",
+                     *               "state": "delivering",
+                     *               "statusCode": null,
+                     *               "transportCode": null
+                     *             }
+                     *           ],
                      *           "collection": "example",
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "completedAt": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
                      *           "deliveryId": "exampleId",
                      *           "event": "example",
-                     *           "resourceId": "exampleId",
+                     *           "resourceId": null,
                      *           "state": "delivering",
-                     *           "updatedAt": "2026-07-29T10:00:00Z",
+                     *           "updatedAt": "2026-10-01T09:00:00Z",
                      *           "webhookId": "exampleId"
                      *         },
                      *         "id": "exampleId",
@@ -19547,18 +20884,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "webhook",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "actions": [],
+                     *           "actions": [
+                     *             "example"
+                     *           ],
                      *           "disabled": false,
                      *           "failCount": 0,
-                     *           "lastStatus": 100,
+                     *           "lastStatus": null,
                      *           "url": "https://example.com/teamgrid",
                      *           "version": 1,
-                     *           "revision": "\"example-revision\"",
-                     *           "signingSecret": "store-this-example-secret-securely"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "webhook"
+                     *           "revision": "whk1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -19629,9 +20967,7 @@ export interface operations {
                  * @example {
                  *       "actions": [
                  *         "example"
-                 *       ],
-                 *       "disabled": false,
-                 *       "url": "https://example.com/teamgrid"
+                 *       ]
                  *     }
                  */
                 "application/json": components["schemas"]["WebhookUpdate"];
@@ -19649,18 +20985,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "webhook",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "actions": [],
+                     *           "actions": [
+                     *             "example"
+                     *           ],
                      *           "disabled": false,
                      *           "failCount": 0,
-                     *           "lastStatus": 100,
+                     *           "lastStatus": null,
                      *           "url": "https://example.com/teamgrid",
                      *           "version": 1,
-                     *           "revision": "\"example-revision\"",
-                     *           "signingSecret": "store-this-example-secret-securely"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "webhook"
+                     *           "revision": "whk1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -19710,15 +21047,25 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "member",
                      *           "id": "exampleId",
-                     *           "type": "member"
+                     *           "attributes": {
+                     *             "currentGroupId": null,
+                     *             "disabled": false,
+                     *             "groupIds": [
+                     *               "example"
+                     *             ],
+                     *             "owner": false,
+                     *             "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "roleId": "exampleId",
+                     *             "status": "active"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -19770,20 +21117,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "currentGroupId": "exampleId",
-                     *           "disabled": false,
-                     *           "groupIds": [],
-                     *           "owner": false,
-                     *           "revision": "\"example-revision\"",
-                     *           "roleId": "exampleId",
-                     *           "status": "active",
-                     *           "contactId": "exampleId",
-                     *           "displayName": "Example",
-                     *           "email": "developer@example.com"
-                     *         },
+                     *         "type": "member",
                      *         "id": "exampleId",
-                     *         "type": "member"
+                     *         "attributes": {
+                     *           "currentGroupId": null,
+                     *           "disabled": false,
+                     *           "groupIds": [
+                     *             "example"
+                     *           ],
+                     *           "owner": false,
+                     *           "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "roleId": "exampleId",
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -19875,20 +21221,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "currentGroupId": "exampleId",
-                     *           "disabled": false,
-                     *           "groupIds": [],
-                     *           "owner": false,
-                     *           "revision": "\"example-revision\"",
-                     *           "roleId": "exampleId",
-                     *           "status": "active",
-                     *           "contactId": "exampleId",
-                     *           "displayName": "Example",
-                     *           "email": "developer@example.com"
-                     *         },
+                     *         "type": "member",
                      *         "id": "exampleId",
-                     *         "type": "member"
+                     *         "attributes": {
+                     *           "currentGroupId": null,
+                     *           "disabled": false,
+                     *           "groupIds": [
+                     *             "example"
+                     *           ],
+                     *           "owner": false,
+                     *           "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "roleId": "exampleId",
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -19939,15 +21284,21 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "invitation",
                      *           "id": "exampleId",
-                     *           "type": "invitation"
+                     *           "attributes": {
+                     *             "createdAt": null,
+                     *             "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "roleId": "exampleId",
+                     *             "status": "pending",
+                     *             "workspaceOwner": false
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -19989,10 +21340,8 @@ export interface operations {
                 /**
                  * @example {
                  *       "email": "developer@example.com",
-                 *       "firstname": "Example",
-                 *       "lastname": "Example",
-                 *       "position": "example",
-                 *       "roleId": "exampleId"
+                 *       "firstname": "example",
+                 *       "lastname": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["InvitationCreate"];
@@ -20011,16 +21360,15 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "invitation",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "revision": "\"example-revision\"",
+                     *           "createdAt": null,
+                     *           "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "roleId": "exampleId",
                      *           "status": "pending",
-                     *           "workspaceOwner": false,
-                     *           "email": "developer@example.com"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "invitation"
+                     *           "workspaceOwner": false
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -20068,16 +21416,15 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "invitation",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "revision": "\"example-revision\"",
+                     *           "createdAt": null,
+                     *           "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "roleId": "exampleId",
                      *           "status": "pending",
-                     *           "workspaceOwner": false,
-                     *           "email": "developer@example.com"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "invitation"
+                     *           "workspaceOwner": false
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -20194,15 +21541,25 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "role",
                      *           "id": "exampleId",
-                     *           "type": "role"
+                     *           "attributes": {
+                     *             "default": false,
+                     *             "description": "example",
+                     *             "memberCount": 0,
+                     *             "name": "example",
+                     *             "permissions": [
+                     *               "example"
+                     *             ],
+                     *             "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "system": false
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -20243,11 +21600,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
-                 *       "description": "Example generated from the documented schema.",
-                 *       "permissions": [
-                 *         "example"
-                 *       ]
+                 *       "name": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["RoleCreate"];
@@ -20266,17 +21619,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "role",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "default": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "memberCount": 0,
-                     *           "name": "Example",
-                     *           "permissions": [],
-                     *           "revision": "\"example-revision\"",
+                     *           "name": "example",
+                     *           "permissions": [
+                     *             "example"
+                     *           ],
+                     *           "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "system": false
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "role"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -20321,17 +21676,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "role",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "default": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "memberCount": 0,
-                     *           "name": "Example",
-                     *           "permissions": [],
-                     *           "revision": "\"example-revision\"",
+                     *           "name": "example",
+                     *           "permissions": [
+                     *             "example"
+                     *           ],
+                     *           "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "system": false
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "role"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -20405,11 +21762,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "description": "Example generated from the documented schema.",
-                 *       "name": "Example",
-                 *       "permissions": [
-                 *         "example"
-                 *       ]
+                 *       "description": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["RoleUpdate"];
@@ -20427,17 +21780,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "role",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "default": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "memberCount": 0,
-                     *           "name": "Example",
-                     *           "permissions": [],
-                     *           "revision": "\"example-revision\"",
+                     *           "name": "example",
+                     *           "permissions": [
+                     *             "example"
+                     *           ],
+                     *           "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "system": false
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "role"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -20486,15 +21841,23 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "group",
                      *           "id": "exampleId",
-                     *           "type": "group"
+                     *           "attributes": {
+                     *             "createdAt": null,
+                     *             "memberIds": [
+                     *               "example"
+                     *             ],
+                     *             "name": "example",
+                     *             "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "visibility": "all"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -20535,11 +21898,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
-                 *       "memberIds": [
-                 *         "example"
-                 *       ],
-                 *       "visibility": "all"
+                 *       "name": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["GroupCreate"];
@@ -20558,15 +21917,17 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "memberIds": [],
-                     *           "name": "Example",
-                     *           "revision": "\"example-revision\"",
-                     *           "visibility": "all"
-                     *         },
+                     *         "type": "group",
                      *         "id": "exampleId",
-                     *         "type": "group"
+                     *         "attributes": {
+                     *           "createdAt": null,
+                     *           "memberIds": [
+                     *             "example"
+                     *           ],
+                     *           "name": "example",
+                     *           "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "visibility": "all"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -20611,15 +21972,17 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "memberIds": [],
-                     *           "name": "Example",
-                     *           "revision": "\"example-revision\"",
-                     *           "visibility": "all"
-                     *         },
+                     *         "type": "group",
                      *         "id": "exampleId",
-                     *         "type": "group"
+                     *         "attributes": {
+                     *           "createdAt": null,
+                     *           "memberIds": [
+                     *             "example"
+                     *           ],
+                     *           "name": "example",
+                     *           "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "visibility": "all"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -20695,9 +22058,7 @@ export interface operations {
                  * @example {
                  *       "memberIds": [
                  *         "example"
-                 *       ],
-                 *       "name": "Example",
-                 *       "visibility": "all"
+                 *       ]
                  *     }
                  */
                 "application/json": components["schemas"]["GroupUpdate"];
@@ -20715,15 +22076,17 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "memberIds": [],
-                     *           "name": "Example",
-                     *           "revision": "\"example-revision\"",
-                     *           "visibility": "all"
-                     *         },
+                     *         "type": "group",
                      *         "id": "exampleId",
-                     *         "type": "group"
+                     *         "attributes": {
+                     *           "createdAt": null,
+                     *           "memberIds": [
+                     *             "example"
+                     *           ],
+                     *           "name": "example",
+                     *           "revision": "adm1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "visibility": "all"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -20766,8 +22129,7 @@ export interface operations {
                  *       "term": "example",
                  *       "types": [
                  *         "contacts"
-                 *       ],
-                 *       "limit": 1
+                 *       ]
                  *     }
                  */
                 "application/json": components["schemas"]["SearchRequest"];
@@ -20784,21 +22146,16 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "title": "example"
+                     *           },
                      *           "id": "exampleId",
                      *           "type": "contact"
                      *         }
                      *       ],
                      *       "meta": {
-                     *         "requestId": "exampleId",
-                     *         "search": {
-                     *           "complete": false,
-                     *           "indexed": true,
-                     *           "limit": 1,
-                     *           "returned": 0,
-                     *           "continuation": "narrow-query-or-list",
-                     *           "verification": "read-by-id"
-                     *         }
+                     *         "requestId": "exampleId"
                      *       }
                      *     }
                      */
@@ -20829,7 +22186,12 @@ export interface operations {
         /** @description JSON payload used to create an asynchronous export. The server validates this payload before applying any change. */
         requestBody: {
             content: {
-                /** @example {} */
+                /**
+                 * @example {
+                 *       "resourceType": "auditEvents",
+                 *       "createdAtTo": "2026-10-01T09:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ExportCreate"];
             };
         };
@@ -20844,11 +22206,11 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "export",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "replayed": false
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "export"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -20892,19 +22254,18 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "export",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "fields": [],
-                     *           "fileName": "Example",
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "fields": [
+                     *             "example"
+                     *           ],
+                     *           "fileName": "example",
                      *           "format": "csv",
                      *           "resourceType": "auditEvents",
-                     *           "state": "failed",
-                     *           "failure": {},
-                     *           "finishedAt": "2026-07-29T10:00:00Z",
-                     *           "rowCount": 0
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "export"
+                     *           "state": "failed"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -20953,13 +22314,13 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "fileName": "Example",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "exportDownloadIntent",
                      *         "id": "exampleId",
-                     *         "type": "exportDownloadIntent"
+                     *         "attributes": {
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "fileName": "example",
+                     *           "token": "ex1.1790000000.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -21040,9 +22401,29 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "automationAction",
                      *           "id": "exampleId",
-                     *           "type": "automationAction"
+                     *           "attributes": {
+                     *             "branches": [
+                     *               {
+                     *                 "key": "example"
+                     *               }
+                     *             ],
+                     *             "config": [
+                     *               {}
+                     *             ],
+                     *             "description": null,
+                     *             "input": [
+                     *               {}
+                     *             ],
+                     *             "name": null,
+                     *             "output": [
+                     *               {}
+                     *             ],
+                     *             "requiredScopes": [
+                     *               "tasks:read"
+                     *             ]
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
@@ -21090,15 +22471,27 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "automationDefinition",
                      *           "id": "exampleId",
-                     *           "type": "automationDefinition"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "description": "example",
+                     *             "editable": false,
+                     *             "flow": [
+                     *               {
+                     *                 "actionId": "exampleId"
+                     *               }
+                     *             ],
+                     *             "name": "example",
+                     *             "revision": "aut1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "trigger": {}
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -21140,16 +22533,17 @@ export interface operations {
                 /**
                  * @example {
                  *       "flow": [
-                 *         {}
+                 *         {
+                 *           "actionId": "automationTask"
+                 *         }
                  *       ],
-                 *       "name": "Example",
+                 *       "name": "example",
                  *       "trigger": {
                  *         "data": {
                  *           "type": "projects"
                  *         },
                  *         "event": "change"
-                 *       },
-                 *       "description": "Example generated from the documented schema."
+                 *       }
                  *     }
                  */
                 "application/json": components["schemas"]["AutomationDefinitionCreate"];
@@ -21168,20 +22562,21 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "automationDefinition",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "editable": false,
-                     *           "flow": [],
-                     *           "name": "Example",
-                     *           "revision": "\"example-revision\"",
-                     *           "trigger": {},
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "replayed": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "automationDefinition"
+                     *           "flow": [
+                     *             {
+                     *               "actionId": "exampleId"
+                     *             }
+                     *           ],
+                     *           "name": "example",
+                     *           "revision": "aut1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "trigger": {}
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -21226,20 +22621,21 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "automationDefinition",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "editable": false,
-                     *           "flow": [],
-                     *           "name": "Example",
-                     *           "revision": "\"example-revision\"",
-                     *           "trigger": {},
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "replayed": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "automationDefinition"
+                     *           "flow": [
+                     *             {
+                     *               "actionId": "exampleId"
+                     *             }
+                     *           ],
+                     *           "name": "example",
+                     *           "revision": "aut1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "trigger": {}
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -21289,20 +22685,21 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "automationDefinition",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "editable": false,
-                     *           "flow": [],
-                     *           "name": "Example",
-                     *           "revision": "\"example-revision\"",
-                     *           "trigger": {},
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "replayed": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "automationDefinition"
+                     *           "flow": [
+                     *             {
+                     *               "actionId": "exampleId"
+                     *             }
+                     *           ],
+                     *           "name": "example",
+                     *           "revision": "aut1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "trigger": {}
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -21345,11 +22742,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "description": "Example generated from the documented schema.",
-                 *       "flow": [
-                 *         {}
-                 *       ],
-                 *       "name": "Example"
+                 *       "description": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["AutomationDefinitionUpdate"];
@@ -21369,20 +22762,21 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "automationDefinition",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "editable": false,
-                     *           "flow": [],
-                     *           "name": "Example",
-                     *           "revision": "\"example-revision\"",
-                     *           "trigger": {},
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "replayed": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "automationDefinition"
+                     *           "flow": [
+                     *             {
+                     *               "actionId": "exampleId"
+                     *             }
+                     *           ],
+                     *           "name": "example",
+                     *           "revision": "aut1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "trigger": {}
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -21435,20 +22829,21 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "automationDefinition",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "archived": false,
-                     *           "description": "Example generated from the documented schema.",
+                     *           "description": "example",
                      *           "editable": false,
-                     *           "flow": [],
-                     *           "name": "Example",
-                     *           "revision": "\"example-revision\"",
-                     *           "trigger": {},
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "replayed": false,
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "automationDefinition"
+                     *           "flow": [
+                     *             {
+                     *               "actionId": "exampleId"
+                     *             }
+                     *           ],
+                     *           "name": "example",
+                     *           "revision": "aut1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "trigger": {}
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -21500,15 +22895,29 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "automationDefinitionVersion",
                      *           "id": "exampleId",
-                     *           "type": "automationDefinitionVersion"
+                     *           "attributes": {
+                     *             "archived": false,
+                     *             "description": "example",
+                     *             "editable": false,
+                     *             "flow": [
+                     *               {
+                     *                 "actionId": "exampleId"
+                     *               }
+                     *             ],
+                     *             "name": "example",
+                     *             "revision": "aut1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "trigger": {},
+                     *             "definitionId": "exampleId",
+                     *             "versionedAt": "2026-10-01T09:00:00Z"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -21566,15 +22975,22 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "automationRun",
                      *           "id": "exampleId",
-                     *           "type": "automationRun"
+                     *           "attributes": {
+                     *             "definition": {
+                     *               "id": "exampleId",
+                     *               "name": "example"
+                     *             },
+                     *             "revision": "aur1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "state": "aborted"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -21623,16 +23039,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "definition": {},
-                     *           "revision": "\"example-revision\"",
-                     *           "state": "aborted",
-                     *           "abortedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "failedAt": "2026-07-29T10:00:00Z"
-                     *         },
+                     *         "type": "automationRun",
                      *         "id": "exampleId",
-                     *         "type": "automationRun"
+                     *         "attributes": {
+                     *           "definition": {
+                     *             "id": "exampleId",
+                     *             "name": "example"
+                     *           },
+                     *           "revision": "aur1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "aborted"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -21681,16 +23097,16 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "definition": {},
-                     *           "revision": "\"example-revision\"",
-                     *           "state": "aborted",
-                     *           "abortedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "failedAt": "2026-07-29T10:00:00Z"
-                     *         },
+                     *         "type": "automationRun",
                      *         "id": "exampleId",
-                     *         "type": "automationRun"
+                     *         "attributes": {
+                     *           "definition": {
+                     *             "id": "exampleId",
+                     *             "name": "example"
+                     *           },
+                     *           "revision": "aur1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "state": "aborted"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -21734,9 +23150,17 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "integrationInstallation",
                      *           "id": "exampleId",
-                     *           "type": "integrationInstallation"
+                     *           "attributes": {
+                     *             "provider": "googleCalendar",
+                     *             "state": "configured",
+                     *             "target": {
+                     *               "id": "exampleId",
+                     *               "type": "contact"
+                     *             },
+                     *             "verification": "not_checked"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
@@ -21777,9 +23201,16 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "eventDefinition",
                      *           "id": "exampleId",
-                     *           "type": "eventDefinition"
+                     *           "attributes": {
+                     *             "channel": "webhook",
+                     *             "operation": null,
+                     *             "requiredScopes": [
+                     *               "tasks:read"
+                     *             ],
+                     *             "resourceType": null
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
@@ -21831,9 +23262,17 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "changeEvent",
                      *           "id": "exampleId",
-                     *           "type": "changeEvent"
+                     *           "attributes": {
+                     *             "operation": "created",
+                     *             "occurredAt": "2026-10-01T09:00:00Z",
+                     *             "region": "example",
+                     *             "resourceId": "exampleId",
+                     *             "resourceType": "absence",
+                     *             "sequence": 1,
+                     *             "tombstone": false
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
@@ -21897,9 +23336,12 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "systemCapability",
                      *           "id": "exampleId",
-                     *           "type": "systemCapability"
+                     *           "attributes": {
+                     *             "accessible": false,
+                     *             "entitled": false
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
@@ -21940,9 +23382,12 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "workspaceEntitlement",
                      *           "id": "exampleId",
-                     *           "type": "workspaceEntitlement"
+                     *           "attributes": {
+                     *             "accessible": false,
+                     *             "enabled": false
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
@@ -21984,17 +23429,17 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "workspaceSettings",
+                     *         "id": "current",
                      *         "attributes": {
                      *           "currency": "AUD",
                      *           "defaultLanguage": "de",
-                     *           "defaultPlannedTime": 0,
-                     *           "defaultProductivity": 1,
-                     *           "defaultShowInScheduling": false,
-                     *           "name": "Example",
-                     *           "revision": "\"example-revision\""
-                     *         },
-                     *         "id": "current",
-                     *         "type": "workspaceSettings"
+                     *           "defaultPlannedTime": null,
+                     *           "defaultProductivity": null,
+                     *           "defaultShowInScheduling": null,
+                     *           "name": "example",
+                     *           "revision": "wst1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22032,9 +23477,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "currency": "AUD",
-                 *       "defaultLanguage": "de",
-                 *       "defaultPlannedTime": 0
+                 *       "currency": "AUD"
                  *     }
                  */
                 "application/json": components["schemas"]["WorkspaceSettingsUpdate"];
@@ -22053,17 +23496,17 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "workspaceSettings",
+                     *         "id": "current",
                      *         "attributes": {
                      *           "currency": "AUD",
                      *           "defaultLanguage": "de",
-                     *           "defaultPlannedTime": 0,
-                     *           "defaultProductivity": 1,
-                     *           "defaultShowInScheduling": false,
-                     *           "name": "Example",
-                     *           "revision": "\"example-revision\""
-                     *         },
-                     *         "id": "current",
-                     *         "type": "workspaceSettings"
+                     *           "defaultPlannedTime": null,
+                     *           "defaultProductivity": null,
+                     *           "defaultShowInScheduling": null,
+                     *           "name": "example",
+                     *           "revision": "wst1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22116,13 +23559,13 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "webhookSecretRotation",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "replayed": false,
-                     *           "revision": "\"example-revision\"",
-                     *           "signingSecret": "store-this-example-secret-securely"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "webhookSecretRotation"
+                     *           "revision": "whk1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "signingSecret": "whsec_v2_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22147,13 +23590,13 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "webhookSecretRotation",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "replayed": false,
-                     *           "revision": "\"example-revision\"",
-                     *           "signingSecret": "store-this-example-secret-securely"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "webhookSecretRotation"
+                     *           "revision": "whk1-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "signingSecret": "whsec_v2_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22204,13 +23647,13 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "webhookTestDelivery",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "replayed": false,
                      *           "test": true,
                      *           "webhookId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "webhookTestDelivery"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22234,13 +23677,13 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "webhookTestDelivery",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "replayed": false,
                      *           "test": true,
                      *           "webhookId": "exampleId"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "webhookTestDelivery"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22282,16 +23725,18 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "cellId": "exampleId",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "kind": "personalAccess",
-                     *           "region": "example",
-                     *           "scopes": [],
-                     *           "status": "active"
-                     *         },
+                     *         "type": "credentialContext",
                      *         "id": "exampleId",
-                     *         "type": "credentialContext"
+                     *         "attributes": {
+                     *           "cellId": "de-test",
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "kind": "personalAccess",
+                     *           "region": "de-test",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22362,15 +23807,30 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "personalAccessToken",
                      *           "id": "exampleId",
-                     *           "type": "personalAccessToken"
+                     *           "attributes": {
+                     *             "createdAt": "2026-10-01T09:00:00Z",
+                     *             "description": null,
+                     *             "expiresAt": "2026-10-01T09:00:00Z",
+                     *             "generation": 1,
+                     *             "graceEndsAt": null,
+                     *             "lastFour": "exam",
+                     *             "lastUsedAt": null,
+                     *             "name": "example",
+                     *             "notBeforeAt": null,
+                     *             "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "scopes": [
+                     *               "tasks:read"
+                     *             ],
+                     *             "status": "active"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -22410,12 +23870,10 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
+                 *       "name": "example",
                  *       "scopes": [
-                 *         "example"
-                 *       ],
-                 *       "description": "Example generated from the documented schema.",
-                 *       "expiresAt": "2026-07-29T10:00:00Z"
+                 *         "tasks:read"
+                 *       ]
                  *     }
                  */
                 "application/json": components["schemas"]["PersonalAccessTokenCreate"];
@@ -22433,23 +23891,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "generation": 1,
-                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
-                     *           "lastFour": "example",
-                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
-                     *           "principalId": "exampleId",
-                     *           "scopes": [],
-                     *           "status": "active",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "personalAccessToken",
                      *         "id": "exampleId",
-                     *         "type": "personalAccessToken"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "description": null,
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": null,
+                     *           "lastFour": "exam",
+                     *           "lastUsedAt": null,
+                     *           "name": "example",
+                     *           "notBeforeAt": null,
+                     *           "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22473,23 +23932,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "generation": 1,
-                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
-                     *           "lastFour": "example",
-                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
-                     *           "principalId": "exampleId",
-                     *           "scopes": [],
-                     *           "status": "active",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "personalAccessToken",
                      *         "id": "exampleId",
-                     *         "type": "personalAccessToken"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "description": null,
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": null,
+                     *           "lastFour": "exam",
+                     *           "lastUsedAt": null,
+                     *           "name": "example",
+                     *           "notBeforeAt": null,
+                     *           "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22553,15 +24013,7 @@ export interface operations {
         /** @description JSON payload used to rotate a personal access token. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
-                /**
-                 * @example {
-                 *       "expiresAt": "2026-07-29T10:00:00Z",
-                 *       "gracePeriodSeconds": 60,
-                 *       "scopes": [
-                 *         "example"
-                 *       ]
-                 *     }
-                 */
+                /** @example {} */
                 "application/json": components["schemas"]["PersonalAccessTokenRotation"];
             };
         };
@@ -22577,23 +24029,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "generation": 1,
-                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
-                     *           "lastFour": "example",
-                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
-                     *           "principalId": "exampleId",
-                     *           "scopes": [],
-                     *           "status": "active",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "personalAccessToken",
                      *         "id": "exampleId",
-                     *         "type": "personalAccessToken"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "description": null,
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": null,
+                     *           "lastFour": "exam",
+                     *           "lastUsedAt": null,
+                     *           "name": "example",
+                     *           "notBeforeAt": null,
+                     *           "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22617,23 +24070,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "generation": 1,
-                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
-                     *           "lastFour": "example",
-                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
-                     *           "principalId": "exampleId",
-                     *           "scopes": [],
-                     *           "status": "active",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "personalAccessToken",
                      *         "id": "exampleId",
-                     *         "type": "personalAccessToken"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "description": null,
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": null,
+                     *           "lastFour": "exam",
+                     *           "lastUsedAt": null,
+                     *           "name": "example",
+                     *           "notBeforeAt": null,
+                     *           "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22679,15 +24133,50 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "serviceAccount",
                      *           "id": "exampleId",
-                     *           "type": "serviceAccount"
+                     *           "attributes": {
+                     *             "createdAt": "2026-10-01T09:00:00Z",
+                     *             "credentials": [
+                     *               {
+                     *                 "type": "serviceAccountCredential",
+                     *                 "id": "exampleId",
+                     *                 "attributes": {
+                     *                   "createdAt": "2026-10-01T09:00:00Z",
+                     *                   "description": null,
+                     *                   "expiresAt": "2026-10-01T09:00:00Z",
+                     *                   "generation": 1,
+                     *                   "graceEndsAt": null,
+                     *                   "lastFour": "exam",
+                     *                   "lastUsedAt": null,
+                     *                   "name": "example",
+                     *                   "notBeforeAt": null,
+                     *                   "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *                   "scopes": [
+                     *                     "tasks:read"
+                     *                   ],
+                     *                   "status": "active"
+                     *                 }
+                     *               }
+                     *             ],
+                     *             "description": null,
+                     *             "displayName": "example",
+                     *             "permissionSet": [
+                     *               "example"
+                     *             ],
+                     *             "revision": "example",
+                     *             "scopeCeiling": [
+                     *               "tasks:read"
+                     *             ],
+                     *             "status": "active",
+                     *             "updatedAt": "2026-10-01T09:00:00Z"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -22727,12 +24216,10 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
+                 *       "name": "example",
                  *       "scopes": [
-                 *         "example"
-                 *       ],
-                 *       "description": "Example generated from the documented schema.",
-                 *       "expiresAt": "2026-07-29T10:00:00Z"
+                 *         "tasks:read"
+                 *       ]
                  *     }
                  */
                 "application/json": components["schemas"]["ServiceAccountCreate"];
@@ -22750,23 +24237,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "generation": 1,
-                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
-                     *           "lastFour": "example",
-                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
-                     *           "principalId": "exampleId",
-                     *           "scopes": [],
-                     *           "status": "active",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "serviceAccountCredential",
                      *         "id": "exampleId",
-                     *         "type": "serviceAccountCredential"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "description": null,
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": null,
+                     *           "lastFour": "exam",
+                     *           "lastUsedAt": null,
+                     *           "name": "example",
+                     *           "notBeforeAt": null,
+                     *           "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22790,23 +24278,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "generation": 1,
-                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
-                     *           "lastFour": "example",
-                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
-                     *           "principalId": "exampleId",
-                     *           "scopes": [],
-                     *           "status": "active",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "serviceAccountCredential",
                      *         "id": "exampleId",
-                     *         "type": "serviceAccountCredential"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "description": null,
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": null,
+                     *           "lastFour": "exam",
+                     *           "lastUsedAt": null,
+                     *           "name": "example",
+                     *           "notBeforeAt": null,
+                     *           "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22849,19 +24338,44 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "credentials": [],
-                     *           "description": "Example generated from the documented schema.",
-                     *           "displayName": "Example",
-                     *           "permissionSet": [],
-                     *           "revision": "\"example-revision\"",
-                     *           "scopeCeiling": [],
-                     *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
+                     *         "type": "serviceAccount",
                      *         "id": "exampleId",
-                     *         "type": "serviceAccount"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "credentials": [
+                     *             {
+                     *               "type": "serviceAccountCredential",
+                     *               "id": "exampleId",
+                     *               "attributes": {
+                     *                 "createdAt": "2026-10-01T09:00:00Z",
+                     *                 "description": null,
+                     *                 "expiresAt": "2026-10-01T09:00:00Z",
+                     *                 "generation": 1,
+                     *                 "graceEndsAt": null,
+                     *                 "lastFour": "exam",
+                     *                 "lastUsedAt": null,
+                     *                 "name": "example",
+                     *                 "notBeforeAt": null,
+                     *                 "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *                 "scopes": [
+                     *                   "tasks:read"
+                     *                 ],
+                     *                 "status": "active"
+                     *               }
+                     *             }
+                     *           ],
+                     *           "description": null,
+                     *           "displayName": "example",
+                     *           "permissionSet": [
+                     *             "example"
+                     *           ],
+                     *           "revision": "example",
+                     *           "scopeCeiling": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active",
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22926,8 +24440,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "status": "active",
-                 *       "reason": "example"
+                 *       "status": "active"
                  *     }
                  */
                 "application/json": components["schemas"]["ServiceAccountUpdate"];
@@ -22943,19 +24456,44 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "credentials": [],
-                     *           "description": "Example generated from the documented schema.",
-                     *           "displayName": "Example",
-                     *           "permissionSet": [],
-                     *           "revision": "\"example-revision\"",
-                     *           "scopeCeiling": [],
-                     *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
+                     *         "type": "serviceAccount",
                      *         "id": "exampleId",
-                     *         "type": "serviceAccount"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "credentials": [
+                     *             {
+                     *               "type": "serviceAccountCredential",
+                     *               "id": "exampleId",
+                     *               "attributes": {
+                     *                 "createdAt": "2026-10-01T09:00:00Z",
+                     *                 "description": null,
+                     *                 "expiresAt": "2026-10-01T09:00:00Z",
+                     *                 "generation": 1,
+                     *                 "graceEndsAt": null,
+                     *                 "lastFour": "exam",
+                     *                 "lastUsedAt": null,
+                     *                 "name": "example",
+                     *                 "notBeforeAt": null,
+                     *                 "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *                 "scopes": [
+                     *                   "tasks:read"
+                     *                 ],
+                     *                 "status": "active"
+                     *               }
+                     *             }
+                     *           ],
+                     *           "description": null,
+                     *           "displayName": "example",
+                     *           "permissionSet": [
+                     *             "example"
+                     *           ],
+                     *           "revision": "example",
+                     *           "scopeCeiling": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active",
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -22993,12 +24531,10 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "name": "Example",
+                 *       "name": "example",
                  *       "scopes": [
-                 *         "example"
-                 *       ],
-                 *       "description": "Example generated from the documented schema.",
-                 *       "expiresAt": "2026-07-29T10:00:00Z"
+                 *         "tasks:read"
+                 *       ]
                  *     }
                  */
                 "application/json": components["schemas"]["ServiceAccountCredentialCreate"];
@@ -23016,23 +24552,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "generation": 1,
-                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
-                     *           "lastFour": "example",
-                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
-                     *           "principalId": "exampleId",
-                     *           "scopes": [],
-                     *           "status": "active",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "serviceAccountCredential",
                      *         "id": "exampleId",
-                     *         "type": "serviceAccountCredential"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "description": null,
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": null,
+                     *           "lastFour": "exam",
+                     *           "lastUsedAt": null,
+                     *           "name": "example",
+                     *           "notBeforeAt": null,
+                     *           "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23056,23 +24593,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "generation": 1,
-                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
-                     *           "lastFour": "example",
-                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
-                     *           "principalId": "exampleId",
-                     *           "scopes": [],
-                     *           "status": "active",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "serviceAccountCredential",
                      *         "id": "exampleId",
-                     *         "type": "serviceAccountCredential"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "description": null,
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": null,
+                     *           "lastFour": "exam",
+                     *           "lastUsedAt": null,
+                     *           "name": "example",
+                     *           "notBeforeAt": null,
+                     *           "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23136,15 +24674,7 @@ export interface operations {
         /** @description JSON payload used to rotate a service account credential. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody: {
             content: {
-                /**
-                 * @example {
-                 *       "expiresAt": "2026-07-29T10:00:00Z",
-                 *       "gracePeriodSeconds": 60,
-                 *       "scopes": [
-                 *         "example"
-                 *       ]
-                 *     }
-                 */
+                /** @example {} */
                 "application/json": components["schemas"]["ServiceAccountCredentialRotation"];
             };
         };
@@ -23160,23 +24690,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "generation": 1,
-                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
-                     *           "lastFour": "example",
-                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
-                     *           "principalId": "exampleId",
-                     *           "scopes": [],
-                     *           "status": "active",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "serviceAccountCredential",
                      *         "id": "exampleId",
-                     *         "type": "serviceAccountCredential"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "description": null,
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": null,
+                     *           "lastFour": "exam",
+                     *           "lastUsedAt": null,
+                     *           "name": "example",
+                     *           "notBeforeAt": null,
+                     *           "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23200,23 +24731,24 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "description": "Example generated from the documented schema.",
-                     *           "expiresAt": "2026-07-29T10:00:00Z",
-                     *           "generation": 1,
-                     *           "graceEndsAt": "2026-07-29T10:00:00Z",
-                     *           "lastFour": "example",
-                     *           "lastUsedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "notBeforeAt": "2026-07-29T10:00:00Z",
-                     *           "principalId": "exampleId",
-                     *           "scopes": [],
-                     *           "status": "active",
-                     *           "token": "example"
-                     *         },
+                     *         "type": "serviceAccountCredential",
                      *         "id": "exampleId",
-                     *         "type": "serviceAccountCredential"
+                     *         "attributes": {
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "description": null,
+                     *           "expiresAt": "2026-10-01T09:00:00Z",
+                     *           "generation": 1,
+                     *           "graceEndsAt": null,
+                     *           "lastFour": "exam",
+                     *           "lastUsedAt": null,
+                     *           "name": "example",
+                     *           "notBeforeAt": null,
+                     *           "principalId": "pat:aaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scopes": [
+                     *             "tasks:read"
+                     *           ],
+                     *           "status": "active"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23261,13 +24793,25 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "grants": [],
-                     *           "policyVersion": 1,
-                     *           "revision": "\"example-revision\""
-                     *         },
+                     *         "type": "serviceAccountResourceGrantSet",
                      *         "id": "exampleId",
-                     *         "type": "serviceAccountResourceGrantSet"
+                     *         "attributes": {
+                     *           "grants": [
+                     *             {
+                     *               "anchorId": null,
+                     *               "anchorType": "workspace",
+                     *               "capabilities": [
+                     *                 "example"
+                     *               ],
+                     *               "expiresAt": null,
+                     *               "id": "exampleId",
+                     *               "inheritance": "domainDescendants",
+                     *               "resourceKey": "example"
+                     *             }
+                     *           ],
+                     *           "policyVersion": 1,
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23304,7 +24848,14 @@ export interface operations {
                 /**
                  * @example {
                  *       "grants": [
-                 *         {}
+                 *         {
+                 *           "anchorType": "workspace",
+                 *           "capabilities": [
+                 *             "example"
+                 *           ],
+                 *           "inheritance": "domainDescendants",
+                 *           "resourceKey": "example"
+                 *         }
                  *       ]
                  *     }
                  */
@@ -23323,13 +24874,25 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "grants": [],
-                     *           "policyVersion": 1,
-                     *           "revision": "\"example-revision\""
-                     *         },
+                     *         "type": "serviceAccountResourceGrantSet",
                      *         "id": "exampleId",
-                     *         "type": "serviceAccountResourceGrantSet"
+                     *         "attributes": {
+                     *           "grants": [
+                     *             {
+                     *               "anchorId": null,
+                     *               "anchorType": "workspace",
+                     *               "capabilities": [
+                     *                 "example"
+                     *               ],
+                     *               "expiresAt": null,
+                     *               "id": "exampleId",
+                     *               "inheritance": "domainDescendants",
+                     *               "resourceKey": "example"
+                     *             }
+                     *           ],
+                     *           "policyVersion": 1,
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23380,15 +24943,83 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "taskRecurrence",
                      *           "id": "exampleId",
-                     *           "type": "taskRecurrence"
+                     *           "attributes": {
+                     *             "attentionCode": null,
+                     *             "createdAt": "2026-10-01T09:00:00Z",
+                     *             "currentDefinition": {
+                     *               "costClass": "low",
+                     *               "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *               "engineVersion": "recurrence-v1",
+                     *               "id": "exampleId",
+                     *               "policy": {
+                     *                 "candidates": {
+                     *                   "nodeId": "exampleId",
+                     *                   "op": "calendarRule",
+                     *                   "rule": {
+                     *                     "frequency": "minutely",
+                     *                     "startLocal": "2026-10-01T09:00:00"
+                     *                   }
+                     *                 },
+                     *                 "conditions": [
+                     *                   {
+                     *                     "op": "exists",
+                     *                     "value": null
+                     *                   }
+                     *                 ],
+                     *                 "engineVersion": "recurrence-v1",
+                     *                 "limits": {
+                     *                   "maxOccurrences": null,
+                     *                   "until": null
+                     *                 },
+                     *                 "materialization": {
+                     *                   "catchUp": "all",
+                     *                   "lead": {
+                     *                     "unit": "minute",
+                     *                     "value": 0
+                     *                   },
+                     *                   "overlap": "allow"
+                     *                 },
+                     *                 "schemaVersion": 1,
+                     *                 "timeBasis": {
+                     *                   "disambiguation": "compatible",
+                     *                   "mode": "elapsed",
+                     *                   "timeZone": "Europe/Berlin"
+                     *                 },
+                     *                 "transforms": [
+                     *                   {
+                     *                     "op": "offset",
+                     *                     "unit": "minute",
+                     *                     "value": -1000000
+                     *                   }
+                     *                 ]
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "summary": {},
+                     *               "template": {
+                     *                 "name": "example"
+                     *               },
+                     *               "version": 1
+                     *             },
+                     *             "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *             "name": null,
+                     *             "owner": {
+                     *               "id": "exampleId",
+                     *               "kind": "developerPrincipal"
+                     *             },
+                     *             "replayed": false,
+                     *             "resourceContext": {},
+                     *             "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "status": "active",
+                     *             "updatedAt": "2026-10-01T09:00:00Z"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -23427,7 +25058,53 @@ export interface operations {
         /** @description JSON payload used to create a task recurrence. The server validates this payload before applying any change. */
         requestBody: {
             content: {
-                /** @example example */
+                /**
+                 * @example {
+                 *       "policy": {
+                 *         "candidates": {
+                 *           "nodeId": "exampleId",
+                 *           "op": "calendarRule",
+                 *           "rule": {
+                 *             "frequency": "minutely",
+                 *             "startLocal": "2026-10-01T09:00:00"
+                 *           }
+                 *         },
+                 *         "conditions": [
+                 *           {
+                 *             "op": "exists",
+                 *             "value": null
+                 *           }
+                 *         ],
+                 *         "engineVersion": "recurrence-v1",
+                 *         "limits": {
+                 *           "maxOccurrences": null,
+                 *           "until": null
+                 *         },
+                 *         "materialization": {
+                 *           "catchUp": "all",
+                 *           "lead": {
+                 *             "unit": "minute",
+                 *             "value": 0
+                 *           },
+                 *           "overlap": "allow"
+                 *         },
+                 *         "schemaVersion": 1,
+                 *         "timeBasis": {
+                 *           "disambiguation": "compatible",
+                 *           "mode": "elapsed",
+                 *           "timeZone": "Europe/Berlin"
+                 *         },
+                 *         "transforms": [
+                 *           {
+                 *             "op": "offset",
+                 *             "unit": "minute",
+                 *             "value": -1000000
+                 *           }
+                 *         ]
+                 *       },
+                 *       "sourceTaskId": "exampleId"
+                 *     }
+                 */
                 "application/json": components["schemas"]["TaskRecurrenceCreate"];
             };
         };
@@ -23444,21 +25121,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23483,21 +25216,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23532,17 +25321,47 @@ export interface operations {
                 /**
                  * @example {
                  *       "policy": {
-                 *         "conditions": [],
+                 *         "candidates": {
+                 *           "nodeId": "exampleId",
+                 *           "op": "calendarRule",
+                 *           "rule": {
+                 *             "frequency": "minutely",
+                 *             "startLocal": "2026-10-01T09:00:00"
+                 *           }
+                 *         },
+                 *         "conditions": [
+                 *           {
+                 *             "op": "exists",
+                 *             "value": null
+                 *           }
+                 *         ],
                  *         "engineVersion": "recurrence-v1",
-                 *         "limits": {},
-                 *         "materialization": {},
+                 *         "limits": {
+                 *           "maxOccurrences": null,
+                 *           "until": null
+                 *         },
+                 *         "materialization": {
+                 *           "catchUp": "all",
+                 *           "lead": {
+                 *             "unit": "minute",
+                 *             "value": 0
+                 *           },
+                 *           "overlap": "allow"
+                 *         },
                  *         "schemaVersion": 1,
-                 *         "timeBasis": {},
-                 *         "transforms": []
-                 *       },
-                 *       "context": {},
-                 *       "count": 20,
-                 *       "from": "2026-07-29T10:00:00Z"
+                 *         "timeBasis": {
+                 *           "disambiguation": "compatible",
+                 *           "mode": "elapsed",
+                 *           "timeZone": "Europe/Berlin"
+                 *         },
+                 *         "transforms": [
+                 *           {
+                 *             "op": "offset",
+                 *             "unit": "minute",
+                 *             "value": -1000000
+                 *           }
+                 *         ]
+                 *       }
                  *     }
                  */
                 "application/json": components["schemas"]["TaskRecurrencePreviewInput"];
@@ -23558,14 +25377,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrencePreview",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "costClass": "low",
-                     *           "definitionHash": "example",
-                     *           "occurrences": [],
+                     *           "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "occurrences": [
+                     *             {
+                     *               "cardDates": {},
+                     *               "occurrenceKey": "example",
+                     *               "placeholderToken": "trp1.example",
+                     *               "provenance": [
+                     *                 "example"
+                     *               ],
+                     *               "scheduledFor": "2026-10-01T09:00:00Z",
+                     *               "scheduledForLocal": "exampleaaaaaaaaa",
+                     *               "timeZone": "Europe/Berlin"
+                     *             }
+                     *           ],
                      *           "summary": {}
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrencePreview"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23589,17 +25420,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "errorCode": "example",
-                     *           "operationType": "catchUp",
-                     *           "seriesId": "exampleId",
-                     *           "status": "pending",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
+                     *         "type": "taskRecurrenceOperation",
                      *         "id": "exampleId",
-                     *         "type": "taskRecurrenceOperation"
+                     *         "attributes": {
+                     *           "completedAt": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "errorCode": null,
+                     *           "operationType": "catchUp",
+                     *           "progress": {},
+                     *           "result": {},
+                     *           "seriesId": null,
+                     *           "status": "pending",
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23652,21 +25485,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23714,21 +25603,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23771,17 +25716,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "changeReason": "example",
-                 *       "name": "Example",
-                 *       "policy": {
-                 *         "conditions": [],
-                 *         "engineVersion": "recurrence-v1",
-                 *         "limits": {},
-                 *         "materialization": {},
-                 *         "schemaVersion": 1,
-                 *         "timeBasis": {},
-                 *         "transforms": []
-                 *       }
+                 *       "changeReason": "example"
                  *     }
                  */
                 "application/json": components["schemas"]["TaskRecurrenceUpdate"];
@@ -23799,21 +25734,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23866,14 +25857,26 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrencePreview",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "costClass": "low",
-                     *           "definitionHash": "example",
-                     *           "occurrences": [],
+                     *           "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "occurrences": [
+                     *             {
+                     *               "cardDates": {},
+                     *               "occurrenceKey": "example",
+                     *               "placeholderToken": "trp1.example",
+                     *               "provenance": [
+                     *                 "example"
+                     *               ],
+                     *               "scheduledFor": "2026-10-01T09:00:00Z",
+                     *               "scheduledForLocal": "exampleaaaaaaaaa",
+                     *               "timeZone": "Europe/Berlin"
+                     *             }
+                     *           ],
                      *           "summary": {}
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrencePreview"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23921,21 +25924,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -23986,21 +26045,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24051,21 +26166,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24116,21 +26287,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24181,21 +26408,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24257,21 +26540,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24314,17 +26653,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "taskId": "exampleId",
-                 *       "changeReason": "example",
-                 *       "policy": {
-                 *         "conditions": [],
-                 *         "engineVersion": "recurrence-v1",
-                 *         "limits": {},
-                 *         "materialization": {},
-                 *         "schemaVersion": 1,
-                 *         "timeBasis": {},
-                 *         "transforms": []
-                 *       }
+                 *       "taskId": "exampleId"
                  *     }
                  */
                 "application/json": components["schemas"]["TaskRecurrenceTaskTemplateUpdate"];
@@ -24342,21 +26671,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24403,15 +26788,72 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "taskRecurrenceVersion",
                      *           "id": "exampleId",
-                     *           "type": "taskRecurrenceVersion"
+                     *           "attributes": {
+                     *             "changeReason": null,
+                     *             "costClass": "low",
+                     *             "createdAt": "2026-10-01T09:00:00Z",
+                     *             "createdBy": "example",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "effectiveFromOccurrenceKey": null,
+                     *             "engineVersion": "recurrence-v1",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "seriesId": "exampleId",
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -24459,21 +26901,66 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrenceVersion",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "changeReason": "example",
+                     *           "changeReason": null,
                      *           "costClass": "low",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
+                     *           "createdAt": "2026-10-01T09:00:00Z",
                      *           "createdBy": "example",
-                     *           "definitionHash": "example",
-                     *           "effectiveFromOccurrenceKey": "example",
+                     *           "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "effectiveFromOccurrenceKey": null,
                      *           "engineVersion": "recurrence-v1",
+                     *           "policy": {
+                     *             "candidates": {
+                     *               "nodeId": "exampleId",
+                     *               "op": "calendarRule",
+                     *               "rule": {
+                     *                 "frequency": "minutely",
+                     *                 "startLocal": "2026-10-01T09:00:00"
+                     *               }
+                     *             },
+                     *             "conditions": [
+                     *               {
+                     *                 "op": "exists",
+                     *                 "value": null
+                     *               }
+                     *             ],
+                     *             "engineVersion": "recurrence-v1",
+                     *             "limits": {
+                     *               "maxOccurrences": null,
+                     *               "until": null
+                     *             },
+                     *             "materialization": {
+                     *               "catchUp": "all",
+                     *               "lead": {
+                     *                 "unit": "minute",
+                     *                 "value": 0
+                     *               },
+                     *               "overlap": "allow"
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "timeBasis": {
+                     *               "disambiguation": "compatible",
+                     *               "mode": "elapsed",
+                     *               "timeZone": "Europe/Berlin"
+                     *             },
+                     *             "transforms": [
+                     *               {
+                     *                 "op": "offset",
+                     *                 "unit": "minute",
+                     *                 "value": -1000000
+                     *               }
+                     *             ]
+                     *           },
                      *           "schemaVersion": 1,
                      *           "seriesId": "exampleId",
                      *           "summary": {},
+                     *           "template": {
+                     *             "name": "example"
+                     *           },
                      *           "version": 1
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrenceVersion"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24513,11 +27000,7 @@ export interface operations {
         /** @description JSON payload used to restore a task recurrence version. Omitted optional properties retain their current value unless the schema explicitly defines replacement semantics. */
         requestBody?: {
             content: {
-                /**
-                 * @example {
-                 *       "changeReason": "example"
-                 *     }
-                 */
+                /** @example {} */
                 "application/json": components["schemas"]["TaskRecurrenceVersionRestore"];
             };
         };
@@ -24533,21 +27016,77 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
-                     *           "attentionCode": "example",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "currentDefinition": {},
-                     *           "developerUpdatedAt": "2026-07-29T10:00:00Z",
-                     *           "name": "Example",
-                     *           "owner": {},
+                     *           "attentionCode": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "currentDefinition": {
+                     *             "costClass": "low",
+                     *             "definitionHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "engineVersion": "recurrence-v1",
+                     *             "id": "exampleId",
+                     *             "policy": {
+                     *               "candidates": {
+                     *                 "nodeId": "exampleId",
+                     *                 "op": "calendarRule",
+                     *                 "rule": {
+                     *                   "frequency": "minutely",
+                     *                   "startLocal": "2026-10-01T09:00:00"
+                     *                 }
+                     *               },
+                     *               "conditions": [
+                     *                 {
+                     *                   "op": "exists",
+                     *                   "value": null
+                     *                 }
+                     *               ],
+                     *               "engineVersion": "recurrence-v1",
+                     *               "limits": {
+                     *                 "maxOccurrences": null,
+                     *                 "until": null
+                     *               },
+                     *               "materialization": {
+                     *                 "catchUp": "all",
+                     *                 "lead": {
+                     *                   "unit": "minute",
+                     *                   "value": 0
+                     *                 },
+                     *                 "overlap": "allow"
+                     *               },
+                     *               "schemaVersion": 1,
+                     *               "timeBasis": {
+                     *                 "disambiguation": "compatible",
+                     *                 "mode": "elapsed",
+                     *                 "timeZone": "Europe/Berlin"
+                     *               },
+                     *               "transforms": [
+                     *                 {
+                     *                   "op": "offset",
+                     *                   "unit": "minute",
+                     *                   "value": -1000000
+                     *                 }
+                     *               ]
+                     *             },
+                     *             "schemaVersion": 1,
+                     *             "summary": {},
+                     *             "template": {
+                     *               "name": "example"
+                     *             },
+                     *             "version": 1
+                     *           },
+                     *           "developerUpdatedAt": "2026-10-01T09:00:00Z",
+                     *           "name": null,
+                     *           "owner": {
+                     *             "id": "exampleId",
+                     *             "kind": "developerPrincipal"
+                     *           },
                      *           "replayed": false,
                      *           "resourceContext": {},
-                     *           "revision": "\"example-revision\"",
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                      *           "status": "active",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24599,15 +27138,37 @@ export interface operations {
                      * @example {
                      *       "data": [
                      *         {
-                     *           "attributes": {},
+                     *           "type": "taskRecurrenceOccurrence",
                      *           "id": "exampleId",
-                     *           "type": "taskRecurrenceOccurrence"
+                     *           "attributes": {
+                     *             "attempts": 0,
+                     *             "cardId": null,
+                     *             "decision": {},
+                     *             "definitionVersionId": "exampleId",
+                     *             "detachedAt": null,
+                     *             "detachedBy": null,
+                     *             "detachedCardId": null,
+                     *             "lastErrorCode": null,
+                     *             "materializeAt": "2026-10-01T09:00:00Z",
+                     *             "materializedAt": null,
+                     *             "occurrenceKey": "example",
+                     *             "override": {
+                     *               "action": "materialize"
+                     *             },
+                     *             "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *             "scheduledFor": "2026-10-01T09:00:00Z",
+                     *             "scheduledForLocal": "exampleaaaaaaaaa",
+                     *             "seriesId": "exampleId",
+                     *             "state": "planned",
+                     *             "timeZone": "Europe/Berlin",
+                     *             "updatedAt": "2026-10-01T09:00:00Z"
+                     *           }
                      *         }
                      *       ],
                      *       "meta": {
                      *         "page": {
                      *           "limit": 1,
-                     *           "nextCursor": "example"
+                     *           "nextCursor": null
                      *         },
                      *         "requestId": "exampleId"
                      *       }
@@ -24657,27 +27218,31 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrenceOccurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "attempts": 0,
-                     *           "cardId": "exampleId",
+                     *           "cardId": null,
+                     *           "decision": {},
                      *           "definitionVersionId": "exampleId",
-                     *           "detachedAt": "2026-07-29T10:00:00Z",
-                     *           "detachedBy": "example",
-                     *           "detachedCardId": "exampleId",
-                     *           "lastErrorCode": "example",
-                     *           "materializeAt": "2026-07-29T10:00:00Z",
-                     *           "materializedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedAt": null,
+                     *           "detachedBy": null,
+                     *           "detachedCardId": null,
+                     *           "lastErrorCode": null,
+                     *           "materializeAt": "2026-10-01T09:00:00Z",
+                     *           "materializedAt": null,
                      *           "occurrenceKey": "example",
-                     *           "revision": "\"example-revision\"",
-                     *           "scheduledFor": "2026-07-29T10:00:00Z",
-                     *           "scheduledForLocal": "example",
+                     *           "override": {
+                     *             "action": "materialize"
+                     *           },
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scheduledFor": "2026-10-01T09:00:00Z",
+                     *           "scheduledForLocal": "exampleaaaaaaaaa",
                      *           "seriesId": "exampleId",
                      *           "state": "planned",
                      *           "timeZone": "Europe/Berlin",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrenceOccurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24721,14 +27286,7 @@ export interface operations {
             content: {
                 /**
                  * @example {
-                 *       "action": "materialize",
-                 *       "placeholderToken": "example",
-                 *       "scheduledForLocal": "example",
-                 *       "templatePatch": {
-                 *         "billable": false,
-                 *         "contactId": "exampleId",
-                 *         "customFieldValues": {}
-                 *       }
+                 *       "action": "materialize"
                  *     }
                  */
                 "application/json": components["schemas"]["TaskRecurrenceOccurrenceOverride"];
@@ -24746,27 +27304,31 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrenceOccurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "attempts": 0,
-                     *           "cardId": "exampleId",
+                     *           "cardId": null,
+                     *           "decision": {},
                      *           "definitionVersionId": "exampleId",
-                     *           "detachedAt": "2026-07-29T10:00:00Z",
-                     *           "detachedBy": "example",
-                     *           "detachedCardId": "exampleId",
-                     *           "lastErrorCode": "example",
-                     *           "materializeAt": "2026-07-29T10:00:00Z",
-                     *           "materializedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedAt": null,
+                     *           "detachedBy": null,
+                     *           "detachedCardId": null,
+                     *           "lastErrorCode": null,
+                     *           "materializeAt": "2026-10-01T09:00:00Z",
+                     *           "materializedAt": null,
                      *           "occurrenceKey": "example",
-                     *           "revision": "\"example-revision\"",
-                     *           "scheduledFor": "2026-07-29T10:00:00Z",
-                     *           "scheduledForLocal": "example",
+                     *           "override": {
+                     *             "action": "materialize"
+                     *           },
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scheduledFor": "2026-10-01T09:00:00Z",
+                     *           "scheduledForLocal": "exampleaaaaaaaaa",
                      *           "seriesId": "exampleId",
                      *           "state": "planned",
                      *           "timeZone": "Europe/Berlin",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrenceOccurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24819,27 +27381,31 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrenceOccurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "attempts": 0,
-                     *           "cardId": "exampleId",
+                     *           "cardId": null,
+                     *           "decision": {},
                      *           "definitionVersionId": "exampleId",
-                     *           "detachedAt": "2026-07-29T10:00:00Z",
-                     *           "detachedBy": "example",
-                     *           "detachedCardId": "exampleId",
-                     *           "lastErrorCode": "example",
-                     *           "materializeAt": "2026-07-29T10:00:00Z",
-                     *           "materializedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedAt": null,
+                     *           "detachedBy": null,
+                     *           "detachedCardId": null,
+                     *           "lastErrorCode": null,
+                     *           "materializeAt": "2026-10-01T09:00:00Z",
+                     *           "materializedAt": null,
                      *           "occurrenceKey": "example",
-                     *           "revision": "\"example-revision\"",
-                     *           "scheduledFor": "2026-07-29T10:00:00Z",
-                     *           "scheduledForLocal": "example",
+                     *           "override": {
+                     *             "action": "materialize"
+                     *           },
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scheduledFor": "2026-10-01T09:00:00Z",
+                     *           "scheduledForLocal": "exampleaaaaaaaaa",
                      *           "seriesId": "exampleId",
                      *           "state": "planned",
                      *           "timeZone": "Europe/Berlin",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrenceOccurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24892,27 +27458,31 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
+                     *         "type": "taskRecurrenceOccurrence",
+                     *         "id": "exampleId",
                      *         "attributes": {
                      *           "attempts": 0,
-                     *           "cardId": "exampleId",
+                     *           "cardId": null,
+                     *           "decision": {},
                      *           "definitionVersionId": "exampleId",
-                     *           "detachedAt": "2026-07-29T10:00:00Z",
-                     *           "detachedBy": "example",
-                     *           "detachedCardId": "exampleId",
-                     *           "lastErrorCode": "example",
-                     *           "materializeAt": "2026-07-29T10:00:00Z",
-                     *           "materializedAt": "2026-07-29T10:00:00Z",
+                     *           "detachedAt": null,
+                     *           "detachedBy": null,
+                     *           "detachedCardId": null,
+                     *           "lastErrorCode": null,
+                     *           "materializeAt": "2026-10-01T09:00:00Z",
+                     *           "materializedAt": null,
                      *           "occurrenceKey": "example",
-                     *           "revision": "\"example-revision\"",
-                     *           "scheduledFor": "2026-07-29T10:00:00Z",
-                     *           "scheduledForLocal": "example",
+                     *           "override": {
+                     *             "action": "materialize"
+                     *           },
+                     *           "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                     *           "scheduledFor": "2026-10-01T09:00:00Z",
+                     *           "scheduledForLocal": "exampleaaaaaaaaa",
                      *           "seriesId": "exampleId",
                      *           "state": "planned",
                      *           "timeZone": "Europe/Berlin",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
-                     *         "id": "exampleId",
-                     *         "type": "taskRecurrenceOccurrence"
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -24959,17 +27529,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "errorCode": "example",
-                     *           "operationType": "catchUp",
-                     *           "seriesId": "exampleId",
-                     *           "status": "pending",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
+                     *         "type": "taskRecurrenceOperation",
                      *         "id": "exampleId",
-                     *         "type": "taskRecurrenceOperation"
+                     *         "attributes": {
+                     *           "completedAt": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "errorCode": null,
+                     *           "operationType": "catchUp",
+                     *           "progress": {},
+                     *           "result": {},
+                     *           "seriesId": null,
+                     *           "status": "pending",
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -25008,12 +27580,9 @@ export interface operations {
                  * @example {
                  *       "eventId": "exampleId",
                  *       "eventType": "example",
-                 *       "occurredAt": "2026-07-29T10:00:00Z",
+                 *       "occurredAt": "2026-10-01T09:00:00Z",
                  *       "schemaVersion": 1,
-                 *       "sourceId": "exampleId",
-                 *       "causationId": "exampleId",
-                 *       "correlationId": "exampleId",
-                 *       "payload": {}
+                 *       "sourceId": "exampleId"
                  *     }
                  */
                 "application/json": components["schemas"]["TaskRecurrenceEventSubmit"];
@@ -25029,11 +27598,11 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "acceptedAt": "2026-07-29T10:00:00Z"
-                     *         },
+                     *         "type": "taskRecurrenceEvent",
                      *         "id": "exampleId",
-                     *         "type": "taskRecurrenceEvent"
+                     *         "attributes": {
+                     *           "acceptedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -25088,17 +27657,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "errorCode": "example",
-                     *           "operationType": "catchUp",
-                     *           "seriesId": "exampleId",
-                     *           "status": "pending",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
+                     *         "type": "taskRecurrenceOperation",
                      *         "id": "exampleId",
-                     *         "type": "taskRecurrenceOperation"
+                     *         "attributes": {
+                     *           "completedAt": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "errorCode": null,
+                     *           "operationType": "catchUp",
+                     *           "progress": {},
+                     *           "result": {},
+                     *           "seriesId": null,
+                     *           "status": "pending",
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"
@@ -25143,17 +27714,19 @@ export interface operations {
                     /**
                      * @example {
                      *       "data": {
-                     *         "attributes": {
-                     *           "completedAt": "2026-07-29T10:00:00Z",
-                     *           "createdAt": "2026-07-29T10:00:00Z",
-                     *           "errorCode": "example",
-                     *           "operationType": "catchUp",
-                     *           "seriesId": "exampleId",
-                     *           "status": "pending",
-                     *           "updatedAt": "2026-07-29T10:00:00Z"
-                     *         },
+                     *         "type": "taskRecurrenceOperation",
                      *         "id": "exampleId",
-                     *         "type": "taskRecurrenceOperation"
+                     *         "attributes": {
+                     *           "completedAt": null,
+                     *           "createdAt": "2026-10-01T09:00:00Z",
+                     *           "errorCode": null,
+                     *           "operationType": "catchUp",
+                     *           "progress": {},
+                     *           "result": {},
+                     *           "seriesId": null,
+                     *           "status": "pending",
+                     *           "updatedAt": "2026-10-01T09:00:00Z"
+                     *         }
                      *       },
                      *       "meta": {
                      *         "requestId": "exampleId"

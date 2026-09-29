@@ -15,7 +15,7 @@ type SetupOptions = {
 export function describeMcpAccess(options: SetupOptions) {
   const tools = enabledMcpTools(options.toolProfile, options)
   const requiredScopes = [...new Set(tools.flatMap((tool) => [...toolScopes[tool]]))].sort()
-  const browserBlockedScopes = requiredScopes.filter((scope) =>
+  const confirmationScopes = requiredScopes.filter((scope) =>
     sensitiveBrowserAuthorizationScopes.includes(scope),
   )
   const writeTools = tools.filter((tool) =>
@@ -23,11 +23,13 @@ export function describeMcpAccess(options: SetupOptions) {
   )
   return {
     browserLogin: {
-      blockedScopes: browserBlockedScopes,
+      blockedScopes: [],
+      confirmationScopes,
+      requiresPasskey: confirmationScopes.length > 0,
       scopeArguments: requiredScopes.length ? ['--scope', requiredScopes.join(',')] : [],
-      supported: requiredScopes.length > 0 && browserBlockedScopes.length === 0,
-      guidance: browserBlockedScopes.length
-        ? 'Create a narrowly scoped personal credential in Developer settings and import it with teamgrid auth login --token-stdin, or explicitly filter out tools requiring these scopes. Browser login cannot grant sensitive scopes yet.'
+      supported: requiredScopes.length > 0,
+      guidance: confirmationScopes.length
+        ? 'Use the exact scope arguments with teamgrid auth login. These permissions require an account passkey and a one-time confirmation. Browser login and developer consent must be enabled in the cell.'
         : 'Use the exact scope arguments with teamgrid auth login. Browser login must be enabled in your TeamGrid cell.',
     },
     requiredScopes,

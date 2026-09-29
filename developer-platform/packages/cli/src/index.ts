@@ -29,5 +29,6 @@ export {
   type DoctorReport,
   runDoctorChecks,
 } from './doctor.js'
+export { downloadPrivateFile } from './fileTransfer.js'
 export { createProgram, exitCodeForError, type ProgramDependencies } from './program.js'
 export { runCli } from './run.js'
