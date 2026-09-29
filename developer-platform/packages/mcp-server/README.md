@@ -55,6 +55,30 @@ Repeat either option or use comma-separated names. Unknown tools, overlapping
 filters and attempts to enable tools outside the selected profile fail startup.
 `TEAMGRID_MCP_ALLOW_TOOLS` and `TEAMGRID_MCP_DENY_TOOLS` provide the same controls.
 
+## Check the setup before starting a host
+
+These candidate commands print a human-facing JSON report and exit; they do not
+start the stdio server or register authentication diagnostics as MCP tools.
+
+```sh
+teamgrid-mcp --explain-scopes --tool-profile work
+teamgrid-mcp --check --profile default --tool-profile work
+```
+
+`--explain-scopes` does not access credentials or contact TeamGrid. It respects
+the same profile and allow/deny filters as the server, lists exact required
+scopes, identifies write tools and explains scopes that browser login cannot
+currently grant. In particular, full profiles include `task-recurrences:read`,
+which still needs a narrowly scoped manual credential or an explicitly reduced
+tool selection. It never silently removes those tools or permissions.
+
+`--check` reads the current server credential context and verifies Workspace
+access. Missing scopes produce a nonzero exit code and list the affected tools.
+It never uses cached profile scopes as proof and never prints a credential or
+its full context. A successful check still leaves each operation subject to
+current resource, role, sharing and Workspace restrictions. Use the diagnostic
+flags in a terminal, not in the MCP host's server arguments.
+
 ## Guarded changes
 
 | Tool | Required protection | API scope |

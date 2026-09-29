@@ -6,6 +6,7 @@ export {
   loginWithSystemBrowser,
   normalizeBrowserAuthorizationScopes,
   openSystemBrowser,
+  sensitiveBrowserAuthorizationScopes,
   startCliBrowserCallbackServer,
 } from './browserAuth.js'
 export {

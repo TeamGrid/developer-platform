@@ -26,6 +26,7 @@ export type McpRuntimeDependencies = {
 }
 
 export type McpArguments = {
+  diagnostic?: 'check' | 'explain-scopes'
   allowTools?: McpToolName[]
   denyTools?: McpToolName[]
   profile?: string
@@ -36,6 +37,14 @@ export function parseMcpArguments(argv: string[]): McpArguments {
   const result: McpArguments = {}
   for (let index = 0; index < argv.length; index += 2) {
     const name = argv[index]
+    if (name === '--check' || name === '--explain-scopes') {
+      if (result.diagnostic) {
+        throw new TeamGridClientError('invalid_arguments', 'Choose one diagnostic mode only.')
+      }
+      result.diagnostic = name === '--check' ? 'check' : 'explain-scopes'
+      index -= 1
+      continue
+    }
     const value = argv[index + 1]
     if (
       !value ||
@@ -43,7 +52,7 @@ export function parseMcpArguments(argv: string[]): McpArguments {
     ) {
       throw new TeamGridClientError(
         'invalid_arguments',
-        "Expected only '--profile <name>', '--tool-profile <profile>', '--allow-tool <name>', and '--deny-tool <name>'.",
+        "Expected '--profile <name>', '--tool-profile <profile>', '--allow-tool <name>', '--deny-tool <name>', '--check', or '--explain-scopes'.",
       )
     }
     if (name === '--profile') {

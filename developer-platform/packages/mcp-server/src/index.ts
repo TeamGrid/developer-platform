@@ -6,6 +6,7 @@ export {
 } from './config.js'
 export { createTeamGridMcpHttpHandler, type McpAuthorization, type McpHttpOptions } from './http.js'
 export { createReadOnlyHandlers, createTeamGridMcpServer } from './server.js'
+export { checkMcpAccess, describeMcpAccess } from './setup.js'
 export {
   allMcpTools,
   enabledMcpTools,
