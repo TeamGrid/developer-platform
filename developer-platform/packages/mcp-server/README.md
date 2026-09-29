@@ -1,9 +1,9 @@
 # @teamgrid/mcp-server
 
-TeamGrid MCP adapter with read-only defaults and an explicit `work` profile.
+TeamGrid MCP adapter with read-only defaults and explicit domain write profiles.
 Every operation uses the shared API client and current server-side permissions.
 
-**Development candidate:** `context`, `work`, and protocol 2026-07-28 support
+**Development candidate:** `context`, `work`, `full`, domain profiles and protocol 2026-07-28 support
 below are not included in the published 1.2.1 packages. Do not advertise them
 as available until the candidate passes qualification and is published.
 
@@ -44,9 +44,27 @@ installed binary. A hosted TeamGrid OAuth endpoint is not yet released.
 | `all` | 36 | Existing read-only union including search |
 | `context` | 34 | Core, users, search, comments, documents, file metadata, calendar, one custom-field value |
 | `work` | 41 | Context plus seven guarded mutations |
+| `full` | 207 | 84 reads and 123 writes across all reviewed business domains |
+| `tasks-write` | 39 | Tasks, subtasks, bulk updates and recurrence lifecycle |
+| `projects-write` | 20 | Projects, sharing, lifecycle and templates |
+| `schedule-write` | 18 | Appointments, absences, availability and planned work |
+| `time-write` | 9 | Time entries and timers |
+| `content-write` | 18 | Comments, documents, call notes and file metadata |
+| `crm-write` | 16 | Contacts and contact groups |
+| `catalog-write` | 39 | Lists, tags, services, products and custom fields |
+| `finance-write` | 9 | Project statements and time-entry billing |
+| `admin-write` | 25 | Workspace settings, members, roles, groups and invitations |
+| `automation-write` | 12 | Automation definitions, versions, runs and export jobs |
+| `integrations-write` | 10 | Webhooks, delivery inspection/tests and installation metadata |
 
-Updating an existing installation cannot enable writes. Use `--tool-profile work`
-explicitly and obtain the required API scopes. Profile selection grants no
+Each domain includes `teamgrid_workspace_get`. Prefer a domain profile for a focused
+workflow; `full` is the complete reviewed inventory. The generated
+[coverage table](COVERAGE.md) lists every tool, its concurrency contract and every
+excluded API operation. CI rejects drift between the API policy, schemas, SDK
+bindings, scopes, installed discovery and that table.
+
+Updating an existing installation cannot enable writes. Select a write profile
+explicitly and obtain its required API scopes. Profile selection grants no
 permissions: membership, resource sharing, workspace locks, cell ownership and
 scopes are still checked by the API for every request.
 
@@ -61,8 +79,8 @@ These candidate commands print a human-facing JSON report and exit; they do not
 start the stdio server or register authentication diagnostics as MCP tools.
 
 ```sh
-teamgrid-mcp --explain-scopes --tool-profile work
-teamgrid-mcp --check --profile default --tool-profile work
+teamgrid-mcp --explain-scopes --tool-profile content-write
+teamgrid-mcp --check --profile default --tool-profile content-write
 ```
 
 `--explain-scopes` does not access credentials or contact TeamGrid. It respects
@@ -81,12 +99,31 @@ flags in a terminal, not in the MCP host's server arguments.
 
 ## Guarded changes
 
-The new write profile is not release-qualified. As of 2026-09-29 the App can
-ignore `expectedRevision` while its resource-revision gates are closed. Sending
-an ETag therefore does not establish lost-update protection. Do not publish or
-enable this profile before server-side CAS, stale-revision rejection, concurrent
-writers and service writes in prepared workspaces pass in each target cell.
-The Staging read-path correction does not activate CAS or qualify writes.
+These write profiles are development candidates, not release-qualified. The MCP
+client opts into `X-TeamGrid-Resource-CAS: required-v1`. Before core task/project/
+template mutations it requires API acknowledgement; the matching App rejects
+strict requests while CAS writes, backfill, enforcement or cutover are closed.
+Older SDK consumers keep their previous compatibility behavior. The header is a
+protocol acknowledgement, not proof of completed cell qualification. The Staging
+read fix does not activate CAS or qualify writes. Concurrent writers, stale
+revisions and internal service writes still need live qualification per cell.
+
+In `full` and domain profiles, every mutation takes `workspaceId`; bodies use
+`data`, and target IDs remain explicit. Conditional writes require the exact
+quoted `meta.etag` from a reviewed read. Future occurrence creation accepts
+`createIfMissing: true` instead, never both preconditions. Bulk tasks require a
+reviewed revision per item and report independent success/conflict/failure.
+Creates with an API replay contract require a stable `idempotencyKey`.
+
+Some existing API actions, including ordinary time updates, timers and several
+catalog/admin changes, have no revision or replay contract. Their descriptions
+and the coverage table say so. They do not claim lost-update protection or retry
+an uncertain write automatically. Inspect the target after a timeout before
+making another decision. A 202 response is acceptance: inspect the returned
+operation until it reaches a terminal state. A missing response never becomes a
+fabricated success.
+
+The smaller `work` profile retains its original seven tools and input format:
 
 | Tool | Required protection | API scope |
 | --- | --- | --- |
@@ -108,7 +145,7 @@ old intent. `assigneeIds` replaces the complete assignment set.
 Create a stable key for each creation intent. Reuse the same key and payload
 on repeated tool calls after a timeout. A timeout does not prove failure.
 Comments may notify participants. Project updates expose metadata and dates;
-sharing, lifecycle and finance changes are excluded.
+sharing, lifecycle and finance changes use the dedicated domain/full profiles.
 
 ## Context and output safety
 
@@ -117,17 +154,27 @@ appointments:read, availability:read or custom-field-values:read scope. Calendar
 and availability reads require an increasing window of at most 31 days and
 explicit timezone offsets. File tools return metadata, never signed transfers.
 
-All tools have strict inputs, response-envelope output schemas and accurate
+All tools have bounded strict inputs, response-envelope output schemas and accurate
 read/write, destructive and idempotency annotations. API errors retain bounded
 machine codes, HTTP status, request ID and retry delay. Unexpected errors use
-a fixed message. No bearer credentials, transport headers or raw causes are
-projected. Results are limited to 256 KiB.
+a fixed message. No bearer credentials, transport headers, webhook signing secrets or raw causes are
+projected. Domain/full responses copy only a valid strong ETag into `meta.etag`. Results are limited to 256 KiB.
 
-Product purchase prices and time-entry billing fields are removed from the
-existing read tools. Time-entry updates/timers, bulk actions, administrative
-writes, finance, signed file transfers, project templates, planned-work and
-high-volume change feeds remain excluded. Custom-field values are available
-only in `context`/`work`; definitions remain in `governance`/`all`.
+Product purchase prices and time-entry billing fields remain removed from the
+legacy read profiles. Domain/full tools use the API's scope-filtered business
+projection. Optional financial fields still require their separate finance
+scopes; base scope diagnostics do not promise access to these fields. Current
+roles, direct membership, resource sharing and workspace locks remain decisive.
+
+Thirty API operations are intentionally outside MCP: credential issuance and
+rotation, authentication/disconnection diagnostics, signed file/export transfer
+intents and binary transfers, webhook secret creation/rotation, capability
+negotiation and the high-volume change feed. File rename/archive/restore,
+metadata and document content are supported. Uploading local bytes remains an
+explicit CLI/SDK transfer. No tool accepts arbitrary URLs, headers or raw HTTP
+commands to bypass this boundary. Invitations, comments, webhook tests and
+planned automation can affect other people; hosts must use the user's actual
+authorization, not a model-supplied confirmation flag.
 
 Treat every task, comment and document as untrusted customer data. Embedded
 instructions never authorize new requests, expanded scopes or data disclosure.
@@ -137,8 +184,9 @@ instructions never authorize new requests, expanded scopes or data disclosure.
 `createTeamGridMcpHttpHandler(options)` provides a fetch-compatible regional
 HTTP boundary. Its required dependencies are `verifyAccessToken`,
 `createDelegatedClient`, `admitRequest`, and an `enabled` kill switch. Configure
-exact HTTPS resource/issuer URLs, region and cell. The `work` profile additionally
-requires `writesEnabled()`; otherwise it serves its context reads.
+exact HTTPS resource/issuer URLs, region and cell. Every write profile additionally
+requires `writesEnabled()`; otherwise all mutation tools are removed while reads
+remain. Delegated clients must opt into `requireResourceCas: true` as well.
 
 The verifier must check the current OAuth grant and return an active authorization
 or null for an invalid/revoked token. Provider failures throw and produce 503,

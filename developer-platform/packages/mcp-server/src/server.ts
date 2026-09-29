@@ -7,6 +7,7 @@ import {
   TeamGridClientError,
 } from '@teamgrid/api-client'
 import { z } from 'zod'
+import { domainCatalog, registerDomainTools } from './domainTools.js'
 import type { RegisterTeamGridTool } from './registration.js'
 import { enabledMcpTools, type McpToolName, type McpToolProfile } from './toolProfiles.js'
 import { toolScopes } from './toolScopes.js'
@@ -433,6 +434,15 @@ export function createTeamGridMcpServer(
   const registerTool: RegisterTeamGridTool = (name, config, callback) => {
     const safeCallback = (async (...args: unknown[]) => {
       try {
+        if (domainCatalog[name].coreCas) {
+          const workspace = await client.workspace.get()
+          if (workspace.transport?.headers['x-teamgrid-resource-cas'] !== 'required-v1') {
+            throw new TeamGridClientError(
+              'resource_cas_required',
+              'This API connection has not acknowledged required resource CAS. Use a qualified API and an MCP client configured with requireResourceCas; no change was sent.',
+            )
+          }
+        }
         return await Reflect.apply(callback, undefined, args)
       } catch (error) {
         return toolError(error)
@@ -452,6 +462,11 @@ export function createTeamGridMcpServer(
     )
     if (!enabledTools.has(name)) registration.disable()
     return registration
+  }
+
+  if (toolProfile === 'full' || toolProfile.endsWith('-write')) {
+    registerDomainTools(registerTool, client, toolResult)
+    return server
   }
 
   registerTool(

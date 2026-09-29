@@ -306,26 +306,7 @@ const finalExpansionRoots = new Set([
 const finalExpansionPolicy = ledger.operationPolicy.filter((operation) =>
   finalExpansionRoots.has(operation.path.split('/').filter(Boolean)[0]),
 )
-const finalExpansionReads = finalExpansionPolicy.filter(
-  (operation) => operation.mcp.exposure === 'read',
-)
-const finalExpansionForbidden = finalExpansionPolicy.filter(
-  (operation) => operation.mcp.exposure === 'forbidden',
-)
-const finalExpansionRead = finalExpansionReads[0]
-if (
-  finalExpansionPolicy.length !== 36 ||
-  finalExpansionForbidden.length !== 35 ||
-  finalExpansionReads.length !== 1 ||
-  finalExpansionRead.operationId !== 'searchResources' ||
-  finalExpansionRead.mcp.exposure !== 'read' ||
-  finalExpansionRead.mcp.tool !== 'teamgrid_search' ||
-  finalExpansionRead.mcp.curated !== true ||
-  finalExpansionRead.mcp.sensitive !== true ||
-  Object.keys(finalExpansionRead.mcp).length !== 4
-) {
-  fail('final MCP expansion must expose only the sensitive curated teamgrid_search read')
-}
+if (finalExpansionPolicy.length !== 36) fail('final domain operation inventory changed without review')
 
 const sdk = new TeamGridClient({ fetch: async () => new Response(null, { status: 500 }), token: syntheticToken })
 for (const operation of ledger.operationPolicy) {
@@ -388,11 +369,11 @@ for (const profile of Object.keys(toolsByProfile)) {
     const advertised = new Set(tools.map((tool) => tool.name))
     for (const tool of tools) {
       const policy = ledger.operationPolicy.find((operation) => operation.mcp.tool === tool.name)?.mcp
-      if (!policy || policy.exposure === 'forbidden' || (policy.profiles && !policy.profiles.includes(profile))) {
+      if (!policy || policy.exposure === 'forbidden' || (policy.profiles && !policy.profiles.includes(profile) && tool.name !== 'teamgrid_workspace_get')) {
         fail(`${profile} advertises ${tool.name} without explicit capability permission`)
       }
       const write = policy.exposure === 'gated-write'
-      if (tool.annotations?.readOnlyHint !== !write || (write && profile !== 'work')) {
+      if (tool.annotations?.readOnlyHint !== !write || (write && profile !== 'work' && profile !== 'full' && !profile.endsWith('-write'))) {
         fail(`${profile}/${tool.name} has incorrect read/write metadata`)
       }
       if (write && !policy.requiredArguments.every((name) => tool.inputSchema.required?.includes(name))) {

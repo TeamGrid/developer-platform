@@ -21,7 +21,13 @@ function fixture(workspaceId = 'workspace-1') {
       reopen: vi.fn(resource),
       get: vi.fn(resource),
     },
-    workspace: { get: vi.fn(async () => ({ data: { id: workspaceId }, meta: {} })) },
+    workspace: {
+      get: vi.fn(async () => ({
+        data: { id: workspaceId },
+        meta: {},
+        transport: { headers: { 'x-teamgrid-resource-cas': 'required-v1' } },
+      })),
+    },
   }
 }
 async function connected(api = fixture(), toolProfile: McpToolProfile = 'work') {

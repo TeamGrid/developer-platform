@@ -5,6 +5,9 @@ import { join, resolve } from 'node:path'
 const allowedProductionSdkImports = new Set([
   '@modelcontextprotocol/server',
   '@modelcontextprotocol/server/stdio',
+  // Official bundled AJV + formats export. Compiles only the locally generated,
+  // reviewed schemas; no caller-provided schemas, dynamic refs or network loads.
+  '@modelcontextprotocol/server/validators/ajv',
 ])
 
 function fail(message) {
@@ -34,7 +37,7 @@ for (const { path, specifier } of sdkImports) {
 }
 for (const requiredImport of allowedProductionSdkImports) {
   if (!sdkImports.some(({ specifier }) => specifier === requiredImport)) {
-    fail(`expected MCP stdio-only import ${requiredImport} is missing`)
+    fail(`expected reviewed MCP import ${requiredImport} is missing`)
   }
 }
 

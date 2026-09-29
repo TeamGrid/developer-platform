@@ -283,6 +283,8 @@ type InternalResponse = {
 }
 
 export type TeamGridClientOptions = {
+  /** Require server-side core CAS; supported APIs acknowledge this opt-in on responses. */
+  requireResourceCas?: boolean
   apiRootDomain?: string
   baseUrl?: string
   fetch?: Fetch
@@ -1294,12 +1296,15 @@ export class TeamGridClient {
   readonly #fetch: Fetch
   readonly #maxResponseBytes: number
   readonly #random: () => number
+  readonly #requireResourceCas: boolean
+
   readonly #retries: number
   readonly #sleep: Sleep
   readonly #timeoutMs: number
   readonly #token: string
 
   constructor(options: TeamGridClientOptions) {
+    this.#requireResourceCas = options.requireResourceCas === true
     this.#token = String(options.token || '').trim()
     this.location = parseCredentialLocation(this.#token)
     this.#baseUrl = normalizeApiBaseUrl(
@@ -4167,6 +4172,7 @@ export class TeamGridClient {
       'x-teamgrid-client-version': apiClientVersion,
       'x-request-id': requestId,
     })
+    if (this.#requireResourceCas) headers.set('x-teamgrid-resource-cas', 'required-v1')
     if (options.body !== undefined) headers.set('content-type', 'application/json')
     if (options.idempotencyKey) headers.set('idempotency-key', options.idempotencyKey)
     if (options.ifMatch) headers.set('if-match', options.ifMatch)

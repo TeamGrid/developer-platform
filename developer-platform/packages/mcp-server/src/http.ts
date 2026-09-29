@@ -1,9 +1,11 @@
 import { createMcpHandler } from '@modelcontextprotocol/server'
 import type { TeamGridClient } from '@teamgrid/api-client'
 import { z } from 'zod'
+import { domainWriteTools } from './domainTools.js'
 import { createTeamGridMcpServer } from './server.js'
 import { type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
 import { toolScopes } from './toolScopes.js'
+import { workWriteTools } from './workTools.js'
 
 const identifier = z.string().min(1).max(128)
 const authorizationSchema = z
@@ -83,7 +85,10 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
         if (workspace.data.id !== authorization.workspaceId)
           throw new Error('Wrong delegation workspace')
         return createTeamGridMcpServer(client, {
-          toolProfile: profile === 'work' && !options.writesEnabled?.() ? 'context' : profile,
+          toolProfile: profile,
+          ...(!options.writesEnabled?.()
+            ? { denyTools: [...workWriteTools, ...domainWriteTools] }
+            : {}),
           requireGrantedScopes: true,
         })
       } catch {

@@ -103,4 +103,34 @@ describe('human MCP setup diagnostics', () => {
     )
     expect(() => parseMcpArguments(['--check', '--explain-scopes'])).toThrow('one diagnostic mode')
   })
+
+  it('does not report a core write ready when an older API cannot acknowledge required CAS', async () => {
+    const client = {
+      authorization: {
+        getContext: async () => ({
+          data: { attributes: { scopes: ['workspace:read', 'tasks:write'] } },
+        }),
+      },
+      workspace: {
+        get: vi.fn(async () => ({
+          data: { id: 'workspace-test' },
+          transport: { headers: {} as Record<string, string> },
+        })),
+      },
+      location: { cellId: 'de-test', region: 'de' },
+    }
+    const options = { toolProfile: 'full' as const, allowTools: ['teamgrid_task_update'] as const }
+    const closed = await checkMcpAccess(client as never, options)
+    expect(closed.missingScopes).toEqual([])
+    expect(closed.ready).toBe(false)
+    expect(closed.unavailableTools).toEqual(['teamgrid_task_update'])
+    client.workspace.get.mockResolvedValue({
+      data: { id: 'workspace-test' },
+      transport: { headers: { 'x-teamgrid-resource-cas': 'required-v1' } },
+    })
+    const supported = await checkMcpAccess(client as never, options)
+    expect(supported.ready).toBe(true)
+    expect(supported.resourceCas).toEqual({ required: true, acknowledged: true })
+    expect(supported.limitation).toContain('does not qualify server CAS activation')
+  })
 })

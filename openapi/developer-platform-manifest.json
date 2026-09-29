@@ -9,10 +9,10 @@
       "sha256": "9b26fb2e635b4e64665db3275b6612d5414778972d2f760519bac49de0af7d47"
     },
     {
-      "bytes": 84165,
+      "bytes": 101682,
       "id": "capability-ledger",
       "path": "contracts/developer-capabilities.json",
-      "sha256": "850807895ea4161798b0ff4560d7640afc50df7fd66d0dc460daa2206ae096ad"
+      "sha256": "098cf0dd225558b357b4c2adb0b8c73442aea7b819b9cbb2f85ab9ba0db9bc0e"
     },
     {
       "bytes": 173847,

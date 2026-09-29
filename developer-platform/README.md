@@ -11,7 +11,7 @@ none imports Meteor runtime code.
 - `@teamgrid/cli`: `teamgrid` command for profiles, typed project, contact,
   task, time-entry, list, service, and tag workflows, signed webhook
   management, JSON/JSONL, and automation-safe exits.
-- `@teamgrid/mcp-server`: optional local stdio MCP adapter. It uses read-only defaults, offers an explicit guarded work profile in the
+- `@teamgrid/mcp-server`: optional local stdio MCP adapter. It uses read-only defaults, offers explicit domain write profiles in the
   development candidate, and delegates every request to the same API client.
 
 All three packages support Node.js 22.14 through Node.js 24 on Linux, macOS,
@@ -164,17 +164,18 @@ Recurring tasks use immutable definition versions, a durable occurrence ledger, 
 compare-and-set revisions, and encrypted asynchronous preview/recovery operations. API v1, the TypeScript SDK, and
 the CLI expose the complete lifecycle, including preview, pause/resume/end/archive/restore,
 ownership transfer, version restore, occurrence overrides/retries, external event ingress, and
-recheck operation polling. The MCP adapter exposes only seven bounded saved-definition,
-version, preview, and occurrence reads; it never exposes drafts, writes, trigger ingress, or
-operation control.
+recheck operation polling. Published MCP profiles expose seven bounded recurrence reads.
+The development candidate adds the complete reviewed recurrence lifecycle in the explicit
+`tasks-write` and `full` profiles; these additions are not yet released.
 
 GET requests and POST requests with an idempotency key are retried for bounded transient failures.
 Tasks, projects, and project templates expose developer revisions and strong ETags. Every update,
 archive, restore, completion, reopen, lifecycle start, and template instantiation requires the
 latest revision through `If-Match`. Protection against stale writes additionally requires
 a qualified server-side CAS rollout; a header alone does not prove enforcement. Current
-pre-CAS cells may discard the expected revision. New MCP writes remain release-blocked
-until conflict handling is qualified in each target cell. Other PUT, PATCH, and DELETE
+pre-CAS cells may discard the expected revision for legacy API consumers. Candidate MCP
+clients use the additive required-CAS protocol and reject core writes on unqualified
+cells. New MCP writes remain release-blocked until live conflict handling is qualified. Other PUT, PATCH, and DELETE
 requests are not automatically retried. Errors do not retain or print the bearer credential.
 Time-entry billed state has its own finance-sensitive scope and strong revision; it is available
 through API, SDK, and CLI, but intentionally absent from every read-only MCP profile.
@@ -206,9 +207,13 @@ collaboration (29), governance (28), and all (36). Existing profiles preserve
 these meanings in the development candidate.
 
 The candidate adds `context` (34 bounded reads) and explicit `work` (41 tools,
-including seven guarded writes), plus protocol 2026-07-28 and legacy stdio
-compatibility. Writes require the confirmed workspace and either the reviewed
-revision or a stable creation idempotency key. They do not bypass API rights.
+including seven guarded writes), `full` (207 tools: 84 reads and 123 writes), and
+11 domain write profiles, plus protocol 2026-07-28 and legacy stdio compatibility.
+Writes require the confirmed workspace. Conditional writes use a reviewed ETag;
+replay-safe creates use a stable intent key. Actions without those API contracts
+are explicitly marked and never promise concurrency protection. All current API
+roles, scopes, locks and sharing rules still apply. The generated coverage table
+also accounts for the 30 operations deliberately outside MCP.
 
 See [the MCP package guide](packages/mcp-server/README.md) for exact tools,
 scopes, setup and limitations. These additions are not yet published. Browser

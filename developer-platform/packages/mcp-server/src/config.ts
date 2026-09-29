@@ -139,6 +139,7 @@ export async function createMcpApiClient(
     environment.TEAMGRID_API_BASE_URL || (!environmentToken && metadata?.baseUrl) || '',
   ).trim()
   const options: TeamGridClientOptions = {
+    requireResourceCas: true,
     ...(baseUrl ? { baseUrl } : {}),
     token,
   }

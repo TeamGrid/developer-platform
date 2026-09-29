@@ -1,6 +1,25 @@
+import { domainProfiles, domainToolNames } from './domainTools.js'
 import { workReadTools, workWriteTools } from './workTools.js'
 
-export type McpToolProfile = 'all' | 'collaboration' | 'context' | 'core' | 'governance' | 'work'
+export type McpToolProfile =
+  | 'all'
+  | 'collaboration'
+  | 'context'
+  | 'core'
+  | 'governance'
+  | 'work'
+  | 'full'
+  | 'tasks-write'
+  | 'projects-write'
+  | 'schedule-write'
+  | 'time-write'
+  | 'content-write'
+  | 'crm-write'
+  | 'catalog-write'
+  | 'finance-write'
+  | 'admin-write'
+  | 'automation-write'
+  | 'integrations-write'
 
 const coreTools = [
   'teamgrid_lists_list',
@@ -56,19 +75,24 @@ const contextTools = [
 ] as const
 const workTools = [...contextTools, ...workWriteTools] as const
 
-export type McpToolName = (typeof allTools)[number] | (typeof workTools)[number]
+export type McpToolName =
+  | (typeof allTools)[number]
+  | (typeof workTools)[number]
+  | (typeof domainToolNames)[number]
 
 export const allMcpTools: readonly McpToolName[] = Object.freeze([
-  ...new Set([...allTools, ...workTools]),
+  ...new Set([...allTools, ...workTools, ...domainToolNames]),
 ])
 
-export const toolsByProfile: Readonly<Record<McpToolProfile, readonly string[]>> = Object.freeze({
+export const toolsByProfile: Readonly<Record<string, readonly string[]>> = Object.freeze({
   all: allTools,
   collaboration: collaborationTools,
   context: contextTools,
   core: coreTools,
   governance: governanceTools,
   work: workTools,
+  full: domainToolNames,
+  ...domainProfiles,
 })
 
 export function parseMcpToolProfile(value: string | undefined): McpToolProfile {
@@ -76,9 +100,7 @@ export function parseMcpToolProfile(value: string | undefined): McpToolProfile {
     .trim()
     .toLowerCase()
   if (!Object.hasOwn(toolsByProfile, profile)) {
-    throw new Error(
-      "MCP tool profile must be 'core', 'collaboration', 'governance', 'all', 'context', or 'work'.",
-    )
+    throw new Error(`MCP tool profile must be one of: ${Object.keys(toolsByProfile).join(', ')}.`)
   }
   return profile as McpToolProfile
 }

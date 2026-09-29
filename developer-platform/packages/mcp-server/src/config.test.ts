@@ -25,7 +25,7 @@ describe('TeamGrid MCP configuration', () => {
       toolProfile: 'governance',
     })
     expect(() => parseMcpArguments(['--tool-profile', 'unknown'])).toThrow(
-      "MCP tool profile must be 'core', 'collaboration', 'governance', 'all', 'context', or 'work'.",
+      'MCP tool profile must be one of:',
     )
     expect(() => parseMcpArguments(['--allow-tool', 'teamgrid_unknown_get'])).toThrow(
       'only registered TeamGrid MCP tool names',

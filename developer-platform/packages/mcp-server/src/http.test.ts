@@ -195,84 +195,94 @@ describe('regional HTTP MCP authorization boundary', () => {
     }
   })
 
-  it('returns the full required scope set before executing a work tool', async () => {
-    const { handler } = setup({ toolProfile: 'work', writesEnabled: () => true })
-    try {
-      const response = await handler.fetch(
-        new Request(resourceUrl, {
-          method: 'POST',
-          headers: {
-            Authorization: 'Bearer opaque',
-            'Content-Type': 'application/json',
-            Accept: 'application/json, text/event-stream',
-          },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: 1,
-            method: 'tools/call',
-            params: {
-              name: 'teamgrid_task_create',
-              arguments: {
-                workspaceId: 'workspace-a',
-                idempotencyKey: 'intent-1',
-                data: { name: 'Task' },
-              },
+  it.each(['work', 'full', 'tasks-write'] as const)(
+    'returns the full required scope set before executing a write in %s',
+    async (toolProfile) => {
+      const { handler } = setup({ toolProfile, writesEnabled: () => true })
+      try {
+        const response = await handler.fetch(
+          new Request(resourceUrl, {
+            method: 'POST',
+            headers: {
+              Authorization: 'Bearer opaque',
+              'Content-Type': 'application/json',
+              Accept: 'application/json, text/event-stream',
             },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'tools/call',
+              params: {
+                name: 'teamgrid_task_create',
+                arguments: {
+                  workspaceId: 'workspace-a',
+                  idempotencyKey: 'intent-1',
+                  data: { name: 'Task' },
+                },
+              },
+            }),
           }),
-        }),
-      )
-      expect(response.status).toBe(403)
-      expect(response.headers.get('www-authenticate')).toContain('tasks:write')
-      expect(response.headers.get('www-authenticate')).toContain('workspace:read')
-    } finally {
-      await handler.close()
-    }
-  })
+        )
+        expect(response.status).toBe(403)
+        expect(response.headers.get('www-authenticate')).toContain('tasks:write')
+        expect(response.headers.get('www-authenticate')).toContain('workspace:read')
+      } finally {
+        await handler.close()
+      }
+    },
+  )
 
-  it('serves modern HTTP with isolated delegation and fresh revocation checks', async () => {
-    let revoked = false
-    const { handler, createDelegatedClient, verifyAccessToken } = setup({
-      verifyAccessToken: vi.fn(async (token) =>
-        revoked ? null : grant(token === 'token-a' ? 'workspace-a' : 'workspace-b'),
-      ),
-      toolProfile: 'work',
-      writesEnabled: () => false,
-    })
-    const clients = ['token-a', 'token-b'].map((token) => ({
-      client: new Client(
-        { name: 'http-test', version: '1.0.0' },
-        { versionNegotiation: { mode: { pin: '2026-07-28' } } },
-      ),
-      transport: new StreamableHTTPClientTransport(new URL(resourceUrl), {
-        requestInit: { headers: { Authorization: `Bearer ${token}` } },
-        fetch: (input, init) => handler.fetch(new Request(input, init)),
-      }),
-    }))
-    try {
-      await Promise.all(clients.map(({ client, transport }) => client.connect(transport)))
-      const responses = await Promise.all(
-        clients.map(({ client }) =>
-          client.callTool({ name: 'teamgrid_workspace_get', arguments: {} }),
+  it.each([
+    ['work', 34],
+    ['full', 84],
+    ['time-write', 3],
+  ] as const)(
+    'serves %s reads with writes disabled, isolated delegation and fresh revocation checks',
+    async (toolProfile, readCount) => {
+      let revoked = false
+      const { handler, createDelegatedClient, verifyAccessToken } = setup({
+        verifyAccessToken: vi.fn(async (token) =>
+          revoked ? null : grant(token === 'token-a' ? 'workspace-a' : 'workspace-b'),
         ),
-      )
-      expect(responses.map((r) => r.structuredContent)).toEqual([
-        { data: { id: 'workspace-a', type: 'workspace' }, meta: {} },
-        { data: { id: 'workspace-b', type: 'workspace' }, meta: {} },
-      ])
-      const tools = await clients[0]?.client.listTools()
-      expect(tools?.tools).toHaveLength(34)
-      expect(tools?.tools.every((tool) => tool.annotations?.readOnlyHint)).toBe(true)
-      expect(
-        createDelegatedClient.mock.calls.every(([authorization]) => !('token' in authorization)),
-      ).toBe(true)
-      revoked = true
-      await expect(
-        clients[0]?.client.callTool({ name: 'teamgrid_workspace_get', arguments: {} }),
-      ).rejects.toThrow()
-      expect(verifyAccessToken).toHaveBeenCalled()
-    } finally {
-      await Promise.allSettled(clients.map(({ client }) => client.close()))
-      await handler.close()
-    }
-  })
+        toolProfile,
+        writesEnabled: () => false,
+      })
+      const clients = ['token-a', 'token-b'].map((token) => ({
+        client: new Client(
+          { name: 'http-test', version: '1.0.0' },
+          { versionNegotiation: { mode: { pin: '2026-07-28' } } },
+        ),
+        transport: new StreamableHTTPClientTransport(new URL(resourceUrl), {
+          requestInit: { headers: { Authorization: `Bearer ${token}` } },
+          fetch: (input, init) => handler.fetch(new Request(input, init)),
+        }),
+      }))
+      try {
+        await Promise.all(clients.map(({ client, transport }) => client.connect(transport)))
+        const responses = await Promise.all(
+          clients.map(({ client }) =>
+            client.callTool({ name: 'teamgrid_workspace_get', arguments: {} }),
+          ),
+        )
+        expect(responses.map((r) => r.structuredContent)).toEqual([
+          { data: { id: 'workspace-a', type: 'workspace' }, meta: {} },
+          { data: { id: 'workspace-b', type: 'workspace' }, meta: {} },
+        ])
+        const tools = await clients[0]?.client.listTools()
+        expect(tools?.tools).toHaveLength(readCount)
+        expect(tools?.tools.every((tool) => tool.annotations?.readOnlyHint)).toBe(true)
+        expect(
+          createDelegatedClient.mock.calls.every(([authorization]) => !('token' in authorization)),
+        ).toBe(true)
+        revoked = true
+        await expect(
+          clients[0]?.client.callTool({ name: 'teamgrid_workspace_get', arguments: {} }),
+        ).rejects.toThrow()
+        expect(verifyAccessToken).toHaveBeenCalled()
+      } finally {
+        await Promise.allSettled(clients.map(({ client }) => client.close()))
+        await handler.close()
+      }
+    },
+  )
 })

@@ -8,11 +8,14 @@ import { parseMcpToolFilter, parseMcpToolProfile } from './toolProfiles.js'
 
 const helpText = `Usage: teamgrid-mcp [--profile <name>] [--tool-profile <profile>] [--allow-tool <name>] [--deny-tool <name>]
 
-Starts the TeamGrid MCP server over stdio. Existing profiles are read-only; work explicitly enables writes.
+Starts the TeamGrid MCP server over stdio. Read-only by default; work, full and domain profiles explicitly enable writes.
 
 Options:
   --profile <name>  Use a TeamGrid CLI keychain profile
-  --tool-profile    core (default), collaboration, governance, all, context, or work
+  --tool-profile    core (default), collaboration, governance, all, context, work, full,
+                    tasks-write, projects-write, schedule-write, time-write, content-write,
+                    crm-write, catalog-write, finance-write, admin-write, automation-write,
+                    integrations-write
   --allow-tool      Narrow the profile to an exact tool; repeat or comma-separate
   --deny-tool       Remove an exact tool; repeat or comma-separate
   --explain-scopes  Print exact required permissions without reading credentials or contacting TeamGrid

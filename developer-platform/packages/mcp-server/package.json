@@ -1,7 +1,7 @@
 {
   "name": "@teamgrid/mcp-server",
   "version": "1.2.1",
-  "description": "TeamGrid MCP adapter with read-only defaults and an explicit guarded work profile",
+  "description": "TeamGrid MCP adapter with read-only defaults and explicit domain write profiles",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -20,7 +20,8 @@
   ],
   "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "COVERAGE.md"
   ],
   "bin": {
     "teamgrid-mcp": "dist/bin.js"
@@ -33,7 +34,7 @@
   },
   "scripts": {
     "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
-    "postbuild": "node -e \"require('node:fs').chmodSync('dist/bin.js', 0o755)\"",
+    "postbuild": "node -e \"const fs=require('node:fs'); fs.chmodSync('dist/bin.js', 0o755); const file='dist/generated/domainCatalog.json'; fs.writeFileSync(file, JSON.stringify(JSON.parse(fs.readFileSync(file, 'utf8'))))\"",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "engines": {

@@ -14,7 +14,8 @@
       "scripts/verify-production-release-evidence.test.mjs",
       "!packages/**/dist",
       "!packages/api-client/src/generated/schema.ts",
-      "!packages/mcp-server/src/toolScopes.ts"
+      "!packages/mcp-server/src/toolScopes.ts",
+      "!packages/mcp-server/src/generated/**"
     ]
   },
   "formatter": {
