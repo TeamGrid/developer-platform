@@ -36,6 +36,49 @@ const dailyWorkScopes = Object.freeze([
   'comments:write',
 ])
 
+const mcpContextScopes = Object.freeze([
+  'appointments:read',
+  'availability:read',
+  'comments:read',
+  'custom-field-values:read',
+  'documents:read',
+  'files:read',
+  'lists:read',
+  'product-groups:read',
+  'products:read',
+  'projects:read',
+  'search:read',
+  'tags:read',
+  'task-recurrences:read',
+  'tasks:read',
+  'time-entries:read',
+  'users:read',
+  'workspace:read',
+])
+
+const mcpWorkScopes = Object.freeze([
+  'appointments:read',
+  'availability:read',
+  'comments:read',
+  'comments:write',
+  'custom-field-values:read',
+  'documents:read',
+  'files:read',
+  'lists:read',
+  'product-groups:read',
+  'products:read',
+  'projects:read',
+  'projects:write',
+  'search:read',
+  'tags:read',
+  'task-recurrences:read',
+  'tasks:read',
+  'tasks:write',
+  'time-entries:read',
+  'users:read',
+  'workspace:read',
+])
+
 export const sensitiveBrowserAuthorizationScopes = Object.freeze([
   'absences:admin:write',
   'absences:delegated:read',
@@ -115,7 +158,7 @@ const pairingWords = Object.freeze([
   'zephyr',
 ])
 
-export type CliAuthorizationScopePreset = 'daily-work' | 'read-only'
+export type CliAuthorizationScopePreset = 'daily-work' | 'read-only' | 'mcp-context' | 'mcp-work'
 
 export type BrowserLoginOptions = {
   apiBaseUrl?: string
@@ -228,11 +271,15 @@ export function normalizeBrowserAuthorizationScopes({
 }) {
   const values = scopes?.length
     ? scopes
-    : preset === 'daily-work'
-      ? dailyWorkScopes
-      : preset === 'read-only'
-        ? readOnlyScopes
-        : []
+    : preset === 'mcp-context'
+      ? mcpContextScopes
+      : preset === 'mcp-work'
+        ? mcpWorkScopes
+        : preset === 'daily-work'
+          ? dailyWorkScopes
+          : preset === 'read-only'
+            ? readOnlyScopes
+            : []
   const normalized = Array.from(new Set(values))
   if (
     normalized.length < 1 ||
@@ -242,15 +289,6 @@ export function normalizeBrowserAuthorizationScopes({
     return invalid(
       'invalid_arguments',
       'Browser login requires 1–100 unique valid TeamGrid scopes.',
-    )
-  }
-  const sensitive = normalized.filter((scope) => sensitiveScopeSet.has(scope))
-  if (sensitive.length > 0) {
-    return invalid(
-      'browser_sensitive_scopes_unavailable',
-      `Browser login cannot request sensitive scopes yet (${sensitive.join(', ')}). ` +
-        'Create a narrowly scoped personal credential in the TeamGrid Developer Center and use ' +
-        "'teamgrid auth login --manual' instead.",
     )
   }
   return normalized
@@ -413,8 +451,8 @@ export async function startCliBrowserCallbackServer(
     })
     response.end(
       safeCallbackHtml(
-        'TeamGrid CLI is connected',
-        'You can close this page and return to your terminal.',
+        'Authorization received',
+        'Return to your terminal. The CLI still needs to finish the connection and save it securely. Check the terminal for the final result.',
       ),
     )
     resolveCallback({ authorizationCode, cellId, region })
@@ -695,6 +733,11 @@ export async function loginWithSystemBrowser(
       state,
     })
     options.writeStatus(`Pairing phrase: ${pairing}`)
+    if (scopes.some((scope) => sensitiveScopeSet.has(scope))) {
+      options.writeStatus(
+        'These permissions require confirmation with your TeamGrid passkey in the browser.',
+      )
+    }
     if (options.noBrowser) {
       options.writeStatus(`Open this URL in your browser:\n${authorizationUrl}`)
     } else {

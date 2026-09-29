@@ -5670,6 +5670,37 @@
     },
     {
       "authMode": "developerCredential",
+      "conditionalScopes": [
+        "contacts:read",
+        "projects:read",
+        "tasks:read"
+      ],
+      "dynamicPolicyIds": [
+        "collaboration-target-domain"
+      ],
+      "executionBindings": [
+        {
+          "id": "api.v1.updateComment",
+          "kind": "httpLocal",
+          "role": "transport"
+        },
+        {
+          "id": "developerApi.v1.comments.update",
+          "kind": "appMethod",
+          "role": "authorization"
+        }
+      ],
+      "handlerId": "updateComment",
+      "method": "PATCH",
+      "operationId": "updateComment",
+      "optionalScopes": [],
+      "path": "/comments/{id}",
+      "requiredScopes": [
+        "comments:write"
+      ]
+    },
+    {
+      "authMode": "developerCredential",
       "conditionalScopes": [],
       "dynamicPolicyIds": [],
       "executionBindings": [
@@ -6231,7 +6262,7 @@
   ],
   "schemaVersion": 1,
   "summary": {
-    "authenticatedOperations": 235,
+    "authenticatedOperations": 236,
     "publicClientOperations": 1,
     "directCellReadOperations": [],
     "referencedAppMethodIds": [
@@ -6268,6 +6299,7 @@
       "developerApi.v1.comments.get",
       "developerApi.v1.comments.list",
       "developerApi.v1.comments.restore",
+      "developerApi.v1.comments.update",
       "developerApi.v1.credentials.self.get",
       "developerApi.v1.credentials.self.revoke",
       "developerApi.v1.customFieldValues.clear",

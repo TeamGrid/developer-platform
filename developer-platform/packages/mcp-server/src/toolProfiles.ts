@@ -1,4 +1,25 @@
-export type McpToolProfile = 'all' | 'collaboration' | 'core' | 'governance'
+import { domainProfiles, domainToolNames } from './domainTools.js'
+import { workReadTools, workWriteTools } from './workTools.js'
+
+export type McpToolProfile =
+  | 'all'
+  | 'collaboration'
+  | 'context'
+  | 'core'
+  | 'governance'
+  | 'work'
+  | 'full'
+  | 'tasks-write'
+  | 'projects-write'
+  | 'schedule-write'
+  | 'time-write'
+  | 'content-write'
+  | 'crm-write'
+  | 'catalog-write'
+  | 'finance-write'
+  | 'admin-write'
+  | 'automation-write'
+  | 'integrations-write'
 
 const coreTools = [
   'teamgrid_lists_list',
@@ -43,17 +64,35 @@ const governanceTools = [
   'teamgrid_webhook_get',
   'teamgrid_webhooks_list',
 ] as const
-const allTools = Array.from(new Set([...collaborationTools, ...governanceTools, 'teamgrid_search']))
+const allTools = Array.from(
+  new Set([...collaborationTools, ...governanceTools, 'teamgrid_search' as const]),
+)
+const contextTools = [
+  ...coreTools,
+  'teamgrid_users_list',
+  'teamgrid_search',
+  ...workReadTools,
+] as const
+const workTools = [...contextTools, ...workWriteTools] as const
 
-export type McpToolName = (typeof allTools)[number]
+export type McpToolName =
+  | (typeof allTools)[number]
+  | (typeof workTools)[number]
+  | (typeof domainToolNames)[number]
 
-export const allMcpTools: readonly McpToolName[] = Object.freeze([...allTools])
+export const allMcpTools: readonly McpToolName[] = Object.freeze([
+  ...new Set([...allTools, ...workTools, ...domainToolNames]),
+])
 
-export const toolsByProfile: Readonly<Record<McpToolProfile, readonly string[]>> = Object.freeze({
+export const toolsByProfile: Readonly<Record<string, readonly string[]>> = Object.freeze({
   all: allTools,
   collaboration: collaborationTools,
+  context: contextTools,
   core: coreTools,
   governance: governanceTools,
+  work: workTools,
+  full: domainToolNames,
+  ...domainProfiles,
 })
 
 export function parseMcpToolProfile(value: string | undefined): McpToolProfile {
@@ -61,7 +100,7 @@ export function parseMcpToolProfile(value: string | undefined): McpToolProfile {
     .trim()
     .toLowerCase()
   if (!Object.hasOwn(toolsByProfile, profile)) {
-    throw new Error("MCP tool profile must be 'core', 'collaboration', 'governance', or 'all'.")
+    throw new Error(`MCP tool profile must be one of: ${Object.keys(toolsByProfile).join(', ')}.`)
   }
   return profile as McpToolProfile
 }

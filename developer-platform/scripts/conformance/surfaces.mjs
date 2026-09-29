@@ -1,6 +1,7 @@
 import { Writable } from 'node:stream'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
+import { listAllMcpTools } from '../lib/mcp-tool-discovery.mjs'
 import { evidenceResult } from './evidence.mjs'
 
 function commandPaths(command, prefix = []) {
@@ -71,7 +72,9 @@ export function verifySurfaceBindings({ client, cliCommands, inventory, mcpTools
     .filter((operation) => !commandSet.has(operation.surfaces.cli.command))
     .map((operation) => operation.operationId)
   const expectedMcp = operations
-    .filter((operation) => operation.surfaces.mcp.exposure === 'read')
+    .filter(
+      (operation) => operation.surfaces.mcp.exposure === 'read' && !operation.surfaces.mcp.profiles,
+    )
     .map((operation) => operation.surfaces.mcp.tool)
     .sort()
   const actualMcp = [...mcpTools].sort()
@@ -106,7 +109,7 @@ async function loadDefaultRuntime(config) {
   const mcpClient = new Client({ name: 'teamgrid-conformance', version: '1.0.0' })
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
   await Promise.all([server.connect(serverTransport), mcpClient.connect(clientTransport)])
-  const mcpTools = (await mcpClient.listTools()).tools.map((tool) => tool.name)
+  const mcpTools = (await listAllMcpTools(mcpClient)).tools.map((tool) => tool.name)
 
   return {
     cliCommands: commandPaths(program),
@@ -240,7 +243,9 @@ export async function executeSurfaceConformance({
         results.push(surfaceFailure('cli', 'cli_live_read_failed', operation.operationId, error))
       }
     }
-    const mcpReads = reads.filter((operation) => operation.surfaces.mcp.exposure === 'read')
+    const mcpReads = reads.filter(
+      (operation) => operation.surfaces.mcp.exposure === 'read' && !operation.surfaces.mcp.profiles,
+    )
     for (const [index, operation] of mcpReads.entries()) {
       if (index > 0 || reads.length > 0) await sleep(config.requestIntervalMs)
       try {

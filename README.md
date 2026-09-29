@@ -1,6 +1,6 @@
 # TeamGrid Developer Platform
 
-Official TypeScript SDK, command-line interface, and optional read-only MCP
+Official TypeScript SDK, command-line interface, and optional MCP
 adapter for TeamGrid API v1.
 
 The packages live in [`developer-platform/`](developer-platform/):
@@ -11,19 +11,22 @@ The packages live in [`developer-platform/`](developer-platform/):
 
 The checked API contracts are available at [`openapi/v0.json`](openapi/v0.json) and
 [`openapi/v1.json`](openapi/v1.json). The same directory also mirrors the capability ledger,
-canonical 90-scope policy, complete 87-route v0 migration map, the 237-operation action-policy
+canonical 90-scope policy, complete 87-route v0 migration map, the 238-operation action-policy
 registry identity, and SHA-256 contract manifest used by CI.
 See the [workspace documentation](developer-platform/README.md) for usage,
 credential handling, regional routing, and development instructions.
 
 ## Install
 
-The stable 1.2.1 release is prepared for the default `latest` dist-tag:
+The 1.2.2 release candidate is prepared for the default `latest` dist-tag:
+
+Version 1.2.2 is not published yet; 1.2.1 remains the public release.
+The commands below apply after qualification and publication.
 
 ```sh
-npm install @teamgrid/api-client@1.2.1
-npm install --global @teamgrid/cli@1.2.1
-npm install --global @teamgrid/mcp-server@1.2.1
+npm install @teamgrid/api-client@1.2.2
+npm install --global @teamgrid/cli@1.2.2
+npm install --global @teamgrid/mcp-server@1.2.2
 ```
 
 ## Security

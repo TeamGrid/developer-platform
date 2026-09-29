@@ -125,3 +125,16 @@ but a high-cost draft can return a recoverable operation; use
 Billing updates likewise require an explicit revision and exactly one of
 `--billed` or `--unbilled`; the separate billing scope is never implied by
 ordinary time-entry write access.
+
+### Matching browser authorization to MCP
+
+The `mcp-context` and `mcp-work` presets describe the complete matching tool
+profiles. Browser issuance currently refuses their sensitive recurrence read
+scope until qualified step-up authentication is available; use a personal
+credential with the exact scopes shown by `--explain-scopes` in the meantime. The original `read-only` and `daily-work`
+CLI presets remain available with their existing narrower scopes. Consent shows
+all requested scopes and server permissions are checked on every operation.
+Recurrence reads are included; recurrence mutations, finance, administration and
+other sensitive scopes still require the qualified elevated authorization path.
+Use `teamgrid-mcp --tool-profile work --explain-scopes` to inspect exact scope
+requirements and `--check` to verify the current credential and workspace.

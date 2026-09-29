@@ -205,6 +205,10 @@ function bindV1Operations(operations, capabilities, bindings) {
         mcp: {
           exposure: policy.mcp.exposure,
           ...(policy.mcp.tool ? { tool: policy.mcp.tool } : {}),
+          ...(policy.mcp.profiles ? { profiles: policy.mcp.profiles } : {}),
+          ...(policy.mcp.requiredArguments
+            ? { requiredArguments: policy.mcp.requiredArguments }
+            : {}),
           ...(policy.mcp.reason ? { reason: policy.mcp.reason } : {}),
         },
         sdk: sdkSupported
@@ -259,7 +263,7 @@ function buildSummary(operations) {
     byMethod: {},
     byRisk: {},
     byVersion: {},
-    mcp: { forbidden: 0, read: 0, total: 0 },
+    mcp: { forbidden: 0, 'gated-write': 0, read: 0, total: 0 },
     requiresFixture: 0,
     total: operations.length,
   }
@@ -336,7 +340,7 @@ export function formatInventorySummary(inventory) {
     `${summary.total} API operations (${summary.byVersion.v0} V0, ${summary.byVersion.v1} V1)`,
     `${summary.automaticReadProbes} safe automatic read probes`,
     `${summary.requiresFixture} operations require parameters, fixtures, or cleanup`,
-    `${summary.mcp.read} MCP reads; ${summary.mcp.forbidden} operations intentionally forbidden`,
+    `${summary.mcp.read} MCP reads; ${summary.mcp['gated-write']} opt-in writes; ${summary.mcp.forbidden} operations intentionally forbidden`,
     `Inventory digest: ${inventory.inventoryDigest}`,
   ].join('\n')
 }

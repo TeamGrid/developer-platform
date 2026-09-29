@@ -276,7 +276,32 @@ function exactResource(
   )
 }
 
-function requestMeta(value: unknown) {
+function requestMeta(value: unknown, allowSearch = false) {
+  if (allowSearch && isRecord(value) && value.search !== undefined) {
+    const search = value.search
+    return (
+      hasExactKeys(value, ['requestId', 'search']) &&
+      boundedString(value.requestId, 256, false) &&
+      hasExactKeys(search, [
+        'complete',
+        'indexed',
+        'limit',
+        'returned',
+        'continuation',
+        'verification',
+      ]) &&
+      search.complete === false &&
+      search.indexed === true &&
+      Number.isSafeInteger(search.limit) &&
+      Number(search.limit) >= 1 &&
+      Number(search.limit) <= 50 &&
+      Number.isSafeInteger(search.returned) &&
+      Number(search.returned) >= 0 &&
+      Number(search.returned) <= Number(search.limit) &&
+      search.continuation === 'narrow-query-or-list' &&
+      search.verification === 'read-by-id'
+    )
+  }
   return hasExactKeys(value, ['requestId']) && boundedString(value.requestId, 256, false)
 }
 
@@ -308,9 +333,13 @@ export function assertStrictResourceArray<T>(
 ): ResourceEnvelope<T[]> {
   if (
     !hasExactKeys(value, ['data', 'meta']) ||
-    !requestMeta(value.meta) ||
+    !requestMeta(value.meta, label === 'search') ||
     !Array.isArray(value.data) ||
     value.data.length > maximum ||
+    (label === 'search' &&
+      isRecord(value.meta) &&
+      isRecord(value.meta.search) &&
+      value.meta.search.returned !== value.data.length) ||
     value.data.some((item) => !validator(item)) ||
     new Set(value.data.map((item) => identityKey(item))).size !== value.data.length
   ) {

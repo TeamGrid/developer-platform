@@ -1,0 +1,189 @@
+import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
+import { describe, expect, it } from 'vitest'
+import { createRegionalMcpGateway, type ProviderResult } from './gateway.js'
+
+const resourceUrl = 'https://mcp.example.test/mcp'
+const issuerUrl = 'https://auth.example.test/'
+const apiBaseUrl = 'https://api.de.example.test/v1'
+const access = `tg_mcp_at_v1_${'a'.repeat(43)}`
+const apiToken = `tg_oa_v2_de_de-test_${'b'.repeat(24)}_${'c'.repeat(64)}`
+const now = 1800000000000
+function harness(
+  patch: (value: ProviderResult) => unknown = (value) => value,
+  providerResponse?: () => Response,
+) {
+  const seen: {
+    url: string
+    auth: string | null
+    body: unknown
+    edge: string | null
+    requestId: string | null
+  }[] = []
+  const gateway = createRegionalMcpGateway({
+    resourceUrl,
+    issuerUrl,
+    apiBaseUrl,
+    serviceSecret: 's'.repeat(48),
+    apiOriginSecret: 'edge-secret',
+    region: 'de',
+    cellId: 'de-test',
+    now: () => now,
+    enabled: () => true,
+    admitRequest: async () => true,
+    fetch: async (input, init) => {
+      const url = String(input)
+      const headers = new Headers(init?.headers)
+      seen.push({
+        url,
+        auth: headers.get('authorization'),
+        body: init?.body,
+        edge: headers.get('x-teamgrid-edge-origin-authorization'),
+        requestId: headers.get('x-request-id'),
+      })
+      if (url.startsWith(issuerUrl) && providerResponse) return providerResponse()
+      if (url.startsWith(issuerUrl))
+        return Response.json(
+          patch({
+            authorization: {
+              active: true,
+              audience: resourceUrl,
+              issuer: issuerUrl,
+              expiresAt: now / 1000 + 300,
+              clientId: 'host',
+              subjectId: 'user',
+              workspaceId: 'team',
+              grantId: 'grant',
+              region: 'de',
+              cellId: 'de-test',
+              scopes: ['workspace:read'],
+            },
+            delegation: {
+              token: apiToken,
+              expiresAt: new Date(now + 300000).toISOString(),
+              scopes: ['workspace:read'],
+              workspaceId: 'team',
+            },
+          }),
+        )
+      return Response.json(
+        {
+          data: { id: 'team', type: 'workspace', attributes: { name: 'Example' } },
+          meta: { requestId: 'test' },
+        },
+        { headers: { 'X-TeamGrid-Resource-CAS': 'required-v1' } },
+      )
+    },
+  })
+  return { gateway, seen }
+}
+
+describe('regional OAuth MCP gateway', () => {
+  it.each([401, 429, 500, 503])(
+    'keeps provider status %s from becoming a new-login prompt',
+    async (status) => {
+      const { gateway, seen } = harness(
+        undefined,
+        () =>
+          new Response(null, {
+            status,
+            headers: { 'Retry-After': '120' },
+          }),
+      )
+      try {
+        const result = await gateway.fetch(
+          new Request(resourceUrl, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${access}` },
+          }),
+        )
+        expect(result.status).toBe(status === 429 ? 429 : 503)
+        if (status === 429) expect(result.headers.get('retry-after')).toBe('120')
+        expect(result.headers.has('www-authenticate')).toBe(false)
+        expect(seen.some((call) => call.url.startsWith(apiBaseUrl))).toBe(false)
+      } finally {
+        await gateway.close()
+      }
+    },
+  )
+  it('challenges only an explicit invalid grant and bounds provider bodies', async () => {
+    for (const [reply, status] of [
+      [() => Response.json({ error: 'invalid_grant' }, { status: 400 }), 401],
+      [() => new Response('x'.repeat(32769)), 503],
+    ] as const) {
+      const { gateway } = harness(undefined, reply)
+      try {
+        const result = await gateway.fetch(
+          new Request(resourceUrl, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${access}` },
+          }),
+        )
+        expect(result.status).toBe(status)
+      } finally {
+        await gateway.close()
+      }
+    }
+  })
+
+  it('uses the MCP token only at its issuer and the separate delegation only at its API', async () => {
+    const { gateway, seen } = harness()
+    const client = new Client({ name: 'qualification', version: '1.0.0' })
+    const transport = new StreamableHTTPClientTransport(new URL(resourceUrl), {
+      requestInit: { headers: { Authorization: `Bearer ${access}` } },
+      fetch: (input, init) => gateway.fetch(new Request(input, init)),
+    })
+    await client.connect(transport)
+    await client.close()
+    const providerCalls = seen.filter((call) => call.url.startsWith(issuerUrl))
+    const apiCalls = seen.filter((call) => call.url.startsWith(apiBaseUrl))
+    expect(providerCalls.length).toBeGreaterThan(0)
+    expect(apiCalls.length).toBeGreaterThan(0)
+    for (const call of providerCalls) {
+      expect(call.auth).toBe(`Bearer ${'s'.repeat(48)}`)
+      expect(JSON.parse(String(call.body))).toEqual({ access_token: access })
+      expect(call.edge).toBeNull()
+    }
+    for (const call of apiCalls) {
+      expect(call.auth).toBe(`Bearer ${apiToken}`)
+      expect(call.requestId).toMatch(/^mcp-[a-f0-9-]{36}$/)
+      expect(providerCalls.some((provider) => provider.requestId === call.requestId)).toBe(true)
+      expect(call.edge).toBe('edge-secret')
+      expect(JSON.stringify(call)).not.toContain(access)
+    }
+  })
+
+  it.each(['workspace', 'scopes', 'cell', 'expiry', 'issuer'])(
+    'refuses a provider delegation with a mismatched %s before accessing API data',
+    async (kind) => {
+      const { gateway, seen } = harness((value) => {
+        if (kind === 'workspace') value.delegation.workspaceId = 'other'
+        if (kind === 'scopes') value.delegation.scopes.push('tasks:write')
+        if (kind === 'cell') value.authorization.cellId = 'other'
+        if (kind === 'expiry') value.delegation.expiresAt = new Date(now + 600000).toISOString()
+        if (kind === 'issuer') value.authorization.issuer = 'https://other.example.test/'
+        return value
+      })
+      const response = await gateway.fetch(
+        new Request(resourceUrl, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${access}`, 'Content-Type': 'application/json' },
+          body: '{}',
+        }),
+      )
+      expect(response.status).toBe(503)
+      expect(seen.some((call) => call.url.startsWith(apiBaseUrl))).toBe(false)
+    },
+  )
+
+  it('rejects PATs and shared API credentials at the MCP authorization boundary', async () => {
+    const { gateway, seen } = harness()
+    const response = await gateway.fetch(
+      new Request(resourceUrl, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiToken}` },
+      }),
+    )
+    expect(response.status).toBe(401)
+    expect(seen).toEqual([])
+  })
+})

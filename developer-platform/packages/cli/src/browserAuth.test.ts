@@ -204,7 +204,13 @@ describe('TeamGrid CLI browser authorization', () => {
         cellId: 'de-nbg-001',
         region: 'de',
       })
-      expect((await validRequest).status).toBe(200)
+      const response = await validRequest
+      expect(response.status).toBe(200)
+      const html = await response.text()
+      expect(html).toContain('Authorization received')
+      expect(html).toContain('final result')
+      expect(html).not.toContain('is connected')
+      expect(html).not.toContain('b'.repeat(43))
     } finally {
       await callbackServer.close()
     }
@@ -351,7 +357,7 @@ describe('TeamGrid CLI browser authorization', () => {
     ).toThrow('valid TeamGrid scopes')
   })
 
-  it('fails closed for sensitive scopes until browser step-up authentication is available', async () => {
+  it('requests sensitive scopes for the server-owned passkey confirmation without narrowing them', async () => {
     const contract = JSON.parse(
       await readFile(new URL('../../../../openapi/developer-scopes.json', import.meta.url), 'utf8'),
     ) as { scopes: Array<{ name: string; sensitive?: boolean }> }
@@ -361,10 +367,10 @@ describe('TeamGrid CLI browser authorization', () => {
       .sort()
 
     expect([...sensitiveBrowserAuthorizationScopes].sort()).toEqual(contractSensitiveScopes)
-    expect(() =>
+    expect(
       normalizeBrowserAuthorizationScopes({
         scopes: ['workspace:read', 'members:read'],
       }),
-    ).toThrow('Create a narrowly scoped personal credential')
+    ).toEqual(['workspace:read', 'members:read'])
   })
 })

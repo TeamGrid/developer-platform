@@ -186,3 +186,14 @@ must react again after reopen/complete cycles.
 
 Node.js 22.14–24 is supported. See the workspace README and checked OpenAPI v1
 contract for the complete resource and security model.
+
+## Required resource CAS (development candidate)
+
+`new TeamGridClient({ token, requireResourceCas: true })` sends the additive
+`X-TeamGrid-Resource-CAS: required-v1` header. The matching API acknowledges that
+protocol in its response and forwards a strict marker on core task/project/
+template mutations. The matching App refuses those mutations while CAS writes,
+backfill, enforcement or cutover are disabled. SDK callers default to the previous
+compatibility behavior; MCP opts in explicitly. A transport acknowledgement is
+not a live qualification result and does not add CAS to unconditional APIs.
+The exact precondition remains the reviewed ETag, never a freshly fetched retry.

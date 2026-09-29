@@ -44,7 +44,9 @@ const operations = capabilities.operationPolicy
 const operationCount = operations.length
 const sdkMethodCount = operations.filter((operation) => operation.sdk).length
 const cliMappingCount = operations.filter((operation) => operation.cli).length
-const mcpToolCount = operations.filter((operation) => operation.mcp?.exposure === 'read').length
+const mcpToolCount = operations.filter(
+  (operation) => operation.mcp?.exposure === 'read' && !operation.mcp.profiles,
+).length
 
 requireFragments('repository README', repositoryReadme, [
   `the ${operationCount}-operation action-policy`,
@@ -58,7 +60,7 @@ if (!new RegExp(`all 87 V0 and\\s+${operationCount} V1 operations`).test(workspa
 }
 requireFragments('workspace README', workspaceReadme, [
   `all ${sdkMethodCount} SDK methods, all ${cliMappingCount} CLI operation mappings`,
-  `exact ${mcpToolCount}-tool MCP allowlist`,
+  `exact ${mcpToolCount}-tool legacy MCP allowlist`,
   'auth status --check',
   'auth logout --revoke',
   'webhooks test webhook-id',

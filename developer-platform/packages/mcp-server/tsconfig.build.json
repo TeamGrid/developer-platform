@@ -4,6 +4,7 @@
     "declarationMap": false
   },
   "exclude": [
-    "src/**/*.test.ts"
+    "src/**/*.test.ts",
+    "src/**/*.testSupport.ts"
   ]
 }

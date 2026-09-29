@@ -19,7 +19,7 @@ const packages = [
   {
     maxUnpackedSize: 1_500_000,
     name: '@teamgrid/mcp-server',
-    requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js'],
+    requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js', 'COVERAGE.md', 'dist/httpBin.js', 'dist/generated/domainCatalog.json', 'dist/generated/outputDefinitions.json'],
   },
 ]
 
@@ -73,7 +73,7 @@ for (const { manifest, maxUnpackedSize, name, requiredFiles } of manifests) {
   if (!artifact || artifact.id !== `${name}@${version}`) fail(`${name} produced an unexpected package id`)
   const files = artifact.files.map(file => file.path).sort()
   const unexpected = files.filter(
-    path => !['LICENSE', 'README.md', 'package.json'].includes(path) && !path.startsWith('dist/'),
+    path => !['LICENSE', 'README.md', 'package.json', ...requiredFiles].includes(path) && !path.startsWith('dist/'),
   )
   if (unexpected.length) fail(`${name} contains unexpected files: ${unexpected.join(', ')}`)
   for (const requiredFile of ['LICENSE', 'README.md', 'package.json', ...requiredFiles]) {

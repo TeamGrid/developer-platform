@@ -2,11 +2,13 @@ import { spawnSync } from 'node:child_process'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
-const acceptedAdvisory = 'https://github.com/advisories/GHSA-frvp-7c67-39w9'
-const acceptedPackages = new Set(['@hono/node-server', '@modelcontextprotocol/sdk'])
 const allowedProductionSdkImports = new Set([
-  '@modelcontextprotocol/sdk/server/mcp.js',
-  '@modelcontextprotocol/sdk/server/stdio.js',
+  '@modelcontextprotocol/server',
+  '@modelcontextprotocol/server/stdio',
+  // Explicit Draft 2020-12 entry; the MCP bundled Ajv export uses Draft 7.
+  // Only reviewed local schemas are compiled. No network or caller schemas.
+  'ajv/dist/2020.js',
+  'ajv-formats/dist/formats.js',
 ])
 
 function fail(message) {
@@ -25,7 +27,7 @@ function sourceFiles(directory) {
 const mcpSourceDirectory = resolve('packages/mcp-server/src')
 const sdkImports = sourceFiles(mcpSourceDirectory).flatMap((path) => {
   const source = readFileSync(path, 'utf8')
-  return [...source.matchAll(/from\s+['"](@modelcontextprotocol\/sdk\/[^'"]+)['"]/g)]
+  return [...source.matchAll(/from\s+['"]((?:@modelcontextprotocol\/|ajv\/|ajv-formats\/)[^'"]+)['"]/g)]
     .map((match) => ({ path, specifier: match[1] }))
 })
 
@@ -36,7 +38,7 @@ for (const { path, specifier } of sdkImports) {
 }
 for (const requiredImport of allowedProductionSdkImports) {
   if (!sdkImports.some(({ specifier }) => specifier === requiredImport)) {
-    fail(`expected MCP stdio-only import ${requiredImport} is missing`)
+    fail(`expected reviewed MCP import ${requiredImport} is missing`)
   }
 }
 
@@ -54,30 +56,7 @@ try {
 }
 
 const vulnerabilities = report.vulnerabilities || {}
-for (const [name, vulnerability] of Object.entries(vulnerabilities)) {
-  if (!acceptedPackages.has(name)) fail(`${name} has an unaccepted vulnerability`)
-  if (!['moderate'].includes(vulnerability.severity)) {
-    fail(`${name} has unexpected ${vulnerability.severity} severity`)
-  }
-  const advisoryUrls = (vulnerability.via || [])
-    .filter((entry) => typeof entry === 'object' && entry !== null)
-    .map((entry) => entry.url)
-  const aliases = (vulnerability.via || []).filter(entry => typeof entry === 'string')
-  if (
-    !advisoryUrls.includes(acceptedAdvisory)
-    && !(name === '@modelcontextprotocol/sdk' && aliases.includes('@hono/node-server'))
-  ) {
-    fail(`${name} is not exclusively explained by the reviewed Hono advisory`)
-  }
+if (Object.keys(vulnerabilities).length > 0) {
+  fail(`unreviewed production vulnerabilities: ${Object.keys(vulnerabilities).sort().join(', ')}`)
 }
-
-if (report.metadata?.vulnerabilities?.high || report.metadata?.vulnerabilities?.critical) {
-  fail('high or critical production vulnerabilities remain')
-}
-
-const names = Object.keys(vulnerabilities).sort()
-console.log(names.length === 0
-  ? 'Production dependencies contain no known vulnerabilities.'
-  : 'Production dependencies contain no high/critical findings; every reported moderate '
-    + 'finding is the reviewed unreachable Hono advisory and the shipped MCP binary imports '
-    + 'only stdio transport.')
+console.log('Production dependencies contain no known vulnerabilities.')

@@ -11,21 +11,24 @@ none imports Meteor runtime code.
 - `@teamgrid/cli`: `teamgrid` command for profiles, typed project, contact,
   task, time-entry, list, service, and tag workflows, signed webhook
   management, JSON/JSONL, and automation-safe exits.
-- `@teamgrid/mcp-server`: optional local stdio MCP adapter. It exposes only
-  bounded read tools and delegates every request to the same API client.
+- `@teamgrid/mcp-server`: optional local stdio MCP adapter. It uses read-only defaults, offers explicit domain write profiles in the
+  development candidate, and delegates every request to the same API client.
 
 All three packages support Node.js 22.14 through Node.js 24 on Linux, macOS,
 and Windows. CI qualifies both Node boundaries on all three operating systems.
 Persistent CLI profiles use macOS Keychain, Linux Secret Service, or the native
 Windows Credential Manager.
 
-The stable 1.2.1 release is prepared for npm through the default `latest`
+The 1.2.2 release candidate is prepared for npm through the default `latest`
 channel:
 
+Version 1.2.2 is not published yet; 1.2.1 remains the public release.
+The commands below apply after qualification and publication.
+
 ```sh
-npm install @teamgrid/api-client@1.2.1
-npm install --global @teamgrid/cli@1.2.1
-npm install --global @teamgrid/mcp-server@1.2.1
+npm install @teamgrid/api-client@1.2.2
+npm install --global @teamgrid/cli@1.2.2
+npm install --global @teamgrid/mcp-server@1.2.2
 ```
 
 Use the exact version shown above in reproducible deployments. Unpinned
@@ -34,7 +37,9 @@ on the explicit `next` channel.
 
 ## Credential and routing model
 
-`teamgrid auth login` opens TeamGrid in the system browser. After normal
+Production browser login remains disabled pending qualification. Use
+`teamgrid auth login --manual` for the published package. In a qualified
+environment with browser issuance enabled, `teamgrid auth login` opens TeamGrid in the system browser. After normal
 TeamGrid sign-in, select one workspace, compare the pairing phrase shown in the
 browser and terminal, and approve the requested scopes. The owning regional
 cell issues a scoped personal credential directly to the CLI through an
@@ -162,14 +167,18 @@ Recurring tasks use immutable definition versions, a durable occurrence ledger, 
 compare-and-set revisions, and encrypted asynchronous preview/recovery operations. API v1, the TypeScript SDK, and
 the CLI expose the complete lifecycle, including preview, pause/resume/end/archive/restore,
 ownership transfer, version restore, occurrence overrides/retries, external event ingress, and
-recheck operation polling. The MCP adapter exposes only seven bounded saved-definition,
-version, preview, and occurrence reads; it never exposes drafts, writes, trigger ingress, or
-operation control.
+recheck operation polling. Published MCP profiles expose seven bounded recurrence reads.
+The development candidate adds the complete reviewed recurrence lifecycle in the explicit
+`tasks-write` and `full` profiles; these additions are not yet released.
 
 GET requests and POST requests with an idempotency key are retried for bounded transient failures.
 Tasks, projects, and project templates expose developer revisions and strong ETags. Every update,
 archive, restore, completion, reopen, lifecycle start, and template instantiation requires the
-latest revision through `If-Match`, preventing silent overwrites. Other PUT, PATCH, and DELETE
+latest revision through `If-Match`. Protection against stale writes additionally requires
+a qualified server-side CAS rollout; a header alone does not prove enforcement. Current
+pre-CAS cells may discard the expected revision for legacy API consumers. Candidate MCP
+clients use the additive required-CAS protocol and reject core writes on unqualified
+cells. New MCP writes remain release-blocked until live conflict handling is qualified. Other PUT, PATCH, and DELETE
 requests are not automatically retried. Errors do not retain or print the bearer credential.
 Time-entry billed state has its own finance-sensitive scope and strong revision; it is available
 through API, SDK, and CLI, but intentionally absent from every read-only MCP profile.
@@ -196,28 +205,22 @@ hooks separately and reveals a new v2 signing secret only once.
 
 ## Optional MCP adapter
 
-MCP is intentionally downstream of API v1 and is not required for automation.
-It reads the same CLI keychain profile and offers only bounded read tools.
-The default `core` tool profile includes workspace, projects, tasks, recurring-task definitions,
-versions and occurrences, time entries, lists, and tags. `collaboration` additionally exposes contacts and
-users; `governance` adds webhooks, services, and custom-field definitions. Service reads are kept
-out of `core` because they include billing-rate data. `all` is the explicit
-union of the collaboration and governance profiles.
+The published 1.2.1 MCP package has four read-only profiles: core (22),
+collaboration (29), governance (28), and all (36). Existing profiles preserve
+these meanings in the development candidate.
 
-```json
-{
-  "mcpServers": {
-    "teamgrid": {
-      "command": "teamgrid-mcp",
-      "args": ["--profile", "default", "--tool-profile", "core"]
-    }
-  }
-}
-```
+The candidate adds `context` (34 bounded reads) and explicit `work` (41 tools,
+including seven guarded writes), `full` (208 tools: 84 reads and 124 writes), and
+11 domain write profiles, plus protocol 2026-07-28 and legacy stdio compatibility.
+Writes require the confirmed workspace. Conditional writes use a reviewed ETag;
+replay-safe creates use a stable intent key. Actions without those API contracts
+are explicitly marked and never promise concurrency protection. All current API
+roles, scopes, locks and sharing rules still apply. The generated coverage table
+also accounts for the 30 operations deliberately outside MCP.
 
-No remote MCP endpoint, MCP-specific credential, session affinity, write tool, or change-feed tool
-is introduced. Custom-field values, project templates, planned work, and their operation-status
-resources remain explicitly forbidden from every MCP profile.
+See [the MCP package guide](packages/mcp-server/README.md) for exact tools,
+scopes, setup and limitations. These additions are not yet published. Browser
+login and hosted OAuth require separate environment qualification.
 
 ## Development gates
 
@@ -240,7 +243,7 @@ npm run conformance:plan
 ```
 
 The plan reads the immutable contract set and produces a deterministic inventory of all 87 V0 and
-237 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
+238 V1 operations. It joins V1 with every SDK method or explicit SDK exclusion, CLI command, MCP exposure decision, scope,
 execution binding, CAS precondition, and idempotency requirement. V0 compatibility statuses and the
 V0-to-V1 migration map remain explicit, so a documented unavailable route is not confused with an
 unexpected regression. Planning never loads a credential or contacts TeamGrid.
@@ -248,7 +251,7 @@ unexpected regression. Planning never loads a credential or contacts TeamGrid.
 The read-only phase performs only parameter-free GET requests, uses `limit=1` where supported, runs
 sequentially below the shared pre-auth limit, and retries at most two `429` responses. Operations
 that need an id, required filter, body, or mutation are recorded as blocked rather than guessed. A
-V1 run additionally proves all 236 SDK methods, all 237 CLI operation mappings, the exact 36-tool MCP allowlist, and one
+V1 run additionally proves all 237 SDK methods, all 238 CLI operation mappings, the exact 36-tool legacy MCP allowlist, and one
 live workspace request through SDK, CLI, and MCP:
 
 ```sh
@@ -346,7 +349,7 @@ the exact repository, commit, manifest size, and manifest digest in
 working tree.
 
 The mirrored manifest also contains `developer-action-policy-registry.json`.
-It pins the App/API authorization registry version, SHA-256 identity, all 237
+It pins the App/API authorization registry version, SHA-256 identity, all 238
 action policies, and 12 principal-policy rollout families. SDK, CLI, and MCP do
 not evaluate or broaden this policy locally; every request remains subject to
 the owning App cell's authorization decision.
