@@ -6,7 +6,7 @@ The full profile contains 207 tools: 84 reads and 123 writes. 30 API operations 
 
 All writes require workspaceId and current API authorization. Conditional tools accept the exact quoted meta.etag returned by the preceding read. Per-item revision uses data.items[].revision. Unconditional means the API has no revision precondition. Idempotency keys protect repetition of one intent, not concurrent edits.
 
-Domain profiles include their listed tools plus teamgrid_workspace_get. Scope reports list base/compound scopes; optional finance, sharing and cross-resource fields can require additional server-side scopes. A listed tool does not grant roles, scopes or product entitlements.
+Domain profiles include their listed tools plus workspace, user, task/project lookup and search tools. Scope reports list base/compound scopes; optional finance, sharing and cross-resource fields can require additional server-side scopes. A listed tool does not grant roles, scopes or product entitlements.
 
 | Tool | Domain profile | Mode | Concurrency | Stable key required |
 | --- | --- | --- | --- | --- |

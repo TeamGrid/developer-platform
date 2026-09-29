@@ -1350,7 +1350,7 @@
     "concurrency": "unconditional",
     "idempotency": true,
     "coreCas": false,
-    "description": "Create a document. Changes the selected workspace under current API permissions. Reuse the same idempotencyKey and payload for the same intent.",
+    "description": "Create a document. Returns a compact mutation receipt without repeating document content. Read content through teamgrid_document_get.. Changes the selected workspace under current API permissions. Reuse the same idempotencyKey and payload for the same intent.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -1414,7 +1414,7 @@
     "concurrency": "read",
     "idempotency": false,
     "coreCas": false,
-    "description": "Get a document",
+    "description": "Get a document. Content is a bounded chunk, not necessarily the whole document. Continue with contentOffset=meta.contentPage.nextOffset and expectedRevision=meta.etag until nextOffset is null. Never infer omitted content or overwrite a document from an incomplete read.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -1423,6 +1423,25 @@
           "maxLength": 128,
           "minLength": 1,
           "type": "string"
+        },
+        "contentOffset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1048576,
+          "description": "UTF-16 offset from meta.contentPage.nextOffset. Continuations require expectedRevision."
+        },
+        "contentLimit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384,
+          "default": 16384
+        },
+        "expectedRevision": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 258,
+          "pattern": "^\"[\\x21\\x23-\\x7e]+\"$",
+          "description": "Exact meta.etag from the first chunk; prevents mixing document versions."
         }
       },
       "required": [
@@ -1446,7 +1465,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Update a document. Changes the selected workspace under current API permissions. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
+    "description": "Update a document. Returns a compact mutation receipt without repeating document content. Read content through teamgrid_document_get.. Changes the selected workspace under current API permissions. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -1511,7 +1530,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Archive a document. Changes the selected workspace under current API permissions. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
+    "description": "Archive a document. Returns a compact mutation receipt without repeating document content. Read content through teamgrid_document_get.. Changes the selected workspace under current API permissions. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -1556,7 +1575,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Restore a document. Changes the selected workspace under current API permissions. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
+    "description": "Restore a document. Returns a compact mutation receipt without repeating document content. Read content through teamgrid_document_get.. Changes the selected workspace under current API permissions. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,

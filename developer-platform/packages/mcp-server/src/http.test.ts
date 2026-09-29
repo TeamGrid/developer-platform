@@ -68,18 +68,49 @@ describe('regional HTTP MCP authorization boundary', () => {
     try {
       const unauthorized = await handler.fetch(request())
       expect(unauthorized.status).toBe(401)
+      expect(unauthorized.headers.get('www-authenticate')).toContain('scope="workspace:read"')
       expect(unauthorized.headers.get('www-authenticate')).toContain(
         '/.well-known/oauth-protected-resource/mcp',
       )
       const metadata = await handler.fetch(
         new Request('https://mcp.de.example.test/.well-known/oauth-protected-resource/mcp'),
       )
-      expect(await metadata.json()).toMatchObject({
+      const discovery = (await metadata.json()) as { scopes_supported: string[] }
+      expect(discovery.scopes_supported.some((scope) => /:write|:run/.test(scope))).toBe(false)
+      expect(discovery).toMatchObject({
         resource: resourceUrl,
         authorization_servers: [issuerUrl],
         bearer_methods_supported: ['header'],
       })
       expect(createDelegatedClient).not.toHaveBeenCalled()
+    } finally {
+      await handler.close()
+    }
+  })
+
+  it('allows modern browser routing headers only for approved origins', async () => {
+    const { handler } = setup({ allowedOrigins: ['https://host.example.test'] })
+    try {
+      const preflight = (origin: string) =>
+        handler.fetch(
+          new Request(resourceUrl, {
+            method: 'OPTIONS',
+            headers: {
+              Origin: origin,
+              'Access-Control-Request-Method': 'POST',
+              'Access-Control-Request-Headers':
+                'authorization,content-type,mcp-method,mcp-name,mcp-protocol-version',
+            },
+          }),
+        )
+      const allowed = await preflight('https://host.example.test')
+      expect(allowed.status).toBe(204)
+      expect(allowed.headers.get('access-control-allow-headers')?.toLowerCase()).toContain(
+        'mcp-name',
+      )
+      const denied = await preflight('https://attacker.example.test')
+      expect(denied.status).toBe(403)
+      expect(denied.headers.has('access-control-allow-origin')).toBe(false)
     } finally {
       await handler.close()
     }
@@ -180,7 +211,7 @@ describe('regional HTTP MCP authorization boundary', () => {
       const large = new Request(resourceUrl, {
         method: 'POST',
         headers: { Authorization: 'Bearer opaque', 'Content-Type': 'application/json' },
-        body: ' '.repeat(256 * 1024 + 1),
+        body: ' '.repeat(8 * 1024 * 1024 + 1),
       })
       expect((await handler.fetch(large)).status).toBe(413)
       expect(createDelegatedClient).not.toHaveBeenCalled()
@@ -232,10 +263,48 @@ describe('regional HTTP MCP authorization boundary', () => {
     },
   )
 
+  it('requests finance permission only when a mutation includes the protected field', async () => {
+    const { handler, createDelegatedClient } = setup({
+      toolProfile: 'full',
+      writesEnabled: () => true,
+      verifyAccessToken: async () => ({ ...grant(), scopes: ['workspace:read', 'products:write'] }),
+    })
+    try {
+      const response = await handler.fetch(
+        new Request(resourceUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer opaque',
+            'Content-Type': 'application/json',
+            Accept: 'application/json, text/event-stream',
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'tools/call',
+            params: {
+              name: 'teamgrid_product_create',
+              arguments: {
+                workspaceId: 'workspace-a',
+                idempotencyKey: 'intent',
+                data: { name: 'Product', purchasePrice: 12 },
+              },
+            },
+          }),
+        }),
+      )
+      expect(response.status).toBe(403)
+      expect(response.headers.get('www-authenticate')).toContain('products:finance:write')
+      expect(createDelegatedClient).toHaveBeenCalledTimes(1)
+    } finally {
+      await handler.close()
+    }
+  })
+
   it.each([
     ['work', 34],
     ['full', 84],
-    ['time-write', 3],
+    ['time-write', 9],
   ] as const)(
     'serves %s reads with writes disabled, isolated delegation and fresh revocation checks',
     async (toolProfile, readCount) => {

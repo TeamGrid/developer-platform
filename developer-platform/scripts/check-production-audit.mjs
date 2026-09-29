@@ -5,9 +5,10 @@ import { join, resolve } from 'node:path'
 const allowedProductionSdkImports = new Set([
   '@modelcontextprotocol/server',
   '@modelcontextprotocol/server/stdio',
-  // Official bundled AJV + formats export. Compiles only the locally generated,
-  // reviewed schemas; no caller-provided schemas, dynamic refs or network loads.
-  '@modelcontextprotocol/server/validators/ajv',
+  // Explicit Draft 2020-12 entry; the MCP bundled Ajv export uses Draft 7.
+  // Only reviewed local schemas are compiled. No network or caller schemas.
+  'ajv/dist/2020.js',
+  'ajv-formats/dist/formats.js',
 ])
 
 function fail(message) {
@@ -26,7 +27,7 @@ function sourceFiles(directory) {
 const mcpSourceDirectory = resolve('packages/mcp-server/src')
 const sdkImports = sourceFiles(mcpSourceDirectory).flatMap((path) => {
   const source = readFileSync(path, 'utf8')
-  return [...source.matchAll(/from\s+['"](@modelcontextprotocol\/[^'"]+)['"]/g)]
+  return [...source.matchAll(/from\s+['"]((?:@modelcontextprotocol\/|ajv\/|ajv-formats\/)[^'"]+)['"]/g)]
     .map((match) => ({ path, specifier: match[1] }))
 })
 

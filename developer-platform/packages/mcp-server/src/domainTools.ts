@@ -1,6 +1,8 @@
 import type { StandardSchemaWithJSON } from '@modelcontextprotocol/server'
-import { Ajv, addFormats } from '@modelcontextprotocol/server/validators/ajv'
 import { type TeamGridClient, TeamGridClientError } from '@teamgrid/api-client'
+import { Ajv2020 } from 'ajv/dist/2020.js'
+import { fullFormats } from 'ajv-formats/dist/formats.js'
+import { projectDocumentContent } from './documentContent.js'
 import generatedCatalog from './generated/domainCatalog.json' with { type: 'json' }
 import { type DomainToolName, domainDispatch, domainToolNames } from './generated/domainDispatch.js'
 import type { RegisterTeamGridTool } from './registration.js'
@@ -42,14 +44,46 @@ export const domainProfiles = Object.fromEntries(
       domain,
       [
         'teamgrid_workspace_get',
+        'teamgrid_users_list',
+        'teamgrid_tasks_list',
+        'teamgrid_task_get',
+        'teamgrid_projects_list',
+        'teamgrid_project_get',
+        'teamgrid_search',
         ...domainToolNames.filter((name) => catalog[name].domain === domain),
-      ],
+      ].filter((name, index, names) => names.indexOf(name) === index),
     ]),
 ) as Record<string, readonly DomainToolName[]>
 
-const ajv = new Ajv({ strict: false, allErrors: false, ownProperties: true, validateFormats: true })
-addFormats(ajv)
+const ajv = new Ajv2020({
+  strictSchema: true,
+  strictTypes: false,
+  strictRequired: false,
+  allErrors: false,
+  ownProperties: true,
+  validateFormats: true,
+  formats: fullFormats,
+})
 const schemas = new Map<DomainToolName, StandardSchemaWithJSON<Record<string, unknown>>>()
+
+function semanticInputValid(name: DomainToolName, input: Record<string, unknown>) {
+  if (name === 'teamgrid_task_create' || name === 'teamgrid_task_update') {
+    const data = input.data as Record<string, unknown>
+    const assignees = data.assigneeIds as string[] | null | undefined
+    if (data.groupId && (assignees?.length || data.primaryAssigneeId)) return false
+    if (
+      data.primaryAssigneeId &&
+      (name === 'teamgrid_task_create' || assignees !== undefined) &&
+      !assignees?.includes(String(data.primaryAssigneeId))
+    )
+      return false
+  }
+  if (name === 'teamgrid_appointments_list' || name === 'teamgrid_availability_list') {
+    const span = Date.parse(String(input.end)) - Date.parse(String(input.start))
+    if (!(span > 0 && span <= 31 * 86400000)) return false
+  }
+  return true
+}
 
 function boundedJson(value: unknown, depth = 0, remaining = { count: 20000 }): boolean {
   if (depth > 32 || --remaining.count < 0) return false
@@ -81,7 +115,14 @@ export function domainInputSchema(
       vendor: 'teamgrid-reviewed-openapi',
       jsonSchema: { input: () => schema, output: () => schema },
       validate: (value) => {
-        if (!boundedJson(value) || Buffer.byteLength(JSON.stringify(value), 'utf8') > 256 * 1024) {
+        const maximumBytes =
+          catalog[name].sdk.startsWith('documents.') && catalog[name].write
+            ? 8 * 1024 * 1024
+            : 256 * 1024
+        if (
+          !boundedJson(value) ||
+          Buffer.byteLength(JSON.stringify(value), 'utf8') > maximumBytes
+        ) {
           return { issues: [{ message: 'Input exceeds the bounded JSON contract.' }] }
         }
         if (!validate(value)) {
@@ -90,6 +131,11 @@ export function domainInputSchema(
             issues: [
               { message: `Invalid operation input: ${validate.errors?.[0]?.keyword || 'schema'}.` },
             ],
+          }
+        }
+        if (!semanticInputValid(name, value as Record<string, unknown>)) {
+          return {
+            issues: [{ message: 'Inconsistent assignment or time window (maximum 31 days).' }],
           }
         }
         return { value: value as Record<string, unknown> }
@@ -137,12 +183,17 @@ export async function executeDomainTool(
       const { signingSecret: _secret, ...attributes } = item.attributes as Record<string, unknown>
       return { ...item, attributes }
     }
+    const projected =
+      operation.sdk.startsWith('documents.') && !Array.isArray(response.data)
+        ? projectDocumentContent(response.data, input, etag, operation.write)
+        : { data: response.data, meta: {} }
     return {
-      data: Array.isArray(response.data)
-        ? response.data.map(redactResource)
-        : redactResource(response.data),
+      data: Array.isArray(projected.data)
+        ? projected.data.map(redactResource)
+        : redactResource(projected.data),
       meta: {
         ...(response.meta as Record<string, unknown>),
+        ...projected.meta,
         ...(etag && /^"[\x21\x23-\x7e]{1,256}"$/.test(etag) ? { etag } : {}),
       },
     }

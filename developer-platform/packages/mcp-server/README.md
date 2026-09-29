@@ -137,15 +137,16 @@ The smaller `work` profile retains its original seven tools and input format:
 
 Every mutation additionally needs `workspace:read` for its wrong-profile guard.
 Confirm the intended workspace using `teamgrid_workspace_get`. For existing
-objects, read the object and review the intended change. Supply `tsk1-` or
-`prj1-` followed by the returned `attributes.developerRevision`. A conflict is
+objects, read the object and review the intended change. Supply the exact quoted
+`meta.etag` returned by the preceding read. Context/work/domain/full share this
+revision contract. A conflict is
 returned to the host; the adapter never fetches a newer revision to retry an
 old intent. `assigneeIds` replaces the complete assignment set.
 
 Create a stable key for each creation intent. Reuse the same key and payload
 on repeated tool calls after a timeout. A timeout does not prove failure.
-Comments may notify participants. Project updates expose metadata and dates;
-sharing, lifecycle and finance changes use the dedicated domain/full profiles.
+Comments may notify participants. The API checks every field against current
+roles and scopes; sharing and lifecycle changes use their dedicated tools.
 
 ## Context and output safety
 
@@ -158,7 +159,22 @@ All tools have bounded strict inputs, response-envelope output schemas and accur
 read/write, destructive and idempotency annotations. API errors retain bounded
 machine codes, HTTP status, request ID and retry delay. Unexpected errors use
 a fixed message. No bearer credentials, transport headers, webhook signing secrets or raw causes are
-projected. Domain/full responses copy only a valid strong ETag into `meta.etag`. Results are limited to 256 KiB.
+projected. Context/work/domain/full responses copy only a valid strong ETag into
+`meta.etag`. Results are limited to 256 KiB.
+
+`teamgrid_document_get` returns at most 16,384 UTF-16 units of content. Follow
+`meta.contentPage.nextOffset` with the same `expectedRevision` until it is null.
+A changed revision aborts continuation; restart the read. Document mutations
+return metadata, `meta.outcome=completed` and the new ETag without repeating
+content. Document inputs support the API content limit inside an 8 MiB JSON
+bound; other tool inputs remain bounded to 256 KiB.
+
+A 30-second operation budget and cancellation propagate through SDK calls,
+including response bodies. Request IDs are generated per MCP operation and
+retained across its API calls. An upstream Retry-After is never shortened;
+when it exceeds the remaining budget the error retains that delay. A timed-out
+or cancelled mutation may already have committed: inspect the target or retained
+operation ID before deciding whether to repeat it.
 
 Product purchase prices and time-entry billing fields remain removed from the
 legacy read profiles. Domain/full tools use the API's scope-filtered business
@@ -196,10 +212,14 @@ API client is created from the verified grant; it never receives the incoming MC
 bearer token. Its workspace is checked before serving tools. Every HTTP request
 gets a fresh authorization and client; no mutable client is shared between users.
 
-Resource metadata and 401/403 scope challenges are included. Scope requirements
+Resource metadata and 401/403 scope challenges are included. Initial consent
+requests only `workspace:read`; advertised scopes follow the active profile and
+write gate. Known field-dependent finance and target-read scopes produce an
+action-specific challenge. Business permission failures never trigger consent.
+Scope requirements
 are generated from the API capability contract, including compound recurrence
 scopes and the mutation workspace check. Native API credentials are rejected at
-this endpoint. Requests are bounded to 256 KiB, token query parameters are rejected,
+this endpoint. Requests are bounded to 8 MiB with smaller per-tool limits, token query parameters are rejected,
 and host/origin validation plus explicit CORS rules are applied.
 
 This library boundary does **not** implement a TeamGrid OAuth authorization

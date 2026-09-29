@@ -3,7 +3,7 @@ import type { TeamGridClient } from '@teamgrid/api-client'
 import { z } from 'zod'
 import { domainWriteTools } from './domainTools.js'
 import { createTeamGridMcpServer } from './server.js'
-import { type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
+import { enabledMcpTools, type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
 import { toolScopes } from './toolScopes.js'
 import { workWriteTools } from './workTools.js'
 
@@ -98,7 +98,7 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
     {
       legacy: 'stateless',
       responseMode: 'auto',
-      maxRequestBodySize: 256 * 1024,
+      maxRequestBodySize: 8 * 1024 * 1024,
       maxSubscriptions: 0,
     },
   )
@@ -112,7 +112,7 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
           'Cache-Control': 'no-store',
           ...(challenge
             ? {
-                'WWW-Authenticate': `Bearer resource_metadata="${metadataUrl.href}"${challenge === 'missing' ? '' : `, error="${challenge}"`}`,
+                'WWW-Authenticate': `Bearer resource_metadata="${metadataUrl.href}", scope="workspace:read"${challenge === 'missing' ? '' : `, error="${challenge}"`}`,
               }
             : {}),
         },
@@ -145,7 +145,15 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
       return Response.json({
         resource: resource.href,
         authorization_servers: [issuer.href],
-        scopes_supported: [...new Set(Object.values(toolScopes).flat())].sort(),
+        scopes_supported: [
+          ...new Set(
+            enabledMcpTools(profile, {
+              ...(!options.writesEnabled?.()
+                ? { denyTools: [...workWriteTools, ...domainWriteTools] }
+                : {}),
+            }).flatMap((name) => toolScopes[name]),
+          ),
+        ].sort(),
         bearer_methods_supported: ['header'],
       })
     }
@@ -213,7 +221,7 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
         headers.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
         headers.set(
           'Access-Control-Allow-Headers',
-          'Authorization, Content-Type, MCP-Protocol-Version, MCP-Method',
+          'Authorization, Content-Type, MCP-Protocol-Version, MCP-Method, Mcp-Name',
         )
         headers.set(
           'Access-Control-Expose-Headers',

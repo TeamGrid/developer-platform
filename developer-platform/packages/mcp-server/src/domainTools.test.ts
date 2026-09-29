@@ -50,6 +50,49 @@ async function connected() {
 }
 
 describe('complete domain MCP', () => {
+  it.each([
+    [
+      'teamgrid_task_create',
+      {
+        workspaceId,
+        idempotencyKey: 'create-1',
+        data: { name: 'Task', descriptionFormat: 'markdown-v1' },
+      },
+    ],
+    [
+      'teamgrid_task_update',
+      {
+        workspaceId,
+        id: 't1',
+        expectedRevision: revision('tsk1'),
+        data: { descriptionFormat: 'markdown-v1' },
+      },
+    ],
+    [
+      'teamgrid_tasks_bulk_update',
+      {
+        workspaceId,
+        data: {
+          items: [
+            { id: 't1', revision: 'a'.repeat(64), data: { descriptionFormat: 'markdown-v1' } },
+          ],
+        },
+      },
+    ],
+  ] as const)(
+    'enforces field dependencies in the actual %s MCP request',
+    async (name, arguments_) => {
+      const c = await connected()
+      try {
+        const result = await c.client.callTool({ name, arguments: arguments_ })
+        expect(result.isError).toBe(true)
+        expect(JSON.stringify(result)).toContain('dependentRequired')
+        expect(c.calls.size).toBe(0)
+      } finally {
+        await c.close()
+      }
+    },
+  )
   it('advertises every reviewed tool with executable strict schemas and truthful mutation metadata', async () => {
     const c = await connected()
     try {
@@ -69,6 +112,78 @@ describe('complete domain MCP', () => {
           ),
         ),
       ).toBe(false)
+    } finally {
+      await c.close()
+    }
+  })
+
+  it('reads a large document completely in revision-bound chunks and returns a compact write receipt', async () => {
+    const c = await connected()
+    try {
+      await c.client.callTool({ name: 'teamgrid_document_get', arguments: { id: 'doc1' } })
+      const content = 'Hello 🦊\n'.repeat(40000)
+      const response = {
+        data: { id: 'doc1', type: 'document', attributes: { name: 'Large', content } },
+        meta: { requestId: 'document-read' },
+        transport: { headers: { etag: '"doc1-version-1"' } },
+      }
+      c.calls.get('documents.get')?.mockResolvedValue(response)
+      let offset = 0
+      let reconstructed = ''
+      do {
+        const result = await c.client.callTool({
+          name: 'teamgrid_document_get',
+          arguments: {
+            id: 'doc1',
+            contentOffset: offset,
+            ...(offset ? { expectedRevision: '"doc1-version-1"' } : {}),
+          },
+        })
+        expect(result.isError, JSON.stringify(result)).not.toBe(true)
+        const value = result.structuredContent as typeof response & {
+          meta: { contentPage: { nextOffset: number | null } }
+        }
+        reconstructed += value.data.attributes.content
+        offset = value.meta.contentPage.nextOffset ?? 0
+      } while (offset)
+      expect(reconstructed).toBe(content)
+      c.calls
+        .get('documents.get')
+        ?.mockResolvedValue({ ...response, transport: { headers: { etag: '"doc1-version-2"' } } })
+      const changed = await c.client.callTool({
+        name: 'teamgrid_document_get',
+        arguments: {
+          id: 'doc1',
+          contentOffset: 100,
+          expectedRevision: '"doc1-version-1"',
+        },
+      })
+      expect(changed.structuredContent).toMatchObject({ error: { code: 'revision_conflict' } })
+      await c.client.callTool({
+        name: 'teamgrid_document_update',
+        arguments: {
+          workspaceId,
+          id: 'doc1',
+          expectedRevision: '"doc1-version-1"',
+          data: { name: 'Renamed' },
+        },
+      })
+      c.calls.get('documents.update')?.mockResolvedValue(response)
+      const updated = await c.client.callTool({
+        name: 'teamgrid_document_update',
+        arguments: {
+          workspaceId,
+          id: 'doc1',
+          expectedRevision: '"doc1-version-1"',
+          data: { name: 'Renamed' },
+        },
+      })
+      expect(updated.isError).not.toBe(true)
+      expect(updated.structuredContent).toMatchObject({
+        data: { id: 'doc1' },
+        meta: { outcome: 'completed', etag: '"doc1-version-1"' },
+      })
+      expect(JSON.stringify(updated)).not.toContain('Hello')
     } finally {
       await c.close()
     }

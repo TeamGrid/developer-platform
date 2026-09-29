@@ -5,7 +5,7 @@ import { createTeamGridMcpServer } from './server.js'
 import { enabledMcpTools, type McpToolProfile } from './toolProfiles.js'
 import { workWriteTools } from './workTools.js'
 
-const revision = `tsk1-${'a'.repeat(64)}`
+const revision = `"tsk1-${'a'.repeat(64)}"`
 function fixture(workspaceId = 'workspace-1') {
   const resource = async () => ({ data: { id: 'task-1' }, meta: {} })
   return {
@@ -131,7 +131,7 @@ describe('explicit MCP work profile', () => {
       {
         workspaceId: 'workspace-1',
         idempotencyKey: 'intent',
-        data: { name: 'Task', billable: true },
+        data: { name: 'Task', unknownField: true },
       },
     ],
   ])('rejects invalid %s before reading credentials or calling the API', async (name, args) => {
@@ -256,13 +256,14 @@ describe('explicit MCP work profile', () => {
         arguments: {
           targetType: 'project-journal-entry',
           resourceId: 'entry-1',
-          fieldId: 'field-1',
+          fieldId: 'field1',
         },
       })
       expect(connection.api.customFieldValues.get).toHaveBeenCalledExactlyOnceWith(
         'project-journal-entry',
         'entry-1',
-        'field-1',
+        'field1',
+        {},
       )
     } finally {
       await connection.close()

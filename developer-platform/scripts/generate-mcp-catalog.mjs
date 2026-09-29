@@ -75,6 +75,12 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
     pattern: '^[\\x21-\\x7e]+$', description: 'Stable key for this exact intent. Retain and reuse the same key and payload after a timeout; a timeout does not prove failure.' }, true)
   const body = operation.requestBody?.content?.['application/json']?.schema
   if (body) put('data', resolve(body), operation.requestBody.required)
+  if (entry.operationId === 'getDocument') {
+    // Local bounded projection only; never forwarded as new API query parameters.
+    put('contentOffset', { type: 'integer', minimum: 0, maximum: 1048576, description: 'UTF-16 offset from meta.contentPage.nextOffset. Continuations require expectedRevision.' }, false)
+    put('contentLimit', { type: 'integer', minimum: 1, maximum: 16384, default: 16384 }, false)
+    put('expectedRevision', { type: 'string', minLength: 3, maxLength: 258, pattern: '^"[\\x21\\x23-\\x7e]+"$', description: 'Exact meta.etag from the first chunk; prevents mixing document versions.' }, false)
+  }
   if (cyclicRefs.size) {
     shape.$defs = {}
     for (const ref of cyclicRefs) shape.$defs[ref.split('/').at(-1)] = resolve(
@@ -102,6 +108,8 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
   const perItemRevision = entry.operationId === 'bulkUpdateTasks'
   const concurrency = perItemRevision ? 'per-item revision' : ifMatch ? 'conditional' : write ? 'unconditional' : 'read'
   let description = operation.summary || entry.operationId
+  if (entry.operationId === 'getDocument') description += '. Content is a bounded chunk, not necessarily the whole document. Continue with contentOffset=meta.contentPage.nextOffset and expectedRevision=meta.etag until nextOffset is null. Never infer omitted content or overwrite a document from an incomplete read.'
+  if (write && entry.sdk.startsWith('documents.')) description += '. Returns a compact mutation receipt without repeating document content. Read content through teamgrid_document_get.'
   if (write) description += '. Changes the selected workspace under current API permissions.'
   if (ifMatch) description += ' Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.'
   if (perItemRevision) description += ' Each item requires the developerRevision from its reviewed task. Results are independent: inspect every item for success, conflict or failure. Never refresh revisions and retry the entire batch automatically.'
@@ -129,7 +137,7 @@ const coverage = [
   'Generated from the reviewed canonical API contract. Not a publication or live qualification claim.', '',
   `The full profile contains ${rows.length} tools: ${rows.filter(([, entry]) => !entry.write).length} reads and ${rows.filter(([, entry]) => entry.write).length} writes. ${excluded.length} API operations use other connection or transfer surfaces.`, '',
   'All writes require workspaceId and current API authorization. Conditional tools accept the exact quoted meta.etag returned by the preceding read. Per-item revision uses data.items[].revision. Unconditional means the API has no revision precondition. Idempotency keys protect repetition of one intent, not concurrent edits.', '',
-  'Domain profiles include their listed tools plus teamgrid_workspace_get. Scope reports list base/compound scopes; optional finance, sharing and cross-resource fields can require additional server-side scopes. A listed tool does not grant roles, scopes or product entitlements.', '',
+  'Domain profiles include their listed tools plus workspace, user, task/project lookup and search tools. Scope reports list base/compound scopes; optional finance, sharing and cross-resource fields can require additional server-side scopes. A listed tool does not grant roles, scopes or product entitlements.', '',
   '| Tool | Domain profile | Mode | Concurrency | Stable key required |',
   '| --- | --- | --- | --- | --- |',
   ...rows.map(([name, entry]) => `| \`${name}\` | ${entry.domain} | ${entry.write ? 'write' : 'read'} | ${entry.concurrency} | ${entry.idempotency ? 'yes' : '—'} |`),

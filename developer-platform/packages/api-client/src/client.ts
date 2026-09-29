@@ -283,6 +283,8 @@ type InternalResponse = {
 }
 
 export type TeamGridClientOptions = {
+  /** Trusted host context, evaluated separately for each operation. Never takes model input. */
+  requestContext?: () => RequestOptions
   /** Require server-side core CAS; supported APIs acknowledge this opt-in on responses. */
   requireResourceCas?: boolean
   apiRootDomain?: string
@@ -323,11 +325,11 @@ function parseRetryAfter(value: string | null, now = Date.now()) {
   if (!value) return undefined
   const seconds = Number(value)
   if (Number.isFinite(seconds) && seconds >= 0) {
-    return Math.min(seconds * 1000, maxRetryDelayMs)
+    return Math.min(seconds * 1000, Number.MAX_SAFE_INTEGER)
   }
   const date = new Date(value).getTime()
   if (!Number.isFinite(date)) return undefined
-  return Math.min(Math.max(date - now, 0), maxRetryDelayMs)
+  return Math.max(date - now, 0)
 }
 
 function defaultSleep(milliseconds: number, signal?: AbortSignal) {
@@ -397,7 +399,12 @@ function buildCombinedSignal(signal: AbortSignal | undefined, timeoutMs: number)
   }
 }
 
-async function readBoundedResponseText(response: Response, maxResponseBytes: number) {
+async function readBoundedResponseText(
+  response: Response,
+  maxResponseBytes: number,
+  signal?: AbortSignal,
+) {
+  signal?.throwIfAborted()
   const contentLength = Number(response.headers.get('content-length'))
   if (Number.isFinite(contentLength) && contentLength > maxResponseBytes) {
     await response.body?.cancel()
@@ -417,20 +424,33 @@ async function readBoundedResponseText(response: Response, maxResponseBytes: num
     return new TextDecoder().decode(bytes)
   }
   const reader = response.body.getReader()
+  const abort = () => {
+    // A custom stream's cancel hook can itself hang. Cancellation must still
+    // release the caller; reader.cancel settles a pending read immediately.
+    void reader.cancel(signal?.reason).catch(() => undefined)
+  }
+  signal?.addEventListener('abort', abort, { once: true })
   const chunks: Uint8Array[] = []
   let received = 0
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    received += value.byteLength
-    if (received > maxResponseBytes) {
-      await reader.cancel()
-      throw new TeamGridClientError(
-        'response_too_large',
-        `The TeamGrid API response exceeded ${maxResponseBytes} bytes.`,
-      )
+  try {
+    while (true) {
+      signal?.throwIfAborted()
+      const { done, value } = await reader.read()
+      signal?.throwIfAborted()
+      if (done) break
+      received += value.byteLength
+      if (received > maxResponseBytes) {
+        void reader.cancel().catch(() => undefined)
+        throw new TeamGridClientError(
+          'response_too_large',
+          `The TeamGrid API response exceeded ${maxResponseBytes} bytes.`,
+        )
+      }
+      chunks.push(value)
     }
-    chunks.push(value)
+  } finally {
+    signal?.removeEventListener('abort', abort)
+    reader.releaseLock()
   }
   const bytes = new Uint8Array(received)
   let offset = 0
@@ -576,8 +596,12 @@ function exportDownloadFileName(value: string | null) {
   }
 }
 
-async function parseJsonResponse(response: Response, maxResponseBytes: number) {
-  const text = await readBoundedResponseText(response, maxResponseBytes)
+async function parseJsonResponse(
+  response: Response,
+  maxResponseBytes: number,
+  signal?: AbortSignal,
+) {
+  const text = await readBoundedResponseText(response, maxResponseBytes, signal)
   if (!text) return undefined
   try {
     return JSON.parse(text) as unknown
@@ -1302,8 +1326,39 @@ export class TeamGridClient {
   readonly #sleep: Sleep
   readonly #timeoutMs: number
   readonly #token: string
+  readonly #requestContext?: () => RequestOptions
+
+  /** A separate client view; does not mutate the credential or another caller's context. */
+  withRequestContext(context: () => RequestOptions): TeamGridClient {
+    return new TeamGridClient({
+      baseUrl: this.#baseUrl,
+      token: this.#token,
+      fetch: this.#fetch,
+      maxResponseBytes: this.#maxResponseBytes,
+      random: this.#random,
+      requireResourceCas: this.#requireResourceCas,
+      retries: this.#retries,
+      sleep: this.#sleep,
+      timeoutMs: this.#timeoutMs,
+      requestContext: () => this.#contextOptions(context()),
+    })
+  }
+
+  #contextOptions<T extends RequestOptions>(options: T): T {
+    const context = this.#requestContext?.()
+    if (!context) return options
+    return {
+      ...options,
+      requestId: context.requestId ?? options.requestId,
+      signal:
+        context.signal && options.signal
+          ? AbortSignal.any([context.signal, options.signal])
+          : (context.signal ?? options.signal),
+    }
+  }
 
   constructor(options: TeamGridClientOptions) {
+    this.#requestContext = options.requestContext
     this.#requireResourceCas = options.requireResourceCas === true
     this.#token = String(options.token || '').trim()
     this.location = parseCredentialLocation(this.#token)
@@ -3921,6 +3976,7 @@ export class TeamGridClient {
   }
 
   async #downloadExport(id: string, options: ExportDownloadOptions): Promise<ExportDownload> {
+    options = this.#contextOptions(options)
     const { intentToken, maxBytes = maximumExportDownloadBytes, requestId, signal } = options
     if (!isDownloadIntentToken(intentToken)) {
       throw new TeamGridClientError(
@@ -3979,7 +4035,11 @@ export class TeamGridClient {
         )
       }
       if (response.status !== 200) {
-        const text = await readBoundedResponseText(response, this.#maxResponseBytes)
+        const text = await readBoundedResponseText(
+          response,
+          this.#maxResponseBytes,
+          combined.signal,
+        )
         let payload: unknown
         try {
           payload = text ? (JSON.parse(text) as unknown) : undefined
@@ -4049,6 +4109,7 @@ export class TeamGridClient {
   }
 
   async #openExportDownload(id: string, options: ExportDownloadOptions) {
+    options = this.#contextOptions(options)
     const { intentToken, maxBytes = maximumExportDownloadBytes, requestId, signal } = options
     if (!isDownloadIntentToken(intentToken)) {
       throw new TeamGridClientError(
@@ -4108,7 +4169,11 @@ export class TeamGridClient {
         )
       }
       if (response.status !== 200) {
-        const text = await readBoundedResponseText(response, this.#maxResponseBytes)
+        const text = await readBoundedResponseText(
+          response,
+          this.#maxResponseBytes,
+          combined.signal,
+        )
         let payload: unknown
         try {
           payload = text ? (JSON.parse(text) as unknown) : undefined
@@ -4161,6 +4226,7 @@ export class TeamGridClient {
   }
 
   async #request(path: string, options: InternalRequestOptions = {}): Promise<InternalResponse> {
+    options = this.#contextOptions(options)
     const method = options.method || 'GET'
     const url = new URL(`${this.#baseUrl}${path}`)
     addQuery(url, options.query)
@@ -4178,73 +4244,92 @@ export class TeamGridClient {
     if (options.ifMatch) headers.set('if-match', options.ifMatch)
     if (options.ifNoneMatch) headers.set('if-none-match', options.ifNoneMatch)
 
-    for (let attempt = 0; attempt <= this.#retries; attempt += 1) {
-      const combined = buildCombinedSignal(options.signal, this.#timeoutMs)
-      let response: Response
-      try {
-        response = await this.#fetch(url, {
-          body: options.body === undefined ? undefined : JSON.stringify(options.body),
-          headers,
-          method,
-          redirect: 'manual',
-          signal: combined.signal,
-        })
-      } catch (error) {
-        combined.cleanup()
+    // One deadline covers headers, body and all backoff/attempts. An upstream
+    // Retry-After is never shortened to fit this budget.
+    const deadline = Date.now() + this.#timeoutMs
+    const combined = buildCombinedSignal(options.signal, this.#timeoutMs)
+    try {
+      for (let attempt = 0; attempt <= this.#retries; attempt += 1) {
+        combined.signal.throwIfAborted()
+        let response: Response
+        try {
+          response = await this.#fetch(url, {
+            body: options.body === undefined ? undefined : JSON.stringify(options.body),
+            headers,
+            method,
+            redirect: 'manual',
+            signal: combined.signal,
+          })
+        } catch (error) {
+          const delay = this.#retryDelay(attempt)
+          if (
+            attempt < this.#retries &&
+            isRetryableMethod(method, options.idempotencyKey) &&
+            !combined.signal.aborted &&
+            delay < deadline - Date.now()
+          ) {
+            await this.#sleep(delay, combined.signal)
+            continue
+          }
+          if (combined.signal.aborted) throw combined.signal.reason
+          if (error instanceof TeamGridClientError) throw error
+          throw new TeamGridClientError(
+            'network_error',
+            'The TeamGrid API request could not reach the service.',
+            { cause: error },
+          )
+        }
+        const retryAfterMs = parseRetryAfter(response.headers.get('retry-after'))
+        const delay = retryAfterMs ?? this.#retryDelay(attempt)
         if (
+          retryStatuses.has(response.status) &&
           attempt < this.#retries &&
           isRetryableMethod(method, options.idempotencyKey) &&
-          !options.signal?.aborted
+          delay < deadline - Date.now()
         ) {
-          await this.#sleep(this.#retryDelay(attempt), options.signal)
+          void response.body?.cancel().catch(() => undefined)
+          await this.#sleep(delay, combined.signal)
           continue
         }
-        if (error instanceof TeamGridClientError) throw error
-        throw new TeamGridClientError(
-          combined.signal.aborted ? 'request_aborted' : 'network_error',
-          combined.signal.aborted
-            ? 'The TeamGrid API request was aborted.'
-            : 'The TeamGrid API request could not reach the service.',
-          { cause: error },
-        )
-      } finally {
-        combined.cleanup()
-      }
-
-      const retryAfterMs = parseRetryAfter(response.headers.get('retry-after'))
-      if (
-        retryStatuses.has(response.status) &&
-        attempt < this.#retries &&
-        isRetryableMethod(method, options.idempotencyKey)
-      ) {
-        await response.body?.cancel()
-        await this.#sleep(retryAfterMs ?? this.#retryDelay(attempt), options.signal)
-        continue
-      }
-      const payload = await parseJsonResponse(response, this.#maxResponseBytes)
-      const envelope = isObject(payload) ? payload : {}
-      const responseRequestId =
-        isObject(envelope.meta) && typeof envelope.meta.requestId === 'string'
-          ? envelope.meta.requestId
-          : response.headers.get('x-request-id') || requestId
-      const transport = transportMetadata({
-        attempts: attempt + 1,
-        fallbackRequestId: responseRequestId,
-        response,
-        retryAfterMs,
-      })
-      if (!response.ok) {
-        throw new TeamGridApiError({
-          errors: Array.isArray(envelope.errors) ? envelope.errors : undefined,
-          requestId: responseRequestId,
+        const payload = await parseJsonResponse(response, this.#maxResponseBytes, combined.signal)
+        combined.signal.throwIfAborted()
+        const envelope = isObject(payload) ? payload : {}
+        const responseRequestId =
+          isObject(envelope.meta) && typeof envelope.meta.requestId === 'string'
+            ? envelope.meta.requestId
+            : response.headers.get('x-request-id') || requestId
+        const transport = transportMetadata({
+          attempts: attempt + 1,
+          fallbackRequestId: responseRequestId,
+          response,
           retryAfterMs,
-          status: response.status,
-          transport,
+        })
+        if (!response.ok) {
+          throw new TeamGridApiError({
+            errors: Array.isArray(envelope.errors) ? envelope.errors : undefined,
+            requestId: responseRequestId,
+            retryAfterMs,
+            status: response.status,
+            transport,
+          })
+        }
+        return { payload, transport }
+      }
+      throw new TeamGridClientError(
+        'retry_exhausted',
+        'The TeamGrid API retry budget was exhausted.',
+      )
+    } catch (error) {
+      if (combined.signal.aborted) {
+        if (combined.signal.reason instanceof TeamGridClientError) throw combined.signal.reason
+        throw new TeamGridClientError('request_aborted', 'The TeamGrid API request was aborted.', {
+          cause: error,
         })
       }
-      return { payload, transport }
+      throw error
+    } finally {
+      combined.cleanup()
     }
-    throw new TeamGridClientError('retry_exhausted', 'The TeamGrid API retry budget was exhausted.')
   }
 
   async #waitForProjectLifecycleOperation(id: string, options: ProjectLifecycleWaitOptions = {}) {

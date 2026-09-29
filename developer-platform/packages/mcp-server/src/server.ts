@@ -1,16 +1,19 @@
+import { AsyncLocalStorage } from 'node:async_hooks'
+import { randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
-import { McpServer, requireScopes } from '@modelcontextprotocol/server'
+import { McpServer } from '@modelcontextprotocol/server'
 import {
+  type RequestOptions,
   redactDeveloperSecrets,
   TeamGridApiError,
-  type TeamGridClient,
+  TeamGridClient,
   TeamGridClientError,
 } from '@teamgrid/api-client'
 import { z } from 'zod'
 import { domainCatalog, registerDomainTools } from './domainTools.js'
 import type { RegisterTeamGridTool } from './registration.js'
+import { toolScopeChallenge } from './scopeRequirements.js'
 import { enabledMcpTools, type McpToolName, type McpToolProfile } from './toolProfiles.js'
-import { toolScopes } from './toolScopes.js'
 import { registerWorkTools } from './workTools.js'
 
 const packageVersion = (createRequire(import.meta.url)('../package.json') as { version: string })
@@ -171,7 +174,7 @@ function toolError(error: unknown) {
     error instanceof TeamGridApiError &&
     Number.isFinite(error.retryAfterMs) &&
     Number(error.retryAfterMs) >= 0
-      ? Math.min(Number(error.retryAfterMs), 30_000)
+      ? Number(error.retryAfterMs)
       : undefined
   const result = {
     error: {
@@ -422,6 +425,10 @@ export function createTeamGridMcpServer(
     requireGrantedScopes?: boolean
   } = {},
 ) {
+  const execution = new AsyncLocalStorage<RequestOptions>()
+  if (client instanceof TeamGridClient) {
+    client = client.withRequestContext(() => execution.getStore() ?? {})
+  }
   const server = new McpServer(
     { name: 'teamgrid', version: packageVersion },
     {
@@ -433,19 +440,40 @@ export function createTeamGridMcpServer(
   const enabledTools = new Set(enabledMcpTools(toolProfile, { allowTools, denyTools }))
   const registerTool: RegisterTeamGridTool = (name, config, callback) => {
     const safeCallback = (async (...args: unknown[]) => {
+      const extra = args[1] as { mcpReq?: { signal?: AbortSignal } } | undefined
+      const controller = new AbortController()
+      const signal = extra?.mcpReq?.signal
+        ? AbortSignal.any([extra.mcpReq.signal, controller.signal])
+        : controller.signal
+      const timer = setTimeout(
+        () =>
+          controller.abort(
+            new TeamGridClientError(
+              'request_timeout',
+              'The TeamGrid MCP operation exceeded 30 seconds.',
+            ),
+          ),
+        30_000,
+      )
+      const requestId = `mcp-${randomUUID()}`
       try {
-        if (domainCatalog[name].coreCas) {
-          const workspace = await client.workspace.get()
-          if (workspace.transport?.headers['x-teamgrid-resource-cas'] !== 'required-v1') {
-            throw new TeamGridClientError(
-              'resource_cas_required',
-              'This API connection has not acknowledged required resource CAS. Use a qualified API and an MCP client configured with requireResourceCas; no change was sent.',
-            )
+        return await execution.run({ signal, requestId }, async () => {
+          signal.throwIfAborted()
+          if (domainCatalog[name].coreCas) {
+            const workspace = await client.workspace.get()
+            if (workspace.transport?.headers['x-teamgrid-resource-cas'] !== 'required-v1') {
+              throw new TeamGridClientError(
+                'resource_cas_required',
+                'This API connection has not acknowledged required resource CAS. Use a qualified API and an MCP client configured with requireResourceCas; no change was sent.',
+              )
+            }
           }
-        }
-        return await Reflect.apply(callback, undefined, args)
+          return await Reflect.apply(callback, undefined, args)
+        })
       } catch (error) {
         return toolError(error)
+      } finally {
+        clearTimeout(timer)
       }
     }) as typeof callback
     const registration = server.registerTool(
@@ -454,9 +482,7 @@ export function createTeamGridMcpServer(
         ...config,
         outputSchema: responseEnvelopeOutput,
         title: toolTitle(name),
-        ...(requireGrantedScopes
-          ? { scopeChallenge: requireScopes(toolScopes[name][0], ...toolScopes[name].slice(1)) }
-          : {}),
+        ...(requireGrantedScopes ? { scopeChallenge: toolScopeChallenge(name) } : {}),
       },
       safeCallback,
     )
@@ -464,7 +490,7 @@ export function createTeamGridMcpServer(
     return registration
   }
 
-  if (toolProfile === 'full' || toolProfile.endsWith('-write')) {
+  if (['full', 'work', 'context'].includes(toolProfile) || toolProfile.endsWith('-write')) {
     registerDomainTools(registerTool, client, toolResult)
     return server
   }
