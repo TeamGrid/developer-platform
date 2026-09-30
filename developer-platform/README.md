@@ -23,6 +23,11 @@ The 1.2.2 release candidate is prepared for npm through the default `latest`
 channel:
 
 Version 1.2.2 is not published yet; 1.2.1 remains the public release.
+
+The candidate pins `fast-uri` 3.1.8 to address
+[GHSA-hrr3-gc8f-f4qj](https://github.com/advisories/GHSA-hrr3-gc8f-f4qj).
+Re-run `npm run audit:production` on the exact release source before deployment;
+a previous successful audit does not cover newly published advisories.
 The commands below apply after qualification and publication.
 
 ```sh
