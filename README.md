@@ -18,10 +18,10 @@ credential handling, regional routing, and development instructions.
 
 ## Install
 
-The 1.2.2 release candidate is prepared for the default `latest` dist-tag:
-
-Version 1.2.2 is not published yet; 1.2.1 remains the public release.
-The commands below apply after qualification and publication.
+Version 1.2.2 is the stable release for the default `latest` dist-tag. It includes
+browser login, explicit MCP write profiles and the regional hosted MCP service.
+Hosted access is available across Production workspaces, subject to the user's
+membership, permissions and approved OAuth scopes.
 
 ```sh
 npm install @teamgrid/api-client@1.2.2

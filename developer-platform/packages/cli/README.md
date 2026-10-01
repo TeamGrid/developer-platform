@@ -45,10 +45,11 @@ approve the displayed scopes, then stores the resulting credential in the
 operating-system credential store. Use `--preset daily-work` for the bounded
 write preset or repeat `--scope` for an exact custom scope set.
 
-Sensitive scopes are intentionally unavailable through browser login until
-TeamGrid can carry a reviewed recent-authentication signal across regions.
-Create a narrowly scoped personal credential in Developer settings and import
-it with `--manual` when one is required.
+Sensitive scopes require a personal Passkey confirmation in the browser. This
+includes sensitive recurrence, finance and administration access. The selected
+Workspace, displayed scopes and current server permissions remain binding.
+A narrowly scoped personal credential from Developer settings can also be
+imported with `--manual`.
 
 `--no-browser` prints the approval URL while still waiting on the local
 callback. Treat that short-lived URL as private and never paste it into logs or
@@ -92,6 +93,10 @@ unattended services should continue to use a scoped service-account credential
 from a secret manager through `TEAMGRID_API_TOKEN`; they must not start an
 interactive browser login.
 
+Real desktop browser-login and credential-store acceptance was performed on
+the release owner's Mac. Windows and Linux retain their source and installation
+compatibility; no real desktop qualification is claimed for those platforms.
+
 The CLI mirrors every public API operation, including project lifecycle jobs,
 products and product groups, finance-gated project statements, call notes,
 contact groups, custom-field definitions, and credential-owned webhook delivery
@@ -129,12 +134,11 @@ ordinary time-entry write access.
 ### Matching browser authorization to MCP
 
 The `mcp-context` and `mcp-work` presets describe the complete matching tool
-profiles. Browser issuance currently refuses their sensitive recurrence read
-scope until qualified step-up authentication is available; use a personal
-credential with the exact scopes shown by `--explain-scopes` in the meantime. The original `read-only` and `daily-work`
+profiles. Their sensitive recurrence read scope requires the additional Passkey
+confirmation. Inspect the exact scopes with `--explain-scopes`. The original `read-only` and `daily-work`
 CLI presets remain available with their existing narrower scopes. Consent shows
 all requested scopes and server permissions are checked on every operation.
 Recurrence reads are included; recurrence mutations, finance, administration and
-other sensitive scopes still require the qualified elevated authorization path.
+other sensitive scopes require the elevated authorization path.
 Use `teamgrid-mcp --tool-profile work --explain-scopes` to inspect exact scope
 requirements and `--check` to verify the current credential and workspace.

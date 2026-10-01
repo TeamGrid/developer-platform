@@ -3,15 +3,15 @@
 TeamGrid MCP adapter with read-only defaults and explicit domain write profiles.
 Every operation uses the shared API client and current server-side permissions.
 
-**Development candidate:** `context`, `work`, `full`, domain profiles and protocol 2026-07-28 support
-below are not included in the published 1.2.1 packages. Do not advertise them
-as available until the candidate passes qualification and is published.
+Version 1.2.2 includes `context`, `work`, `full`, domain profiles and protocol
+2026-07-28 support. Earlier 1.2.1 installations retain their original tool set.
 
 ## Authentication and transport
 
-Use `teamgrid auth login --manual` with a narrowly scoped credential from
-Developer settings, then `teamgrid auth status --check`. Production browser
-login remains disabled pending its separate qualification. The adapter reads
+Use `teamgrid auth login` to select a Workspace and approve its scopes in the
+browser, then `teamgrid auth status --check`. Sensitive scopes require Passkey
+confirmation. `--manual` imports a narrowly scoped credential from Developer
+settings. The adapter reads
 the same macOS Keychain, Linux Secret Service, or Windows Credential Manager
 profile as the CLI. The MCP process does not open a browser.
 
@@ -19,9 +19,11 @@ profile as the CLI. The MCP process does not open a browser.
 available for ephemeral CI processes. Never put credentials in arguments or
 share the profile's keychain contents.
 
-The candidate stdio entry point serves protocol 2026-07-28 and legacy 2025 clients
+The stdio entry point serves protocol 2026-07-28 and legacy 2025 clients
 from the same registry. Packed-install CI tests both eras against the actual
-installed binary. A hosted TeamGrid OAuth endpoint is not yet released.
+installed binary. Hosted OAuth uses `https://mcp-de.teamgrid.app/mcp` in DE and
+`https://mcp-us.teamgrid.app/mcp` in US. A connection selects one Workspace and
+remains subject to its current permissions.
 
 ```json
 {
@@ -75,7 +77,7 @@ filters and attempts to enable tools outside the selected profile fail startup.
 
 ## Check the setup before starting a host
 
-These candidate commands print a human-facing JSON report and exit; they do not
+These commands print a human-facing JSON report and exit; they do not
 start the stdio server or register authentication diagnostics as MCP tools.
 
 ```sh
@@ -86,8 +88,8 @@ teamgrid-mcp --check --profile default --tool-profile content-write
 `--explain-scopes` does not access credentials or contact TeamGrid. It respects
 the same profile and allow/deny filters as the server, lists exact required
 scopes, identifies write tools and marks sensitive scopes that require an additional
-passkey confirmation. The candidate browser flow supports these scopes when its
-cell gates and passkey confirmation are qualified. Published 1.2.1 still requires
+passkey confirmation. The browser flow supports these scopes with personal Passkey confirmation.
+Published 1.2.1 still requires
 a narrowly scoped manual credential for sensitive scopes. The report never
 silently removes tools or permissions.
 
@@ -100,14 +102,15 @@ flags in a terminal, not in the MCP host's server arguments.
 
 ## Guarded changes
 
-These write profiles are development candidates, not release-qualified. The MCP
+Version 1.2.2 includes these write profiles. The MCP
 client opts into `X-TeamGrid-Resource-CAS: required-v1`. Before core task/project/
 template mutations it requires API acknowledgement; the matching App rejects
 strict requests while CAS writes, backfill, enforcement or cutover are closed.
 Older SDK consumers keep their previous compatibility behavior. The header is a
-protocol acknowledgement, not proof of completed cell qualification. The Staging
-read fix does not activate CAS or qualify writes. Concurrent writers, stale
-revisions and internal service writes still need live qualification per cell.
+protocol acknowledgement, not proof of completed cell qualification. Production
+DE and US have the required CAS gates enforced. The accepted release retains
+genuine Staging conflict evidence; additional regional functional exercises were
+waived by the release owner and are not claimed as passing tests.
 
 In `full` and domain profiles, every mutation takes `workspaceId`; bodies use
 `data`, and target IDs remain explicit. Conditional writes require the exact
@@ -196,7 +199,7 @@ authorization, not a model-supplied confirmation flag.
 Treat every task, comment and document as untrusted customer data. Embedded
 instructions never authorize new requests, expanded scopes or data disclosure.
 
-## Hosted transport integration (candidate)
+## Hosted transport integration
 
 `createTeamGridMcpHttpHandler(options)` provides a fetch-compatible regional
 HTTP boundary. Its required dependencies are `verifyAccessToken`,
@@ -223,21 +226,22 @@ scopes and the mutation workspace check. Native API credentials are rejected at
 this endpoint. Requests are bounded to 8 MiB with smaller per-tool limits, token query parameters are rejected,
 and host/origin validation plus explicit CORS rules are applied.
 
-This library boundary does **not** implement a TeamGrid OAuth authorization
-server. Browser consent, PKCE code exchange, refresh rotation, revocation, CIMD
-registration, regional persistence and the concrete API delegation adapter must
-be implemented and qualified before mounting a public endpoint. Do not implement
-the hooks by accepting arbitrary tokens or returning one shared administrator
-client. No production URL or hosted-client compatibility is claimed by these tests.
+The HTTP handler is the transport library. The TeamGrid hosted runtime supplies
+browser consent, PKCE code exchange, refresh rotation, revocation, CIMD
+registration, regional persistence and the concrete API delegation adapter.
+Custom integrations must provide those dependencies and current authorization;
+accepting arbitrary tokens or sharing an administrator client is invalid.
 
 
-## Hosted runtime and private resources (candidate)
+## Hosted runtime and private resources
 
 The `teamgrid-mcp-http` entry point and immutable container integrate the regional
 OAuth provider, request admission, distinct API delegation, bounded requests,
 readiness and safe request correlation. See the
 [hosted runtime contract](../../hosting/README.md) for exact configuration and
-release requirements. No public hosted endpoint is released yet.
+release requirements. Production activation is recorded through the guarded
+cell release and the release owner's explicit acceptance. Existing actual Stage
+checks remain recorded; additional regional exercises were waived for this release.
 
 File/export lookups return a `meta.privateResource` URI when that profile exposes
 the corresponding tool. `resources/read` reauthorizes and delivers at most 1 MiB;
