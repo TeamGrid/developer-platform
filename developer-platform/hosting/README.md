@@ -1,9 +1,12 @@
-# Regional MCP runtime — candidate
+# Regional MCP runtime
 
-This runtime is implemented and locally tested. No hosted public endpoint is
-released. Promotion requires the App repository's Release Pipeline v2, the same
-App/API/contract bindings, and live OAuth/write qualification in each cell.
-A Docker smoke or a passing package build alone does not authorize enablement.
+The hosted Production resources are `https://mcp.de.teamgrid.app/mcp` and
+`https://mcp.us.teamgrid.app/mcp`. Access is available to Production workspaces
+with user consent and the existing workspace, role and scope permissions.
+Promotion uses the App repository's Release Pipeline v2 with immutable
+App/API/SDK/contract bindings. The exact October 2026 release has explicit owner
+acceptance and genuine Staging OAuth/read/write evidence; additional regional
+functional exercises were waived without relabeling them as passing tests.
 
 ## Build and process
 
@@ -69,12 +72,15 @@ Upload creation/finalization remains in the existing App/CLI/SDK transfer flow;
 there is no arbitrary filesystem or URL-fetch MCP tool. Remote export ownership
 is grant-specific; a separate local CLI login does not acquire that ownership.
 
-Before enabling a cell, record exact image/package/contract identities and test:
+For subsequent releases, record exact image/package/contract identities and test:
 central login and workspace handoff, minimal consent and passkey step-up, refresh
 rotation/reuse, disconnect/reconnect, two isolated users/workspaces, fresh role
 and membership removal, locked workspace and wrong cell, real file/export delivery,
 strict core CAS conflicts, uncertain writes and resume, origin/preflight, load and
-provider outage. Keep writes closed until the write qualification is complete.
+provider outage. The current release uses the reviewed owner-acceptance record
+instead of requiring additional functional exercises. Its guarded activation
+still verifies exact runtime identity, CAS enforcement and existing authorization
+gates. It does not bypass user consent or personal Passkey step-up.
 
 Revoking one connection invalidates its family and API delegation on subsequent
 requests. Disable the MCP gate to stop new remote access. Revert an image only to

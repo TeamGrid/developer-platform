@@ -11,24 +11,23 @@ none imports Meteor runtime code.
 - `@teamgrid/cli`: `teamgrid` command for profiles, typed project, contact,
   task, time-entry, list, service, and tag workflows, signed webhook
   management, JSON/JSONL, and automation-safe exits.
-- `@teamgrid/mcp-server`: optional local stdio MCP adapter. It uses read-only defaults, offers explicit domain write profiles in the
-  development candidate, and delegates every request to the same API client.
+- `@teamgrid/mcp-server`: optional local stdio MCP adapter. It uses read-only defaults,
+  offers explicit domain write profiles and delegates every request to the same API client.
 
 All three packages support Node.js 22.14 through Node.js 24 on Linux, macOS,
 and Windows. CI qualifies both Node boundaries on all three operating systems.
 Persistent CLI profiles use macOS Keychain, Linux Secret Service, or the native
 Windows Credential Manager.
 
-The 1.2.2 release candidate is prepared for npm through the default `latest`
-channel:
+Version 1.2.2 is the stable npm release on the default `latest` channel.
+Real desktop credential-storage acceptance was performed on macOS. Windows and
+Linux retain source and installation compatibility; no real desktop acceptance
+is claimed for those platforms.
 
-Version 1.2.2 is not published yet; 1.2.1 remains the public release.
-
-The candidate pins `fast-uri` 3.1.8 to address
+The release pins `fast-uri` 3.1.8 to address
 [GHSA-hrr3-gc8f-f4qj](https://github.com/advisories/GHSA-hrr3-gc8f-f4qj).
 Re-run `npm run audit:production` on the exact release source before deployment;
 a previous successful audit does not cover newly published advisories.
-The commands below apply after qualification and publication.
 
 ```sh
 npm install @teamgrid/api-client@1.2.2
@@ -42,9 +41,8 @@ on the explicit `next` channel.
 
 ## Credential and routing model
 
-Production browser login remains disabled pending qualification. Use
-`teamgrid auth login --manual` for the published package. In a qualified
-environment with browser issuance enabled, `teamgrid auth login` opens TeamGrid in the system browser. After normal
+Production browser login is enabled in the DE and US cells.
+`teamgrid auth login` opens TeamGrid in the system browser. After normal
 TeamGrid sign-in, select one workspace, compare the pairing phrase shown in the
 browser and terminal, and approve the requested scopes. The owning regional
 cell issues a scoped personal credential directly to the CLI through an
@@ -62,10 +60,10 @@ printed URL is short lived but contains authentication request material; do
 not share it or place it in logs. `--manual` and `--token-stdin` retain the
 reveal-once token workflow as an explicit compatibility path.
 
-Browser login currently rejects sensitive scopes because the regional approval
-flow does not yet receive a qualified recent-authentication signal. Create a
-narrowly scoped personal credential in Developer settings and use `--manual`
-for those cases. Device authorization is not part of this release.
+Sensitive scopes require a personal Passkey confirmation during approval.
+The approved credential remains bound to the selected workspace and current
+permissions. `--manual` remains available as an explicit alternative.
+Device authorization is not part of this release.
 
 Existing profiles require explicit `--replace`; this prevents accidental
 orphaning of the previous server credential. Plain `auth logout` remains an
@@ -172,18 +170,17 @@ Recurring tasks use immutable definition versions, a durable occurrence ledger, 
 compare-and-set revisions, and encrypted asynchronous preview/recovery operations. API v1, the TypeScript SDK, and
 the CLI expose the complete lifecycle, including preview, pause/resume/end/archive/restore,
 ownership transfer, version restore, occurrence overrides/retries, external event ingress, and
-recheck operation polling. Published MCP profiles expose seven bounded recurrence reads.
-The development candidate adds the complete reviewed recurrence lifecycle in the explicit
-`tasks-write` and `full` profiles; these additions are not yet released.
+recheck operation polling. MCP profiles expose seven bounded recurrence reads and
+the complete reviewed recurrence lifecycle in the explicit `tasks-write` and `full` profiles.
 
 GET requests and POST requests with an idempotency key are retried for bounded transient failures.
 Tasks, projects, and project templates expose developer revisions and strong ETags. Every update,
 archive, restore, completion, reopen, lifecycle start, and template instantiation requires the
 latest revision through `If-Match`. Protection against stale writes additionally requires
 a qualified server-side CAS rollout; a header alone does not prove enforcement. Current
-pre-CAS cells may discard the expected revision for legacy API consumers. Candidate MCP
-clients use the additive required-CAS protocol and reject core writes on unqualified
-cells. New MCP writes remain release-blocked until live conflict handling is qualified. Other PUT, PATCH, and DELETE
+pre-CAS cells may discard the expected revision for legacy API consumers. MCP
+clients use the additive required-CAS protocol and reject core writes when its
+server gates are unavailable. Production DE and US enforce this protocol. Other PUT, PATCH, and DELETE
 requests are not automatically retried. Errors do not retain or print the bearer credential.
 Time-entry billed state has its own finance-sensitive scope and strong revision; it is available
 through API, SDK, and CLI, but intentionally absent from every read-only MCP profile.
@@ -210,11 +207,10 @@ hooks separately and reveals a new v2 signing secret only once.
 
 ## Optional MCP adapter
 
-The published 1.2.1 MCP package has four read-only profiles: core (22),
-collaboration (29), governance (28), and all (36). Existing profiles preserve
-these meanings in the development candidate.
+The preserved read-only profiles are core (22), collaboration (29), governance (28),
+and all (36).
 
-The candidate adds `context` (34 bounded reads) and explicit `work` (41 tools,
+Version 1.2.2 adds `context` (34 bounded reads) and explicit `work` (41 tools,
 including seven guarded writes), `full` (208 tools: 84 reads and 124 writes), and
 11 domain write profiles, plus protocol 2026-07-28 and legacy stdio compatibility.
 Writes require the confirmed workspace. Conditional writes use a reviewed ETag;
@@ -224,8 +220,12 @@ roles, scopes, locks and sharing rules still apply. The generated coverage table
 also accounts for the 30 operations deliberately outside MCP.
 
 See [the MCP package guide](packages/mcp-server/README.md) for exact tools,
-scopes, setup and limitations. These additions are not yet published. Browser
-login and hosted OAuth require separate environment qualification.
+scopes, setup and limitations. Hosted OAuth is available at
+`https://mcp.de.teamgrid.app/mcp` and `https://mcp.us.teamgrid.app/mcp`.
+Each connection selects one workspace and requires user consent; sensitive
+permissions require a personal Passkey. The release owner's acceptance applies
+to this exact deployed release; additional regional exercises were waived and
+are not represented as passing tests.
 
 ## Development gates
 
@@ -367,9 +367,10 @@ publish tokens are disabled for all three packages. Published prereleases use
 the `next` dist-tag; stable releases use `latest`.
 
 To release, update all three package versions, commit and tag the exact source
-as `v<version>`. The same immutable developer-platform commit and contract
-manifest must first pass staging, the DE production canary, and the separate US
-production promotion in `TeamGrid/teamgrid`. Dispatch `Stage npm release` from
+as `v<version>`. The deployed immutable developer-platform commit and contract
+manifest must first pass the accepted Staging-to-DE-to-US promotion in `TeamGrid/teamgrid`.
+For the owner-accepted 1.2.2 release, the existing production image and Stage
+proof remain pinned and additional functional exercises were waived. Dispatch `Stage npm release` from
 the tag with the matching version, dist-tag, exact API runtime image SHA, and
 successful `Promote qualified release to US production` run URL. The workflow
 verifies the exact US artifact, its cited DE-canary run and artifact, the
@@ -387,6 +388,13 @@ flow. Reject any stage whose contents or provenance do not match the tag. The
 workflow accepts prereleases only with `next` and stable versions only with
 `latest`; a stable release additionally requires the explicit `confirm_ga`
 input after the separately governed GA decision.
+
+When package documentation or the release workflow follows the deployed runtime,
+set `developer_platform_runtime_sha` to that immutable runtime SHA. The workflow
+requires it to be an ancestor of the tagged package source and allows only its
+explicit README/release-workflow file list to differ. Executable code, contracts,
+dependencies and package versions must match. npm provenance identifies the
+actual tagged package source; deployment evidence retains the runtime source.
 
 After npm approval, dispatch `Verify published npm release` with the exact
 version and dist-tag. It waits for all three registry entries to converge,

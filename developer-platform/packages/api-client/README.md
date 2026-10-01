@@ -187,7 +187,7 @@ must react again after reopen/complete cycles.
 Node.js 22.14–24 is supported. See the workspace README and checked OpenAPI v1
 contract for the complete resource and security model.
 
-## Required resource CAS (development candidate)
+## Required resource CAS
 
 `new TeamGridClient({ token, requireResourceCas: true })` sends the additive
 `X-TeamGrid-Resource-CAS: required-v1` header. The matching API acknowledges that
