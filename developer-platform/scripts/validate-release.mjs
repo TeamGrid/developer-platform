@@ -7,6 +7,7 @@ const modeIndex = process.argv.indexOf('--mode')
 const mode = modeIndex === -1 ? undefined : process.argv[modeIndex + 1]
 const expectedVersion = process.env.RELEASE_VERSION
 const distTag = process.env.RELEASE_DIST_TAG
+const deliveryRevision = process.env.RELEASE_DELIVERY_REVISION || ''
 
 function fail(message) {
   throw new Error(`Release validation failed: ${message}`)
@@ -14,6 +15,9 @@ function fail(message) {
 
 if (mode !== 'stage') fail('mode must be stage')
 if (!expectedVersion) fail('RELEASE_VERSION is required')
+if (deliveryRevision && !/^[1-9]\d*$/.test(deliveryRevision)) {
+  fail('delivery revision must be a positive integer')
+}
 if (!['next', 'latest'].includes(distTag)) fail('RELEASE_DIST_TAG must be next or latest')
 if (distTag === 'latest' && process.env.RELEASE_CONFIRM_GA !== 'true') {
   fail('latest requires the separately approved confirm_ga gate')
@@ -61,8 +65,9 @@ if (process.env.GITHUB_ACTIONS === 'true') {
     fail('workflow is not running in the canonical repository')
   }
   if (process.env.GITHUB_REF_TYPE !== 'tag') fail('workflow must run from a Git tag')
-  if (process.env.GITHUB_REF_NAME !== `v${expectedVersion}`) {
-    fail(`Git tag must be v${expectedVersion}`)
+  const expectedTag = `v${expectedVersion}${deliveryRevision ? `-delivery.${deliveryRevision}` : ''}`
+  if (process.env.GITHUB_REF_NAME !== expectedTag) {
+    fail(`Git tag must be ${expectedTag}`)
   }
 }
 
