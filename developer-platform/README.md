@@ -396,6 +396,14 @@ explicit README/release-workflow file list to differ. Executable code, contracts
 dependencies and package versions must match. npm provenance identifies the
 actual tagged package source; deployment evidence retains the runtime source.
 
+The allowlist also covers the release validator, which is not included in the
+published packages. If an unpublished delivery failed because of release-control
+code, preserve the original tag and create `v<version>-delivery.<N>` at the reviewed
+repair source. Dispatch with the unchanged package version and matching positive
+`delivery_revision`. Each recovery tag remains immutable; npm provenance and
+`gitHead` identify its actual source. The workflow fetches full Git history before
+checking runtime ancestry, including when checkout starts from a tag.
+
 After npm approval, dispatch `Verify published npm release` with the exact
 version and dist-tag. It waits for all three registry entries to converge,
 performs a clean installation, verifies registry signatures, imports each
