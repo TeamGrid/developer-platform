@@ -1,7 +1,7 @@
 # Regional MCP runtime
 
-The hosted Production resources are `https://mcp.de.teamgrid.app/mcp` and
-`https://mcp.us.teamgrid.app/mcp`. Access is available to Production workspaces
+The hosted Production resources are `https://mcp-de.teamgrid.app/mcp` and
+`https://mcp-us.teamgrid.app/mcp`. Access is available to Production workspaces
 with user consent and the existing workspace, role and scope permissions.
 Promotion uses the App repository's Release Pipeline v2 with immutable
 App/API/SDK/contract bindings. The exact October 2026 release has explicit owner
