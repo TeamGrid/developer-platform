@@ -172,6 +172,13 @@ zusätzlich zum Import auch das Routing eines Modellaufrufs über MCP belegt.
 Die Attrappe gibt bewusst keine Geschäftsantwort zurück; dieser Nachweis
 ersetzt keinen autorisierten Production Read.
 
+Nach dem erfolgreichen Import bot auch dieser Codex Turn die Funktion
+`mcp__codex_apps__teamgrid_oauth_diagnose_teamgrid_workspace_get` an. Ihr direkter
+Aufruf mit `{}` über das bereitgestellte MCP Tool lieferte ebenfalls
+`isError: true` und `diagnostic_catalog_only`. Das bestätigt die Bereitstellung
+und den Aufruf in Codex zusätzlich zum ChatGPT Browsernachweis. Die originale
+Production Verbindung stellte weiterhin keine TeamGrid Funktionen bereit.
+
 Die Änderung betrifft ausschließlich wiederholte Schemaabschnitte in vier
 großen Eingaben. Der Generator ersetzt identische Abschnitte durch lokale
 `$defs` und `$ref`. Er besucht nur tatsächliche Schema Positionen, erhält
