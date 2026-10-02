@@ -217,9 +217,24 @@ bearer token. Its workspace is checked before serving tools. Every HTTP request
 gets a fresh authorization and client; no mutable client is shared between users.
 
 Resource metadata and 401/403 scope challenges are included. Initial consent
-requests only `workspace:read`; advertised scopes follow the active profile and
-write gate. Known field-dependent finance and target-read scopes produce an
+requests only `workspace:read`. Every advertised tool declares its required
+OAuth scopes in `securitySchemes` and the `_meta.securitySchemes` compatibility
+mirror; tool visibility never grants those scopes. The catalog follows the active
+profile and write gate. Known field-dependent finance and target-read scopes produce an
 action-specific challenge. Business permission failures never trigger consent.
+For the verified ChatGPT CIMD client, missing tool scopes return an unsuccessful
+MCP tool result with `_meta["mcp/www_authenticate"]`, an `insufficient_scope`
+challenge and a clear request for additional approval. This uses ChatGPT's
+documented tool-level OAuth flow instead of presenting missing permissions as
+an expired connection. Other clients retain standard HTTP403 scope challenges.
+Invalid or revoked tokens still return HTTP401 for every client; provider
+outages remain HTTP503. A denied tool performs no mutation.
+
+The client requests the scopes. The TeamGrid consent screen displays the
+requested set for the chosen workspace and currently offers approval or denial
+of that set, rather than individual scope checkboxes. Refreshing a token never
+adds permissions. A later operation needs a new explicit consent when its scopes
+are missing, and sensitive permissions still require personal Passkey confirmation.
 Scope requirements
 are generated from the API capability contract, including compound recurrence
 scopes and the mutation workspace check. Native API credentials are rejected at

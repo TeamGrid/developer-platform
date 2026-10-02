@@ -24,6 +24,10 @@ export function installBoundedToolDiscovery(
         title: entry.title,
         description: entry.description,
         annotations: entry.annotations,
+        ...(entry._meta ? { _meta: entry._meta } : {}),
+        // SDK registration accepts extension metadata, but does not retain this
+        // top-level OpenAI field. Publish both declarations from the same source.
+        ...(entry._meta?.securitySchemes ? { securitySchemes: entry._meta.securitySchemes } : {}),
         inputSchema: entry.inputSchema?.['~standard'].jsonSchema.input({
           target: 'draft-2020-12',
         }) ?? { type: 'object' },

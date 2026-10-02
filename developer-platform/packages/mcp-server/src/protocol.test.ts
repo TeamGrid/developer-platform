@@ -29,7 +29,9 @@ describe('MCP wire protocol compatibility', () => {
       try {
         await client.connect(clientTransport)
         if (client instanceof Client) expect(client.getProtocolEra()).toBe('modern')
-        expect((await client.listTools()).tools).toHaveLength(22)
+        const tools = (await client.listTools()).tools
+        expect(tools).toHaveLength(22)
+        expect(tools.every((tool) => tool._meta?.securitySchemes === undefined)).toBe(true)
         const result = await client.callTool({ name: 'teamgrid_workspace_get', arguments: {} })
         expect(result.structuredContent).toMatchObject({ data: { id: 'workspace-1' } })
         await expect(
