@@ -4,6 +4,7 @@ import type { TeamGridClient } from '@teamgrid/api-client'
 import { z } from 'zod'
 import { domainWriteTools } from './domainTools.js'
 import { createTeamGridMcpServer } from './server.js'
+import { usesChatGptToolChallenges } from './toolAuthorization.js'
 import { type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
 import { workWriteTools } from './workTools.js'
 
@@ -139,6 +140,9 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
             ? { denyTools: [...workWriteTools, ...domainWriteTools] }
             : {}),
           requireGrantedScopes: true,
+          scopeChallengeTransport: usesChatGptToolChallenges(authorization.clientId)
+            ? 'tool-result'
+            : 'http',
         })
       } catch {
         throw new Error('MCP delegation is unavailable.')

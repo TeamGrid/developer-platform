@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
-import { McpServer, type RegisteredTool } from '@modelcontextprotocol/server'
+import { McpServer, type RegisteredTool, type ServerContext } from '@modelcontextprotocol/server'
 import {
   type RequestOptions,
   redactDeveloperSecrets,
@@ -16,6 +16,7 @@ import { mutationErrorOutcome } from './outcomes.js'
 import type { RegisterTeamGridTool } from './registration.js'
 import { toolScopeChallenge } from './scopeRequirements.js'
 import { boundedSearchMetadata } from './searchCompleteness.js'
+import { toolConsentRequired, toolSecuritySchemes } from './toolAuthorization.js'
 import { installBoundedToolDiscovery } from './toolDiscovery.js'
 import { enabledMcpTools, type McpToolName, type McpToolProfile } from './toolProfiles.js'
 import { registerWorkTools } from './workTools.js'
@@ -418,11 +419,14 @@ export function createTeamGridMcpServer(
     denyTools,
     toolProfile = 'core',
     requireGrantedScopes = false,
+    scopeChallengeTransport = 'http',
   }: {
     allowTools?: readonly McpToolName[]
     denyTools?: readonly McpToolName[]
     toolProfile?: McpToolProfile
     requireGrantedScopes?: boolean
+    /** Tool-result OAuth challenges for clients that require them; scope checks are identical. */
+    scopeChallengeTransport?: 'http' | 'tool-result'
   } = {},
 ) {
   const execution = new AsyncLocalStorage<RequestOptions>()
@@ -441,8 +445,9 @@ export function createTeamGridMcpServer(
   registerPrivateFileResources(server, client, enabledTools, requireGrantedScopes)
   const registrations = new Map<string, RegisteredTool>()
   const registerTool: RegisterTeamGridTool = (name, config, callback) => {
+    const scopeChallenge = toolScopeChallenge(name, client)
     const safeCallback = (async (...args: unknown[]) => {
-      const extra = args[1] as { mcpReq?: { signal?: AbortSignal } } | undefined
+      const extra = args[1] as ServerContext | undefined
       const controller = new AbortController()
       const signal = extra?.mcpReq?.signal
         ? AbortSignal.any([extra.mcpReq.signal, controller.signal])
@@ -462,6 +467,26 @@ export function createTeamGridMcpServer(
       try {
         return await execution.run({ signal, requestId }, async () => {
           signal.throwIfAborted()
+          if (requireGrantedScopes && scopeChallengeTransport === 'tool-result') {
+            const authInfo = extra?.http?.authInfo
+            // Hosted requests have already passed token verification. Fail closed
+            // if this adapter is ever invoked without that verified context.
+            if (!authInfo)
+              throw new TeamGridClientError(
+                'authentication_required',
+                'Verified OAuth authorization is required.',
+              )
+            const challenge = await scopeChallenge({
+              authInfo,
+              request: {
+                jsonrpc: '2.0',
+                id: 0,
+                method: 'tools/call',
+                params: { name, arguments: args[0] as Record<string, unknown> },
+              },
+            })
+            if (challenge) return toolConsentRequired(challenge, authInfo)
+          }
           if (domainCatalog[name].coreCas) {
             const workspace = await client.workspace.get()
             if (workspace.transport?.headers['x-teamgrid-resource-cas'] !== 'required-v1') {
@@ -505,7 +530,8 @@ export function createTeamGridMcpServer(
           ['core', 'collaboration', 'governance', 'all'].includes(toolProfile),
         ),
         title: toolTitle(name),
-        ...(requireGrantedScopes ? { scopeChallenge: toolScopeChallenge(name, client) } : {}),
+        ...(requireGrantedScopes ? { _meta: { securitySchemes: toolSecuritySchemes(name) } } : {}),
+        ...(requireGrantedScopes && scopeChallengeTransport === 'http' ? { scopeChallenge } : {}),
       },
       safeCallback,
     )
