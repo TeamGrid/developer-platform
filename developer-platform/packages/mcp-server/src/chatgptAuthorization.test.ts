@@ -107,6 +107,18 @@ describe('ChatGPT OAuth permission escalation', () => {
       } while (cursor)
       expect(tools.map((tool) => tool.name).sort()).toEqual([...domainToolNames].sort())
       for (const tool of tools) {
+        // OpenAI requires these safety hints on the actual descriptor. Private
+        // workspace reads are closed-world, even for stored external targets.
+        expect(tool.annotations).toMatchObject({
+          readOnlyHint: expect.any(Boolean),
+          destructiveHint: expect.any(Boolean),
+          openWorldHint: expect.any(Boolean),
+        })
+        if (tool.annotations.readOnlyHint) {
+          expect(tool.annotations.destructiveHint).toBe(false)
+          expect(tool.annotations.openWorldHint).toBe(false)
+          expect(tool.description).not.toContain('May notify other people.')
+        }
         expect(tool.securitySchemes).toHaveLength(1)
         expect(tool.securitySchemes[0].type).toBe('oauth2')
         for (const scope of toolScopes[tool.name as keyof typeof toolScopes])
@@ -120,6 +132,18 @@ describe('ChatGPT OAuth permission escalation', () => {
       expect(
         tools.find((tool) => tool.name === 'teamgrid_tasks_list').securitySchemes[0].scopes,
       ).toContain('tasks:read')
+      // Outbound mutations retain their safety declaration after read metadata
+      // is corrected; annotations never replace authorization or user consent.
+      for (const name of [
+        'teamgrid_webhook_delivery_test',
+        'teamgrid_invitation_create',
+        'teamgrid_automation_definition_create',
+      ]) {
+        expect(tools.find((tool) => tool.name === name).annotations).toMatchObject({
+          readOnlyHint: false,
+          openWorldHint: true,
+        })
+      }
     } finally {
       await test.handler.close()
     }
