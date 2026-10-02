@@ -163,6 +163,15 @@ synthetischen OAuth Verbindung wiederholt: verdichtet HTTP 200
 keine serverübergreifenden Trace IDs. Der erfolgreiche Dialog zeigte wieder
 84 Reads und 124 Writes.
 
+Anschließend wurde in einer temporären ChatGPT Unterhaltung ausschließlich die
+OAuth Diagnoseverbindung ausgewählt und einmal `teamgrid_workspace_get` mit
+`{}` angefordert. Der Diagnoseendpunkt protokollierte um
+`19:49:27.964Z` genau einen `tools/call`; die Host UI zeigte den Workspace
+Aufruf und das erwartete Fehlerergebnis `diagnostic_catalog_only`. Damit ist
+zusätzlich zum Import auch das Routing eines Modellaufrufs über MCP belegt.
+Die Attrappe gibt bewusst keine Geschäftsantwort zurück; dieser Nachweis
+ersetzt keinen autorisierten Production Read.
+
 Die Änderung betrifft ausschließlich wiederholte Schemaabschnitte in vier
 großen Eingaben. Der Generator ersetzt identische Abschnitte durch lokale
 `$defs` und `$ref`. Er besucht nur tatsächliche Schema Positionen, erhält
@@ -236,6 +245,13 @@ neue Kunden API Key oder Service Account Freigabe.
   erfolgreich. Alle vier verdichteten Eingaben ergeben nach Expansion der
   neuen Referenzen exakt ihre bisherigen Schemas; die übrigen 204
   Eingabeschemas sind unverändert.
+- [SDK PR60 CI](https://github.com/TeamGrid/developer-platform/actions/runs/37056161616):
+  alle sechs Paketprüfungen auf Linux, macOS und Windows mit Node 22.14.0 und
+  Node 24 sowie die Hosted MCP Image Prüfung erfolgreich für Quellstand
+  `b52a0dd528652bcc4a79a602f84d0f997db60c2e`.
+- Tatsächlicher ChatGPT Diagnoseaufruf: ein `tools/call` erreicht nach
+  erfolgreichem OAuth Import den datenfreien Endpunkt und das erwartete
+  Fehlerergebnis. Keine CLI oder Geschäftsoperation wurde dafür verwendet.
 - [DE native Qualification](https://github.com/TeamGrid/teamgrid/actions/runs/37032566951):
   Code und PKCE, Refresh Rotation und Reuse, Widerruf, falsche Resource,
   Discovery, autorisierter Read und Write, Konflikt, Read Grant Write Verbot,
