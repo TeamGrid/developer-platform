@@ -14,7 +14,11 @@ import { domainCatalog, domainOutputSchema, registerDomainTools } from './domain
 import { registerPrivateFileResources } from './fileResources.js'
 import { mutationErrorOutcome } from './outcomes.js'
 import type { RegisterTeamGridTool } from './registration.js'
-import { toolScopeChallenge } from './scopeRequirements.js'
+import {
+  requiredToolScopes,
+  resourceScopeChallenge,
+  toolScopeChallenge,
+} from './scopeRequirements.js'
 import { boundedSearchMetadata } from './searchCompleteness.js'
 import { toolConsentRequired, toolSecuritySchemes } from './toolAuthorization.js'
 import { installBoundedToolDiscovery } from './toolDiscovery.js'
@@ -467,6 +471,19 @@ export function createTeamGridMcpServer(
       try {
         return await execution.run({ signal, requestId }, async () => {
           signal.throwIfAborted()
+          if (requireGrantedScopes && domainCatalog[name].write) {
+            const authorization = extra?.http?.authInfo?.extra?.authorization as
+              | { workspaceId?: string }
+              | undefined
+            if (
+              authorization?.workspaceId &&
+              (args[0] as Record<string, unknown>).workspaceId !== authorization.workspaceId
+            )
+              throw new TeamGridClientError(
+                'workspace_mismatch',
+                'The credential belongs to another workspace. No change was sent.',
+              )
+          }
           if (requireGrantedScopes && scopeChallengeTransport === 'tool-result') {
             const authInfo = extra?.http?.authInfo
             // Hosted requests have already passed token verification. Fail closed
@@ -485,7 +502,7 @@ export function createTeamGridMcpServer(
                 params: { name, arguments: args[0] as Record<string, unknown> },
               },
             })
-            if (challenge) return toolConsentRequired(challenge, authInfo)
+            if (challenge) return toolConsentRequired(challenge, authInfo, name)
           }
           if (domainCatalog[name].coreCas) {
             const workspace = await client.workspace.get()
@@ -513,6 +530,19 @@ export function createTeamGridMcpServer(
           return result
         })
       } catch (error) {
+        const authInfo = extra?.http?.authInfo
+        const additional = requireGrantedScopes ? resourceScopeChallenge(error) : []
+        if (authInfo && additional.some((scope) => !authInfo.scopes.includes(scope)))
+          return toolConsentRequired(
+            {
+              scopes: [...new Set([...requiredToolScopes(name, args[0]), ...additional])] as [
+                string,
+                ...string[],
+              ],
+            },
+            authInfo,
+            name,
+          )
         return toolError(
           error,
           domainCatalog[name].write ? mutationErrorOutcome(error, dispatched) : undefined,

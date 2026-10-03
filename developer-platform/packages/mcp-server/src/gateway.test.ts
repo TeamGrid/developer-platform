@@ -105,6 +105,26 @@ describe('regional OAuth MCP gateway', () => {
       }
     },
   )
+  it('reports a valid token blocked by workspace policy without reauthentication', async () => {
+    const { gateway, seen } = harness(undefined, () =>
+      Response.json({ error: 'access_denied' }, { status: 403 }),
+    )
+    try {
+      const result = await gateway.fetch(
+        new Request(resourceUrl, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${access}` },
+        }),
+      )
+      expect(result.status).toBe(403)
+      expect(result.headers.has('www-authenticate')).toBe(false)
+      expect(await result.json()).toEqual({ error: 'access_denied' })
+      expect(seen.some((call) => call.url.startsWith(apiBaseUrl))).toBe(false)
+    } finally {
+      await gateway.close()
+    }
+  })
+
   it('challenges only an explicit invalid grant and bounds provider bodies', async () => {
     for (const [reply, status] of [
       [() => Response.json({ error: 'invalid_grant' }, { status: 400 }), 401],

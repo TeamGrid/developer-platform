@@ -6,7 +6,13 @@ import { domainWriteTools } from './domainTools.js'
 import { createTeamGridMcpServer } from './server.js'
 import { usesChatGptToolChallenges } from './toolAuthorization.js'
 import { type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
+import { supportedOAuthScopes } from './toolScopes.js'
 import { workWriteTools } from './workTools.js'
+
+/** Valid authority blocked by workspace policy; another login cannot repair it. */
+export class McpAccessDeniedError extends Error {}
+
+const initialScopes = ['workspace:read', 'projects:read', 'tasks:read', 'time-entries:read']
 
 /** Safe transport signal: keep the provider's wait time without prompting another login. */
 export class McpRateLimitError extends Error {
@@ -165,7 +171,7 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
           'Cache-Control': 'no-store',
           ...(challenge
             ? {
-                'WWW-Authenticate': `Bearer resource_metadata="${metadataUrl.href}", scope="workspace:read"${challenge === 'missing' ? '' : `, error="${challenge}"`}`,
+                'WWW-Authenticate': `Bearer resource_metadata="${metadataUrl.href}", scope="${initialScopes.join(' ')}"${challenge === 'missing' ? '' : `, error="${challenge}"`}`,
               }
             : {}),
         },
@@ -198,8 +204,9 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
       return Response.json({
         resource: resource.href,
         authorization_servers: [issuer.href],
-        // Initial consent stays minimal; tool challenges request additional scopes when needed.
-        scopes_supported: ['workspace:read'],
+        // The catalog describes support, not a request for every permission.
+        // The initial 401 explicitly requests basic reads; tools request precise additions.
+        scopes_supported: [...supportedOAuthScopes],
         bearer_methods_supported: ['header'],
       })
     }
@@ -265,15 +272,17 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
         )
       } catch (error) {
         result =
-          error instanceof McpRateLimitError && !signal.aborted
-            ? Response.json(
-                { error: 'rate_limited' },
-                {
-                  status: 429,
-                  headers: { 'Retry-After': error.retryAfter },
-                },
-              )
-            : response(503, signal.aborted ? 'request_interrupted' : 'temporarily_unavailable')
+          error instanceof McpAccessDeniedError && !signal.aborted
+            ? response(403, 'access_denied')
+            : error instanceof McpRateLimitError && !signal.aborted
+              ? Response.json(
+                  { error: 'rate_limited' },
+                  {
+                    status: 429,
+                    headers: { 'Retry-After': error.retryAfter },
+                  },
+                )
+              : response(503, signal.aborted ? 'request_interrupted' : 'temporarily_unavailable')
       } finally {
         clearTimeout(timer)
       }

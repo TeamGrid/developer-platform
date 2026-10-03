@@ -2,6 +2,7 @@ import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/cli
 import { describe, expect, it, vi } from 'vitest'
 import { responseFixture } from './fixtures.testSupport.js'
 import { createTeamGridMcpHttpHandler, type McpAuthorization, type McpHttpOptions } from './http.js'
+import { supportedOAuthScopes } from './toolScopes.js'
 
 const resourceUrl = 'https://mcp.de.example.test/mcp'
 const issuerUrl = 'https://auth.de.example.test/'
@@ -88,7 +89,9 @@ describe('regional HTTP MCP authorization boundary', () => {
     try {
       const unauthorized = await handler.fetch(request())
       expect(unauthorized.status).toBe(401)
-      expect(unauthorized.headers.get('www-authenticate')).toContain('scope="workspace:read"')
+      expect(unauthorized.headers.get('www-authenticate')).toContain(
+        'scope="workspace:read projects:read tasks:read time-entries:read"',
+      )
       expect(unauthorized.headers.get('www-authenticate')).toContain(
         '/.well-known/oauth-protected-resource/mcp',
       )
@@ -96,7 +99,7 @@ describe('regional HTTP MCP authorization boundary', () => {
         new Request('https://mcp.de.example.test/.well-known/oauth-protected-resource/mcp'),
       )
       const discovery = (await metadata.json()) as { scopes_supported: string[] }
-      expect(discovery.scopes_supported).toEqual(['workspace:read'])
+      expect(discovery.scopes_supported).toEqual([...supportedOAuthScopes])
       expect(discovery).toMatchObject({
         resource: resourceUrl,
         authorization_servers: [issuerUrl],
