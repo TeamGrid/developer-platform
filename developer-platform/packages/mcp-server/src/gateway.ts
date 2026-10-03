@@ -5,6 +5,7 @@ import { z } from 'zod'
 import {
   authorizationSchema,
   createTeamGridMcpHttpHandler,
+  McpAccessDeniedError,
   type McpHttpOptions,
   McpRateLimitError,
 } from './http.js'
@@ -130,6 +131,16 @@ export function createRegionalMcpGateway(options: RegionalMcpGatewayOptions) {
         if (response.status === 429) {
           void response.body?.cancel().catch(() => {})
           throw new McpRateLimitError(response.headers.get('retry-after'))
+        }
+        if (response.status === 403) {
+          const error = await boundedProviderJson(response, signal)
+          if (
+            error &&
+            typeof error === 'object' &&
+            'error' in error &&
+            error.error === 'access_denied'
+          )
+            throw new McpAccessDeniedError('Workspace access is unavailable.')
         }
         if (response.status === 400) {
           const error = await boundedProviderJson(response, signal)

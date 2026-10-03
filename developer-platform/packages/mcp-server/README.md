@@ -263,3 +263,19 @@ the corresponding tool. `resources/read` reauthorizes and delivers at most 1 MiB
 private transfer URLs stay internal. Larger downloads use an independently
 authorized App or CLI transfer flow. A separate login cannot access exports
 owned by another OAuth grant. Uploads use the existing App/CLI/SDK transfer path.
+
+
+Hosted OAuth starts with workspace, project, task and time-entry read scopes.
+Protected Resource Metadata advertises the canonical supported scope catalog;
+that is distinct from the initial consent request. Each tool publishes its base
+OAuth policy in both descriptor locations, while argument-dependent rights are
+requested only for the specific action. The stable and callback-specific verified
+ChatGPT client IDs receive the native error-tool-result challenge. A foreign
+workspace or a policy-blocked valid grant does not request another login.
+
+The authorization UI can offer narrower read-only or daily-work grants even when
+OpenAI initially requests scopes from the full catalog. Only the owner's selected
+scopes enter the token; refresh cannot enlarge them. Native authorization and
+automatic action resumption are client behavior and need an actual OpenAI QA
+flow, beyond the protocol fixture tests. Reuse the exact workspace, payload and
+idempotency key if resuming after consent.

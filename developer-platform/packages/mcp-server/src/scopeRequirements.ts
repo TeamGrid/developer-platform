@@ -1,5 +1,6 @@
 import type { ScopeChallengeHandler } from '@modelcontextprotocol/server'
 import { TeamGridApiError, type TeamGridClient } from '@teamgrid/api-client'
+import catalog from './generated/domainCatalog.json' with { type: 'json' }
 import type { McpToolName } from './toolProfiles.js'
 import { toolScopes } from './toolScopes.js'
 
@@ -96,6 +97,15 @@ export function toolScopeChallenge(
 ): ScopeChallengeHandler {
   return async ({ request, authInfo }) => {
     if (!authInfo) return undefined
+    // The hosted verifier owns this workspace identity. A foreign target is a
+    // business denial, so let the normal tool path report it without re-consent.
+    const authorization = object(authInfo.extra?.authorization)
+    if (
+      catalog[name].write &&
+      typeof authorization.workspaceId === 'string' &&
+      object(request.params?.arguments).workspaceId !== authorization.workspaceId
+    )
+      return undefined
     const scopes = requiredToolScopes(name, request.params?.arguments)
     // A reviewed comment write needs its current target and version first.
     if (commentById.has(name) && !scopes.includes('comments:read')) scopes.push('comments:read')

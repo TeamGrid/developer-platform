@@ -180,6 +180,41 @@ describe('ChatGPT OAuth permission escalation', () => {
     },
   )
 
+  it.each([chatGptClient, 'https://chatgpt.com/oauth/callback_123/client.json', 'test-client'])(
+    'refuses a foreign workspace before asking for scopes for %s',
+    async (clientId) => {
+      const test = setup(clientId)
+      try {
+        const denied = await test.rpc('tools/call', {
+          name: 'teamgrid_task_create',
+          arguments: {
+            workspaceId: 'foreign-workspace',
+            idempotencyKey: 'intent',
+            data: { name: 'Test' },
+          },
+        })
+        expect(denied.response.status).toBe(200)
+        expect(denied.message.result.isError).toBe(true)
+        expect(denied.message.result._meta?.['mcp/www_authenticate']).toBeUndefined()
+        expect(JSON.stringify(denied.message)).toContain('workspace_mismatch')
+        expect(test.create).not.toHaveBeenCalled()
+      } finally {
+        await test.handler.close()
+      }
+    },
+  )
+
+  it('supports the documented callback-specific ChatGPT identity', async () => {
+    const test = setup('https://chatgpt.com/oauth/callback_123/client.json')
+    try {
+      const denied = await test.rpc('tools/call', { name: 'teamgrid_tasks_list', arguments: {} })
+      expect(denied.response.status).toBe(200)
+      expect(denied.message.result._meta['mcp/www_authenticate'][0]).toContain('tasks:read')
+    } finally {
+      await test.handler.close()
+    }
+  })
+
   it('preserves the explicit workspace boundary after the user approves write scopes', async () => {
     const test = setup()
     test.update({ scopes: ['workspace:read', 'tasks:write'] })
