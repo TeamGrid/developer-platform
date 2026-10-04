@@ -17,6 +17,18 @@ export {
   resolveMcpHostProfile,
 } from './hostProfiles.js'
 export { createTeamGridMcpHttpHandler, type McpAuthorization, type McpHttpOptions } from './http.js'
+export {
+  createMongoOAuthRoutingDirectory,
+  type MongoOAuthRoutingCollection,
+  type OAuthCredentialKind,
+  type OAuthRoutingDirectory,
+  type OAuthRoutingRecord,
+} from './oauthRoutingDirectory.js'
+export {
+  createFederatedOAuthTokenBroker,
+  type FederatedOAuthBrokerCell,
+  OAuthBrokerInvalidClientError,
+} from './oauthTokenBroker.js'
 export { createReadOnlyHandlers, createTeamGridMcpServer } from './server.js'
 export { checkMcpAccess, describeMcpAccess } from './setup.js'
 export {

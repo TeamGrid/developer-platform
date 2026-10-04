@@ -297,10 +297,25 @@ returns a distinct regional API delegation. No other cell is tried on failure.
 Lookup and execution share the request budget. Existing regional gateway options
 retain their previous behavior when `providerUrl` is omitted.
 
-This is a transport library, not a deployed global OAuth broker or an in-memory
-routing-store substitute. See the [global OAuth decision](../../../integrations/global-oauth-federation.md)
-for the additional App registry, private service authentication, durable
-code/refresh routing, crash recovery and launch requirements.
+`createMongoOAuthRoutingDirectory` registers immutable, issuer/resource/kind-bound
+hash routes using a supplied native replica-set collection. Call `initialize(signal)`
+before serving requests. Publication uses majority+journaled writes; lookup uses
+bounded primary linearizable reads. It supplies no credentials, connection string
+or in-memory fallback. Inject `resolve('access', hash, signal)` into the MCP gateway.
+
+`createFederatedOAuthTokenBroker` handles public token and revocation requests.
+It requires global client authentication, admission and directory adapters. Reject
+client identity with `OAuthBrokerInvalidClientError`; infrastructure failures remain
+503. Regional App authentication also runs freshly. On an ambiguous private
+exchange, the broker attempts one explicit receipt recovery with the same nonce
+and original body. It never repeats issuance or tries another cell. Both token
+routes must publish before a response containing tokens reaches the client.
+
+These libraries do not deploy the public endpoint or implement the browser
+authorization/consent-resume flow. See the
+[global OAuth decision](../../../integrations/global-oauth-federation.md)
+for private service authentication, recovery-key provisioning, operating topology
+and remaining launch requirements.
 
 
 ## Hosted runtime and private resources

@@ -29,9 +29,15 @@ and separately approved OAuth scopes still apply.
   retain existing regional grants. `createFederatedMcpGateway` routes opaque
   access-token hashes to one allowlisted cell, with fresh regional authorization,
   distinct API delegations, bounded lookup and concurrent DE/US isolation.
-  The [global OAuth decision](global-oauth-federation.md) specifies the durable
-  directory and broker protocol still to implement; this library does not deploy
-  the proposed public endpoint or supply a routing store.
+  `createMongoOAuthRoutingDirectory` supplies immutable hash registration,
+  journaled majority writes and bounded linearizable reads on a native replica-set
+  collection. `createFederatedOAuthTokenBroker` routes exchange/refresh/revocation
+  to that exact cell. Private recovery reads a one-minute encrypted receipt,
+  rechecks current authority and never repeats issuance. Token transactions commit
+  their hash outbox and receipt atomically; consent commits the code hash outbox.
+  See the [global OAuth decision](global-oauth-federation.md). Browser request
+  persistence, authenticated workspace selection, consent resume, global client
+  registry/discovery wiring and the deployed endpoint remain outstanding.
 
 ```sh
 cd developer-platform
