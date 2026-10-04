@@ -9,6 +9,7 @@ import {
   type McpHttpOptions,
   McpRateLimitError,
 } from './http.js'
+import type { McpToolObservation } from './observability.js'
 
 const delegationSchema = z
   .object({
@@ -35,14 +36,18 @@ export type RegionalMcpGatewayOptions = Omit<
   apiBaseUrl: string
   apiOriginSecret?: string
   fetch?: typeof fetch
-  observe?(event: {
-    event: 'teamgrid.mcp.request'
-    requestId: string
-    region: string
-    cellId: string
-    statusCode: number
-    durationMs: number
-  }): void
+  observe?(
+    event:
+      | (McpToolObservation & { region: string; cellId: string })
+      | {
+          event: 'teamgrid.mcp.request'
+          requestId: string
+          region: string
+          cellId: string
+          statusCode: number
+          durationMs: number
+        },
+  ): void
 }
 
 function canonicalHttps(value: string) {
@@ -111,6 +116,9 @@ export function createRegionalMcpGateway(options: RegionalMcpGatewayOptions) {
   const requests = new AsyncLocalStorage<{ requestId: string; verified?: ProviderResult }>()
   const handler = createTeamGridMcpHttpHandler({
     ...options,
+    toolRequestId: () => requests.getStore()?.requestId,
+    observeTool: (event) =>
+      options.observe?.({ ...event, region: options.region, cellId: options.cellId }),
     async verifyAccessToken(token, signal) {
       if (!/^tg_mcp_at_v1_[A-Za-z0-9_-]{43}$/.test(token)) return null
       const current = requests.getStore()

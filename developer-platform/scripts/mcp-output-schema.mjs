@@ -28,6 +28,9 @@ export function mcpOutputSchema(api, operation) {
         continuation: { const: 'narrow-query-or-list' }, verification: { const: 'read-by-id' } },
       required: ['complete', 'indexed', 'returned', 'limit', 'continuation', 'verification'] },
   }
+  if (operation.operationId === 'getContact') extension.notesPage = extension.contentPage
+  if (operation.operationId === 'listContacts')
+    extension.notesReadTool = { const: 'teamgrid_contact_get' }
   const dereference = (ref) => {
     if (!ref.startsWith('#/components/schemas/')) throw new Error(`Unsupported output reference ${ref}`)
     const name = ref.split('/').at(-1)
@@ -80,6 +83,28 @@ export function mcpOutputSchema(api, operation) {
       return visit(schema)
     })
   if (!variants.length) throw new Error(`Missing successful output for ${operation.operationId}`)
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(operation['x-teamgrid-mcp-method'] || 'GET')) {
+    const receipt = { type: 'object', additionalProperties: false, required: ['type', 'attributes'], properties: {
+      type: { const: 'mutationReceipt' }, attributes: { type: 'object', additionalProperties: false,
+        required: ['operation', 'resources'], properties: {
+          operation: { type: 'string', maxLength: 128 },
+          resources: { type: 'array', maxItems: 200, items: { type: 'object', additionalProperties: false,
+            required: ['type'], properties: { id: {type:'string',maxLength:128},
+              type: {type:'string',maxLength:128}, status: {type:'string',maxLength:64} } } },
+        } },
+    } }
+    definitions.McpMutationReceipt = receipt
+    for (let index = 0; index < variants.length; index++) {
+      const original = variants[index]
+      const variant = original.$ref
+        ? structuredClone(definitions[original.$ref.replace('#/$defs/', '')]) : original
+      variants[index] = variant
+      variant.properties.data = { anyOf: [variant.properties.data, { allOf: [
+        { $ref: '#/$defs/McpMutationReceipt' },
+        { properties: { attributes: { properties: { operation: { const: operation.operationId } } } } },
+      ] }] }
+    }
+  }
   return { ...(variants.length === 1 ? variants[0] : { type: 'object', anyOf: variants }),
     ...(Object.keys(definitions).length ? { $defs: definitions } : {}) }
 }

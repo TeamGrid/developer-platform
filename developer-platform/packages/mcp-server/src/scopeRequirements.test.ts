@@ -1,6 +1,10 @@
 import { TeamGridApiError } from '@teamgrid/api-client'
 import { describe, expect, it, vi } from 'vitest'
-import { resourceScopeChallenge, toolScopeChallenge } from './scopeRequirements.js'
+import {
+  requiredToolScopes,
+  resourceScopeChallenge,
+  toolScopeChallenge,
+} from './scopeRequirements.js'
 
 const denied = (header = 'Bearer error="insufficient_scope", scope="tasks:read"') =>
   new TeamGridApiError({
@@ -25,6 +29,46 @@ const context = (scopes: string[]) => ({
 })
 
 describe('resource-derived OAuth consent', () => {
+  it('derives invitation PII and only the selected custom-field target', () => {
+    expect(requiredToolScopes('teamgrid_invitation_get', { includePii: true })).toContain(
+      'members:pii:read',
+    )
+    expect(requiredToolScopes('teamgrid_invitations_list', {})).not.toContain('members:pii:read')
+    expect(requiredToolScopes('teamgrid_custom_field_value_get', { targetType: 'task' })).toContain(
+      'tasks:read',
+    )
+    const scopes = requiredToolScopes('teamgrid_custom_field_value_set', {
+      targetType: 'project-journal-entry',
+    })
+    expect(scopes).toContain('project-statements:write')
+    expect(scopes).not.toContain('tasks:write')
+  })
+  it('accepts only the reviewed additional scopes for each operation', () => {
+    const challenge = (scope: string) =>
+      denied(`Bearer error="insufficient_scope", scope="${scope}"`)
+    expect(
+      resourceScopeChallenge(challenge('members:pii:read'), 'teamgrid_invitations_list'),
+    ).toEqual(['members:pii:read'])
+    expect(resourceScopeChallenge(challenge('members:pii:read'), 'teamgrid_task_get')).toEqual([])
+    expect(
+      resourceScopeChallenge(
+        challenge('appointments:delegated:write'),
+        'teamgrid_appointment_update',
+      ),
+    ).toEqual(['appointments:delegated:write'])
+    expect(
+      resourceScopeChallenge(
+        challenge('appointments:delegated:write'),
+        'teamgrid_appointments_list',
+      ),
+    ).toEqual([])
+    expect(
+      resourceScopeChallenge(challenge('tags:read users:read'), 'teamgrid_custom_field_value_get'),
+    ).toEqual(['tags:read', 'users:read'])
+    expect(
+      resourceScopeChallenge(challenge('credentials:write'), 'teamgrid_custom_field_value_set'),
+    ).toEqual([])
+  })
   it('accepts only the closed API read-scope challenge', () => {
     expect(resourceScopeChallenge(denied())).toEqual(['tasks:read'])
     for (const header of [

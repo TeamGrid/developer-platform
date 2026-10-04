@@ -1363,7 +1363,7 @@ export interface paths {
         head?: never;
         /**
          * Update a time entry
-         * @description Use this operation to update a time entry. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         * @description Use this operation to update a time entry. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
          */
         patch: operations["updateTimeEntry"];
         trace?: never;
@@ -1595,7 +1595,7 @@ export interface paths {
         head?: never;
         /**
          * Update a contact
-         * @description Use this operation to update a contact. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request.
+         * @description Use this operation to update a contact. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change.
          */
         patch: operations["updateContact"];
         trace?: never;
@@ -16898,6 +16898,9 @@ export interface operations {
             /** @description The request to get a time entry succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
+                    /** @description Exact snapshot revision when X-TeamGrid-Snapshot-CAS: required-v1 is negotiated. */
+                    ETag?: string;
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -16976,7 +16979,10 @@ export interface operations {
     updateTimeEntry: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Exact reviewed ETag. Required for hosted MCP and negotiated snapshot CAS; legacy requests without negotiation remain compatible. */
+                "If-Match"?: string;
+            };
             path: {
                 /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
@@ -16998,6 +17004,9 @@ export interface operations {
             /** @description The request to update a time entry succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
+                    /** @description Exact snapshot revision when X-TeamGrid-Snapshot-CAS: required-v1 is negotiated. */
+                    ETag?: string;
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -17041,6 +17050,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];
@@ -18354,6 +18365,9 @@ export interface operations {
             /** @description The request to get a contact succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
+                    /** @description Exact snapshot revision when X-TeamGrid-Snapshot-CAS: required-v1 is negotiated. */
+                    ETag?: string;
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -18472,7 +18486,10 @@ export interface operations {
     updateContact: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Exact reviewed ETag. Required for hosted MCP and negotiated snapshot CAS; legacy requests without negotiation remain compatible. */
+                "If-Match"?: string;
+            };
             path: {
                 /** @description Stable identifier of the resource in the authenticated workspace. */
                 id: components["parameters"]["ResourceId"];
@@ -18494,6 +18511,9 @@ export interface operations {
             /** @description The request to update a contact succeeded. The response contains the canonical public result and request metadata. */
             200: {
                 headers: {
+                    /** @description Exact snapshot revision when X-TeamGrid-Snapshot-CAS: required-v1 is negotiated. */
+                    ETag?: string;
+                    "Cache-Control": components["headers"]["StrongETagCacheControl"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -18606,6 +18626,8 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+            412: components["responses"]["PreconditionFailed"];
+            428: components["responses"]["PreconditionRequired"];
             429: components["responses"]["RateLimited"];
             502: components["responses"]["BadGateway"];
             503: components["responses"]["ServiceUnavailable"];

@@ -55,7 +55,7 @@ Domain profiles include their listed tools plus workspace, user, task/project lo
 | `teamgrid_contact_group_restore` | crm-write | write | unconditional | — |
 | `teamgrid_contact_group_update` | crm-write | write | unconditional | — |
 | `teamgrid_contact_groups_list` | crm-write | read | read | — |
-| `teamgrid_contact_update` | crm-write | write | unconditional | — |
+| `teamgrid_contact_update` | crm-write | write | conditional | — |
 | `teamgrid_contacts_list` | crm-write | read | read | — |
 | `teamgrid_custom_field_definition_archive` | catalog-write | write | unconditional | — |
 | `teamgrid_custom_field_definition_create` | catalog-write | write | unconditional | yes |
@@ -206,7 +206,7 @@ Domain profiles include their listed tools plus workspace, user, task/project lo
 | `teamgrid_time_entry_create` | time-write | write | unconditional | yes |
 | `teamgrid_time_entry_get` | time-write | read | read | — |
 | `teamgrid_time_entry_restore` | time-write | write | unconditional | — |
-| `teamgrid_time_entry_update` | time-write | write | unconditional | — |
+| `teamgrid_time_entry_update` | time-write | write | conditional | — |
 | `teamgrid_users_list` | context | read | read | — |
 | `teamgrid_webhook_deliveries_list` | integrations-write | read | read | — |
 | `teamgrid_webhook_delivery_get` | integrations-write | read | read | — |

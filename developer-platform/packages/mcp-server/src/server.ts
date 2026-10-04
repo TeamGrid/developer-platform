@@ -1,7 +1,12 @@
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
-import { McpServer, type RegisteredTool, type ServerContext } from '@modelcontextprotocol/server'
+import {
+  type CallToolResult,
+  McpServer,
+  type RegisteredTool,
+  type ServerContext,
+} from '@modelcontextprotocol/server'
 import {
   type RequestOptions,
   redactDeveloperSecrets,
@@ -10,8 +15,10 @@ import {
   TeamGridClientError,
 } from '@teamgrid/api-client'
 import { z } from 'zod'
+import { boundToolResult } from './boundedResults.js'
 import { domainCatalog, domainOutputSchema, registerDomainTools } from './domainTools.js'
 import { registerPrivateFileResources } from './fileResources.js'
+import type { McpToolObservation } from './observability.js'
 import { mutationErrorOutcome } from './outcomes.js'
 import type { RegisterTeamGridTool } from './registration.js'
 import {
@@ -27,7 +34,6 @@ import { registerWorkTools } from './workTools.js'
 
 const packageVersion = (createRequire(import.meta.url)('../package.json') as { version: string })
   .version
-const maxToolResultBytes = 256 * 1024
 const readOnlyAnnotations = Object.freeze({
   destructiveHint: false,
   idempotentHint: true,
@@ -84,19 +90,6 @@ function toolResult(value: unknown) {
     }
   }
   const text = JSON.stringify(value)
-  if (Buffer.byteLength(text, 'utf8') > maxToolResultBytes) {
-    const error = {
-      error: {
-        code: 'result_too_large',
-        detail: 'The TeamGrid result exceeds the MCP context safety limit. Use a smaller page.',
-      },
-    }
-    return {
-      content: [{ text: JSON.stringify(error), type: 'text' as const }],
-      isError: true,
-      structuredContent: error,
-    }
-  }
   const structuredContent: Record<string, unknown> =
     value && typeof value === 'object' && !Array.isArray(value)
       ? (value as Record<string, unknown>)
@@ -424,6 +417,8 @@ export function createTeamGridMcpServer(
     toolProfile = 'core',
     requireGrantedScopes = false,
     scopeChallengeTransport = 'http',
+    observeTool,
+    toolRequestId,
   }: {
     allowTools?: readonly McpToolName[]
     denyTools?: readonly McpToolName[]
@@ -431,6 +426,8 @@ export function createTeamGridMcpServer(
     requireGrantedScopes?: boolean
     /** Tool-result OAuth challenges for clients that require them; scope checks are identical. */
     scopeChallengeTransport?: 'http' | 'tool-result'
+    observeTool?: (event: McpToolObservation) => void
+    toolRequestId?: () => string | undefined
   } = {},
 ) {
   const execution = new AsyncLocalStorage<RequestOptions>()
@@ -466,86 +463,143 @@ export function createTeamGridMcpServer(
           ),
         30_000,
       )
-      const requestId = `mcp-${randomUUID()}`
+      const requestId = toolRequestId?.() ?? `mcp-${randomUUID()}`
+      const started = performance.now()
+      const finish = (result: CallToolResult) => {
+        const authChallenge = Boolean(result._meta?.['mcp/www_authenticate'])
+        const meta = (result.structuredContent as Record<string, unknown> | undefined)?.meta as
+          | Record<string, unknown>
+          | undefined
+        const outcome = authChallenge
+          ? 'authorization-required'
+          : ['completed', 'accepted', 'partial', 'unknown', 'failed'].includes(
+                String(meta?.outcome),
+              )
+            ? (meta?.outcome as McpToolObservation['outcome'])
+            : result.isError
+              ? 'failed'
+              : 'completed'
+        try {
+          observeTool?.({
+            event: 'teamgrid.mcp.tool',
+            requestId,
+            tool: name,
+            outcome,
+            isError: result.isError === true,
+            authChallenge,
+            durationMs: Math.round(performance.now() - started),
+          })
+        } catch {
+          /* Observability must never affect delivery or authorization. */
+        }
+        return result
+      }
       let dispatched = false
       try {
-        return await execution.run({ signal, requestId }, async () => {
-          signal.throwIfAborted()
-          if (requireGrantedScopes && domainCatalog[name].write) {
-            const authorization = extra?.http?.authInfo?.extra?.authorization as
-              | { workspaceId?: string }
-              | undefined
-            if (
-              authorization?.workspaceId &&
-              (args[0] as Record<string, unknown>).workspaceId !== authorization.workspaceId
-            )
-              throw new TeamGridClientError(
-                'workspace_mismatch',
-                'The credential belongs to another workspace. No change was sent.',
+        return finish(
+          await execution.run({ signal, requestId }, async () => {
+            signal.throwIfAborted()
+            if (requireGrantedScopes && domainCatalog[name].write) {
+              const authorization = extra?.http?.authInfo?.extra?.authorization as
+                | { workspaceId?: string }
+                | undefined
+              if (
+                authorization?.workspaceId &&
+                (args[0] as Record<string, unknown>).workspaceId !== authorization.workspaceId
               )
-          }
-          if (requireGrantedScopes && scopeChallengeTransport === 'tool-result') {
-            const authInfo = extra?.http?.authInfo
-            // Hosted requests have already passed token verification. Fail closed
-            // if this adapter is ever invoked without that verified context.
-            if (!authInfo)
-              throw new TeamGridClientError(
-                'authentication_required',
-                'Verified OAuth authorization is required.',
-              )
-            const challenge = await scopeChallenge({
-              authInfo,
-              request: {
-                jsonrpc: '2.0',
-                id: 0,
-                method: 'tools/call',
-                params: { name, arguments: args[0] as Record<string, unknown> },
-              },
-            })
-            if (challenge) return toolConsentRequired(challenge, authInfo, name)
-          }
-          if (domainCatalog[name].coreCas) {
-            const workspace = await client.workspace.get()
-            if (workspace.transport?.headers['x-teamgrid-resource-cas'] !== 'required-v1') {
-              throw new TeamGridClientError(
-                'resource_cas_required',
-                'This API connection has not acknowledged required resource CAS. Use a qualified API and an MCP client configured with requireResourceCas; no change was sent.',
-              )
+                throw new TeamGridClientError(
+                  'workspace_mismatch',
+                  'The credential belongs to another workspace. No change was sent.',
+                )
             }
-          }
-          dispatched = true
-          const result = await Reflect.apply(callback, undefined, args)
-          if (!result.isError) {
-            const schema = domainOutputSchema(
-              name,
-              ['core', 'collaboration', 'governance', 'all'].includes(toolProfile),
-            )
-            const checked = await schema['~standard'].validate(result.structuredContent)
-            if (checked.issues)
-              throw new TeamGridClientError(
-                'invalid_api_response',
-                'The API result did not match its response contract. For a mutation, completion is unconfirmed; inspect the target before retrying.',
+            if (requireGrantedScopes && scopeChallengeTransport === 'tool-result') {
+              const authInfo = extra?.http?.authInfo
+              // Hosted requests have already passed token verification. Fail closed
+              // if this adapter is ever invoked without that verified context.
+              if (!authInfo)
+                throw new TeamGridClientError(
+                  'authentication_required',
+                  'Verified OAuth authorization is required.',
+                )
+              const challenge = await scopeChallenge({
+                authInfo,
+                request: {
+                  jsonrpc: '2.0',
+                  id: 0,
+                  method: 'tools/call',
+                  params: { name, arguments: args[0] as Record<string, unknown> },
+                },
+              })
+              if (challenge) return toolConsentRequired(challenge, authInfo, name)
+            }
+            if (domainCatalog[name].coreCas) {
+              const workspace = await client.workspace.get()
+              if (workspace.transport?.headers['x-teamgrid-resource-cas'] !== 'required-v1') {
+                throw new TeamGridClientError(
+                  'resource_cas_required',
+                  'This API connection has not acknowledged required resource CAS. Use a qualified API and an MCP client configured with requireResourceCas; no change was sent.',
+                )
+              }
+            }
+            if (domainCatalog[name].snapshotCas) {
+              const workspace = await client.workspace.get()
+              if (workspace.transport?.headers['x-teamgrid-snapshot-cas'] !== 'required-v1') {
+                throw new TeamGridClientError(
+                  'resource_cas_required',
+                  'This connection has not acknowledged snapshot concurrency protection. Use a compatible API and MCP client; no change was sent.',
+                )
+              }
+            }
+            dispatched = true
+            const result = await Reflect.apply(callback, undefined, args)
+            if (!result.isError) {
+              const schema = domainOutputSchema(
+                name,
+                ['core', 'collaboration', 'governance', 'all'].includes(toolProfile),
+                false,
               )
-          }
-          return result
-        })
+              const checked = await schema['~standard'].validate(result.structuredContent)
+              if (checked.issues)
+                throw new TeamGridClientError(
+                  'invalid_api_response',
+                  'The API result did not match its response contract. For a mutation, completion is unconfirmed; inspect the target before retrying.',
+                )
+            }
+            const bounded = boundToolResult(result, name)
+            if (!bounded.isError && bounded !== result) {
+              const checked = await domainOutputSchema(name)['~standard'].validate(
+                bounded.structuredContent,
+              )
+              if (checked.issues)
+                throw new TeamGridClientError(
+                  'invalid_api_response',
+                  'Invalid compact mutation receipt; inspect the target before retrying.',
+                )
+            }
+            return bounded
+          }),
+        )
       } catch (error) {
         const authInfo = extra?.http?.authInfo
-        const additional = requireGrantedScopes ? resourceScopeChallenge(error) : []
+        const additional = requireGrantedScopes ? resourceScopeChallenge(error, name) : []
         if (authInfo && additional.some((scope) => !authInfo.scopes.includes(scope)))
-          return toolConsentRequired(
-            {
-              scopes: [...new Set([...requiredToolScopes(name, args[0]), ...additional])] as [
-                string,
-                ...string[],
-              ],
-            },
-            authInfo,
-            name,
+          return finish(
+            toolConsentRequired(
+              {
+                scopes: [...new Set([...requiredToolScopes(name, args[0]), ...additional])] as [
+                  string,
+                  ...string[],
+                ],
+              },
+              authInfo,
+              name,
+            ),
           )
-        return toolError(
-          error,
-          domainCatalog[name].write ? mutationErrorOutcome(error, dispatched) : undefined,
+        return finish(
+          toolError(
+            error,
+            domainCatalog[name].write ? mutationErrorOutcome(error, dispatched) : undefined,
+          ),
         )
       } finally {
         clearTimeout(timer)

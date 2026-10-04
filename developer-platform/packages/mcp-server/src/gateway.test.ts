@@ -1,6 +1,11 @@
 import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client'
 import { describe, expect, it } from 'vitest'
-import { createRegionalMcpGateway, type ProviderResult } from './gateway.js'
+import { responseFixture } from './fixtures.testSupport.js'
+import {
+  createRegionalMcpGateway,
+  type ProviderResult,
+  type RegionalMcpGatewayOptions,
+} from './gateway.js'
 
 const resourceUrl = 'https://mcp.example.test/mcp'
 const issuerUrl = 'https://auth.example.test/'
@@ -11,7 +16,10 @@ const now = 1800000000000
 function harness(
   patch: (value: ProviderResult) => unknown = (value) => value,
   providerResponse?: () => Response,
+  apiResponse?: (url: string) => Response,
+  failingObserver = false,
 ) {
+  const observations: Parameters<NonNullable<RegionalMcpGatewayOptions['observe']>>[0][] = []
   const seen: {
     url: string
     auth: string | null
@@ -29,6 +37,11 @@ function harness(
     cellId: 'de-test',
     now: () => now,
     enabled: () => true,
+    toolProfile: 'full',
+    observe: (event) => {
+      observations.push(event)
+      if (failingObserver) throw new Error('Isolated telemetry failure')
+    },
     admitRequest: async () => true,
     fetch: async (input, init) => {
       const url = String(input)
@@ -65,6 +78,7 @@ function harness(
             },
           }),
         )
+      if (apiResponse) return apiResponse(url)
       return Response.json(
         {
           data: { id: 'team', type: 'workspace', attributes: { name: 'Example' } },
@@ -74,10 +88,76 @@ function harness(
       )
     },
   })
-  return { gateway, seen }
+  return { gateway, seen, observations }
 }
 
 describe('regional OAuth MCP gateway', () => {
+  it.each(['scope', 'role'] as const)(
+    'observes an HTTP 200 %s denial without logging customer data',
+    async (kind) => {
+      const { gateway, seen, observations } = harness(
+        (value) => {
+          value.authorization.clientId = 'https://chatgpt.com/oauth/client.json'
+          if (kind === 'role') {
+            value.authorization.scopes.push('contacts:read')
+            value.delegation.scopes.push('contacts:read')
+          }
+          return value
+        },
+        undefined,
+        (url) =>
+          url.endsWith('/workspace')
+            ? Response.json(responseFixture('getWorkspace', 'team'))
+            : Response.json(
+                { errors: [{ status: '403', code: 'forbidden', title: 'Forbidden' }] },
+                { status: 403 },
+              ),
+        true,
+      )
+      const client = new Client({ name: 'tool-observation', version: '1.0.0' })
+      const transport = new StreamableHTTPClientTransport(new URL(resourceUrl), {
+        requestInit: { headers: { Authorization: `Bearer ${access}` } },
+        fetch: (input, init) => gateway.fetch(new Request(input, init)),
+      })
+      try {
+        await client.connect(transport)
+        const result = await client.callTool({
+          name: 'teamgrid_contact_get',
+          arguments: { id: 'private-contact' },
+        })
+        expect(result.isError).toBe(true)
+        expect(Boolean(result._meta?.['mcp/www_authenticate'])).toBe(kind === 'scope')
+        const event = observations.find((event) => event.event === 'teamgrid.mcp.tool')
+        expect(event).toMatchObject({
+          tool: 'teamgrid_contact_get',
+          isError: true,
+          authChallenge: kind === 'scope',
+          outcome: kind === 'scope' ? 'authorization-required' : 'failed',
+          region: 'de',
+          cellId: 'de-test',
+        })
+        expect(observations).toContainEqual(
+          expect.objectContaining({
+            event: 'teamgrid.mcp.request',
+            requestId: event?.requestId,
+            statusCode: 200,
+          }),
+        )
+        expect(JSON.stringify(observations)).not.toMatch(/private-contact|tg_mcp_at|tg_oa_v2/)
+        if (kind === 'role')
+          expect(seen).toContainEqual(
+            expect.objectContaining({
+              requestId: event?.requestId,
+              url: `${apiBaseUrl}/contacts/private-contact`,
+            }),
+          )
+        else expect(seen.some((call) => call.url.includes('/contacts/'))).toBe(false)
+      } finally {
+        await client.close()
+        await gateway.close()
+      }
+    },
+  )
   it.each([401, 429, 500, 503])(
     'keeps provider status %s from becoming a new-login prompt',
     async (status) => {

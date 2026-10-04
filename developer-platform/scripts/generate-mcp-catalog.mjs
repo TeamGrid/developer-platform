@@ -66,7 +66,7 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
   const ifMatch = parameters.find((parameter) => parameter.in === 'header' && parameter.name === 'If-Match')
   const ifNoneMatch = parameters.find((parameter) => parameter.in === 'header' && parameter.name === 'If-None-Match')
   if (ifMatch) put('expectedRevision', { ...ifMatch.schema,
-    description: 'Exact strong ETag (including quotes) from the read reviewed for this action. Never replace it automatically after a conflict.' }, ifMatch.required)
+    description: 'Exact strong ETag (including quotes) from the read reviewed for this action. Never replace it automatically after a conflict.' }, ifMatch.required || ifMatch['x-teamgrid-mcp-required'] === true)
   if (ifNoneMatch) {
     put('createIfMissing', { type: 'boolean', const: true,
       description: 'Create only an absent future occurrence. Mutually exclusive with expectedRevision.' }, false)
@@ -83,6 +83,13 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
     put('contentOffset', { type: 'integer', minimum: 0, maximum: 1048576, description: 'UTF-16 offset from meta.contentPage.nextOffset. Continuations require expectedRevision.' }, false)
     put('contentLimit', { type: 'integer', minimum: 1, maximum: 16384, default: 16384 }, false)
     put('expectedRevision', { type: 'string', minLength: 3, maxLength: 258, pattern: '^"[\\x21\\x23-\\x7e]+"$', description: 'Exact meta.etag from the first chunk; prevents mixing document versions.' }, false)
+  }
+  if (entry.operationId === 'getContact') {
+    put('notesOffset', { type: 'integer', minimum: 0, maximum: 16777216,
+      description: 'UTF-16 offset from meta.notesPage.nextOffset. Continuations require expectedRevision.' }, false)
+    put('notesLimit', { type: 'integer', minimum: 1, maximum: 16384, default: 16384 }, false)
+    put('expectedRevision', { type: 'string', minLength: 3, maxLength: 258,
+      pattern: '^"[\\x21\\x23-\\x7e]+"$', description: 'Exact meta.etag from the first notes chunk.' }, false)
   }
   if (cyclicRefs.size) {
     shape.$defs = {}
@@ -112,8 +119,11 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
   const concurrency = perItemRevision ? 'per-item revision' : ifMatch ? 'conditional' : write ? 'unconditional' : 'read'
   let description = operation.summary || entry.operationId
   if (entry.operationId === 'getDocument') description += '. Content is a bounded chunk, not necessarily the whole document. Continue with contentOffset=meta.contentPage.nextOffset and expectedRevision=meta.etag until nextOffset is null. Never infer omitted content or overwrite a document from an incomplete read.'
+  if (entry.operationId === 'getContact') description += '. Notes are a bounded chunk. Continue with notesOffset=meta.notesPage.nextOffset and expectedRevision=meta.etag until nextOffset is null. Never infer omitted notes or overwrite them from an incomplete read.'
+  if (entry.operationId === 'listContacts') description += '. Notes are omitted; use teamgrid_contact_get to read them with revision-checked continuation.'
   if (write && entry.sdk.startsWith('documents.')) description += '. Returns a compact mutation receipt without repeating document content. Read content through teamgrid_document_get.'
   if (write) description += '. Changes the selected workspace under current API permissions.'
+  if (write) description += ' Large results return mutationReceipt; inspect meta.outcome and resource IDs.'
   if (ifMatch) description += ' Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.'
   if (perItemRevision) description += ' Each item requires the developerRevision from its reviewed task. Results are independent: inspect every item for success, conflict or failure. Never refresh revisions and retry the entire batch automatically.'
   if (write && !ifMatch && !idempotent && !perItemRevision) description += ' The API has no conditional-write or replay contract for this action. Do not retry an uncertain result automatically; read the current state first.'
@@ -122,7 +132,8 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
   if (write && (entry.sdk.startsWith('automation') || entry.sdk.startsWith('taskRecurrence'))) description += ' Changes can affect future automated actions; inspect the definition and schedule first.'
   if (write && (entry.mcp.domain === 'admin-write' || entry.operationId === 'replaceProjectSharing')) description += ' Administrative action: review the exact target and access impact with the user.'
   if (operation.responses?.['202']) description += ' Acceptance is not completion. Use the corresponding operation-get tool to inspect the returned operation until terminal.'
-  const { $defs: outputDefinitions, ...outputSchema } = mcpOutputSchema(api, operation)
+  const { $defs: outputDefinitions, ...outputSchema } = mcpOutputSchema(api, { ...operation,
+    'x-teamgrid-mcp-method': entry.method })
   for (const [name, schema] of Object.entries(outputDefinitions || {})) {
     if (sharedOutputDefinitions[name] && JSON.stringify(sharedOutputDefinitions[name]) !== JSON.stringify(schema))
       throw Error(`Conflicting output definition ${name}`)
@@ -132,6 +143,8 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
     operationId: entry.operationId, sdk: entry.sdk, method: entry.method, path: entry.path,
     domain: entry.mcp.domain, write, concurrency, idempotency: idempotent,
     coreCas: operation['x-teamgrid-resource-cas'] === 'resource-cas-v1' || entry.operationId === 'bulkUpdateTasks',
+    ...(write && operation['x-teamgrid-snapshot-cas'] === 'resource-snapshot-cas-v1'
+      ? { snapshotCas: true } : {}),
     description, inputSchema: compactMcpInputSchema(shape), outputSchema,
     annotations: { readOnlyHint: !write, destructiveHint: write && !/^create/.test(entry.operationId),
       idempotentHint: !write || idempotent || Boolean(ifMatch),

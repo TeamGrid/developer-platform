@@ -29467,7 +29467,19 @@
                 }
               }
             },
-            "description": "The request to get a time entry succeeded. The response contains the canonical public result and request metadata."
+            "description": "The request to get a time entry succeeded. The response contains the canonical public result and request metadata.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"tme1-[a-f0-9]{64}\"$"
+                },
+                "description": "Exact snapshot revision when X-TeamGrid-Snapshot-CAS: required-v1 is negotiated."
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -29500,6 +29512,7 @@
         "x-teamgrid-required-scopes": [
           "time-entries:read"
         ],
+        "x-teamgrid-snapshot-cas": "resource-snapshot-cas-v1",
         "description": "Use this operation to get a time entry. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request."
       },
       "patch": {
@@ -29507,6 +29520,17 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "in": "header",
+            "name": "If-Match",
+            "required": false,
+            "x-teamgrid-mcp-required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"tme1-[a-f0-9]{64}\"$"
+            },
+            "description": "Exact reviewed ETag. Required for hosted MCP and negotiated snapshot CAS; legacy requests without negotiation remain compatible."
           }
         ],
         "requestBody": {
@@ -29572,7 +29596,19 @@
                 }
               }
             },
-            "description": "The request to update a time entry succeeded. The response contains the canonical public result and request metadata."
+            "description": "The request to update a time entry succeeded. The response contains the canonical public result and request metadata.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"tme1-[a-f0-9]{64}\"$"
+                },
+                "description": "Exact snapshot revision when X-TeamGrid-Snapshot-CAS: required-v1 is negotiated."
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -29588,6 +29624,12 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -29611,7 +29653,8 @@
         "x-teamgrid-required-scopes": [
           "time-entries:write"
         ],
-        "description": "Use this operation to update a time entry. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request."
+        "x-teamgrid-snapshot-cas": "resource-snapshot-cas-v1",
+        "description": "Use this operation to update a time entry. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change."
       }
     },
     "/time-entries/{id}/billing": {
@@ -31814,7 +31857,19 @@
                 }
               }
             },
-            "description": "The request to get a contact succeeded. The response contains the canonical public result and request metadata."
+            "description": "The request to get a contact succeeded. The response contains the canonical public result and request metadata.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"ct1-[a-f0-9]{64}\"$"
+                },
+                "description": "Exact snapshot revision when X-TeamGrid-Snapshot-CAS: required-v1 is negotiated."
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -31847,6 +31902,7 @@
         "x-teamgrid-required-scopes": [
           "contacts:read"
         ],
+        "x-teamgrid-snapshot-cas": "resource-snapshot-cas-v1",
         "description": "Use this operation to get a contact. It returns the resource only when it belongs to the authenticated workspace and is visible to the credential. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request."
       },
       "patch": {
@@ -31854,6 +31910,17 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ResourceId"
+          },
+          {
+            "in": "header",
+            "name": "If-Match",
+            "required": false,
+            "x-teamgrid-mcp-required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"ct1-[a-f0-9]{64}\"$"
+            },
+            "description": "Exact reviewed ETag. Required for hosted MCP and negotiated snapshot CAS; legacy requests without negotiation remain compatible."
           }
         ],
         "requestBody": {
@@ -31988,7 +32055,19 @@
                 }
               }
             },
-            "description": "The request to update a contact succeeded. The response contains the canonical public result and request metadata."
+            "description": "The request to update a contact succeeded. The response contains the canonical public result and request metadata.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string",
+                  "pattern": "^\"ct1-[a-f0-9]{64}\"$"
+                },
+                "description": "Exact snapshot revision when X-TeamGrid-Snapshot-CAS: required-v1 is negotiated."
+              },
+              "Cache-Control": {
+                "$ref": "#/components/headers/StrongETagCacheControl"
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -32004,6 +32083,12 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimited"
@@ -32027,7 +32112,8 @@
         "x-teamgrid-required-scopes": [
           "contacts:write"
         ],
-        "description": "Use this operation to update a contact. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request."
+        "x-teamgrid-snapshot-cas": "resource-snapshot-cas-v1",
+        "description": "Use this operation to update a contact. Only documented mutable fields are accepted; omitted fields retain their current values unless the request schema states replacement semantics. Required scopes, product permissions, sharing rules, workspace locks, and regional cell ownership are enforced for every request. Send the latest strong ETag in If-Match; stale revisions fail without overwriting a concurrent change."
       }
     },
     "/users": {
