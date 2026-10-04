@@ -79,7 +79,7 @@ export type McpHttpOptions = {
 }
 
 /** Bound even injected adapters that do not cooperate with cancellation. */
-function withinSignal<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
+export function withinSignal<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
   return new Promise((resolve, reject) => {
     const abort = () => reject(signal.reason ?? new Error('Request interrupted'))
     signal.addEventListener('abort', abort, { once: true })

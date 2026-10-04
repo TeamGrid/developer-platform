@@ -4,6 +4,11 @@ export {
   type McpRuntimeDependencies,
   parseMcpArguments,
 } from './config.js'
+export {
+  createFederatedMcpGateway,
+  type FederatedMcpCell,
+  type FederatedMcpGatewayOptions,
+} from './federatedGateway.js'
 export { createRegionalMcpGateway, type RegionalMcpGatewayOptions } from './gateway.js'
 export {
   type McpHostClient,

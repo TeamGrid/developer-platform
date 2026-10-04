@@ -17,7 +17,8 @@ const packages = [
     requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js'],
   },
   {
-    maxUnpackedSize: 1_500_000,
+    // The federated transport adds one runtime module and its public types (~9 KiB).
+    maxUnpackedSize: 1_510_000,
     name: '@teamgrid/mcp-server',
     requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js', 'COVERAGE.md', 'dist/httpBin.js', 'dist/generated/domainCatalog.json', 'dist/generated/outputDefinitions.json'],
   },

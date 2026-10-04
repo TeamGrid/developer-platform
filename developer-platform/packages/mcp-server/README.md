@@ -287,6 +287,21 @@ registration, regional persistence and the concrete API delegation adapter.
 Custom integrations must provide those dependencies and current authorization;
 accepting arbitrary tokens or sharing an administrator client is invalid.
 
+`createFederatedMcpGateway(options)` adds one logical issuer/resource across a
+fixed cell registry. It requires each cell's private additional-authority
+`providerUrl`, regional API URL and service credentials, plus an authenticated,
+strongly consistent `resolveAccessTokenCell(hash, signal)` adapter. Lookup receives
+only the SHA-256 token hash. The token reaches only the selected provider; that
+provider rechecks the global issuer/resource, grant, workspace and exact cell and
+returns a distinct regional API delegation. No other cell is tried on failure.
+Lookup and execution share the request budget. Existing regional gateway options
+retain their previous behavior when `providerUrl` is omitted.
+
+This is a transport library, not a deployed global OAuth broker or an in-memory
+routing-store substitute. See the [global OAuth decision](../../../integrations/global-oauth-federation.md)
+for the additional App registry, private service authentication, durable
+code/refresh routing, crash recovery and launch requirements.
+
 
 ## Hosted runtime and private resources
 

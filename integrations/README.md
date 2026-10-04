@@ -25,6 +25,13 @@ and separately approved OAuth scopes still apply.
   `localhost`/IP-loopback callbacks without a registration port. An ephemeral
   request port is permitted, while the code exchange binds the actual selected
   redirect exactly. Host/path/query aliases remain rejected.
+- An additive App authority registry and authenticated private regional transport
+  retain existing regional grants. `createFederatedMcpGateway` routes opaque
+  access-token hashes to one allowlisted cell, with fresh regional authorization,
+  distinct API delegations, bounded lookup and concurrent DE/US isolation.
+  The [global OAuth decision](global-oauth-federation.md) specifies the durable
+  directory and broker protocol still to implement; this library does not deploy
+  the proposed public endpoint or supply a routing store.
 
 ```sh
 cd developer-platform
