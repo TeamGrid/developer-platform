@@ -197,3 +197,10 @@ backfill, enforcement or cutover are disabled. SDK callers default to the previo
 compatibility behavior; MCP opts in explicitly. A transport acknowledgement is
 not a live qualification result and does not add CAS to unconditional APIs.
 The exact precondition remains the reviewed ETag, never a freshly fetched retry.
+
+The opt-in also sends `X-TeamGrid-Snapshot-CAS: required-v1` for the candidate
+contact/time-entry snapshot contract. Read the resource, then pass its exact
+`transport.headers.etag` as `ifMatch` to `contacts.update` or `timeEntries.update`.
+With `requireResourceCas`, missing or invalid revisions fail before dispatch;
+concurrent edits return 412 without a retry. Legacy callers remain compatible.
+This addition requires the matching App/API release and no document backfill.

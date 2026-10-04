@@ -1096,6 +1096,9 @@ export type RequestOptions = {
   signal?: AbortSignal
 }
 
+/** Snapshot ETag from the reviewed contact/time-entry read. Required by MCP. */
+export type SnapshotMutationOptions = RequestOptions & { ifMatch?: string }
+
 export type PaginationOptions = {
   maxPages?: number
   signal?: AbortSignal

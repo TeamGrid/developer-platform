@@ -26,8 +26,25 @@ export function requiredToolScopes(name: McpToolName, arguments_: unknown): [str
     scopes.add('project-statements:finance:write')
   if (name === 'teamgrid_project_statements_list' && input.type === 'budget')
     scopes.add('project-statements:finance:read')
-  if (['teamgrid_members_list', 'teamgrid_member_get'].includes(name) && input.includePii === true)
+  if (
+    [
+      'teamgrid_members_list',
+      'teamgrid_member_get',
+      'teamgrid_invitations_list',
+      'teamgrid_invitation_get',
+    ].includes(name) &&
+    input.includePii === true
+  )
     scopes.add('members:pii:read')
+  if (name.startsWith('teamgrid_custom_field_value')) {
+    const target = {
+      contact: 'contacts',
+      project: 'projects',
+      task: 'tasks',
+      'project-journal-entry': 'project-statements',
+    }[String(input.targetType)]
+    if (target) scopes.add(`${target}:${catalog[name].write ? 'write' : 'read'}`)
+  }
   if (
     ['teamgrid_comments_list', 'teamgrid_comment_create', 'teamgrid_activity_list'].includes(name)
   ) {
@@ -72,7 +89,7 @@ const resourceReadScopes = new Set([
 ])
 
 /** Only a closed, backend-issued challenge can add resource-derived read scopes. */
-export function resourceScopeChallenge(error: unknown): string[] {
+export function resourceScopeChallenge(error: unknown, name?: McpToolName): string[] {
   if (
     !(error instanceof TeamGridApiError) ||
     error.status !== 403 ||
@@ -84,9 +101,27 @@ export function resourceScopeChallenge(error: unknown): string[] {
     challenge ?? '',
   )
   const scopes = match?.[1]?.split(' ') ?? []
-  return scopes.length > 0 &&
-    scopes.length <= 8 &&
-    scopes.every((scope) => resourceReadScopes.has(scope))
+  const allowed = new Set(resourceReadScopes)
+  if (name === 'teamgrid_invitations_list' || name === 'teamgrid_invitation_get')
+    allowed.add('members:pii:read')
+  if (name?.startsWith('teamgrid_custom_field_value')) {
+    for (const scope of [
+      'tags:read',
+      'users:read',
+      'project-statements:read',
+      ...(catalog[name].write
+        ? ['tasks:write', 'projects:write', 'contacts:write', 'project-statements:write']
+        : []),
+    ])
+      allowed.add(scope)
+  }
+  if (name?.startsWith('teamgrid_appointment'))
+    allowed.add(`appointments:delegated:${catalog[name].write ? 'write' : 'read'}`)
+  if (name?.startsWith('teamgrid_absence'))
+    allowed.add(catalog[name].write ? 'absences:admin:write' : 'absences:delegated:read')
+  if (name === 'teamgrid_availability_list') allowed.add('availability:delegated:read')
+  if (name) for (const scope of requiredToolScopes(name, {})) allowed.add(scope)
+  return scopes.length > 0 && scopes.length <= 8 && scopes.every((scope) => allowed.has(scope))
     ? [...new Set(scopes)]
     : []
 }
@@ -118,7 +153,7 @@ export function toolScopeChallenge(
       if (commentById.has(name)) await client.comments.get(id, options)
       else await client.exports.get(id, options)
     } catch (error) {
-      const additional = resourceScopeChallenge(error)
+      const additional = resourceScopeChallenge(error, name)
       if (additional.some((scope) => !authInfo.scopes.includes(scope))) {
         return { scopes: [...new Set([...scopes, ...additional])].sort() as [string, ...string[]] }
       }

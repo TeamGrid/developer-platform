@@ -119,7 +119,16 @@ quoted `meta.etag` from a reviewed read. Future occurrence creation accepts
 reviewed revision per item and report independent success/conflict/failure.
 Creates with an API replay contract require a stable `idempotencyKey`.
 
-Some existing API actions, including ordinary time updates, timers and several
+Contact and ordinary time-entry edits now require a reviewed snapshot ETag in MCP.
+The SDK opts in with `requireResourceCas`; a compatible API acknowledges
+`X-TeamGrid-Snapshot-CAS: required-v1`. The App compares the complete source
+snapshot atomically, including intervening Web/legacy edits and time-entry locks.
+No customer-document backfill is needed. Legacy API callers retain their existing
+behavior unless they opt in or supply `If-Match`. Mixed deployments fail closed
+before an unprotected MCP mutation. This additional contract is a candidate change
+and must be released with the matching App/API implementation.
+
+Some existing API actions, including timers and several
 catalog/admin changes, have no revision or replay contract. Their descriptions
 and the coverage table say so. They do not claim lost-update protection or retry
 an uncertain write automatically. Inspect the target after a timeout before
@@ -166,6 +175,17 @@ a fixed message. No bearer credentials, transport headers, webhook signing secre
 projected. Context/work/domain/full responses copy only a valid strong ETag into
 `meta.etag`. Results are limited to 256 KiB.
 
+Oversized valid mutation responses return `data.type=mutationReceipt` with the
+operation, resource IDs/statuses and the original `meta.outcome`, ETag and
+continuation where available. The original API response is schema-validated
+before compaction. Accepted or partial actions retain that outcome; a lost or
+invalid response never becomes a success receipt. Read omitted attributes by ID.
+
+`teamgrid_contact_get` chunks notes with `notesLimit` (at most 16,384 UTF-16 units),
+`notesOffset=meta.notesPage.nextOffset` and the same `expectedRevision=meta.etag`.
+Continuation rejects a changed contact. Contact lists omit notes and name the
+read tool in metadata. Never replace notes from an incomplete read.
+
 `teamgrid_document_get` returns at most 16,384 UTF-16 units of content. Follow
 `meta.contentPage.nextOffset` with the same `expectedRevision` until it is null.
 A changed revision aborts continuation; restart the read. Document mutations
@@ -174,7 +194,12 @@ content. Document inputs support the API content limit inside an 8 MiB JSON
 bound; other tool inputs remain bounded to 256 KiB.
 
 A 30-second operation budget and cancellation propagate through SDK calls,
-including response bodies. Request IDs are generated per MCP operation and
+including response bodies. The hosted gateway emits `teamgrid.mcp.tool` alongside
+HTTP request events, using the same request ID across gateway and API calls.
+Finite tool/outcome, authorization-challenge, duration, region and cell fields
+distinguish tool errors from HTTP 200 delivery. Arguments, customer content,
+resource IDs and credentials are excluded; telemetry failure cannot affect delivery.
+Request IDs are generated per MCP operation and
 retained across its API calls. An upstream Retry-After is never shortened;
 when it exceeds the remaining budget the error retains that delay. A timed-out
 or cancelled mutation may already have committed: inspect the target or retained

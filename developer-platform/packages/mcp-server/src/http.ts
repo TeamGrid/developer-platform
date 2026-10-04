@@ -3,6 +3,7 @@ import { createMcpHandler } from '@modelcontextprotocol/server'
 import type { TeamGridClient } from '@teamgrid/api-client'
 import { z } from 'zod'
 import { domainWriteTools } from './domainTools.js'
+import type { McpToolObservation } from './observability.js'
 import { createTeamGridMcpServer } from './server.js'
 import { usesChatGptToolChallenges } from './toolAuthorization.js'
 import { type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
@@ -70,6 +71,8 @@ export type McpHttpOptions = {
   /** Entire admission, verification and delegation budget; maximum 30 seconds. */
   requestTimeoutMs?: number
   now?: () => number
+  observeTool?: (event: McpToolObservation) => void
+  toolRequestId?: () => string | undefined
 }
 
 /** Bound even injected adapters that do not cooperate with cancellation. */
@@ -146,6 +149,8 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
             ? { denyTools: [...workWriteTools, ...domainWriteTools] }
             : {}),
           requireGrantedScopes: true,
+          observeTool: options.observeTool,
+          toolRequestId: options.toolRequestId,
           scopeChallengeTransport: usesChatGptToolChallenges(authorization.clientId)
             ? 'tool-result'
             : 'http',

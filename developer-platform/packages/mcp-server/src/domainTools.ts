@@ -2,6 +2,7 @@ import type { StandardSchemaWithJSON } from '@modelcontextprotocol/server'
 import { type TeamGridClient, TeamGridClientError } from '@teamgrid/api-client'
 import { Ajv2020, type ValidateFunction } from 'ajv/dist/2020.js'
 import { fullFormats } from 'ajv-formats/dist/formats.js'
+import { projectContactNotes } from './contactNotes.js'
 import { projectDocumentContent } from './documentContent.js'
 import { maximumMcpResourceBytes, privateResourceUri } from './fileResources.js'
 import generatedCatalog from './generated/domainCatalog.json' with { type: 'json' }
@@ -21,6 +22,7 @@ type DomainDefinition = {
   concurrency: string
   idempotency: boolean
   coreCas: boolean
+  snapshotCas?: boolean
   description: string
   inputSchema: {
     type: string
@@ -158,8 +160,9 @@ const outputSchemas = new Map<string, StandardSchemaWithJSON<Record<string, unkn
 export function domainOutputSchema(
   name: DomainToolName,
   legacyReadProjection = false,
+  allowReceipts = true,
 ): StandardSchemaWithJSON<Record<string, unknown>> {
-  const cacheKey = `${name}:${legacyReadProjection}`
+  const cacheKey = `${name}:${legacyReadProjection}:${allowReceipts}`
   const cached = outputSchemas.get(cacheKey)
   if (cached) return cached
   const definitions: Record<string, unknown> = {}
@@ -176,7 +179,17 @@ export function domainOutputSchema(
     }
     for (const child of Object.values(value)) collect(child)
   }
-  collect(catalog[name].outputSchema)
+  const output = structuredClone(catalog[name].outputSchema) as Record<string, unknown>
+  // Receipts are created here only after validating a real API result. They
+  // must never let an upstream response bypass the operation's API schema.
+  if (!allowReceipts && catalog[name].write) {
+    for (const variant of (output.anyOf as Record<string, unknown>[] | undefined) ?? [output]) {
+      const properties = variant.properties as Record<string, unknown>
+      const data = properties.data as { anyOf?: unknown[] }
+      if (data.anyOf) properties.data = data.anyOf[0]
+    }
+  }
+  collect(output)
   if (legacyReadProjection) {
     for (const [name, fields] of Object.entries({
       Product: ['purchasePrice'],
@@ -192,7 +205,7 @@ export function domainOutputSchema(
       definitions[name] = definition
     }
   }
-  const schema = { ...catalog[name].outputSchema, $defs: definitions }
+  const schema = { ...output, $defs: definitions }
   let validate: ValidateFunction | undefined
   const result: StandardSchemaWithJSON<Record<string, unknown>> = {
     '~standard': {
@@ -253,7 +266,20 @@ export async function executeDomainTool(
     const projected =
       operation.sdk.startsWith('documents.') && !Array.isArray(response.data)
         ? projectDocumentContent(response.data, input, etag, operation.write)
-        : { data: response.data, meta: {} }
+        : operation.sdk === 'contacts.get'
+          ? projectContactNotes(response.data, input, etag)
+          : operation.sdk === 'contacts.list' && Array.isArray(response.data)
+            ? {
+                data: response.data.map((item) => ({
+                  ...item,
+                  attributes: { ...item.attributes, notes: '' },
+                })),
+                meta: {
+                  omittedFields: ['contacts[].attributes.notes'],
+                  notesReadTool: 'teamgrid_contact_get',
+                },
+              }
+            : { data: response.data, meta: {} }
     return {
       data: Array.isArray(projected.data)
         ? projected.data.map(redactResource)

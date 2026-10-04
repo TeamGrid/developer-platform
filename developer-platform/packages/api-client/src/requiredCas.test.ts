@@ -26,8 +26,39 @@ describe('required core CAS transport', () => {
       expect(new Headers(fetch.mock.calls[0]?.[1]?.headers).get('x-teamgrid-resource-cas')).toBe(
         required ? 'required-v1' : null,
       )
+      expect(new Headers(fetch.mock.calls[0]?.[1]?.headers).get('x-teamgrid-snapshot-cas')).toBe(
+        required ? 'required-v1' : null,
+      )
       expect(result.transport.headers['x-teamgrid-resource-cas']).toBe('required-v1')
       expect(JSON.stringify(result)).not.toContain('transport')
     },
   )
+  it.each(['contact', 'timeEntry'] as const)('protects %s edits before dispatch', async (kind) => {
+    const prefix = kind === 'contact' ? 'ct1' : 'tme1'
+    const etag = `"${prefix}-${'a'.repeat(64)}"`
+    const fetch = vi.fn(async () =>
+      Response.json({
+        data: { id: 'resource1', type: kind, attributes: {} },
+        meta: { requestId: 'test' },
+      }),
+    )
+    const client = new TeamGridClient({ token, fetch, requireResourceCas: true })
+    const update = (ifMatch?: string) =>
+      kind === 'contact'
+        ? client.contacts.update('resource1', { firstName: 'New' }, { ifMatch })
+        : client.timeEntries.update('resource1', { comment: 'New' }, { ifMatch })
+    await expect(update()).rejects.toMatchObject({ code: 'revision_required' })
+    for (const invalid of ['*', `W/${etag}`, `${etag}, ${etag}`, `"other-${'a'.repeat(64)}"`]) {
+      await expect(update(invalid)).rejects.toMatchObject({ code: 'invalid_arguments' })
+    }
+    expect(fetch).not.toHaveBeenCalled()
+    await update(etag)
+    expect(fetch).toHaveBeenCalledOnce()
+    const init = (fetch.mock.calls as unknown as [string, RequestInit][])[0]?.[1]
+    expect(new Headers(init?.headers).get('if-match')).toBe(etag)
+    expect(new Headers(init?.headers).get('x-teamgrid-snapshot-cas')).toBe('required-v1')
+    expect(JSON.parse(String(init?.body))).toEqual(
+      kind === 'contact' ? { firstName: 'New' } : { comment: 'New' },
+    )
+  })
 })

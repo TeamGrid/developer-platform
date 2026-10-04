@@ -211,6 +211,7 @@ import type {
   ServiceAccountUpdate,
   ServiceCreate,
   ServiceUpdate,
+  SnapshotMutationOptions,
   Tag,
   TagCreate,
   TagUpdate,
@@ -2958,8 +2959,13 @@ export class TeamGridClient {
           undefined,
           options,
         ),
-      update: (id: string, data: TimeEntryUpdate, options?: RequestOptions) =>
-        this.#update<TimeEntry>(`/time-entries/${encodeURIComponent(id)}`, data, options),
+      update: (id: string, data: TimeEntryUpdate, options?: SnapshotMutationOptions) =>
+        this.#updateSnapshot<TimeEntry>(
+          `/time-entries/${encodeURIComponent(id)}`,
+          data,
+          'tme1',
+          options,
+        ),
       updateBilling: (
         id: string,
         data: TimeEntryBillingUpdate,
@@ -3006,8 +3012,8 @@ export class TeamGridClient {
       list: (options?: ContactListOptions) => this.#page<Contact>('/contacts', options),
       pages: (options?: ContactListOptions, pagination?: PaginationOptions) =>
         this.#pages<Contact>('/contacts', options, pagination),
-      update: (id: string, data: ContactUpdate, options?: RequestOptions) =>
-        this.#update<Contact>(`/contacts/${encodeURIComponent(id)}`, data, options),
+      update: (id: string, data: ContactUpdate, options?: SnapshotMutationOptions) =>
+        this.#updateSnapshot<Contact>(`/contacts/${encodeURIComponent(id)}`, data, 'ct1', options),
     }
     this.contactGroups = {
       archive: (id: string, options?: RequestOptions) =>
@@ -4250,7 +4256,10 @@ export class TeamGridClient {
       'x-teamgrid-client-version': apiClientVersion,
       'x-request-id': requestId,
     })
-    if (this.#requireResourceCas) headers.set('x-teamgrid-resource-cas', 'required-v1')
+    if (this.#requireResourceCas) {
+      headers.set('x-teamgrid-resource-cas', 'required-v1')
+      headers.set('x-teamgrid-snapshot-cas', 'required-v1')
+    }
     if (path === '/search') headers.set('x-teamgrid-response-features', 'bounded-search-v1')
     if (options.body !== undefined) headers.set('content-type', 'application/json')
     if (options.idempotencyKey) headers.set('idempotency-key', options.idempotencyKey)
@@ -4997,6 +5006,30 @@ export class TeamGridClient {
       )
     }
     return attachTransport(envelope, response.transport)
+  }
+
+  async #updateSnapshot<T>(
+    path: string,
+    data: unknown,
+    prefix: 'ct1' | 'tme1',
+    options: SnapshotMutationOptions = {},
+  ) {
+    if (this.#requireResourceCas && !options.ifMatch) {
+      throw new TeamGridClientError(
+        'revision_required',
+        'Read the target and supply its exact snapshot ETag before editing.',
+      )
+    }
+    if (
+      options.ifMatch !== undefined &&
+      !new RegExp(`^"${prefix}-[a-f0-9]{64}"$`).test(options.ifMatch)
+    ) {
+      throw new TeamGridClientError(
+        'invalid_arguments',
+        'Supply exactly one strong snapshot ETag from the reviewed resource.',
+      )
+    }
+    return this.#update<T>(path, data, options)
   }
 
   async #update<T>(path: string, data: unknown, options: RequestOptions = {}) {
