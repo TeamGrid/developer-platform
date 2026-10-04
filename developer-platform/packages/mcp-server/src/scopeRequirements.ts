@@ -132,6 +132,9 @@ export function toolScopeChallenge(
 ): ScopeChallengeHandler {
   return async ({ request, authInfo }) => {
     if (!authInfo) return undefined
+    const consent = (scopes: readonly string[]) => ({
+      scopes: [...new Set([...authInfo.scopes, ...scopes])].sort() as [string, ...string[]],
+    })
     // The hosted verifier owns this workspace identity. A foreign target is a
     // business denial, so let the normal tool path report it without re-consent.
     const authorization = object(authInfo.extra?.authorization)
@@ -144,7 +147,7 @@ export function toolScopeChallenge(
     const scopes = requiredToolScopes(name, request.params?.arguments)
     // A reviewed comment write needs its current target and version first.
     if (commentById.has(name) && !scopes.includes('comments:read')) scopes.push('comments:read')
-    if (scopes.some((scope) => !authInfo.scopes.includes(scope))) return { scopes }
+    if (scopes.some((scope) => !authInfo.scopes.includes(scope))) return consent(scopes)
     if (!client || (!commentById.has(name) && name !== 'teamgrid_export_get')) return undefined
     const id = object(request.params?.arguments).id
     if (typeof id !== 'string' || !/^[A-Za-z0-9_.:-]{1,128}$/.test(id)) return undefined
@@ -155,7 +158,7 @@ export function toolScopeChallenge(
     } catch (error) {
       const additional = resourceScopeChallenge(error, name)
       if (additional.some((scope) => !authInfo.scopes.includes(scope))) {
-        return { scopes: [...new Set([...scopes, ...additional])].sort() as [string, ...string[]] }
+        return consent([...scopes, ...additional])
       }
       // Roles, sharing, missing resources and outages are reported by the normal tool path.
     }

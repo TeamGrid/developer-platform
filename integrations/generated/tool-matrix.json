@@ -1,0 +1,6708 @@
+[
+  {
+    "name": "teamgrid_absence_archive",
+    "operationId": "archiveAbsence",
+    "domain": "schedule-write",
+    "scopes": [
+      "absences:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_absence_create",
+    "operationId": "createAbsence",
+    "domain": "schedule-write",
+    "scopes": [
+      "absences:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_absence_get",
+    "operationId": "getAbsence",
+    "domain": "schedule-write",
+    "scopes": [
+      "absences:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_absence_restore",
+    "operationId": "restoreAbsence",
+    "domain": "schedule-write",
+    "scopes": [
+      "absences:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_absence_update",
+    "operationId": "updateAbsence",
+    "domain": "schedule-write",
+    "scopes": [
+      "absences:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_absences_list",
+    "operationId": "listAbsences",
+    "domain": "schedule-write",
+    "scopes": [
+      "absences:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_activity_list",
+    "operationId": "listActivity",
+    "domain": "content-write",
+    "scopes": [
+      "activity:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_appointment_archive",
+    "operationId": "archiveAppointment",
+    "domain": "schedule-write",
+    "scopes": [
+      "appointments:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_appointment_create",
+    "operationId": "createAppointment",
+    "domain": "schedule-write",
+    "scopes": [
+      "appointments:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_appointment_get",
+    "operationId": "getAppointment",
+    "domain": "schedule-write",
+    "scopes": [
+      "appointments:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_appointment_restore",
+    "operationId": "restoreAppointment",
+    "domain": "schedule-write",
+    "scopes": [
+      "appointments:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_appointment_update",
+    "operationId": "updateAppointment",
+    "domain": "schedule-write",
+    "scopes": [
+      "appointments:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_appointments_list",
+    "operationId": "listAppointments",
+    "domain": "schedule-write",
+    "scopes": [
+      "appointments:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_audit_events_list",
+    "operationId": "listAuditEvents",
+    "domain": "admin-write",
+    "scopes": [
+      "audit:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_actions_list",
+    "operationId": "listAutomationActions",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_definition_archive",
+    "operationId": "archiveAutomationDefinition",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_definition_create",
+    "operationId": "createAutomationDefinition",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_definition_get",
+    "operationId": "getAutomationDefinition",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_definition_restore",
+    "operationId": "restoreAutomationDefinition",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_definition_update",
+    "operationId": "updateAutomationDefinition",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_definition_versions_list",
+    "operationId": "listAutomationDefinitionVersions",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_definitions_list",
+    "operationId": "listAutomationDefinitions",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_run_abort",
+    "operationId": "abortAutomationRun",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:run",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_run_get",
+    "operationId": "getAutomationRun",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_automation_runs_list",
+    "operationId": "listAutomationRuns",
+    "domain": "automation-write",
+    "scopes": [
+      "automations:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_availability_list",
+    "operationId": "listAvailability",
+    "domain": "schedule-write",
+    "scopes": [
+      "availability:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_call_note_archive",
+    "operationId": "archiveCallNote",
+    "domain": "crm-write",
+    "scopes": [
+      "call-notes:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_call_note_create",
+    "operationId": "createCallNote",
+    "domain": "crm-write",
+    "scopes": [
+      "call-notes:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_call_note_get",
+    "operationId": "getCallNote",
+    "domain": "crm-write",
+    "scopes": [
+      "call-notes:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_call_note_restore",
+    "operationId": "restoreCallNote",
+    "domain": "crm-write",
+    "scopes": [
+      "call-notes:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_call_notes_list",
+    "operationId": "listCallNotes",
+    "domain": "crm-write",
+    "scopes": [
+      "call-notes:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_comment_archive",
+    "operationId": "archiveComment",
+    "domain": "content-write",
+    "scopes": [
+      "comments:read",
+      "comments:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_comment_create",
+    "operationId": "createComment",
+    "domain": "content-write",
+    "scopes": [
+      "comments:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_comment_get",
+    "operationId": "getComment",
+    "domain": "content-write",
+    "scopes": [
+      "comments:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_comment_restore",
+    "operationId": "restoreComment",
+    "domain": "content-write",
+    "scopes": [
+      "comments:read",
+      "comments:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_comment_update",
+    "operationId": "updateComment",
+    "domain": "content-write",
+    "scopes": [
+      "comments:read",
+      "comments:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_comments_list",
+    "operationId": "listComments",
+    "domain": "content-write",
+    "scopes": [
+      "comments:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_contact_create",
+    "operationId": "createContact",
+    "domain": "crm-write",
+    "scopes": [
+      "contacts:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_contact_get",
+    "operationId": "getContact",
+    "domain": "crm-write",
+    "scopes": [
+      "contacts:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_contact_group_archive",
+    "operationId": "archiveContactGroup",
+    "domain": "crm-write",
+    "scopes": [
+      "contact-groups:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_contact_group_create",
+    "operationId": "createContactGroup",
+    "domain": "crm-write",
+    "scopes": [
+      "contact-groups:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_contact_group_get",
+    "operationId": "getContactGroup",
+    "domain": "crm-write",
+    "scopes": [
+      "contact-groups:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_contact_group_restore",
+    "operationId": "restoreContactGroup",
+    "domain": "crm-write",
+    "scopes": [
+      "contact-groups:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_contact_group_update",
+    "operationId": "updateContactGroup",
+    "domain": "crm-write",
+    "scopes": [
+      "contact-groups:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_contact_groups_list",
+    "operationId": "listContactGroups",
+    "domain": "crm-write",
+    "scopes": [
+      "contact-groups:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_contact_update",
+    "operationId": "updateContact",
+    "domain": "crm-write",
+    "scopes": [
+      "contacts:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_contacts_list",
+    "operationId": "listContacts",
+    "domain": "crm-write",
+    "scopes": [
+      "contacts:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_custom_field_definition_archive",
+    "operationId": "archiveCustomFieldDefinition",
+    "domain": "catalog-write",
+    "scopes": [
+      "custom-field-definitions:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_custom_field_definition_create",
+    "operationId": "createCustomFieldDefinition",
+    "domain": "catalog-write",
+    "scopes": [
+      "custom-field-definitions:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_custom_field_definition_get",
+    "operationId": "getCustomFieldDefinition",
+    "domain": "catalog-write",
+    "scopes": [
+      "custom-field-definitions:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_custom_field_definition_restore",
+    "operationId": "restoreCustomFieldDefinition",
+    "domain": "catalog-write",
+    "scopes": [
+      "custom-field-definitions:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_custom_field_definition_update",
+    "operationId": "updateCustomFieldDefinition",
+    "domain": "catalog-write",
+    "scopes": [
+      "custom-field-definitions:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_custom_field_definitions_list",
+    "operationId": "listCustomFieldDefinitions",
+    "domain": "catalog-write",
+    "scopes": [
+      "custom-field-definitions:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_custom_field_value_clear",
+    "operationId": "clearCustomFieldValue",
+    "domain": "catalog-write",
+    "scopes": [
+      "custom-field-values:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_custom_field_value_get",
+    "operationId": "getCustomFieldValue",
+    "domain": "catalog-write",
+    "scopes": [
+      "custom-field-values:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_custom_field_value_set",
+    "operationId": "setCustomFieldValue",
+    "domain": "catalog-write",
+    "scopes": [
+      "custom-field-values:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_custom_field_values_get",
+    "operationId": "getCustomFieldValues",
+    "domain": "catalog-write",
+    "scopes": [
+      "custom-field-values:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_document_archive",
+    "operationId": "archiveDocument",
+    "domain": "content-write",
+    "scopes": [
+      "documents:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_document_create",
+    "operationId": "createDocument",
+    "domain": "content-write",
+    "scopes": [
+      "documents:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_document_get",
+    "operationId": "getDocument",
+    "domain": "content-write",
+    "scopes": [
+      "documents:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_document_restore",
+    "operationId": "restoreDocument",
+    "domain": "content-write",
+    "scopes": [
+      "documents:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_document_update",
+    "operationId": "updateDocument",
+    "domain": "content-write",
+    "scopes": [
+      "documents:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_documents_list",
+    "operationId": "listDocuments",
+    "domain": "content-write",
+    "scopes": [
+      "documents:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_event_catalog_get",
+    "operationId": "getEventCatalog",
+    "domain": "integrations-write",
+    "scopes": [
+      "events:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_export_create",
+    "operationId": "createExport",
+    "domain": "admin-write",
+    "scopes": [
+      "exports:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_export_get",
+    "operationId": "getExport",
+    "domain": "admin-write",
+    "scopes": [
+      "exports:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_file_archive",
+    "operationId": "archiveFile",
+    "domain": "content-write",
+    "scopes": [
+      "files:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_file_get",
+    "operationId": "getFile",
+    "domain": "content-write",
+    "scopes": [
+      "files:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_file_rename",
+    "operationId": "renameFile",
+    "domain": "content-write",
+    "scopes": [
+      "files:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_file_restore",
+    "operationId": "restoreFile",
+    "domain": "content-write",
+    "scopes": [
+      "files:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_files_list",
+    "operationId": "listFiles",
+    "domain": "content-write",
+    "scopes": [
+      "files:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_group_create",
+    "operationId": "createGroup",
+    "domain": "admin-write",
+    "scopes": [
+      "groups:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_group_delete",
+    "operationId": "deleteGroup",
+    "domain": "admin-write",
+    "scopes": [
+      "groups:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_group_get",
+    "operationId": "getGroup",
+    "domain": "admin-write",
+    "scopes": [
+      "groups:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_group_update",
+    "operationId": "updateGroup",
+    "domain": "admin-write",
+    "scopes": [
+      "groups:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_groups_list",
+    "operationId": "listGroups",
+    "domain": "admin-write",
+    "scopes": [
+      "groups:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_integration_installations_list",
+    "operationId": "listIntegrationInstallations",
+    "domain": "integrations-write",
+    "scopes": [
+      "integrations:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_invitation_cancel",
+    "operationId": "cancelInvitation",
+    "domain": "admin-write",
+    "scopes": [
+      "invitations:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_invitation_create",
+    "operationId": "createInvitation",
+    "domain": "admin-write",
+    "scopes": [
+      "invitations:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_invitation_get",
+    "operationId": "getInvitation",
+    "domain": "admin-write",
+    "scopes": [
+      "invitations:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_invitation_resend",
+    "operationId": "resendInvitation",
+    "domain": "admin-write",
+    "scopes": [
+      "invitations:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_invitations_list",
+    "operationId": "listInvitations",
+    "domain": "admin-write",
+    "scopes": [
+      "invitations:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_list_archive",
+    "operationId": "archiveList",
+    "domain": "catalog-write",
+    "scopes": [
+      "lists:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_list_create",
+    "operationId": "createList",
+    "domain": "catalog-write",
+    "scopes": [
+      "lists:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_list_get",
+    "operationId": "getList",
+    "domain": "catalog-write",
+    "scopes": [
+      "lists:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_list_restore",
+    "operationId": "restoreList",
+    "domain": "catalog-write",
+    "scopes": [
+      "lists:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_list_update",
+    "operationId": "updateList",
+    "domain": "catalog-write",
+    "scopes": [
+      "lists:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_lists_list",
+    "operationId": "listLists",
+    "domain": "catalog-write",
+    "scopes": [
+      "lists:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_member_get",
+    "operationId": "getMember",
+    "domain": "admin-write",
+    "scopes": [
+      "members:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_member_remove",
+    "operationId": "removeMember",
+    "domain": "admin-write",
+    "scopes": [
+      "members:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_member_role_update",
+    "operationId": "updateMemberRole",
+    "domain": "admin-write",
+    "scopes": [
+      "members:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_members_list",
+    "operationId": "listMembers",
+    "domain": "admin-write",
+    "scopes": [
+      "members:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_planned_work_list",
+    "operationId": "listPlannedWork",
+    "domain": "schedule-write",
+    "scopes": [
+      "planned-work:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_planned_work_operation_get",
+    "operationId": "getPlannedWorkOperation",
+    "domain": "schedule-write",
+    "scopes": [
+      "planned-work:write",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_product_archive",
+    "operationId": "archiveProduct",
+    "domain": "catalog-write",
+    "scopes": [
+      "products:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_product_create",
+    "operationId": "createProduct",
+    "domain": "catalog-write",
+    "scopes": [
+      "products:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_product_get",
+    "operationId": "getProduct",
+    "domain": "catalog-write",
+    "scopes": [
+      "products:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_product_group_archive",
+    "operationId": "archiveProductGroup",
+    "domain": "catalog-write",
+    "scopes": [
+      "product-groups:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_product_group_create",
+    "operationId": "createProductGroup",
+    "domain": "catalog-write",
+    "scopes": [
+      "product-groups:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_product_group_get",
+    "operationId": "getProductGroup",
+    "domain": "catalog-write",
+    "scopes": [
+      "product-groups:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_product_group_update",
+    "operationId": "updateProductGroup",
+    "domain": "catalog-write",
+    "scopes": [
+      "product-groups:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_product_groups_list",
+    "operationId": "listProductGroups",
+    "domain": "catalog-write",
+    "scopes": [
+      "product-groups:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_product_update",
+    "operationId": "updateProduct",
+    "domain": "catalog-write",
+    "scopes": [
+      "products:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_products_list",
+    "operationId": "listProducts",
+    "domain": "catalog-write",
+    "scopes": [
+      "products:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_archive",
+    "operationId": "archiveProject",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:lifecycle",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_complete",
+    "operationId": "completeProject",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:lifecycle",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_create",
+    "operationId": "createProject",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_get",
+    "operationId": "getProject",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_lifecycle_operation_get",
+    "operationId": "getProjectLifecycleOperation",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:lifecycle",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_reopen",
+    "operationId": "reopenProject",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:lifecycle",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_restore",
+    "operationId": "restoreProject",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:lifecycle",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_sharing_get",
+    "operationId": "getProjectSharing",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:sharing",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_sharing_replace",
+    "operationId": "replaceProjectSharing",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:sharing",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_statement_archive",
+    "operationId": "archiveProjectStatement",
+    "domain": "finance-write",
+    "scopes": [
+      "project-statements:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_statement_create",
+    "operationId": "createProjectStatement",
+    "domain": "finance-write",
+    "scopes": [
+      "project-statements:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_statement_get",
+    "operationId": "getProjectStatement",
+    "domain": "finance-write",
+    "scopes": [
+      "project-statements:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_statement_restore",
+    "operationId": "restoreProjectStatement",
+    "domain": "finance-write",
+    "scopes": [
+      "project-statements:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_statement_update",
+    "operationId": "updateProjectStatement",
+    "domain": "finance-write",
+    "scopes": [
+      "project-statements:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_statements_list",
+    "operationId": "listProjectStatements",
+    "domain": "finance-write",
+    "scopes": [
+      "project-statements:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_template_archive",
+    "operationId": "archiveProjectTemplate",
+    "domain": "projects-write",
+    "scopes": [
+      "project-templates:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_template_create",
+    "operationId": "createProjectTemplate",
+    "domain": "projects-write",
+    "scopes": [
+      "project-templates:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_template_get",
+    "operationId": "getProjectTemplate",
+    "domain": "projects-write",
+    "scopes": [
+      "project-templates:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_template_instantiate",
+    "operationId": "instantiateProjectTemplate",
+    "domain": "projects-write",
+    "scopes": [
+      "project-templates:write",
+      "projects:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_template_instantiation_get",
+    "operationId": "getProjectTemplateInstantiation",
+    "domain": "projects-write",
+    "scopes": [
+      "project-templates:write",
+      "projects:write",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_template_restore",
+    "operationId": "restoreProjectTemplate",
+    "domain": "projects-write",
+    "scopes": [
+      "project-templates:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_template_update",
+    "operationId": "updateProjectTemplate",
+    "domain": "projects-write",
+    "scopes": [
+      "project-templates:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_templates_list",
+    "operationId": "listProjectTemplates",
+    "domain": "projects-write",
+    "scopes": [
+      "project-templates:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_project_update",
+    "operationId": "updateProject",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_projects_list",
+    "operationId": "listProjects",
+    "domain": "projects-write",
+    "scopes": [
+      "projects:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_role_create",
+    "operationId": "createRole",
+    "domain": "admin-write",
+    "scopes": [
+      "roles:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_role_delete",
+    "operationId": "deleteRole",
+    "domain": "admin-write",
+    "scopes": [
+      "roles:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_role_get",
+    "operationId": "getRole",
+    "domain": "admin-write",
+    "scopes": [
+      "roles:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_role_update",
+    "operationId": "updateRole",
+    "domain": "admin-write",
+    "scopes": [
+      "roles:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_roles_list",
+    "operationId": "listRoles",
+    "domain": "admin-write",
+    "scopes": [
+      "roles:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_search",
+    "operationId": "searchResources",
+    "domain": "context",
+    "scopes": [
+      "search:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_service_archive",
+    "operationId": "archiveService",
+    "domain": "catalog-write",
+    "scopes": [
+      "services:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_service_create",
+    "operationId": "createService",
+    "domain": "catalog-write",
+    "scopes": [
+      "services:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_service_get",
+    "operationId": "getService",
+    "domain": "catalog-write",
+    "scopes": [
+      "services:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_service_restore",
+    "operationId": "restoreService",
+    "domain": "catalog-write",
+    "scopes": [
+      "services:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_service_update",
+    "operationId": "updateService",
+    "domain": "catalog-write",
+    "scopes": [
+      "services:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_services_list",
+    "operationId": "listServices",
+    "domain": "catalog-write",
+    "scopes": [
+      "services:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_tag_archive",
+    "operationId": "archiveTag",
+    "domain": "catalog-write",
+    "scopes": [
+      "tags:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_tag_create",
+    "operationId": "createTag",
+    "domain": "catalog-write",
+    "scopes": [
+      "tags:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_tag_get",
+    "operationId": "getTag",
+    "domain": "catalog-write",
+    "scopes": [
+      "tags:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_tag_restore",
+    "operationId": "restoreTag",
+    "domain": "catalog-write",
+    "scopes": [
+      "tags:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_tag_update",
+    "operationId": "updateTag",
+    "domain": "catalog-write",
+    "scopes": [
+      "tags:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_tags_list",
+    "operationId": "listTags",
+    "domain": "catalog-write",
+    "scopes": [
+      "tags:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_archive",
+    "operationId": "archiveTask",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_complete",
+    "operationId": "completeTask",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_create",
+    "operationId": "createTask",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_duplicate",
+    "operationId": "duplicateTask",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_get",
+    "operationId": "getTask",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_move",
+    "operationId": "moveTask",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_planned_work_get",
+    "operationId": "getTaskPlannedWork",
+    "domain": "schedule-write",
+    "scopes": [
+      "planned-work:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_planned_work_replace",
+    "operationId": "replaceTaskPlannedWork",
+    "domain": "schedule-write",
+    "scopes": [
+      "planned-work:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_apply_task_template",
+    "operationId": "applyTaskAsTaskRecurrenceTemplate",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_archive",
+    "operationId": "archiveTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_create",
+    "operationId": "createTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_end",
+    "operationId": "endTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_event_submit",
+    "operationId": "submitTaskRecurrenceEvent",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:run",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_get",
+    "operationId": "getTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:read",
+      "tasks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_occurrence_get",
+    "operationId": "getTaskRecurrenceOccurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:read",
+      "tasks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_occurrence_override",
+    "operationId": "overrideTaskRecurrenceOccurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_occurrence_override_clear",
+    "operationId": "clearTaskRecurrenceOccurrenceOverride",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_occurrence_retry",
+    "operationId": "retryTaskRecurrenceOccurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_occurrences_list",
+    "operationId": "listTaskRecurrenceOccurrences",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:read",
+      "tasks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_operation_cancel",
+    "operationId": "cancelTaskRecurrenceOperation",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_operation_get",
+    "operationId": "getTaskRecurrenceOperation",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:read",
+      "tasks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_owner_transfer",
+    "operationId": "transferTaskRecurrenceOwner",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_pause",
+    "operationId": "pauseTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_preview",
+    "operationId": "previewStoredTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:read",
+      "tasks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_preview_input",
+    "operationId": "previewTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_recheck",
+    "operationId": "recheckTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_remove_from_tasks",
+    "operationId": "removeTaskRecurrenceFromTasks",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_restore",
+    "operationId": "restoreTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_resume",
+    "operationId": "resumeTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_update",
+    "operationId": "updateTaskRecurrence",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_version_get",
+    "operationId": "getTaskRecurrenceVersion",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:read",
+      "tasks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_version_restore",
+    "operationId": "restoreTaskRecurrenceVersion",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:write",
+      "tasks:read",
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrence_versions_list",
+    "operationId": "listTaskRecurrenceVersions",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:read",
+      "tasks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_recurrences_list",
+    "operationId": "listTaskRecurrences",
+    "domain": "tasks-write",
+    "scopes": [
+      "task-recurrences:read",
+      "tasks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_reopen",
+    "operationId": "reopenTask",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_restore",
+    "operationId": "restoreTask",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_subtasks_replace",
+    "operationId": "replaceTaskSubtasks",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_timer_start",
+    "operationId": "startTaskTimer",
+    "domain": "time-write",
+    "scopes": [
+      "tasks:write",
+      "time-entries:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_timer_stop",
+    "operationId": "stopTaskTimer",
+    "domain": "time-write",
+    "scopes": [
+      "tasks:write",
+      "time-entries:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_task_update",
+    "operationId": "updateTask",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_tasks_bulk_update",
+    "operationId": "bulkUpdateTasks",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:write",
+      "workspace:read"
+    ],
+    "concurrency": "per-item revision",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_tasks_list",
+    "operationId": "listTasks",
+    "domain": "tasks-write",
+    "scopes": [
+      "tasks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_time_entries_list",
+    "operationId": "listTimeEntries",
+    "domain": "time-write",
+    "scopes": [
+      "time-entries:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_time_entry_archive",
+    "operationId": "archiveTimeEntry",
+    "domain": "time-write",
+    "scopes": [
+      "time-entries:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_time_entry_billing_get",
+    "operationId": "getTimeEntryBilling",
+    "domain": "finance-write",
+    "scopes": [
+      "time-entries:billing",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_time_entry_billing_update",
+    "operationId": "updateTimeEntryBilling",
+    "domain": "finance-write",
+    "scopes": [
+      "time-entries:billing",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_time_entry_create",
+    "operationId": "createTimeEntry",
+    "domain": "time-write",
+    "scopes": [
+      "time-entries:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_time_entry_get",
+    "operationId": "getTimeEntry",
+    "domain": "time-write",
+    "scopes": [
+      "time-entries:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_time_entry_restore",
+    "operationId": "restoreTimeEntry",
+    "domain": "time-write",
+    "scopes": [
+      "time-entries:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_time_entry_update",
+    "operationId": "updateTimeEntry",
+    "domain": "time-write",
+    "scopes": [
+      "time-entries:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_users_list",
+    "operationId": "listUsers",
+    "domain": "context",
+    "scopes": [
+      "users:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_webhook_deliveries_list",
+    "operationId": "listWebhookDeliveries",
+    "domain": "integrations-write",
+    "scopes": [
+      "webhooks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_webhook_delivery_get",
+    "operationId": "getWebhookDelivery",
+    "domain": "integrations-write",
+    "scopes": [
+      "webhooks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_webhook_delivery_test",
+    "operationId": "testWebhookDelivery",
+    "domain": "integrations-write",
+    "scopes": [
+      "webhooks:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_webhook_get",
+    "operationId": "getWebhook",
+    "domain": "integrations-write",
+    "scopes": [
+      "webhooks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_webhook_remove",
+    "operationId": "removeWebhook",
+    "domain": "integrations-write",
+    "scopes": [
+      "webhooks:write",
+      "workspace:read"
+    ],
+    "concurrency": "unconditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_webhook_update",
+    "operationId": "updateWebhook",
+    "domain": "integrations-write",
+    "scopes": [
+      "webhooks:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_webhooks_list",
+    "operationId": "listWebhooks",
+    "domain": "integrations-write",
+    "scopes": [
+      "webhooks:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_workspace_get",
+    "operationId": "getWorkspace",
+    "domain": "context",
+    "scopes": [
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_workspace_settings_get",
+    "operationId": "getWorkspaceSettings",
+    "domain": "admin-write",
+    "scopes": [
+      "workspace-settings:read",
+      "workspace:read"
+    ],
+    "concurrency": "read",
+    "idempotency": false,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  },
+  {
+    "name": "teamgrid_workspace_settings_update",
+    "operationId": "updateWorkspaceSettings",
+    "domain": "admin-write",
+    "scopes": [
+      "workspace-settings:write",
+      "workspace:read"
+    ],
+    "concurrency": "conditional",
+    "idempotency": true,
+    "annotations": {
+      "openai": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "anthropic": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "microsoft365": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    "hostAcceptance": "pending"
+  }
+]

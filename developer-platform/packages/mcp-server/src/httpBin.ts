@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { createRegionalMcpAdmission } from './admission.js'
 import { createRegionalMcpGateway } from './gateway.js'
+import { parseMcpHostClients } from './hostProfiles.js'
 import { createMcpNodeServer } from './httpServer.js'
 import { createMcpReadinessProbe } from './readiness.js'
 import { parseMcpToolProfile } from './toolProfiles.js'
@@ -35,6 +36,7 @@ async function main() {
     region: required('TEAMGRID_REGION'),
     cellId: required('TEAMGRID_CELL_ID'),
     toolProfile: parseMcpToolProfile(process.env.TEAMGRID_MCP_TOOL_PROFILE),
+    hostClients: parseMcpHostClients(process.env.TEAMGRID_MCP_HOST_CLIENTS),
     allowedOrigins: (process.env.TEAMGRID_MCP_ALLOWED_ORIGINS ?? '').split(' ').filter(Boolean),
     enabled: () => enabled,
     writesEnabled: () => writes,

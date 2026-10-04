@@ -90,7 +90,7 @@ describe('resource-derived OAuth consent', () => {
       comments: { get, update },
     } as never)
     expect(await challenge(context(['workspace:read', 'comments:write']))).toEqual({
-      scopes: ['comments:write', 'workspace:read', 'comments:read'],
+      scopes: ['comments:read', 'comments:write', 'workspace:read'],
     })
     expect(get).not.toHaveBeenCalled()
     expect(await challenge(context(['workspace:read', 'comments:write', 'comments:read']))).toEqual(

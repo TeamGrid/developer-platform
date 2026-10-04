@@ -1,0 +1,38 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "teamgrid",
+  "version": "0.1.0",
+  "description": "Work with TeamGrid projects, tasks, planning, content, CRM and workspace administration.",
+  "author": {
+    "name": "TeamGrid",
+    "url": "https://teamgrid.app"
+  },
+  "homepage": "https://teamgrid.app",
+  "repository": "https://github.com/TeamGrid/developer-platform",
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "TeamGrid",
+        "shortDescription": "Projects, tasks, planning and team operations",
+        "longDescription": "Work with TeamGrid projects, tasks, planning, content, CRM and workspace administration.",
+        "developerName": "TeamGrid",
+        "category": "Productivity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://teamgrid.app",
+        "privacyPolicyURL": "https://example.invalid/teamgrid/privacy-not-configured",
+        "termsOfServiceURL": "https://example.invalid/teamgrid/terms-not-configured",
+        "defaultPrompt": [
+          "Summarize the current TeamGrid project status.",
+          "Create the TeamGrid task I describe."
+        ],
+        "brandColor": "#355CFD",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/icon.png"
+      }
+    }
+  }
+}

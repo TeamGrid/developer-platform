@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "mcpUrl": "https://mcp.teamgrid.app/mcp",
+  "endpointStatus": "proposed-not-deployed",
+  "websiteUrl": "https://teamgrid.app",
+  "privacyUrl": null,
+  "termsUrl": null,
+  "microsoft365": {
+    "appId": "464912f8-ded5-4bcb-b8b4-923452e0b90d",
+    "oauthReferenceId": null,
+    "oauthClientId": null
+  }
+}

@@ -25,6 +25,21 @@ installed binary. Hosted OAuth uses `https://mcp-de.teamgrid.app/mcp` in DE and
 `https://mcp-us.teamgrid.app/mcp` in US. A connection selects one Workspace and
 remains subject to its current permissions.
 
+Hosted presentation is selected only from the freshly verified OAuth client ID.
+ChatGPT receives tool-result consent metadata; other clients receive HTTP 403
+scope challenges, including rights first determined by the API. Every consent
+challenge preserves previously approved scopes. For Claude, all modifying tools
+advertise `destructiveHint: true` so its confirmation policy covers creations too.
+This changes metadata, not the underlying authorization or mutation semantics.
+
+Static Microsoft/Claude registrations can be mapped through the operator-only
+`TEAMGRID_MCP_HOST_CLIENTS` JSON array, for example
+`[{"clientId":"your-registered-client-id","host":"microsoft365"}]`.
+Supported profiles are `standard`, `openai`, `anthropic` and `microsoft365`.
+Callback URLs, user agents and request parameters cannot select a host profile.
+The proposed public packages and their outstanding qualification are documented
+in [AI integrations](../../../integrations/README.md).
+
 ```json
 {
   "mcpServers": {

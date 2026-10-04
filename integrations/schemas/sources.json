@@ -1,0 +1,32 @@
+[
+  {
+    "file": "agent-plugin-1.0.0.json",
+    "url": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+    "retrievedAt": "2026-10-04",
+    "sha256": "bd0cfd6388f7d5c5c1b4c5edd70df030276345df115274686a0e6d52a92366ed"
+  },
+  {
+    "file": "agent-mcp-1.0.0.json",
+    "url": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+    "retrievedAt": "2026-10-04",
+    "sha256": "2d4b2b9d1c95e75a356152534d2071f18094c1ee9be2eec238c91a1e1f9bd115"
+  },
+  {
+    "file": "microsoft-plugin-2.4.json",
+    "url": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.4/schema.json",
+    "retrievedAt": "2026-10-04",
+    "sha256": "95ff279f33b3758e693711e7f15f10ca9fd2f9f72edf92bd7dd2e5cb695d87b7"
+  },
+  {
+    "file": "microsoft-app-1.29.json",
+    "url": "https://developer.microsoft.com/json-schemas/teams/v1.29/MicrosoftTeams.schema.json",
+    "retrievedAt": "2026-10-04",
+    "sha256": "fb7c2df220bd5c5b960ca0baa29bcfb9c35188db7200ae20a780b0ab347b7941"
+  },
+  {
+    "file": "microsoft-declarative-agent-1.6.json",
+    "url": "https://developer.microsoft.com/json-schemas/copilot/declarative-agent/v1.6/schema.json",
+    "retrievedAt": "2026-10-04",
+    "sha256": "a416e903a90a88ca0f01732fca7eced78fcd7af8124d3b1db6e1ab292029922a"
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "teamgrid": {
+      "type": "http",
+      "url": "https://mcp.teamgrid.app/mcp"
+    }
+  }
+}

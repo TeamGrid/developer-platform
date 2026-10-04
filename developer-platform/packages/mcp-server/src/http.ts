@@ -3,9 +3,10 @@ import { createMcpHandler } from '@modelcontextprotocol/server'
 import type { TeamGridClient } from '@teamgrid/api-client'
 import { z } from 'zod'
 import { domainWriteTools } from './domainTools.js'
+import { type McpHostClient, parseMcpHostClients, resolveMcpHostProfile } from './hostProfiles.js'
+import { bufferMcpHttpResponse } from './httpResponse.js'
 import type { McpToolObservation } from './observability.js'
 import { createTeamGridMcpServer } from './server.js'
-import { usesChatGptToolChallenges } from './toolAuthorization.js'
 import { type McpToolProfile, parseMcpToolProfile } from './toolProfiles.js'
 import { supportedOAuthScopes } from './toolScopes.js'
 import { workWriteTools } from './workTools.js'
@@ -54,6 +55,8 @@ export type McpHttpOptions = {
   region: string
   cellId: string
   toolProfile?: McpToolProfile
+  /** Trusted operator registry for static OAuth client identities. */
+  hostClients?: readonly McpHostClient[]
   allowedOrigins?: readonly string[]
   /** Read dynamically so operators can close remote access without a restart. */
   enabled: () => boolean
@@ -116,10 +119,11 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
   const timeoutMs = options.requestTimeoutMs ?? 30_000
   if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30_000)
     throw new Error('HTTP request timeout must be 1–30000 milliseconds.')
-  const requestSignals = new AsyncLocalStorage<AbortSignal>()
+  const requests = new AsyncLocalStorage<{ signal: AbortSignal; scopeResponse?: Response }>()
   const resource = httpsUrl(options.resourceUrl)
   const issuer = httpsUrl(options.issuerUrl)
   const profile = parseMcpToolProfile(options.toolProfile)
+  const hostClients = parseMcpHostClients(JSON.stringify(options.hostClients ?? []))
   const metadataUrl = new URL(
     `/.well-known/oauth-protected-resource${resource.pathname === '/' ? '' : resource.pathname}`,
     resource.origin,
@@ -133,8 +137,9 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
     async (context) => {
       const authorization = authorizationSchema.parse(context.authInfo?.extra?.authorization)
       try {
-        const signal = requestSignals.getStore()
-        if (!signal) throw new Error('Missing request lifetime')
+        const current = requests.getStore()
+        if (!current) throw new Error('Missing request lifetime')
+        const { signal } = current
         const client = await withinSignal(
           options.createDelegatedClient(Object.freeze(authorization), signal),
           signal,
@@ -145,15 +150,21 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
           throw new Error('Wrong delegation workspace')
         return createTeamGridMcpServer(client, {
           toolProfile: profile,
+          hostProfile: resolveMcpHostProfile(authorization.clientId, hostClients),
           ...(!options.writesEnabled?.()
             ? { denyTools: [...workWriteTools, ...domainWriteTools] }
             : {}),
           requireGrantedScopes: true,
           observeTool: options.observeTool,
           toolRequestId: options.toolRequestId,
-          scopeChallengeTransport: usesChatGptToolChallenges(authorization.clientId)
-            ? 'tool-result'
-            : 'http',
+          scopeChallengeTransport:
+            resolveMcpHostProfile(authorization.clientId, hostClients) === 'openai'
+              ? 'tool-result'
+              : 'http',
+          onHttpScopeChallenge: (response) => {
+            signal.throwIfAborted()
+            current.scopeResponse = response
+          },
         })
       } catch {
         throw new Error('MCP delegation is unavailable.')
@@ -250,7 +261,7 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
         },
       )
     }
-    return handler.fetch(request, {
+    const result = await handler.fetch(request, {
       authInfo: {
         token: bearer[1] as string,
         clientId: authorization.clientId,
@@ -261,6 +272,9 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
         extra: { authorization },
       },
     })
+    if (resolveMcpHostProfile(authorization.clientId, hostClients) === 'openai') return result
+    const buffered = await bufferMcpHttpResponse(result, request.signal)
+    return requests.getStore()?.scopeResponse ?? buffered
   }
 
   return {
@@ -272,7 +286,7 @@ export function createTeamGridMcpHttpHandler(options: McpHttpOptions) {
       timer.unref?.()
       let result: Response
       try {
-        result = await requestSignals.run(signal, () =>
+        result = await requests.run({ signal }, () =>
           withinSignal(dispatch(new Request(request, { signal })), signal),
         )
       } catch (error) {

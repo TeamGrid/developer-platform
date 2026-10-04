@@ -29,28 +29,39 @@ export function toolSecuritySchemes(name: McpToolName) {
   return [{ type: 'oauth2' as const, scopes: [...scopes].sort() }]
 }
 
+function consentDescription(action?: string) {
+  return action === 'teamgrid_task_create'
+    ? 'To create this task, TeamGrid needs permission to create and edit tasks. Please approve the additional access.'
+    : 'This action needs additional TeamGrid permissions. Please approve the additional access. Your current connection remains valid.'
+}
+
+/** One complete consent request, presented over HTTP or in a ChatGPT tool result. */
+export function toolConsentChallengeResponse(
+  challenge: ScopeChallenge,
+  authInfo: AuthInfo,
+  action?: string,
+) {
+  // Keep the previously approved scopes in the next consent request. Refresh alone
+  // cannot widen a grant; the authorization server still requires explicit consent.
+  return bearerAuthChallengeResponse(
+    new OAuthError(OAuthErrorCode.InsufficientScope, consentDescription(action)),
+    {
+      requiredScopes: [...new Set([...authInfo.scopes, ...challenge.scopes])].sort(),
+      resourceMetadataUrl: authInfo.resourceMetadataUrl,
+    },
+  )
+}
+
 /** Follow ChatGPT's documented tool-result OAuth challenge contract. */
 export function toolConsentRequired(
   challenge: ScopeChallenge,
   authInfo: AuthInfo,
   action?: string,
 ): CallToolResult {
-  const description =
-    action === 'teamgrid_task_create'
-      ? 'To create this task, TeamGrid needs permission to create and edit tasks. Please approve the additional access.'
-      : 'This action needs additional TeamGrid permissions. Please approve the additional access. Your current connection remains valid.'
-  // Keep the previously approved scopes in the next consent request. Refresh alone
-  // cannot widen a grant; the authorization server still requires explicit consent.
-  const response = bearerAuthChallengeResponse(
-    new OAuthError(OAuthErrorCode.InsufficientScope, description),
-    {
-      requiredScopes: [...new Set([...authInfo.scopes, ...challenge.scopes])].sort(),
-      resourceMetadataUrl: authInfo.resourceMetadataUrl,
-    },
-  )
+  const response = toolConsentChallengeResponse(challenge, authInfo, action)
   return {
     isError: true,
-    content: [{ type: 'text', text: description }],
+    content: [{ type: 'text', text: consentDescription(action) }],
     _meta: { 'mcp/www_authenticate': [response.headers.get('WWW-Authenticate') as string] },
   }
 }
