@@ -139,6 +139,8 @@ describe('federated OAuth MCP gateway', () => {
     }
   })
 
+  // Both complete paginated catalogs exercise fresh HTTP setup; slower CI hosts need
+  // more than Vitest's default 5 seconds. Request-deadline tests keep their own limits.
   it('executes concurrent DE/US calls through separate verified delegations and all 208 tools', async () => {
     const h = harness()
     const clients = [
@@ -194,7 +196,7 @@ describe('federated OAuth MCP gateway', () => {
       await Promise.all(clients.map((client) => client.close()))
       await h.gateway.close()
     }
-  })
+  }, 20_000)
 
   it('never sends an unknown token to either cell and preserves the global challenge', async () => {
     const h = harness()
