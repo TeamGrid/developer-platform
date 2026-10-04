@@ -136,7 +136,7 @@ describe('complete domain MCP', () => {
     } finally {
       await c.close()
     }
-  })
+  }, 15_000) // Full catalog traversal includes every strict schema on Windows/Node 22.
 
   it('reads a large document completely in revision-bound chunks and returns a compact write receipt', async () => {
     const c = await connected()
