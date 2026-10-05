@@ -6,3 +6,4 @@ dist/
 .env.*
 !.env.example
 conformance-evidence/
+developer-platform/hosting/federated/.federated-image.*

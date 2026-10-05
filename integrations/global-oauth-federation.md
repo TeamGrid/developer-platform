@@ -5,9 +5,11 @@ MCP routing, a Mongo directory adapter, public token/revocation broker and priva
 transactional exchange recovery are implemented in draft PRs. Persisted browser
 requests, authenticated App workspace selection and consent resume with prior
 code-route publication are also implemented. A bounded static/CIMD client registry
-and composed discovery/OAuth/MCP Node runtime are implemented. Trusted operating
-configuration, database/hosting provisioning, deployment and host qualification
-are outstanding. This document does not authorize a Production release or claim a working public endpoint.
+and composed discovery/OAuth/MCP Node runtime are implemented. A private executable
+service now connects validated private inputs, native storage, shared admission,
+dependency readiness and a separate image. Actual operator configuration, database/
+hosting provisioning, deployment and host qualification are outstanding. This
+document does not authorize a Production release or claim a working public endpoint.
 
 ## Public identity and regional authority
 
@@ -205,13 +207,35 @@ before parsing (including chunked uploads) and keeps the existing MCP byte limit
 Shutdown closes the handler and connections. Readiness requires a supplied,
 five-second-bounded functional probe; liveness is not OAuth qualification.
 
-The deployment bootstrap must supply fixed regional origins/credentials,
-initialized native directory/browser collections, the actual static/CIMD policy,
-shared abuse admission and readiness against the chosen database and private
-providers. The existing `teamgrid-mcp-http` binary/container entry remains regional;
-a global deployment needs its own trusted bootstrap using the composed Node APIs.
-No default global connection string, local memory store, automatic secret source,
-database provisioner or public deployment is provided.
+The [private global service](../developer-platform/hosting/federated/README.md)
+supplies executable bootstrap using these APIs and a separately pinned Mongo driver.
+It validates private regular-file inputs and static client policy before database
+I/O, checks the configured writable replica-set primary, publishes an immutable
+deployment binding and initializes TTL indexes before opening its listener.
+It supplies native directory/browser stores and shared journaled-majority admission.
+Counters hold only bounded HMAC identities and three-minute retention. Each request
+charges the global ceiling plus a public or credential ceiling; fabricated bearers
+cannot escape the global ceiling. Store failure closes admission.
+
+Dependency readiness coalesces a four-second probe, cached for at most ten seconds:
+current client configuration, primary/binding, majority+journaled canary publication
+with linearizable readback and all fixed providers' authenticated HTTPS metadata,
+including the full scope catalog. This does not qualify real consent, Passkeys or
+host behavior. Fresh policy revocation overrides cache without a process restart;
+enabled/write gates also read current private configuration. Other inputs remain
+immutable until a reviewed restart. Admission key/limit changes conflict with the
+DB binding and require a separately reviewed migration. The service has no default
+connection string, memory-store fallback, registration synchronizer, database
+provisioner or automatic secret source.
+
+The separate non-root image is qualified with two instances, disposable MongoDB
+8.3.8/FCV 8.0 and an ephemeral certificate-verified HTTPS metadata fixture. It
+exercises native TTL/consistency, shared quotas, fresh revocation, browser hashes,
+global closure and storage failure. Real provider/vendor acceptance and Production
+HA/failover remain outstanding. The existing `teamgrid-mcp-http` binary/container
+entry remains regional. The new CI image job tests but does not publish or deploy
+the global service. Operator inputs and actual database/hosting still require
+provisioning through the admitted release path.
 
 ## Credential routing directory
 

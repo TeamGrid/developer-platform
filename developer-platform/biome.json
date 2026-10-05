@@ -3,6 +3,7 @@
   "files": {
     "includes": [
       "packages/**/*.ts",
+      "hosting/federated/**/*.mjs",
       "scripts/conformance/**/*.mjs",
       "scripts/build-ai-integrations.mjs",
       "scripts/check-release-documentation.mjs",

@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "npm run generate:types && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server",
-    "check": "node scripts/generate-mcp-catalog.mjs --check && node scripts/generate-mcp-scopes.mjs --check && node scripts/check-contract-manifest.mjs && node scripts/check-release-documentation.mjs && npm run generate:types && git diff --exit-code -- packages/api-client/src/generated/schema.ts && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server && npm run typecheck -w @teamgrid/api-client && npm run typecheck -w @teamgrid/cli && npm run typecheck -w @teamgrid/mcp-server && npm run typecheck:staging-e2e && npm run contract:surfaces && node scripts/check-client-version.mjs && biome check packages scripts && npm run integrations:check",
+    "check": "node scripts/generate-mcp-catalog.mjs --check && node scripts/generate-mcp-scopes.mjs --check && node scripts/check-contract-manifest.mjs && node scripts/check-release-documentation.mjs && npm run generate:types && git diff --exit-code -- packages/api-client/src/generated/schema.ts && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server && npm run typecheck -w @teamgrid/api-client && npm run typecheck -w @teamgrid/cli && npm run typecheck -w @teamgrid/mcp-server && npm run typecheck:staging-e2e && npm run contract:surfaces && node scripts/check-client-version.mjs && biome check packages scripts hosting/federated && npm run integrations:check",
     "check:edge-client": "npm run build -w @teamgrid/api-client && node scripts/check-edge-client.mjs",
     "conformance:credential": "npm run build && node scripts/conformance/credential.mjs",
     "conformance:certification": "npm run build && node scripts/conformance/run.mjs --mode certification",
@@ -28,11 +28,12 @@
     "pack:check": "node scripts/check-package-artifacts.mjs",
     "pack:install-check": "node scripts/verify-packed-install.mjs",
     "audit:production": "node scripts/check-production-audit.mjs",
-    "verify": "npm run audit:production && npm run check && npm run check:edge-client && npm test && npm run build && npm run conformance:redaction && npm run pack:check && npm run pack:install-check",
+    "verify": "npm run audit:production && npm run check && npm run check:edge-client && npm test && npm run build && npm run conformance:redaction && npm run pack:check && npm run pack:install-check && npm run verify:federated",
     "generate:mcp-scopes": "node scripts/generate-mcp-scopes.mjs",
     "generate:mcp-catalog": "node scripts/generate-mcp-catalog.mjs",
     "integrations:build": "npm run build && node scripts/build-ai-integrations.mjs",
-    "integrations:check": "node scripts/build-ai-integrations.mjs --check"
+    "integrations:check": "node scripts/build-ai-integrations.mjs --check",
+    "verify:federated": "npm ci --prefix hosting/federated --ignore-scripts --no-audit --no-fund && npm run audit --prefix hosting/federated && npm test --prefix hosting/federated"
   },
   "packageManager": "npm@11.18.0",
   "engines": {

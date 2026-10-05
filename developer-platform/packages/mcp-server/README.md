@@ -341,6 +341,12 @@ provision storage, install credentials or deploy the public endpoint. See the
 for private service authentication, recovery-key provisioning, operating topology
 and remaining launch requirements.
 
+The repository's [private global service](../../hosting/federated/README.md)
+provides executable bootstrap, private configuration/policy loading, native Mongo
+stores, shared admission and bounded dependency readiness in a separate image.
+Its independently pinned driver is outside the published SDK. Actual operator
+inputs, hosting/database provisioning and real vendor acceptance remain required.
+
 
 ## Hosted runtime and private resources
 

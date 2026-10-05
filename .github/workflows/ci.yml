@@ -107,3 +107,28 @@ jobs:
           printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$REGISTRY_USER" --password-stdin
           docker push "ghcr.io/teamgrid/teamgrid-mcp:$SOURCE_REVISION"
           docker logout ghcr.io
+
+  federated-image:
+    name: Verify federated MCP image
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Build the separate immutable global service
+        env:
+          SOURCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          docker build --file developer-platform/hosting/federated/Dockerfile \
+            --build-arg SOURCE_REVISION="$SOURCE_REVISION" \
+            --tag "teamgrid-federated-mcp:$SOURCE_REVISION" .
+      - name: Qualify two instances against a disposable replica set
+        env:
+          SOURCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: bash developer-platform/hosting/federated/smoke-image.sh "teamgrid-federated-mcp:$SOURCE_REVISION"

@@ -10,3 +10,4 @@ conformance-evidence
 **/.npmrc
 **/*.log
 **/.teamgrid
+**/.federated-image.*

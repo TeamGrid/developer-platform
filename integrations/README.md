@@ -44,9 +44,12 @@ and separately approved OAuth scopes still apply.
   public/Basic/POST authentication. `createFederatedMcpRuntime` composes discovery,
   both OAuth channels and all 208 tools; its Node transport bounds OAuth bytes before
   processing. Global client revocation stops API use even before a regional policy
-  rollout completes. Actual trusted registry/store/admission configuration, database/
-  hosting provisioning, readiness qualification and the deployed endpoint remain
-  outstanding.
+  rollout completes. A [private global service](../developer-platform/hosting/federated/README.md)
+  now supplies executable bootstrap, private configuration/policy loading, native
+  persistent stores, shared Mongo admission, bounded dependency readiness and a
+  separate non-root image. Local two-instance image qualification is implemented.
+  Actual operator inputs, database/hosting provisioning, real-host acceptance and
+  the deployed endpoint remain outstanding.
 
 ```sh
 cd developer-platform
