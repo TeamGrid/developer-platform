@@ -31,6 +31,10 @@ test('self-hosted artifacts isolate two bounded replicas, expose no host port an
   )
   assert.deepEqual(Object.keys(compose.services), ['federation-a', 'federation-b'])
   assert.equal(compose.networks.database.external, true)
+  assert.deepEqual(compose.networks.egress, {
+    external: true,
+    name: 'teamgrid-federation-staging-egress',
+  })
   assert.equal(compose.networks.database.name, 'teamgrid-federation-staging-db')
   for (const service of Object.values(compose.services)) {
     assert.equal(service.user, '1000:1000')

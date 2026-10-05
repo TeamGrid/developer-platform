@@ -99,7 +99,7 @@ export function createSelfHostedArtifacts(input, specification) {
     networks: {
       ingress: { aliases: [`${project}-${replica}`] },
       database: {},
-      egress: {},
+      egress: { external: true, name: `${project}-egress` },
     },
     healthcheck: {
       test: [
@@ -122,7 +122,7 @@ export function createSelfHostedArtifacts(input, specification) {
     networks: {
       ingress: { external: true, name: ingress },
       database: { external: true, name: specification.databaseNetwork },
-      egress: {},
+      egress: { external: true, name: `${project}-egress` },
     },
   }
   const proxy = `reverse_proxy ${project}-a:8080 ${project}-b:8080 {

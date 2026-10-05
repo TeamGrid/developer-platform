@@ -19,7 +19,8 @@ public activation. A DE gateway is not a promise of exclusively US processing.
   replicas, each limited to 512 MiB, 0.75 CPU and 128 processes.
 - Dedicated global TLS Mongo replica set and its database/backup lifecycle.
   It is not part of an application-container rollout or rollback.
-- Three networks: dedicated ingress, dedicated metadata DB and outbound egress.
+- Three pre-provisioned external networks: dedicated ingress, dedicated metadata
+  DB and outbound egress. Component rollout creates none of these networks.
   Only existing Caddy additionally joins ingress; App/API and regional Mongo
   do not join it. Global replicas do not join `teamgrid_default`.
 - No global service or database port is published on the host. Readiness and
