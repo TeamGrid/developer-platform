@@ -56,7 +56,7 @@ image digest and revision with the same admitted immutable image identities:
   "project": "teamgrid-federation-production",
   "sourceRevision": "<40-character-admitted-SDK-SHA>",
   "image": "ghcr.io/teamgrid/teamgrid-federated-mcp@sha256:<64-character-image-digest>",
-  "runtimeDirectory": "/opt/teamgrid-federation-production/runtime",
+  "runtimeDirectory": "/opt/teamgrid-federation-production/releases/<v2-release-id>/runtime",
   "databaseNetwork": "teamgrid-federation-production-db",
   "browserServiceIps": ["159.195.80.235", "152.53.195.156"]
 }
@@ -89,7 +89,9 @@ check its OCI source/revision/runtime labels and protected-source build evidence
 against the admitted release before using it.
 
 The Caddy network file is a **review patch** for the existing persisted base
-Compose definition. Preserve every existing Caddy mount, port, network and
+Compose definition. It adds the ingress network and a read-only persistent site
+fragment mount from `/opt/<project>/Caddyfile.site` to `/etc/caddy/<project>.site`.
+Import that exact fragment in the governed base Caddyfile. Preserve every existing Caddy mount, port, network and
 option. Do not use an untracked one-off network attachment or a transient override
 that the next App release would discard. Apply the reviewed addition through
 the governed release/configuration path, with recorded before/after digests.
@@ -148,8 +150,22 @@ The App/API/Developer Platform normal release remains Release Pipeline v2 in
 TeamGrid's `docs/production-deployment.md`. These operating artifacts are not an
 alternative Production deploy helper. The separate global project and its exact
 image/config/network identities must be admitted into that reviewed release plan
-before any external mutation. The current CI qualifies the image but does not
-publish it; registry publication and release-plan integration remain outstanding.
+before any external mutation. The companion App implements the additive
+`federatedMcp` manifest component, followed by `federation-staging` and
+`federation-production` after the existing regional Staging/DE/US chain.
+Successful protected-main SDK push CI publishes the qualified image and exact
+source/digest proof; PR builds remain unpublished. No live image or deployment
+is established by the draft.
+
+Follow the App's `docs/runbooks/federated-mcp-release-v2.md` for the seven pinned
+operating-file digests, predecessor identity, actual infrastructure qualification,
+fixed root-owned host helper and its restricted sudo rule. Install runtime files
+under the exact v2 release directory. The release lane verifies its installed
+helper hashes, operator-controlled state, persisted Caddy mount and candidate
+image parser before rolling replicas A then B. Its interrupted-transition journal
+blocks blind retry, and the immutable ledger waits for both global receipts.
+Real hosting/DB/ingress, client/vendor and first-release qualification remain
+outstanding.
 
 Qualify Staging first: isolated TLS DB/role/restore, actual regional metadata and
 registrations, two replicas, ingress, workspace selection, ordinary/sensitive

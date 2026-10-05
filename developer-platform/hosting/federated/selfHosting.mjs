@@ -189,7 +189,20 @@ export function createSelfHostedArtifacts(input, specification) {
 }
 `
   const caddyNetwork = {
-    services: { caddy: { networks: { default: {}, federation_ingress: {} } } },
+    services: {
+      caddy: {
+        networks: { default: {}, federation_ingress: {} },
+        volumes: [
+          {
+            type: 'bind',
+            source: `/opt/${project}/Caddyfile.site`,
+            target: `/etc/caddy/${project}.site`,
+            read_only: true,
+            bind: { create_host_path: false },
+          },
+        ],
+      },
+    },
     networks: { federation_ingress: { external: true, name: ingress } },
   }
   return { compose, caddySite, caddyNetwork }

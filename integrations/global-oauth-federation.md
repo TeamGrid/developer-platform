@@ -233,7 +233,8 @@ The separate non-root image is qualified with two instances, disposable MongoDB
 exercises native TTL/consistency, shared quotas, fresh revocation, browser hashes,
 global closure and storage failure. Real provider/vendor acceptance and Production
 HA/failover remain outstanding. The existing `teamgrid-mcp-http` binary/container
-entry remains regional. The new CI image job tests but does not publish or deploy
+entry remains regional. The new CI image job tests, publishes only from successful protected-main push
+CI and never deploys
 the global service. Operator inputs and actual database/hosting still require
 provisioning through the admitted release path.
 

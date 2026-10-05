@@ -26,7 +26,7 @@ COPY --from=build --chown=node:node /opt/teamgrid/developer-platform/packages/mc
 COPY --from=build --chown=node:node /opt/teamgrid/developer-platform/packages/mcp-server/dist ./packages/mcp-server/dist
 COPY --from=build --chown=node:node /opt/teamgrid/developer-platform/hosting/federated/package.json ./hosting/federated/package.json
 COPY --from=build --chown=node:node /opt/teamgrid/developer-platform/hosting/federated/node_modules ./hosting/federated/node_modules
-COPY --from=build --chown=node:node /opt/teamgrid/developer-platform/hosting/federated/main.mjs /opt/teamgrid/developer-platform/hosting/federated/config.mjs /opt/teamgrid/developer-platform/hosting/federated/service.mjs /opt/teamgrid/developer-platform/hosting/federated/io.mjs /opt/teamgrid/developer-platform/hosting/federated/admission.mjs ./hosting/federated/
+COPY --from=build --chown=node:node /opt/teamgrid/developer-platform/hosting/federated/main.mjs /opt/teamgrid/developer-platform/hosting/federated/config.mjs /opt/teamgrid/developer-platform/hosting/federated/service.mjs /opt/teamgrid/developer-platform/hosting/federated/io.mjs /opt/teamgrid/developer-platform/hosting/federated/admission.mjs /opt/teamgrid/developer-platform/hosting/federated/selfHosting.mjs ./hosting/federated/
 USER node
 EXPOSE 8080
 ENTRYPOINT ["node", "hosting/federated/main.mjs"]

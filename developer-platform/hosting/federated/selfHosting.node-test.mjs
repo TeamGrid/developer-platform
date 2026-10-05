@@ -50,6 +50,15 @@ test('self-hosted artifacts isolate two bounded replicas, expose no host port an
     'default',
     'federation_ingress',
   ])
+  assert.deepEqual(caddyNetwork.services.caddy.volumes, [
+    {
+      type: 'bind',
+      source: '/opt/teamgrid-federation-staging/Caddyfile.site',
+      target: '/etc/caddy/teamgrid-federation-staging.site',
+      read_only: true,
+      bind: { create_host_path: false },
+    },
+  ])
   assert.match(caddySite, /health_headers \{\s+Host mcp.example.test/)
   assert.match(caddySite, /lb_try_duration 0s/)
 })

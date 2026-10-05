@@ -115,6 +115,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
+      packages: write
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -132,3 +133,38 @@ jobs:
         env:
           SOURCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
         run: bash developer-platform/hosting/federated/smoke-image.sh "teamgrid-federated-mcp:$SOURCE_REVISION"
+      - name: Publish verified global image only from protected main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY_USER: ${{ github.actor }}
+          SOURCE_REVISION: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          image="ghcr.io/teamgrid/teamgrid-federated-mcp:$SOURCE_REVISION"
+          docker tag "teamgrid-federated-mcp:$SOURCE_REVISION" "$image"
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$REGISTRY_USER" --password-stdin
+          trap 'docker logout ghcr.io' EXIT
+          docker push "$image"
+          docker pull "$image"
+          PUBLISHED_IMAGE="$(docker inspect --format '{{index .RepoDigests 0}}' "$image")"
+          export PUBLISHED_IMAGE
+          python3 - <<'PYPROOF'
+          import json, os, re
+          from pathlib import Path
+          image = os.environ['PUBLISHED_IMAGE']
+          if not re.fullmatch(r'ghcr.io/teamgrid/teamgrid-federated-mcp@sha256:[a-f0-9]{64}', image):
+              raise SystemExit('Published global image digest is unavailable')
+          proof = {'contract': 'teamgrid-federated-mcp-image-v1', 'sourceRevision': os.environ['SOURCE_REVISION'],
+                   'image': image, 'buildRunUrl': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                   'runtime': 'federated-mcp-v1'}
+          Path('federated-mcp-image-proof.json').write_text(json.dumps(proof, sort_keys=True) + '\n')
+          PYPROOF
+      - name: Preserve immutable global image publication proof
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: federated-mcp-image-proof
+          path: federated-mcp-image-proof.json
+          if-no-files-found: error
+          retention-days: 90
