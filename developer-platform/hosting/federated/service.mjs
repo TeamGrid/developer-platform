@@ -292,6 +292,7 @@ export async function createFederatedService({
       clients,
       selectionUiOrigin: config.selectionUiOrigin,
       workspaceRootDomain: config.workspaceRootDomain,
+      workspaceUiMode: config.workspaceUiMode,
       selectionServiceSecret: config.selectionServiceSecret,
       allowedOrigins: config.allowedOrigins,
       hostClients: config.hostClients,

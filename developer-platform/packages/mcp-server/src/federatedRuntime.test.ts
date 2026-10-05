@@ -18,7 +18,7 @@ const client = {
   redirectUris: ['https://host.example.test/callback'],
   status: 'active' as const,
 }
-function harness(timeout = 30000) {
+function harness(timeout = 30000, workspaceUiMode?: 'subdomain' | 'path') {
   const state = {
     enabled: true,
     admitted: true,
@@ -100,6 +100,7 @@ function harness(timeout = 30000) {
     clients,
     selectionUiOrigin: 'https://login.example.test/',
     workspaceRootDomain: 'example.test',
+    workspaceUiMode,
     selectionServiceSecret: 'b'.repeat(48),
     enabled: () => state.enabled,
     writesEnabled: () => true,
@@ -158,6 +159,60 @@ describe('composed global MCP/OAuth runtime', () => {
       ).toContain(`${issuer}.well-known/oauth-protected-resource/mcp`)
       expect(h.directory.resolve).not.toHaveBeenCalled()
       expect(h.fetcher).not.toHaveBeenCalled()
+    } finally {
+      await h.runtime.close()
+    }
+  })
+  it('composes explicit path-based workspace consent without changing its trusted origin or provider', async () => {
+    const h = harness(30000, 'path')
+    try {
+      const query = new URLSearchParams({
+        client_id: 'host1',
+        redirect_uri: client.redirectUris[0] ?? '',
+        response_type: 'code',
+        resource,
+        scope: 'workspace:read',
+        code_challenge_method: 'S256',
+        code_challenge: 'x'.repeat(43),
+      })
+      const started = await h.request(`/oauth/authorize?${query}`),
+        handle = new URL(started.headers.get('location') ?? '').searchParams.get('federation'),
+        cookie = started.headers.get('set-cookie')?.split(';')[0] ?? ''
+      expect(handle).toBeTruthy()
+      const selected = await h.request('/internal/oauth/browser/select', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-TeamGrid-OAuth-Browser-Service-Authorization': `Bearer ${'b'.repeat(48)}`,
+        },
+        body: JSON.stringify({
+          requestId: handle,
+          cellId: 'de-test',
+          workspaceId: 'team1',
+          workspaceSlug: 'workspace',
+        }),
+      })
+      expect(selected.status).toBe(200)
+      const { continueUrl } = await selected.json()
+      h.fetcher.mockImplementationOnce(async () =>
+        Response.json({
+          requestId: handle,
+          cellId: 'de-test',
+          region: 'de',
+          clientRecordId: client._id,
+        }),
+      )
+      const consent = await h.request(continueUrl, { headers: { Cookie: cookie } })
+      expect(consent.status).toBe(303)
+      const target = new URL(consent.headers.get('location') ?? '')
+      expect(target.origin).toBe('https://login.example.test')
+      expect(target.pathname).toBe('/workspace/developer/oauth/authorize')
+      expect(target.searchParams.get('request')).toBe(handle)
+      expect(target.searchParams.get('cell')).toBe('de-test')
+      expect(String(h.fetcher.mock.calls[0]?.[0])).toContain(
+        'https://de.example.test/internal/developer/oauth/integrations/ai-global/authorize?',
+      )
+      expect(h.directory.register).not.toHaveBeenCalled()
     } finally {
       await h.runtime.close()
     }

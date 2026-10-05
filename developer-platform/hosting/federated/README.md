@@ -71,6 +71,15 @@ inputs privately; never paste secrets into chat or command arguments.
 }
 ```
 
+Workspace consent uses `https://<workspace>.<workspaceRootDomain>/developer/oauth/authorize`
+by default. For an environment whose workspace routes use a path on the shared UI
+host, explicitly set `workspaceUiMode` to `"path"`. Consent then uses
+`<selectionUiOrigin><workspace>/developer/oauth/authorize`, with the same validated
+workspace slug and request/region/cell binding. For TeamGrid Staging, the UI origin
+is `https://staging-test.teamgrid.app/`. The path mode never takes an origin from a
+browser request. Production retains its subdomain mode. Changing the mode is an
+immutable service-configuration change requiring a reviewed rollout.
+
 API origin credentials retain the regional contract: 32–512 visible ASCII
 characters, including base64 punctuation. Whitespace, control characters and
 non-ASCII values are rejected. Browser, admission and service secrets retain

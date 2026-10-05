@@ -130,6 +130,7 @@ export function createFederatedOAuthBrowserBroker(options: {
   cells: readonly FederatedOAuthBrokerCell[]
   selectionUiOrigin: string
   workspaceRootDomain: string
+  workspaceUiMode?: 'subdomain' | 'path'
   selectionServiceSecret: string
   store: OAuthBrowserStore
   directory: OAuthRoutingDirectory
@@ -145,6 +146,8 @@ export function createFederatedOAuthBrowserBroker(options: {
   canonicalHttps(options.selectionUiOrigin, true)
   if (
     !/^[a-z0-9]+(?:[.-][a-z0-9]+)+$/.test(options.workspaceRootDomain) ||
+    (options.workspaceUiMode !== undefined &&
+      !['subdomain', 'path'].includes(options.workspaceUiMode)) ||
     options.selectionServiceSecret.length < 32 ||
     options.selectionServiceSecret.length > 256 ||
     !options.scopes.includes('workspace:read')
@@ -526,9 +529,15 @@ export function createFederatedOAuthBrowserBroker(options: {
           )
             throw new BrowserRequestError('invalid_grant')
         }
-        const consent = new URL(
-          `https://${record.selection.workspaceSlug}.${options.workspaceRootDomain}/developer/oauth/authorize`,
-        )
+        const consent =
+          options.workspaceUiMode === 'path'
+            ? new URL(
+                `/${record.selection.workspaceSlug}/developer/oauth/authorize`,
+                options.selectionUiOrigin,
+              )
+            : new URL(
+                `https://${record.selection.workspaceSlug}.${options.workspaceRootDomain}/developer/oauth/authorize`,
+              )
         consent.search = new URLSearchParams({
           request: handle,
           region: record.selection.region,
