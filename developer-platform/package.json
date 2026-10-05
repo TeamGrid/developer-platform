@@ -40,14 +40,14 @@
     "node": ">=22.14 <25"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.5",
-    "@inquirer/prompts": "8.5.2",
+    "@biomejs/biome": "2.5.15",
+    "@inquirer/prompts": "8.7.2",
     "@modelcontextprotocol/client": "2.2.0",
     "@modelcontextprotocol/sdk": "1.31.0",
     "ajv-draft-04": "1.0.0",
     "openapi-typescript": "7.13.0",
     "typescript": "5.9.3",
-    "vitest": "4.1.10"
+    "vitest": "5.0.3"
   },
   "overrides": {
     "brace-expansion": "5.0.8",
