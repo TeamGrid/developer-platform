@@ -89,6 +89,32 @@ test('strict complete configuration, canonical public/private identities and exp
   }
 })
 
+test('API origin credentials preserve the regional visible-ASCII contract and reject header injection', () => {
+  for (const value of ['a'.repeat(32), `${'a'.repeat(60)}+/==`, 'b'.repeat(512)]) {
+    const config = fixture()
+    config.cells[0].apiOriginSecret = value
+    assert.equal(parseServiceConfig(config).cells[0].apiOriginSecret, value)
+  }
+  for (const value of [
+    'a'.repeat(31),
+    'a'.repeat(513),
+    `${'a'.repeat(32)}\r\nInjected: true`,
+    `${'a'.repeat(32)} `,
+    `${'a'.repeat(32)}\t`,
+    `${'a'.repeat(32)}\0`,
+    `${'a'.repeat(32)}\x7f`,
+    `${'a'.repeat(32)}ä`,
+  ]) {
+    const config = fixture()
+    config.cells[0].apiOriginSecret = value
+    assert.throws(() => parseServiceConfig(config))
+  }
+  const config = fixture()
+  config.cells[0].apiOriginSecret = `${'a'.repeat(60)}+/==`
+  config.selectionServiceSecret = config.cells[0].apiOriginSecret
+  assert.throws(() => parseServiceConfig(config))
+})
+
 test('client policy independently validates version, limits and canonical HTTPS origins', () => {
   assert.deepEqual(parseClientPolicy(policy()), policy())
   for (const patch of [

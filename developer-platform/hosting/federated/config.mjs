@@ -20,6 +20,8 @@ function text(value, pattern, max = 2048) {
   return value
 }
 const secret = (value) => text(value, /^[A-Za-z0-9_-]{32,256}$/, 256)
+// Existing regional API origin credentials use bounded visible ASCII, including base64.
+const originSecret = (value) => text(value, /^[\x21-\x7e]{32,512}$/, 512)
 const flag = (value) => {
   if (typeof value !== 'boolean') unavailable()
   return value
@@ -140,7 +142,7 @@ export function parseServiceConfig(input) {
         providerUrl: provider.href,
         serviceSecret: secret(cell.serviceSecret),
         apiBaseUrl: api.href,
-        apiOriginSecret: secret(cell.apiOriginSecret),
+        apiOriginSecret: originSecret(cell.apiOriginSecret),
       }
     })
     if (

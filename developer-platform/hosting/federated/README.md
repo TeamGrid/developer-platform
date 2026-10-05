@@ -71,6 +71,11 @@ inputs privately; never paste secrets into chat or command arguments.
 }
 ```
 
+API origin credentials retain the regional contract: 32–512 visible ASCII
+characters, including base64 punctuation. Whitespace, control characters and
+non-ASCII values are rejected. Browser, admission and service secrets retain
+their separate 32–256 URL-safe character contract.
+
 Use the actual fixed DE and US entries; a cell/provider is never derived from
 a request or directory response. The selection URL, placement and region/cell
 must match the additional App integration. Service/browser/admission credentials
