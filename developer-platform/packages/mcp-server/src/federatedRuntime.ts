@@ -21,6 +21,7 @@ export type FederatedMcpRuntimeOptions = Omit<
   clients: OAuthClientRegistry
   selectionUiOrigin: string
   workspaceRootDomain: string
+  workspaceUiMode?: 'subdomain' | 'path'
   selectionServiceSecret: string
   ready(): Promise<boolean>
 }
@@ -81,6 +82,7 @@ export function createFederatedMcpRuntime(options: FederatedMcpRuntimeOptions) {
     ...brokerOptions,
     selectionUiOrigin: options.selectionUiOrigin,
     workspaceRootDomain: options.workspaceRootDomain,
+    workspaceUiMode: options.workspaceUiMode,
     selectionServiceSecret: options.selectionServiceSecret,
     store: options.browserStore,
     client: (clientId, signal) => options.clients.resolve(clientId, signal),

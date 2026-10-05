@@ -115,6 +115,19 @@ test('API origin credentials preserve the regional visible-ASCII contract and re
   assert.throws(() => parseServiceConfig(config))
 })
 
+test('workspace UI routing is explicit, bounded and immutable for a running service', () => {
+  const original = fixture()
+  assert.equal(parseServiceConfig(original).workspaceUiMode, undefined)
+  for (const mode of ['subdomain', 'path']) {
+    const configured = { ...original, workspaceUiMode: mode }
+    assert.equal(parseServiceConfig(configured).workspaceUiMode, mode)
+    assert.notEqual(immutableConfig(original), immutableConfig(configured))
+  }
+  for (const mode of [null, true, '', 'https://evil.test/', 'PATH', {}]) {
+    assert.throws(() => parseServiceConfig({ ...original, workspaceUiMode: mode }))
+  }
+})
+
 test('client policy independently validates version, limits and canonical HTTPS origins', () => {
   assert.deepEqual(parseClientPolicy(policy()), policy())
   for (const patch of [

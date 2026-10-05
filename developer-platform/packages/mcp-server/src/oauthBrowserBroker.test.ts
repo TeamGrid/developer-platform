@@ -195,7 +195,7 @@ describe('Mongo OAuth browser store', () => {
   })
 })
 
-async function harness(timeout = 30000) {
+async function harness(timeout = 30000, workspaceUiMode?: 'subdomain' | 'path') {
   const m = memory(),
     publications: OAuthRoutingRecord[][] = [],
     calls: { url: string; init: RequestInit }[] = []
@@ -279,6 +279,7 @@ async function harness(timeout = 30000) {
     scopes: ['workspace:read', 'tasks:read'],
     selectionUiOrigin: 'https://login.example.test/',
     workspaceRootDomain: 'example.test',
+    workspaceUiMode,
     selectionServiceSecret: secret,
     store,
     directory: {
@@ -390,6 +391,50 @@ async function harness(timeout = 30000) {
   }
 }
 describe('Federated OAuth browser broker', () => {
+  it('rejects unsupported routing modes before accepting browser requests', async () => {
+    await expect(harness(30000, 'remote' as 'path')).rejects.toThrow('Invalid OAuth browser policy')
+  })
+  it.each(['../escape', '//evil.test', 'work/..', 'other?request=x'])(
+    'rejects path-mode workspace slug %s before navigation or provider preparation',
+    async (workspaceSlug) => {
+      const h = await harness(30000, 'path'),
+        flow = await h.start()
+      const selected = await h.internal('select', {
+        requestId: flow.handle,
+        cellId: 'de-test',
+        workspaceId: 'workspace1',
+        workspaceSlug,
+      })
+      expect(selected.status).toBe(400)
+      expect(selected.headers.has('location')).toBe(false)
+      expect(h.calls).toHaveLength(0)
+      expect(h.publications).toHaveLength(0)
+    },
+  )
+  it.each(['de', 'us'])(
+    'routes explicit path-mode %s consent through the configured UI origin and preserves binding',
+    async (region) => {
+      const h = await harness(30000, 'path'),
+        flow = await h.prepare(region),
+        consent = new URL(flow.consent)
+      expect(consent.origin).toBe('https://login.example.test')
+      expect(consent.pathname).toBe('/workspace/developer/oauth/authorize')
+      expect([...consent.searchParams.keys()].sort()).toEqual(['cell', 'region', 'request'])
+      expect(consent.searchParams.get('request')).toBe(flow.handle)
+      expect(consent.searchParams.get('cell')).toBe(`${region}-test`)
+      expect(consent.searchParams.get('region')).toBe(region)
+      const wrongCookie = await h.request(flow.continuation, { headers: { Cookie: 'foreign=1' } })
+      expect(wrongCookie.status).toBe(400)
+      expect(wrongCookie.headers.has('location')).toBe(false)
+      const result = await h.request(flow.resume, { headers: { Cookie: flow.cookie } })
+      expect(result.status).toBe(303)
+      const callback = new URL(required(result.headers.get('location')))
+      expect(callback.origin).toBe('https://host.example.test')
+      expect(callback.searchParams.get('iss')).toBe(issuer)
+      expect(callback.searchParams.get('state')).toBe('state&unicode-ä')
+      expect(h.publications).toHaveLength(1)
+    },
+  )
   it('stores only validated OAuth fields and cookie hashes; selection sees one opaque handle', async () => {
     const h = await harness(),
       flow = await h.start({ ui_locales: 'de', region: 'us', unknown: 'ignored' })

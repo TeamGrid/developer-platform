@@ -91,6 +91,7 @@ export function parseServiceConfig(input) {
       'writesEnabled',
       'selectionUiOrigin',
       'workspaceRootDomain',
+      'workspaceUiMode',
       'selectionServiceSecret',
       'cells',
       'clientPolicyFile',
@@ -106,6 +107,11 @@ export function parseServiceConfig(input) {
     if (resource.origin !== issuer.origin || resource.pathname !== '/mcp') unavailable()
     const selectionUiOrigin = https(input.selectionUiOrigin, true).href
     const workspaceRootDomain = text(input.workspaceRootDomain, /^[a-z0-9.-]+$/, 253)
+    if (
+      input.workspaceUiMode !== undefined &&
+      !['subdomain', 'path'].includes(input.workspaceUiMode)
+    )
+      unavailable()
     const domain = new URL(`https://${workspaceRootDomain}/`)
     if (
       domain.hostname !== workspaceRootDomain ||
@@ -206,6 +212,7 @@ export function parseServiceConfig(input) {
       writesEnabled: flag(input.writesEnabled),
       selectionUiOrigin,
       workspaceRootDomain,
+      ...(input.workspaceUiMode === undefined ? {} : { workspaceUiMode: input.workspaceUiMode }),
       selectionServiceSecret,
       cells,
       mongo,
