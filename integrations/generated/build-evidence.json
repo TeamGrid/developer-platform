@@ -4,7 +4,7 @@
   "publisher": {
     "legalName": "Foundster Corporate Services FZCO",
     "displayName": "Foundster",
-    "identityStatus": "owner-confirmed-vendor-verification-pending"
+    "identityStatus": "openai-business-approved-other-vendors-pending"
   },
   "proposedEndpoint": "https://mcp.teamgrid.app/mcp",
   "apiSource": {
@@ -60,7 +60,7 @@
     },
     {
       "path": "plugins/openai/teamgrid/README.md",
-      "sha256": "f80e0c5073d9363d4a2e8a3b09e09c990158638a216ea4cb0b97ec0b8898aefa"
+      "sha256": "9fd2a90143eca7b147da6320043674db6fd5dce60d62c4113e5b1508d21dd4ba"
     },
     {
       "path": "plugins/openai/teamgrid/plugin.json",
@@ -96,7 +96,7 @@
     },
     {
       "path": "plugins/claude/teamgrid/README.md",
-      "sha256": "f80e0c5073d9363d4a2e8a3b09e09c990158638a216ea4cb0b97ec0b8898aefa"
+      "sha256": "9fd2a90143eca7b147da6320043674db6fd5dce60d62c4113e5b1508d21dd4ba"
     },
     {
       "path": "plugins/claude/teamgrid/.claude-plugin/plugin.json",
@@ -132,7 +132,7 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/README.md",
-      "sha256": "f80e0c5073d9363d4a2e8a3b09e09c990158638a216ea4cb0b97ec0b8898aefa"
+      "sha256": "9fd2a90143eca7b147da6320043674db6fd5dce60d62c4113e5b1508d21dd4ba"
     },
     {
       "path": "plugins/microsoft365/teamgrid/manifest.json",

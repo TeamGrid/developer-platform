@@ -3,7 +3,7 @@
   "publisher": {
     "legalName": "Foundster Corporate Services FZCO",
     "displayName": "Foundster",
-    "identityStatus": "owner-confirmed-vendor-verification-pending"
+    "identityStatus": "openai-business-approved-other-vendors-pending"
   },
   "mcpUrl": "https://mcp.teamgrid.app/mcp",
   "endpointStatus": "proposed-not-deployed",

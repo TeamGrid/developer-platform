@@ -15,13 +15,18 @@ This confirmation does not establish vendor business
 verification, Microsoft program enrollment or the applicability of legal URLs.
 
 Publisher portals were inspected on 2026-10-05. OpenAI's available organization
-is individually verified; Foundster business verification is pending. Microsoft
+shows **Business: Approved**; the owner confirmed this is Foundster's business
+verification. This does not approve or publish the TeamGrid plugin. Microsoft
 recognizes Foundster in the existing personal account's publisher information,
 but only Windows Desktop Applications is registered. Its Microsoft 365 and
 Copilot enrollment requires a work account; the owner deferred creation of that
-account. Claude's submission portal is available and accepts the public source
-repository for validation. These observations are account readiness, not review
-approval. No vendor terms were accepted or plugin published in this inspection.
+account. Claude's directory validation passed on `28722ae` with three warnings
+and two policy holds: the TeamGrid name and GitHub owner resemble the existing
+connector `teamguide`. The portal checked the repository, 16 files, four skills
+and one MCP server; a human review is still needed. Preserve the actual TeamGrid
+identity rather than renaming it to avoid that review. These observations do not
+establish real-host acceptance. No vendor terms were accepted or plugin published
+in this inspection.
 
 ## Current implementation
 
