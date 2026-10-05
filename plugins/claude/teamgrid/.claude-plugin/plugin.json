@@ -1,0 +1,16 @@
+{
+  "name": "teamgrid",
+  "displayName": "TeamGrid",
+  "version": "0.1.0",
+  "description": "Work with TeamGrid projects, tasks, planning, content, CRM and workspace administration.",
+  "author": {
+    "name": "Foundster Corporate Services FZCO",
+    "url": "https://teamgrid.app"
+  },
+  "homepage": "https://teamgrid.app",
+  "repository": "https://github.com/TeamGrid/developer-platform",
+  "license": "MIT",
+  "icon": "./assets/icon.png",
+  "privacyPolicyUrl": "https://web.teamgrid.app/legal/public/privacy/en",
+  "termsOfServiceUrl": "https://web.teamgrid.app/legal/public/account-terms/en"
+}

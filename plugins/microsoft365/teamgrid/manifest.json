@@ -1,0 +1,63 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.29/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.29",
+  "version": "0.1.0",
+  "id": "464912f8-ded5-4bcb-b8b4-923452e0b90d",
+  "developer": {
+    "name": "Foundster",
+    "websiteUrl": "https://teamgrid.app",
+    "privacyUrl": "https://web.teamgrid.app/legal/public/privacy/en",
+    "termsOfUseUrl": "https://web.teamgrid.app/legal/public/account-terms/en"
+  },
+  "name": {
+    "short": "TeamGrid",
+    "full": "TeamGrid for Microsoft 365 Copilot"
+  },
+  "description": {
+    "short": "Projects, tasks, planning and team operations",
+    "full": "Work with TeamGrid projects, tasks, planning, content, CRM and workspace administration."
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "#355CFD",
+  "agentSkills": [
+    {
+      "folder": "./skills/teamgrid-planning-automation"
+    },
+    {
+      "folder": "./skills/teamgrid-project-content"
+    },
+    {
+      "folder": "./skills/teamgrid-sensitive-changes"
+    },
+    {
+      "folder": "./skills/teamgrid-workspace-context"
+    }
+  ],
+  "agentConnectors": [
+    {
+      "id": "teamgrid",
+      "displayName": "TeamGrid",
+      "description": "Work with TeamGrid projects, tasks, planning, content, CRM and workspace administration.",
+      "toolSource": {
+        "remoteMcpServer": {
+          "mcpServerUrl": "https://mcp.teamgrid.app/mcp",
+          "authorization": {
+            "type": "OAuthPluginVault",
+            "referenceId": "UNREGISTERED-TEAMGRID-OAUTH"
+          }
+        }
+      }
+    }
+  ],
+  "copilotAgents": {
+    "declarativeAgents": [
+      {
+        "id": "teamgrid",
+        "file": "declarativeAgent.json"
+      }
+    ]
+  }
+}

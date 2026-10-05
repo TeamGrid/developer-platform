@@ -3,7 +3,9 @@
   "files": {
     "includes": [
       "packages/**/*.ts",
+      "hosting/federated/**/*.mjs",
       "scripts/conformance/**/*.mjs",
+      "scripts/build-ai-integrations.mjs",
       "scripts/check-release-documentation.mjs",
       "scripts/staging-e2e-cleanup.mjs",
       "scripts/staging-e2e-cleanup.test.mjs",

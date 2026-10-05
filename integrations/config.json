@@ -1,0 +1,21 @@
+{
+  "version": "0.1.0",
+  "publisher": {
+    "legalName": "Foundster Corporate Services FZCO",
+    "displayName": "Foundster",
+    "identityStatus": "openai-business-approved-other-vendors-pending"
+  },
+  "mcpUrl": "https://mcp.teamgrid.app/mcp",
+  "endpointStatus": "proposed-not-deployed",
+  "websiteUrl": "https://teamgrid.app",
+  "supportEmail": "support@teamgridapp.com",
+  "supportUrl": "https://teamgrid.app/contact",
+  "privacyUrl": "https://web.teamgrid.app/legal/public/privacy/en",
+  "termsUrl": "https://web.teamgrid.app/legal/public/account-terms/en",
+  "legalUrlStatus": "public-html-and-ai-disclosures-prepared-not-deployed",
+  "microsoft365": {
+    "appId": "464912f8-ded5-4bcb-b8b4-923452e0b90d",
+    "oauthReferenceId": null,
+    "oauthClientId": null
+  }
+}

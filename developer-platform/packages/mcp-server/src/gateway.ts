@@ -8,6 +8,7 @@ import {
   McpAccessDeniedError,
   type McpHttpOptions,
   McpRateLimitError,
+  withinSignal,
 } from './http.js'
 import type { McpToolObservation } from './observability.js'
 
@@ -33,8 +34,12 @@ export type RegionalMcpGatewayOptions = Omit<
 > & {
   /** Fixed regional App issuer owns introspection and delegation. No client-provided URLs. */
   serviceSecret: string
+  /** Fixed private regional endpoint for an additional logical OAuth authority. */
+  providerUrl?: string
   apiBaseUrl: string
   apiOriginSecret?: string
+  /** Additional global registry policy, after exact regional proof and before API use. */
+  verifyOAuthClient?(clientId: string, signal: AbortSignal): Promise<boolean>
   fetch?: typeof fetch
   observe?(
     event:
@@ -111,7 +116,15 @@ export function createRegionalMcpGateway(options: RegionalMcpGatewayOptions) {
   ) {
     throw new Error('Invalid regional MCP gateway configuration.')
   }
-  const provider = new URL('/internal/developer/oauth/access', issuer)
+  const provider = options.providerUrl
+    ? canonicalHttps(options.providerUrl)
+    : new URL('/internal/developer/oauth/access', issuer)
+  const integrationProvider =
+    /^\/internal\/developer\/oauth\/integrations\/[a-z][a-z0-9-]{0,31}\/access$/.test(
+      provider.pathname,
+    )
+  if (provider.pathname !== '/internal/developer/oauth/access' && !integrationProvider)
+    throw new Error('Invalid regional OAuth provider path.')
   const fetcher = options.fetch ?? fetch
   const requests = new AsyncLocalStorage<{ requestId: string; verified?: ProviderResult }>()
   const handler = createTeamGridMcpHttpHandler({
@@ -129,7 +142,8 @@ export function createRegionalMcpGateway(options: RegionalMcpGatewayOptions) {
         redirect: 'error',
         credentials: 'omit',
         headers: {
-          Authorization: `Bearer ${options.serviceSecret}`,
+          [integrationProvider ? 'X-TeamGrid-OAuth-Service-Authorization' : 'Authorization']:
+            `Bearer ${options.serviceSecret}`,
           'Content-Type': 'application/json',
           'X-Request-Id': current.requestId,
         },
@@ -181,6 +195,11 @@ export function createRegionalMcpGateway(options: RegionalMcpGatewayOptions) {
       ) {
         throw new Error('OAuth delegation binding mismatch.')
       }
+      if (
+        options.verifyOAuthClient &&
+        !(await withinSignal(options.verifyOAuthClient(authorization.clientId, signal), signal))
+      )
+        return null
       current.verified = verified
       return authorization
     },

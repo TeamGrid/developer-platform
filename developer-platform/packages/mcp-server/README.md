@@ -25,6 +25,21 @@ installed binary. Hosted OAuth uses `https://mcp-de.teamgrid.app/mcp` in DE and
 `https://mcp-us.teamgrid.app/mcp` in US. A connection selects one Workspace and
 remains subject to its current permissions.
 
+Hosted presentation is selected only from the freshly verified OAuth client ID.
+ChatGPT receives tool-result consent metadata; other clients receive HTTP 403
+scope challenges, including rights first determined by the API. Every consent
+challenge preserves previously approved scopes. For Claude, all modifying tools
+advertise `destructiveHint: true` so its confirmation policy covers creations too.
+This changes metadata, not the underlying authorization or mutation semantics.
+
+Static Microsoft/Claude registrations can be mapped through the operator-only
+`TEAMGRID_MCP_HOST_CLIENTS` JSON array, for example
+`[{"clientId":"your-registered-client-id","host":"microsoft365"}]`.
+Supported profiles are `standard`, `openai`, `anthropic` and `microsoft365`.
+Callback URLs, user agents and request parameters cannot select a host profile.
+The proposed public packages and their outstanding qualification are documented
+in [AI integrations](../../../integrations/README.md).
+
 ```json
 {
   "mcpServers": {
@@ -271,6 +286,66 @@ browser consent, PKCE code exchange, refresh rotation, revocation, CIMD
 registration, regional persistence and the concrete API delegation adapter.
 Custom integrations must provide those dependencies and current authorization;
 accepting arbitrary tokens or sharing an administrator client is invalid.
+
+`createFederatedMcpGateway(options)` adds one logical issuer/resource across a
+fixed cell registry. It requires each cell's private additional-authority
+`providerUrl`, regional API URL and service credentials, plus an authenticated,
+strongly consistent `resolveAccessTokenCell(hash, signal)` adapter. Lookup receives
+only the SHA-256 token hash. The token reaches only the selected provider; that
+provider rechecks the global issuer/resource, grant, workspace and exact cell and
+returns a distinct regional API delegation. No other cell is tried on failure.
+Lookup and execution share the request budget. Existing regional gateway options
+retain their previous behavior when `providerUrl` is omitted.
+
+`createMongoOAuthRoutingDirectory` registers immutable, issuer/resource/kind-bound
+hash routes using a supplied native replica-set collection. Call `initialize(signal)`
+before serving requests. Publication uses majority+journaled writes; lookup uses
+bounded primary linearizable reads. It supplies no credentials, connection string
+or in-memory fallback. Inject `resolve('access', hash, signal)` into the MCP gateway.
+
+`createFederatedOAuthTokenBroker` handles public token and revocation requests.
+It requires global client authentication, admission and directory adapters. Reject
+client identity with `OAuthBrokerInvalidClientError`; infrastructure failures remain
+503. Regional App authentication also runs freshly. On an ambiguous private
+exchange, the broker attempts one explicit receipt recovery with the same nonce
+and original body. It never repeats issuance or tries another cell. Both token
+routes must publish before a response containing tokens reaches the client.
+
+`createFederatedOAuthBrowserBroker` implements authorization, authenticated
+workspace selection, browser continuation and consent resume. It requires a fresh
+client-registry adapter, separate selection-service secret, fixed regional cells,
+selection UI origin and workspace domain. `createMongoOAuthBrowserStore` provides
+bounded ten-minute records with hashed handles/cookies/selection tickets, explicit
+expiry, linearizable reads and journaled majority conditional transitions. Initialize
+its TTL index before serving. The authenticated App derives the workspace and cell;
+the regional consent flow independently rechecks current authority and Passkey.
+The broker publishes the approved code hash route before exposing the exact host
+callback with original state and logical issuer. A failed publication can resume
+with the same valid code; a consumed/revoked code cannot resume.
+
+`createOAuthClientRegistry` supplies static public/Basic/POST authentication and
+CIMD with the regional deterministic client identity. Its Node HTTPS adapter pins
+checked public DNS answers, preserves TLS hostname, rejects redirects/compression,
+and bounds headers/body/time. Operator revocation takes precedence over metadata
+cache; HTTP age/cache directives cap metadata reuse at five minutes. Use the same
+static IDs/secret hashes and CIMD origin policy in each regional App.
+
+`createFederatedMcpRuntime` composes OAuth discovery, browser/token brokers and
+all 208 tools under one public origin. Both global client policy and the owning
+regional authority must remain valid before API use. `createFederatedMcpNodeServer`
+serves the composed handler with OAuth bodies bounded to 16 KiB before processing,
+separate liveness/readiness and clean shutdown. Supply initialized native stores,
+shared admission and an actual functional readiness probe; these APIs do not
+provision storage, install credentials or deploy the public endpoint. See the
+[global OAuth decision](../../../integrations/global-oauth-federation.md)
+for private service authentication, recovery-key provisioning, operating topology
+and remaining launch requirements.
+
+The repository's [private global service](../../hosting/federated/README.md)
+provides executable bootstrap, private configuration/policy loading, native Mongo
+stores, shared admission and bounded dependency readiness in a separate image.
+Its independently pinned driver is outside the published SDK. Actual operator
+inputs, hosting/database provisioning and real vendor acceptance remain required.
 
 
 ## Hosted runtime and private resources

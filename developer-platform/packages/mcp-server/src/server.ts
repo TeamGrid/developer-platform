@@ -27,7 +27,11 @@ import {
   toolScopeChallenge,
 } from './scopeRequirements.js'
 import { boundedSearchMetadata } from './searchCompleteness.js'
-import { toolConsentRequired, toolSecuritySchemes } from './toolAuthorization.js'
+import {
+  toolConsentChallengeResponse,
+  toolConsentRequired,
+  toolSecuritySchemes,
+} from './toolAuthorization.js'
 import { installBoundedToolDiscovery } from './toolDiscovery.js'
 import { enabledMcpTools, type McpToolName, type McpToolProfile } from './toolProfiles.js'
 import { registerWorkTools } from './workTools.js'
@@ -415,17 +419,22 @@ export function createTeamGridMcpServer(
     allowTools,
     denyTools,
     toolProfile = 'core',
+    hostProfile = 'standard',
     requireGrantedScopes = false,
     scopeChallengeTransport = 'http',
+    onHttpScopeChallenge,
     observeTool,
     toolRequestId,
   }: {
     allowTools?: readonly McpToolName[]
     denyTools?: readonly McpToolName[]
     toolProfile?: McpToolProfile
+    hostProfile?: import('./hostProfiles.js').McpHostProfile
     requireGrantedScopes?: boolean
     /** Tool-result OAuth challenges for clients that require them; scope checks are identical. */
     scopeChallengeTransport?: 'http' | 'tool-result'
+    /** Trusted transport hook for scopes first revealed by the API, before any mutation. */
+    onHttpScopeChallenge?: (response: Response) => void
     observeTool?: (event: McpToolObservation) => void
     toolRequestId?: () => string | undefined
   } = {},
@@ -582,19 +591,24 @@ export function createTeamGridMcpServer(
       } catch (error) {
         const authInfo = extra?.http?.authInfo
         const additional = requireGrantedScopes ? resourceScopeChallenge(error, name) : []
-        if (authInfo && additional.some((scope) => !authInfo.scopes.includes(scope)))
-          return finish(
-            toolConsentRequired(
-              {
-                scopes: [...new Set([...requiredToolScopes(name, args[0]), ...additional])] as [
-                  string,
-                  ...string[],
-                ],
-              },
-              authInfo,
-              name,
-            ),
-          )
+        if (authInfo && additional.some((scope) => !authInfo.scopes.includes(scope))) {
+          const challenge = {
+            scopes: [...new Set([...requiredToolScopes(name, args[0]), ...additional])] as [
+              string,
+              ...string[],
+            ],
+          }
+          if (scopeChallengeTransport === 'http' && onHttpScopeChallenge) {
+            onHttpScopeChallenge(toolConsentChallengeResponse(challenge, authInfo, name))
+            return finish({
+              isError: true,
+              content: [
+                { type: 'text', text: 'This action needs additional TeamGrid permissions.' },
+              ],
+            })
+          }
+          return finish(toolConsentRequired(challenge, authInfo, name))
+        }
         return finish(
           toolError(
             error,
@@ -609,6 +623,9 @@ export function createTeamGridMcpServer(
       name,
       {
         ...config,
+        ...(hostProfile === 'anthropic' && !config.annotations?.readOnlyHint
+          ? { annotations: { ...config.annotations, destructiveHint: true } }
+          : {}),
         outputSchema: domainOutputSchema(
           name,
           ['core', 'collaboration', 'governance', 'all'].includes(toolProfile),

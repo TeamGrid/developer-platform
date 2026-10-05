@@ -1,0 +1,171 @@
+{
+  "status": "draft-unqualified",
+  "version": "0.1.0",
+  "publisher": {
+    "legalName": "Foundster Corporate Services FZCO",
+    "displayName": "Foundster",
+    "identityStatus": "openai-business-approved-other-vendors-pending"
+  },
+  "legalUrls": {
+    "privacy": "https://web.teamgrid.app/legal/public/privacy/en",
+    "terms": "https://web.teamgrid.app/legal/public/account-terms/en",
+    "status": "public-html-and-ai-disclosures-prepared-not-deployed"
+  },
+  "proposedEndpoint": "https://mcp.teamgrid.app/mcp",
+  "apiSource": {
+    "schemaVersion": 1,
+    "sourceRepository": "TeamGrid/teamgrid-api",
+    "sourceCommit": "34e77e2f7556d90d68acb54768b80e816dbf28bf",
+    "contractManifest": {
+      "path": "contracts/developer-platform-manifest.json",
+      "bytes": 2361,
+      "sha256": "5aa5f66921cded858a7121cea3ef3e7b135d283b0d48417c878cc62253d6689c"
+    }
+  },
+  "catalogSha256": "065bdaff09078520c7535fdad93030e58da829964142eb0bc75d0f9c06575a56",
+  "counts": {
+    "tools": 208,
+    "reads": 84,
+    "writes": 124
+  },
+  "skills": [
+    "teamgrid-planning-automation",
+    "teamgrid-project-content",
+    "teamgrid-sensitive-changes",
+    "teamgrid-workspace-context"
+  ],
+  "microsoftTarget": "Microsoft 365 Copilot including Cowork",
+  "blockers": [
+    "Global MCP endpoint and issuer are proposed; DE/US routing and old-grant compatibility are unqualified.",
+    "Remaining publisher registrations, MCP-specific legal disclosures and the full review workspace require verification.",
+    "Microsoft OAuth client/reference registration and public package eligibility are unresolved.",
+    "Real-host OAuth escalation, file/export behavior and all 208 operations require acceptance evidence.",
+    "Claude hosted CIMD URL/client_id currently differ; resolve with Anthropic or register an explicit approved client."
+  ],
+  "files": [
+    {
+      "path": "plugins/openai/teamgrid/LICENSE",
+      "sha256": "16fd83942e3a5c8be3860e8f9e3a36c138e8f8fb303bb9af90782e8359a24415"
+    },
+    {
+      "path": "plugins/openai/teamgrid/skills/teamgrid-planning-automation/SKILL.md",
+      "sha256": "fbe816ecda54d653c58e44cf110fb8efa5044ce27bd557aeba33b07dcd1b0779"
+    },
+    {
+      "path": "plugins/openai/teamgrid/skills/teamgrid-project-content/SKILL.md",
+      "sha256": "659cf734578f3fa78c6696effcf1b131b35a01159a124f143bed1960ea297759"
+    },
+    {
+      "path": "plugins/openai/teamgrid/skills/teamgrid-sensitive-changes/SKILL.md",
+      "sha256": "6034cd5f9bb330b3d1c764e630d42f3436fb013455525403faf27a38bc93341e"
+    },
+    {
+      "path": "plugins/openai/teamgrid/skills/teamgrid-workspace-context/SKILL.md",
+      "sha256": "52c510e75e3da06f53d55a7837d81ad72daccd2601617295a8f6b323d02ebb94"
+    },
+    {
+      "path": "plugins/openai/teamgrid/README.md",
+      "sha256": "bb686aae74bc17c0885237d0b1fe96963845e1aafc799849fb61d3c3575035bf"
+    },
+    {
+      "path": "plugins/openai/teamgrid/plugin.json",
+      "sha256": "75503c1743effdf9d614f98ae5953a247c965cfc1124275718561d9141d469f8"
+    },
+    {
+      "path": "plugins/openai/teamgrid/mcp.json",
+      "sha256": "f94a1fa36bc05c130996b0d93c1603f85d72c0bb6d09c024510ea204f9bcf63d"
+    },
+    {
+      "path": "plugins/openai/teamgrid/assets/icon.png",
+      "sha256": "83340441794141e1d39f426e6b7da5777d8d8291853c6f601f8c0ccf26be6e96"
+    },
+    {
+      "path": "plugins/claude/teamgrid/LICENSE",
+      "sha256": "16fd83942e3a5c8be3860e8f9e3a36c138e8f8fb303bb9af90782e8359a24415"
+    },
+    {
+      "path": "plugins/claude/teamgrid/skills/teamgrid-planning-automation/SKILL.md",
+      "sha256": "fbe816ecda54d653c58e44cf110fb8efa5044ce27bd557aeba33b07dcd1b0779"
+    },
+    {
+      "path": "plugins/claude/teamgrid/skills/teamgrid-project-content/SKILL.md",
+      "sha256": "659cf734578f3fa78c6696effcf1b131b35a01159a124f143bed1960ea297759"
+    },
+    {
+      "path": "plugins/claude/teamgrid/skills/teamgrid-sensitive-changes/SKILL.md",
+      "sha256": "6034cd5f9bb330b3d1c764e630d42f3436fb013455525403faf27a38bc93341e"
+    },
+    {
+      "path": "plugins/claude/teamgrid/skills/teamgrid-workspace-context/SKILL.md",
+      "sha256": "52c510e75e3da06f53d55a7837d81ad72daccd2601617295a8f6b323d02ebb94"
+    },
+    {
+      "path": "plugins/claude/teamgrid/README.md",
+      "sha256": "29daa65991959c1f2d5aff3f546f0555bef78564cdc1dd2013d7e869df5033c6"
+    },
+    {
+      "path": "plugins/claude/teamgrid/.claude-plugin/plugin.json",
+      "sha256": "4f759c3330a425a4a005872c2ba87207959b2901b6cfc3d137baf30464ea6ed0"
+    },
+    {
+      "path": "plugins/claude/teamgrid/.mcp.json",
+      "sha256": "ccfe17118ef81ff1ab6e416d65ae2cf17265425b58f807cb659130e934dd3439"
+    },
+    {
+      "path": "plugins/claude/teamgrid/assets/icon.png",
+      "sha256": "83340441794141e1d39f426e6b7da5777d8d8291853c6f601f8c0ccf26be6e96"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/LICENSE",
+      "sha256": "16fd83942e3a5c8be3860e8f9e3a36c138e8f8fb303bb9af90782e8359a24415"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/skills/teamgrid-planning-automation/SKILL.md",
+      "sha256": "fbe816ecda54d653c58e44cf110fb8efa5044ce27bd557aeba33b07dcd1b0779"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/skills/teamgrid-project-content/SKILL.md",
+      "sha256": "659cf734578f3fa78c6696effcf1b131b35a01159a124f143bed1960ea297759"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/skills/teamgrid-sensitive-changes/SKILL.md",
+      "sha256": "6034cd5f9bb330b3d1c764e630d42f3436fb013455525403faf27a38bc93341e"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/skills/teamgrid-workspace-context/SKILL.md",
+      "sha256": "52c510e75e3da06f53d55a7837d81ad72daccd2601617295a8f6b323d02ebb94"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/README.md",
+      "sha256": "29daa65991959c1f2d5aff3f546f0555bef78564cdc1dd2013d7e869df5033c6"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/manifest.json",
+      "sha256": "337a033c5d06d3ef17c4ed1b8c8a235e7dbb6e1779c657eafcc6c094bd5711ae"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/declarativeAgent.json",
+      "sha256": "b6c7fb2be82cddda750422e360dcee90fb839f27ec2a2b256f5492f8db0ca30f"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/plugin.json",
+      "sha256": "32c91ae836f20805cc34457a69951d955f4bd1b59d30d87089df5c36e560af21"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/tools.json",
+      "sha256": "33a08f610c447d83e9d8e6b33ef9264951d062c885e0596064e00d3f6a967acf"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/color.png",
+      "sha256": "83340441794141e1d39f426e6b7da5777d8d8291853c6f601f8c0ccf26be6e96"
+    },
+    {
+      "path": "plugins/microsoft365/teamgrid/outline.png",
+      "sha256": "ca9070a245e61ee51f7f5c5ca66df0dbadf152bb78c67bc0c2a000ec065395fd"
+    },
+    {
+      "path": "integrations/generated/tool-matrix.json",
+      "sha256": "f2e14adc65fe5d2c052d69a0278591c333431a6f49dc4b0dd331a064cf05c079"
+    }
+  ]
+}

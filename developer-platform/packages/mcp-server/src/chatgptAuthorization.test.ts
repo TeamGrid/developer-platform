@@ -10,7 +10,34 @@ const resourceUrl = 'https://mcp.de.example.test/mcp'
 const issuerUrl = 'https://auth.de.example.test/'
 const chatGptClient = 'https://chatgpt.com/oauth/client.json'
 
-function setup(clientId = chatGptClient) {
+const appointmentIntent = {
+  name: 'teamgrid_appointment_create',
+  arguments: {
+    workspaceId: 'workspace-a',
+    idempotencyKey: 'delegated-intent',
+    data: {
+      userId: 'user-2',
+      start: { at: '2026-10-05T09:00:00Z' },
+      end: { at: '2026-10-05T10:00:00Z' },
+    },
+  },
+}
+
+function scopeRefusal(scope = 'appointments:delegated:write') {
+  return new TeamGridApiError({
+    status: 403,
+    errors: [{ code: 'insufficient_scope', status: '403', title: 'Forbidden', detail: 'Denied.' }],
+    transport: {
+      status: 403,
+      attempts: 1,
+      requestId: 'scope-refusal',
+      rateLimit: {},
+      headers: { 'www-authenticate': `Bearer error="insufficient_scope", scope="${scope}"` },
+    },
+  })
+}
+
+function setup(clientId = chatGptClient, registerHost = false) {
   let current: McpAuthorization | null = {
     active: true,
     audience: resourceUrl,
@@ -29,6 +56,7 @@ function setup(clientId = chatGptClient) {
     throw new TeamGridApiError({ status: 403 })
   })
   const productCreate = vi.fn(async () => responseFixture('createProduct', 'product-1'))
+  const appointmentCreate = vi.fn(async () => responseFixture('createAppointment', 'appointment-1'))
   const client = {
     workspace: {
       get: async () => ({
@@ -38,6 +66,7 @@ function setup(clientId = chatGptClient) {
     },
     tasks: { create, list },
     products: { create: productCreate },
+    appointments: { create: appointmentCreate },
   }
   const createDelegatedClient = vi.fn(async () => client as never)
   const handler = createTeamGridMcpHttpHandler({
@@ -46,6 +75,7 @@ function setup(clientId = chatGptClient) {
     region: 'de',
     cellId: 'de-nbg-001',
     toolProfile: 'full',
+    hostClients: registerHost ? [{ clientId, host: 'anthropic' }] : [],
     enabled: () => true,
     writesEnabled: () => true,
     admitRequest: async () => true,
@@ -81,6 +111,7 @@ function setup(clientId = chatGptClient) {
     create,
     list,
     productCreate,
+    appointmentCreate,
     createDelegatedClient,
     update: (changes: Partial<McpAuthorization>) => {
       if (current) current = { ...current, ...changes }
@@ -92,6 +123,217 @@ function setup(clientId = chatGptClient) {
 }
 
 describe('ChatGPT OAuth permission escalation', () => {
+  it.each(['2025-11-25', '2026-07-28'] as const)(
+    'returns late API scope challenges over HTTP to an actual %s standard client',
+    async (version) => {
+      const test = setup('standard-client')
+      test.update({ scopes: ['workspace:read', 'appointments:write'] })
+      test.appointmentCreate.mockImplementationOnce(async () => {
+        throw scopeRefusal()
+      })
+      const client = new Client(
+        { name: 'standard-fixture', version: '1.0.0' },
+        {
+          versionNegotiation: { mode: version === '2025-11-25' ? 'legacy' : { pin: version } },
+        },
+      )
+      let lastResponse: Response | undefined
+      const transport = new StreamableHTTPClientTransport(new URL(resourceUrl), {
+        requestInit: { headers: { Authorization: 'Bearer synthetic-access' } },
+        fetch: async (input, init) => {
+          lastResponse = await test.handler.fetch(new Request(input, init))
+          return lastResponse
+        },
+      })
+      try {
+        await client.connect(transport)
+        await expect(client.callTool(appointmentIntent)).rejects.toThrow()
+        expect(lastResponse?.status).toBe(403)
+        expect(lastResponse?.headers.get('www-authenticate')).toContain(
+          'appointments:delegated:write',
+        )
+        expect(test.appointmentCreate).toHaveBeenCalledOnce()
+        test.update({
+          scopes: ['workspace:read', 'appointments:write', 'appointments:delegated:write'],
+        })
+        const approved = await client.callTool(appointmentIntent)
+        expect(approved.isError).not.toBe(true)
+        expect(test.appointmentCreate).toHaveBeenCalledTimes(2)
+      } finally {
+        await client.close()
+        await test.handler.close()
+      }
+    },
+  )
+
+  it('isolates a delayed HTTP scope refusal from a concurrent successful request', async () => {
+    const test = setup('standard-client')
+    test.update({ scopes: ['workspace:read', 'appointments:write'] })
+    let started: () => void = () => {}
+    let release: () => void = () => {}
+    const began = new Promise<void>((resolve) => {
+      started = resolve
+    })
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    test.appointmentCreate.mockImplementationOnce(async () => {
+      started()
+      await gate
+      throw scopeRefusal()
+    })
+    try {
+      const pending = test.rpc('tools/call', appointmentIntent)
+      await began
+      const read = await test.rpc('tools/call', { name: 'teamgrid_workspace_get', arguments: {} })
+      expect(read.response.status).toBe(200)
+      expect(read.response.headers.has('www-authenticate')).toBe(false)
+      expect(read.message.result.structuredContent.data.id).toBe('workspace-a')
+      release()
+      const denied = await pending
+      expect(denied.response.status).toBe(403)
+      expect(denied.response.headers.get('www-authenticate')).toContain(
+        'appointments:delegated:write',
+      )
+    } finally {
+      release()
+      await test.handler.close()
+    }
+  })
+
+  it.each([chatGptClient, 'standard-client'])(
+    'keeps role, sharing and unrecognized scope errors out of consent for %s',
+    async (clientId) => {
+      const test = setup(clientId)
+      test.update({ scopes: ['workspace:read', 'appointments:write'] })
+      try {
+        for (const failure of [
+          new TeamGridApiError({ status: 403 }),
+          scopeRefusal('credentials:write'),
+        ]) {
+          test.appointmentCreate.mockImplementationOnce(async () => {
+            throw failure
+          })
+          const denied = await test.rpc('tools/call', appointmentIntent)
+          expect(denied.response.status).toBe(200)
+          expect(denied.message.result.isError).toBe(true)
+          expect(denied.response.headers.has('www-authenticate')).toBe(false)
+          expect(denied.message.result._meta?.['mcp/www_authenticate']).toBeUndefined()
+        }
+      } finally {
+        await test.handler.close()
+      }
+    },
+  )
+
+  it.each([
+    ['https://claude.ai/oauth/claude-code-client-metadata', false],
+    ['https://claude.ai/oauth/mcp-oauth-client-metadata', false],
+    ['operator-registered-claude', true],
+  ] as const)(
+    'keeps all 208 tools and requests confirmation for every Claude write: %s',
+    async (id, registered) => {
+      const test = setup(id, registered)
+      try {
+        const tools = []
+        let cursor: string | undefined
+        do {
+          const { message } = await test.rpc('tools/list', cursor ? { cursor } : {})
+          tools.push(...message.result.tools)
+          cursor = message.result.nextCursor
+        } while (cursor)
+        expect(tools).toHaveLength(208)
+        expect(tools.filter((tool) => tool.annotations.readOnlyHint)).toHaveLength(84)
+        for (const tool of tools)
+          expect(tool.annotations.destructiveHint).toBe(!tool.annotations.readOnlyHint)
+        // Scopes and the core create semantics remain unchanged by presentation.
+        expect(
+          tools.find((tool) => tool.name === 'teamgrid_task_create').securitySchemes[0].scopes,
+        ).toEqual(['tasks:write', 'workspace:read'])
+      } finally {
+        await test.handler.close()
+      }
+    },
+  )
+
+  it.each([chatGptClient, 'claude-fixture', 'microsoft-fixture'])(
+    'presents API-derived delegated scopes correctly for %s and preserves the intent',
+    async (clientId) => {
+      const test = setup(clientId)
+      const scopes = ['workspace:read', 'appointments:write', 'tasks:read']
+      test.update({ scopes })
+      test.appointmentCreate.mockImplementationOnce(async () => {
+        throw new TeamGridApiError({
+          status: 403,
+          errors: [
+            { code: 'insufficient_scope', status: '403', title: 'Forbidden', detail: 'Denied.' },
+          ],
+          transport: {
+            status: 403,
+            attempts: 1,
+            requestId: 'scope-refusal',
+            headers: {
+              'www-authenticate':
+                'Bearer error="insufficient_scope", scope="appointments:delegated:write"',
+            },
+            rateLimit: {},
+          },
+        })
+      })
+      const params = {
+        name: 'teamgrid_appointment_create',
+        arguments: {
+          workspaceId: 'workspace-a',
+          idempotencyKey: 'delegated-intent',
+          data: {
+            userId: 'user-2',
+            start: { at: '2026-10-05T09:00:00Z' },
+            end: { at: '2026-10-05T10:00:00Z' },
+          },
+        },
+      }
+      try {
+        const denied = await test.rpc('tools/call', params)
+        const challenge =
+          clientId === chatGptClient
+            ? denied.message.result._meta['mcp/www_authenticate'][0]
+            : denied.response.headers.get('www-authenticate')
+        expect(denied.response.status).toBe(clientId === chatGptClient ? 200 : 403)
+        expect(challenge).toContain(
+          'scope="appointments:delegated:write appointments:write tasks:read workspace:read"',
+        )
+        expect(challenge).toContain(
+          'resource_metadata="https://mcp.de.example.test/.well-known/oauth-protected-resource/mcp"',
+        )
+        expect(test.appointmentCreate).toHaveBeenCalledOnce()
+        // The API refused before mutation. Only separately approved rights can retry.
+        test.update({ scopes: [...scopes, 'appointments:delegated:write'] })
+        const approved = await test.rpc('tools/call', params)
+        expect(approved.response.status).toBe(200)
+        expect(approved.message.result.isError).not.toBe(true)
+        expect(test.appointmentCreate).toHaveBeenCalledTimes(2)
+        expect(test.appointmentCreate.mock.calls[1]).toEqual(test.appointmentCreate.mock.calls[0])
+      } finally {
+        await test.handler.close()
+      }
+    },
+  )
+
+  it('keeps previous permissions in standard HTTP preflight challenges', async () => {
+    const test = setup('standard-client')
+    test.update({ scopes: ['workspace:read', 'projects:read'] })
+    try {
+      const denied = await test.rpc('tools/call', { name: 'teamgrid_tasks_list', arguments: {} })
+      expect(denied.response.status).toBe(403)
+      expect(denied.response.headers.get('www-authenticate')).toContain(
+        'scope="projects:read tasks:read workspace:read"',
+      )
+      expect(test.list).not.toHaveBeenCalled()
+    } finally {
+      await test.handler.close()
+    }
+  })
+
   it('publishes every tool auth policy and its compatibility mirror through bounded discovery', async () => {
     const test = setup()
     try {
