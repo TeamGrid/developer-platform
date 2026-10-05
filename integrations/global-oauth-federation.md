@@ -4,9 +4,10 @@ Decision date: 2026-10-04. Implementation update: 2026-10-05. Regional transport
 MCP routing, a Mongo directory adapter, public token/revocation broker and private
 transactional exchange recovery are implemented in draft PRs. Persisted browser
 requests, authenticated App workspace selection and consent resume with prior
-code-route publication are also implemented. Global client/discovery wiring,
-deployment and host qualification are outstanding. This document does
-not authorize a Production release or claim a working public endpoint.
+code-route publication are also implemented. A bounded static/CIMD client registry
+and composed discovery/OAuth/MCP Node runtime are implemented. Trusted operating
+configuration, database/hosting provisioning, deployment and host qualification
+are outstanding. This document does not authorize a Production release or claim a working public endpoint.
 
 ## Public identity and regional authority
 
@@ -98,9 +99,10 @@ protocol have passed qualification.
 
 `createFederatedOAuthBrowserBroker` validates a fresh registered client, exact
 callback, resource, scope ceiling and S256 PKCE before persisting a request. Native
-HTTP loopback callbacks allow an ephemeral port only when the registered callback
-omits its port. The actual requested callback remains immutable. Unknown optional
-OAuth hints are ignored; secrets, tokens, codes and verifiers are rejected in the
+HTTP loopback callbacks allow an ephemeral request port while keeping the registered
+host/path/query exact, including when registration contains a port
+([RFC 8252](https://www.rfc-editor.org/rfc/rfc8252#section-7.3)). The actual requested
+callback remains immutable. Unknown optional OAuth hints are ignored; secrets, tokens, codes and verifiers are rejected in the
 initial URL. State remains opaque and bounded.
 
 The public endpoints are `GET /oauth/authorize`, `/oauth/continue` and `/oauth/resume`.
@@ -153,6 +155,60 @@ cookies, selection tickets, codes, access/refresh tokens or business payloads ar
 All browser responses disable caching, referrers and framing. Private responses
 have no browser CORS access. Failed/lost selection requires a fresh connection;
 there is no automatic selection or private preparation retry/fanout.
+
+## Global client registry and runtime composition
+
+`createOAuthClientRegistry` uses operator-owned static registrations and an explicit
+CIMD origin policy, read on every resolution. Static public, Basic and secret-POST
+methods are distinct, including canonical UTF-8/form Basic parsing and up to two
+rotation hashes. No raw client secret is persisted or logged. A static revocation
+of a CIMD URL overrides cached metadata and ongoing metadata fetches. Invalid
+operator configuration fails unavailable; an invalid/revoked client fails client
+authentication before any code/token hash lookup.
+
+CIMD requires an exact canonical HTTPS URL identity, public DNS and an operator
+allowlisted origin. The default Node adapter resolves A/AAAA with bounded DNS,
+rejects private/mixed/oversized answers, pins one checked address through HTTPS
+lookup, retains certificate hostname and disables ambient agents. It performs one
+GET without redirects/compression, with 8 KiB headers, 32 KiB body and five-second
+budget. A document must bind its exact client ID and supported code/public-client
+flow. ChatGPT's advertised `none`/`private_key_jwt` methods can negotiate `none`;
+unsupported JWT assertion authentication is never advertised. CIMD record IDs use
+the regional `cimd_` SHA-256 identity. Unknown document fields confer no authority.
+Cache-Control/Age are respected for at most five minutes, with at most 100 cache
+entries and eight coalesced in-flight fetches. Trust/revocation is checked before
+cache use and again after network I/O; failures are never cached.
+
+Configure identical static record IDs, client IDs, callbacks, auth methods,
+rotation hashes and CIMD policy in the global registry and each owning regional
+App. There is no automatic registration/secret synchronization or DCR endpoint.
+Each region still authenticates independently. A partial registration/rotation
+rollout cannot widen authority and can fail connection attempts; qualify parity
+before enabling the entry. Global MCP execution additionally checks the current
+global client registry after the exact regional proof and before API use. Closing
+that global registration therefore stops actions even while regional configuration
+is being updated. Registry/network outages remain unavailable without a new-login
+challenge.
+
+`createFederatedMcpRuntime` publishes exact OAuth discovery and delegates protected
+resource metadata/MCP, browser authorization and token/revocation to the implemented
+handlers. It selects the `full` 208-tool profile with operator-controlled write
+activation. One canonical public origin is required and reserved OAuth/private/
+discovery paths cannot be used as the MCP resource. Discovery advertises only
+implemented auth methods, S256, issuer-bearing replies and CIMD availability.
+The runtime has no DCR/OIDC claim. `createFederatedMcpNodeServer` reuses the bounded
+Node HTTP adapter, enforces the same resource/Host, limits OAuth bodies to 16 KiB
+before parsing (including chunked uploads) and keeps the existing MCP byte limit.
+Shutdown closes the handler and connections. Readiness requires a supplied,
+five-second-bounded functional probe; liveness is not OAuth qualification.
+
+The deployment bootstrap must supply fixed regional origins/credentials,
+initialized native directory/browser collections, the actual static/CIMD policy,
+shared abuse admission and readiness against the chosen database and private
+providers. The existing `teamgrid-mcp-http` binary/container entry remains regional;
+a global deployment needs its own trusted bootstrap using the composed Node APIs.
+No default global connection string, local memory store, automatic secret source,
+database provisioner or public deployment is provided.
 
 ## Credential routing directory
 

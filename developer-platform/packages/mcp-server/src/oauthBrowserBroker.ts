@@ -106,8 +106,7 @@ function matchesRedirect(client: OAuthBrowserClient, value: string) {
   return client.redirectUris.some((registered) => {
     const candidate = redirect(registered)
     if (registered === value) return true
-    if (requested.protocol !== 'http:' || candidate.protocol !== 'http:' || candidate.port)
-      return false
+    if (requested.protocol !== 'http:' || candidate.protocol !== 'http:') return false
     candidate.port = requested.port
     return candidate.href === value
   })

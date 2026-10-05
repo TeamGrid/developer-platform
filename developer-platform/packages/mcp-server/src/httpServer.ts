@@ -6,13 +6,13 @@ import type { ReadableStream as NodeReadableStream } from 'node:stream/web'
 type Handler = { fetch(request: Request): Promise<Response>; close(): Promise<void> }
 class BodyLimitError extends Error {}
 
-async function body(request: IncomingMessage, signal: AbortSignal) {
+async function body(request: IncomingMessage, signal: AbortSignal, maxBytes: number) {
   const chunks: Buffer[] = []
   let size = 0
   for await (const chunk of request.iterator({ destroyOnReturn: false })) {
     signal.throwIfAborted()
     size += chunk.length
-    if (size > 8 * 1024 * 1024) throw new BodyLimitError()
+    if (size > maxBytes) throw new BodyLimitError()
     chunks.push(chunk)
   }
   return new Uint8Array(Buffer.concat(chunks))
@@ -22,7 +22,7 @@ async function body(request: IncomingMessage, signal: AbortSignal) {
 export function createMcpNodeServer(
   resourceUrl: string,
   handler: Handler,
-  options: { ready?(): Promise<boolean> } = {},
+  options: { ready?(): Promise<boolean>; maxBodyBytes?(pathname: string): number } = {},
 ) {
   const resource = new URL(resourceUrl)
   const lifetime = new AbortController()
@@ -96,7 +96,18 @@ export function createMcpNodeServer(
           if (name === undefined || value === undefined) throw new Error('invalid_headers')
           headers.append(name, value)
         }
-        const requestBody = incoming.method === 'POST' ? await body(incoming, signal) : undefined
+        const maxBytes = options.maxBodyBytes?.(url.pathname) ?? 8 * 1024 * 1024
+        if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > 8 * 1024 * 1024) {
+          throw new Error('Invalid HTTP body limit.')
+        }
+        if (Number(incoming.headers['content-length']) > maxBytes) {
+          outgoing.setHeader('Connection', 'close')
+          incoming.resume()
+          reply(413)
+          return
+        }
+        const requestBody =
+          incoming.method === 'POST' ? await body(incoming, signal, maxBytes) : undefined
         const result = await handler.fetch(
           new Request(url, {
             method: incoming.method,

@@ -9,6 +9,11 @@ export {
   type FederatedMcpCell,
   type FederatedMcpGatewayOptions,
 } from './federatedGateway.js'
+export {
+  createFederatedMcpNodeServer,
+  createFederatedMcpRuntime,
+  type FederatedMcpRuntimeOptions,
+} from './federatedRuntime.js'
 export { createRegionalMcpGateway, type RegionalMcpGatewayOptions } from './gateway.js'
 export {
   type McpHostClient,
@@ -26,6 +31,11 @@ export {
   type OAuthBrowserRecord,
   type OAuthBrowserStore,
 } from './oauthBrowserStore.js'
+export {
+  createOAuthClientRegistry,
+  type OAuthClientRegistration,
+  type OAuthClientRegistry,
+} from './oauthClientRegistry.js'
 export {
   createMongoOAuthRoutingDirectory,
   type MongoOAuthRoutingCollection,

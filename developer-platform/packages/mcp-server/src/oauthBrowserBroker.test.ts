@@ -628,26 +628,22 @@ describe('Federated OAuth browser broker', () => {
     })
     expect(new URL(required(result.headers.get('location'))).origin).toBe('http://127.0.0.1:49321')
   })
-  it('keeps explicitly registered native callback ports exact', async () => {
+  it('accepts native ephemeral ports with a registered port and retains the chosen callback', async () => {
     const h = await harness()
     h.client(async () => ({ ...client, redirectUris: ['http://127.0.0.1:49321/callback'] }))
-    const result = await h.request(
-      `/oauth/authorize?${new URLSearchParams({
-        client_id: client.clientId,
-        redirect_uri: 'http://127.0.0.1:49322/callback',
-        response_type: 'code',
-        resource,
-        scope: 'workspace:read tasks:read',
-        code_challenge: 'p'.repeat(43),
-        code_challenge_method: 'S256',
-      })}`,
-    )
-    expect(result.status).toBe(400)
-    expect(h.m.rows.size).toBe(0)
-    expect(h.calls).toHaveLength(0)
-    expect((await h.start({}, 'http://127.0.0.1:49321/callback')).handle).toMatch(
-      /^[A-Za-z0-9_-]{43}$/,
-    )
+    const flow = await h.start({}, 'http://127.0.0.1:49322/callback')
+    const selected = await h.internal('select', {
+      requestId: flow.handle,
+      cellId: 'de-test',
+      workspaceId: 'workspace1',
+      workspaceSlug: 'workspace',
+    })
+    const { continueUrl } = await selected.json()
+    expect((await h.request(continueUrl, { headers: { Cookie: flow.cookie } })).status).toBe(303)
+    const result = await h.request(`/oauth/resume?request=${flow.handle}&code=${code}`, {
+      headers: { Cookie: flow.cookie },
+    })
+    expect(new URL(required(result.headers.get('location'))).origin).toBe('http://127.0.0.1:49322')
   })
   it('keeps admission, feature gates, stream size and deadlines before private work', async () => {
     const h = await harness(20)

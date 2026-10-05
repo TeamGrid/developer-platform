@@ -40,7 +40,13 @@ and separately approved OAuth scopes still apply.
   The App derives fresh workspace placement and retains sensitive-scope Passkey
   consent. Exact cookie/request/workspace/callback binding and code publication
   precede the host redirect. See the [global OAuth decision](global-oauth-federation.md).
-  Global client registry/discovery wiring and the deployed endpoint remain outstanding.
+  `createOAuthClientRegistry` supplies bounded, DNS-pinned CIMD and current static
+  public/Basic/POST authentication. `createFederatedMcpRuntime` composes discovery,
+  both OAuth channels and all 208 tools; its Node transport bounds OAuth bytes before
+  processing. Global client revocation stops API use even before a regional policy
+  rollout completes. Actual trusted registry/store/admission configuration, database/
+  hosting provisioning, readiness qualification and the deployed endpoint remain
+  outstanding.
 
 ```sh
 cd developer-platform

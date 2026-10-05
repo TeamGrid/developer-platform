@@ -8,6 +8,7 @@ import {
   McpAccessDeniedError,
   type McpHttpOptions,
   McpRateLimitError,
+  withinSignal,
 } from './http.js'
 import type { McpToolObservation } from './observability.js'
 
@@ -37,6 +38,8 @@ export type RegionalMcpGatewayOptions = Omit<
   providerUrl?: string
   apiBaseUrl: string
   apiOriginSecret?: string
+  /** Additional global registry policy, after exact regional proof and before API use. */
+  verifyOAuthClient?(clientId: string, signal: AbortSignal): Promise<boolean>
   fetch?: typeof fetch
   observe?(
     event:
@@ -192,6 +195,11 @@ export function createRegionalMcpGateway(options: RegionalMcpGatewayOptions) {
       ) {
         throw new Error('OAuth delegation binding mismatch.')
       }
+      if (
+        options.verifyOAuthClient &&
+        !(await withinSignal(options.verifyOAuthClient(authorization.clientId, signal), signal))
+      )
+        return null
       current.verified = verified
       return authorization
     },

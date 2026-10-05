@@ -323,8 +323,20 @@ The broker publishes the approved code hash route before exposing the exact host
 callback with original state and logical issuer. A failed publication can resume
 with the same valid code; a consumed/revoked code cannot resume.
 
-These libraries do not deploy the public endpoint or wire its global client registry,
-discovery and hosting composition. See the
+`createOAuthClientRegistry` supplies static public/Basic/POST authentication and
+CIMD with the regional deterministic client identity. Its Node HTTPS adapter pins
+checked public DNS answers, preserves TLS hostname, rejects redirects/compression,
+and bounds headers/body/time. Operator revocation takes precedence over metadata
+cache; HTTP age/cache directives cap metadata reuse at five minutes. Use the same
+static IDs/secret hashes and CIMD origin policy in each regional App.
+
+`createFederatedMcpRuntime` composes OAuth discovery, browser/token brokers and
+all 208 tools under one public origin. Both global client policy and the owning
+regional authority must remain valid before API use. `createFederatedMcpNodeServer`
+serves the composed handler with OAuth bodies bounded to 16 KiB before processing,
+separate liveness/readiness and clean shutdown. Supply initialized native stores,
+shared admission and an actual functional readiness probe; these APIs do not
+provision storage, install credentials or deploy the public endpoint. See the
 [global OAuth decision](../../../integrations/global-oauth-federation.md)
 for private service authentication, recovery-key provisioning, operating topology
 and remaining launch requirements.
