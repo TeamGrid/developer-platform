@@ -168,3 +168,20 @@ jobs:
           path: federated-mcp-image-proof.json
           if-no-files-found: error
           retention-days: 90
+
+  verification-gate:
+    name: Verify packages
+    if: always()
+    needs: [verify, hosted-image, federated-image]
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Require every package matrix and image qualification
+        env:
+          PACKAGE_RESULT: ${{ needs.verify.result }}
+          HOSTED_IMAGE_RESULT: ${{ needs.hosted-image.result }}
+          FEDERATED_IMAGE_RESULT: ${{ needs.federated-image.result }}
+        run: |
+          test "$PACKAGE_RESULT" = success
+          test "$HOSTED_IMAGE_RESULT" = success
+          test "$FEDERATED_IMAGE_RESULT" = success
