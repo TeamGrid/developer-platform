@@ -176,6 +176,7 @@ roles: [{role: 'federatedService', db: auth.database}], mechanisms: ['SCRAM-SHA-
       runtimeDirectory: process.env.HOST_FIXTURE_DIR,
       databaseNetwork: 'teamgrid-federation-staging-db',
       browserServiceIps: ['127.0.0.1'],
+      openaiDomainVerificationToken: 'public-fixture-domain-proof'.padEnd(43, 'x'),
     },
   )
   // This fixture artifact contains no credentials and must be readable by host Compose.
@@ -330,6 +331,14 @@ roles: [{role: 'federatedService', db: auth.database}], mechanisms: ['SCRAM-SHA-
 } else if (mode === 'ingress') {
   // The previous native quota probe intentionally exhausts this minute's public allowance.
   await new Promise((resolve) => setTimeout(resolve, 60000 - (Date.now() % 60000) + 50))
+  const challengePath = '/.well-known/openai-apps-challenge'
+  const proof = await request(8443, challengePath)
+  assert.equal(proof.status, 200)
+  assert.equal(proof.text, 'public-fixture-domain-proof'.padEnd(43, 'x'))
+  assert.match(proof.headers['content-type'], /^text\/plain/)
+  assert.equal((await request(8443, challengePath, { method: 'HEAD' })).status, 200)
+  assert.equal((await request(8443, challengePath, { method: 'POST' })).status, 404)
+  assert.equal((await request(8443, `${challengePath}/extra`)).status, 404)
   assert.equal((await request(8443, '/.well-known/oauth-authorization-server')).status, 200)
   assert.equal((await request(8443, '/.well-known/oauth-protected-resource/mcp')).status, 200)
   assert.equal((await request(8443, '/mcp', { method: 'POST', body: '{}' })).status, 401)

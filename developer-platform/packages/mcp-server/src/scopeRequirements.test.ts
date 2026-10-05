@@ -5,6 +5,7 @@ import {
   resourceScopeChallenge,
   toolScopeChallenge,
 } from './scopeRequirements.js'
+import { supportedOAuthScopes, toolScopes } from './toolScopes.js'
 
 const denied = (header = 'Bearer error="insufficient_scope", scope="tasks:read"') =>
   new TeamGridApiError({
@@ -29,6 +30,34 @@ const context = (scopes: string[]) => ({
 })
 
 describe('resource-derived OAuth consent', () => {
+  it('advertises every business-tool and reviewed overlay scope without API-only administration', () => {
+    const advertised = new Set<string>(supportedOAuthScopes)
+    for (const scopes of Object.values(toolScopes))
+      for (const scope of scopes) expect(advertised.has(scope)).toBe(true)
+    for (const scope of [
+      'appointments:delegated:read',
+      'appointments:delegated:write',
+      'absences:delegated:read',
+      'absences:admin:write',
+      'availability:delegated:read',
+      'products:finance:read',
+      'products:finance:write',
+      'project-statements:finance:read',
+      'project-statements:finance:write',
+      'members:pii:read',
+    ])
+      expect(advertised.has(scope)).toBe(true)
+    for (const scope of [
+      'changes:read',
+      'credentials:read',
+      'credentials:write',
+      'service-accounts:read',
+      'service-accounts:write',
+      'resource-grants:read',
+      'resource-grants:write',
+    ])
+      expect(advertised.has(scope)).toBe(false)
+  })
   it('derives invitation PII and only the selected custom-field target', () => {
     expect(requiredToolScopes('teamgrid_invitation_get', { includePii: true })).toContain(
       'members:pii:read',

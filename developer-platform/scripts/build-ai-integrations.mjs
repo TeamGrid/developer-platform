@@ -174,13 +174,20 @@ const description =
 const blockedPrivacy =
   config.privacyUrl ?? 'https://example.invalid/teamgrid/privacy-not-configured'
 const blockedTerms = config.termsUrl ?? 'https://example.invalid/teamgrid/terms-not-configured'
+if (
+  typeof config.supportEmail !== 'string' ||
+  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(config.supportEmail)
+)
+  throw new Error('An existing public publisher support email is required.')
 const authReference = config.microsoft365.oauthReferenceId ?? 'UNREGISTERED-TEAMGRID-OAUTH'
 const legalUrlNotice =
-  config.privacyUrl && config.termsUrl
-    ? 'Existing public TeamGrid privacy and account terms URLs are configured. Their MCP-specific disclosures still require review.'
-    : 'Privacy/terms URLs are unresolved; example.invalid values are deliberate blockers.'
+  config.legalUrlStatus === 'public-html-and-ai-disclosures-prepared-not-deployed'
+    ? 'Server-readable privacy and account terms pages, including a separate AI integration disclosure supplement, are prepared but require deployment and verification.'
+    : config.privacyUrl && config.termsUrl
+      ? 'Existing public TeamGrid privacy and account terms URLs are configured. Their MCP-specific disclosures still require review.'
+      : 'Privacy/terms URLs are unresolved; example.invalid values are deliberate blockers.'
 
-async function common(path) {
+async function common(path, host = 'other') {
   put(`${path}/LICENSE`, license)
   for (const name of skillNames)
     put(
@@ -189,18 +196,18 @@ async function common(path) {
     )
   put(
     `${path}/README.md`,
-    `# TeamGrid integration draft\n\n${description}\n\nPublisher: ${publisher}. ${publisherIdentityNotice}\n\nConnect one TeamGrid workspace through OAuth. The full business catalog contains 208 tools (84 reads and 124 writes). Current workspace roles, sharing, locks and separately approved scopes apply to every call. No API key belongs in this package or in chat.\n\n## Data flow\n\nThe remote connector sends the selected tool name and arguments to ${config.mcpUrl}; the host receives the permitted TeamGrid response. Arguments and responses can contain workspace, project, task, contact, planning, time, content and file/export data, including personal data. An authorized write changes TeamGrid records. Returned data becomes available to the AI host under that host's account and data settings.\n\nThe proposed global gateway processes request and response payloads in Germany before routing to the workspace's DE or US cell. US regional storage therefore does not mean US-only processing. OAuth routing and browser state use private gateway storage with bounded lifetimes; existing TeamGrid records follow TeamGrid retention. This package contains no local executable, hooks or additional data destinations. Actual hosting, retention and MCP-specific legal disclosures must be confirmed before submission.\n\nThis is a generated, unqualified development package. Its proposed global endpoint is not deployed by this build. ${legalUrlNotice} Microsoft OAuth registration remains unresolved; UNREGISTERED values are deliberate blockers. Read integrations/README.md in the source repository before testing or preparing a submission. This package is not ready to publish.\n`,
+    `# TeamGrid integration draft\n\n${description}\n\nPublisher: ${publisher}. ${host === 'openai' ? 'OpenAI business verification is approved; plugin approval is pending.' : publisherIdentityNotice}\nSupport: ${config.supportEmail}\n\nConnect one TeamGrid workspace through OAuth. The full business catalog contains 208 tools (84 reads and 124 writes). Current workspace roles, sharing, locks and separately approved scopes apply to every call. No API key belongs in this package or in chat.\n\n## Data flow\n\nThe remote connector sends the selected tool name and arguments to ${config.mcpUrl}; the host receives the permitted TeamGrid response. Arguments and responses can contain workspace, project, task, contact, planning, time, content and file/export data, including personal data. An authorized write changes TeamGrid records. Returned data becomes available to the AI host under that host's account and data settings.\n\nThe proposed global gateway processes request and response payloads in Germany before routing to the workspace's DE or US cell. US regional storage therefore does not mean US-only processing. OAuth routing and browser state use private gateway storage with bounded lifetimes; existing TeamGrid records follow TeamGrid retention. This package contains no local executable, hooks or additional data destinations. Actual hosting, retention and MCP-specific legal disclosures must be confirmed before submission.\n\nThis is a generated, unqualified development package. Its proposed global endpoint is not deployed by this build. ${legalUrlNotice}${host === 'openai' ? '' : ' Microsoft OAuth registration remains unresolved; UNREGISTERED values are deliberate blockers.'} Read integrations/README.md in the source repository before testing or preparing a submission. This package is not ready to publish.\n`,
   )
 }
 
 const oa = 'plugins/openai/teamgrid'
-await common(oa)
+await common(oa, 'openai')
 const oaManifest = {
   $schema: 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json',
   name: 'teamgrid',
   version: config.version,
   description,
-  author: { name: publisher, url: config.websiteUrl },
+  author: { name: publisher, email: config.supportEmail, url: config.websiteUrl },
   homepage: config.websiteUrl,
   repository: 'https://github.com/TeamGrid/developer-platform',
   license: 'MIT',
@@ -208,12 +215,13 @@ const oaManifest = {
     'com.openai': {
       interface: {
         displayName: 'TeamGrid',
-        shortDescription: 'Projects, tasks, planning and team operations',
+        shortDescription: 'Manage projects and team work',
         longDescription: description,
         developerName: publisher,
         category: 'Productivity',
         capabilities: ['Read', 'Write'],
         websiteURL: config.websiteUrl,
+        supportURL: config.supportUrl,
         privacyPolicyURL: blockedPrivacy,
         termsOfServiceURL: blockedTerms,
         defaultPrompt: [

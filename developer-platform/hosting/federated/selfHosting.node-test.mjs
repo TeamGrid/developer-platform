@@ -78,6 +78,10 @@ test('self-hosted preparation rejects mutable images, implicit/legacy networks a
     { browserServiceIps: ['0.0.0.0/0'] },
     { browserServiceIps: ['127.0.0.1', '127.0.0.1'] },
     { unknown: true },
+    { openaiDomainVerificationToken: '' },
+    { openaiDomainVerificationToken: 'a'.repeat(257) },
+    { openaiDomainVerificationToken: ['a'.repeat(43)] },
+    { openaiDomainVerificationToken: `${'a'.repeat(32)}\nrespond 200` },
   ])
     assert.throws(() =>
       createSelfHostedArtifacts(hostingConfig(), { ...specification(), ...patch }),
@@ -88,6 +92,21 @@ test('self-hosted preparation rejects mutable images, implicit/legacy networks a
       specification(),
     ),
   )
+})
+test('OpenAI domain proof exposes only the exact read-only challenge when explicitly configured', () => {
+  const spec = specification()
+  assert.equal(
+    createSelfHostedArtifacts(hostingConfig(), spec).caddySite.includes('openai-apps-challenge'),
+    false,
+  )
+  const token = 'proof-token-'.padEnd(43, 'x')
+  const site = createSelfHostedArtifacts(hostingConfig(), {
+    ...spec,
+    openaiDomainVerificationToken: token,
+  }).caddySite
+  assert.match(site, /path \/\.well-known\/openai-apps-challenge\s+method GET HEAD/)
+  assert.ok(site.includes(`respond "${token}" 200`))
+  assert.ok(site.includes('respond 404'))
 })
 test('CLI preparation requires closed private inputs and never overwrites an existing artifact directory', {
   skip: process.platform === 'win32',

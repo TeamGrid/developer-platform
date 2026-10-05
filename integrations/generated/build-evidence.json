@@ -7,9 +7,9 @@
     "identityStatus": "openai-business-approved-other-vendors-pending"
   },
   "legalUrls": {
-    "privacy": "https://web.teamgrid.app/privacy",
-    "terms": "https://web.teamgrid.app/terms",
-    "status": "existing-public-pages-mcp-disclosure-review-pending"
+    "privacy": "https://web.teamgrid.app/legal/public/privacy/en",
+    "terms": "https://web.teamgrid.app/legal/public/account-terms/en",
+    "status": "public-html-and-ai-disclosures-prepared-not-deployed"
   },
   "proposedEndpoint": "https://mcp.teamgrid.app/mcp",
   "apiSource": {
@@ -65,11 +65,11 @@
     },
     {
       "path": "plugins/openai/teamgrid/README.md",
-      "sha256": "a71608fafafe8b4ff75d8d94d4c21fdb8437e8ef024371961334be246555044a"
+      "sha256": "bb686aae74bc17c0885237d0b1fe96963845e1aafc799849fb61d3c3575035bf"
     },
     {
       "path": "plugins/openai/teamgrid/plugin.json",
-      "sha256": "0a23e96a2655b5a9ea7791b4bd3abf91050e5176c0ef147b6faf0fcdf4fcbcb3"
+      "sha256": "75503c1743effdf9d614f98ae5953a247c965cfc1124275718561d9141d469f8"
     },
     {
       "path": "plugins/openai/teamgrid/mcp.json",
@@ -101,11 +101,11 @@
     },
     {
       "path": "plugins/claude/teamgrid/README.md",
-      "sha256": "a71608fafafe8b4ff75d8d94d4c21fdb8437e8ef024371961334be246555044a"
+      "sha256": "29daa65991959c1f2d5aff3f546f0555bef78564cdc1dd2013d7e869df5033c6"
     },
     {
       "path": "plugins/claude/teamgrid/.claude-plugin/plugin.json",
-      "sha256": "864172cc87620ed45a5ffca2fae725ab4664c96b2d77af67efaf1e82aba6bbff"
+      "sha256": "4f759c3330a425a4a005872c2ba87207959b2901b6cfc3d137baf30464ea6ed0"
     },
     {
       "path": "plugins/claude/teamgrid/.mcp.json",
@@ -137,11 +137,11 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/README.md",
-      "sha256": "a71608fafafe8b4ff75d8d94d4c21fdb8437e8ef024371961334be246555044a"
+      "sha256": "29daa65991959c1f2d5aff3f546f0555bef78564cdc1dd2013d7e869df5033c6"
     },
     {
       "path": "plugins/microsoft365/teamgrid/manifest.json",
-      "sha256": "020bb696acba87891e2858faa220fb4f7cd70c2edfaa2f18f29a783844cf7271"
+      "sha256": "337a033c5d06d3ef17c4ed1b8c8a235e7dbb6e1779c657eafcc6c094bd5711ae"
     },
     {
       "path": "plugins/microsoft365/teamgrid/declarativeAgent.json",

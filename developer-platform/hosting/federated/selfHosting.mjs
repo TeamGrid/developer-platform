@@ -38,6 +38,7 @@ export function createSelfHostedArtifacts(input, specification) {
     'runtimeDirectory',
     'databaseNetwork',
     'browserServiceIps',
+    'openaiDomainVerificationToken',
   ]
   if (
     !specification ||
@@ -55,7 +56,10 @@ export function createSelfHostedArtifacts(input, specification) {
     specification.browserServiceIps.length < 1 ||
     specification.browserServiceIps.length > 16 ||
     new Set(specification.browserServiceIps).size !== specification.browserServiceIps.length ||
-    specification.browserServiceIps.some((ip) => typeof ip !== 'string' || !isIP(ip))
+    specification.browserServiceIps.some((ip) => typeof ip !== 'string' || !isIP(ip)) ||
+    (specification.openaiDomainVerificationToken !== undefined &&
+      (typeof specification.openaiDomainVerificationToken !== 'string' ||
+        !/^[A-Za-z0-9_-]{32,256}$/.test(specification.openaiDomainVerificationToken)))
   )
     unavailable()
   const host = new URL(config.issuer).host
@@ -156,6 +160,19 @@ export function createSelfHostedArtifacts(input, specification) {
   ].join(' ')
   const caddySite = `${host} {
   # Require the managed global URI/header redaction block before admitting this site.
+${
+  specification.openaiDomainVerificationToken === undefined
+    ? ''
+    : `  @openaiVerification {
+    path /.well-known/openai-apps-challenge
+    method GET HEAD
+  }
+  handle @openaiVerification {
+    header Content-Type "text/plain; charset=utf-8"
+    respond "${specification.openaiDomainVerificationToken}" 200
+  }
+`
+}
   @private path /internal/oauth/browser/details /internal/oauth/browser/select
   handle @private {
     @trusted {

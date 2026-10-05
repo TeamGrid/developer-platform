@@ -73,6 +73,14 @@ addresses. Measure the actual direct peer separately for DE's same-host Docker
 route and US's external route; bridge/NAT addresses may differ. Admit only the
 exact verified addresses, never a broad private subnet or forwarded-header claim.
 
+For OpenAI submission, the deployment JSON may additionally contain
+`openaiDomainVerificationToken`, taken from this plugin's portal connection dialog.
+This public ownership proof is rendered as plain text only for GET/HEAD on the
+exact `/.well-known/openai-apps-challenge` path. It grants no API/OAuth access.
+Inventory any existing proof before installing it; never overwrite a different
+plugin's verification token. The proof remains bound to the admitted deployment
+and Caddy file digests. Omission leaves this path unavailable.
+
 ```sh
 TEAMGRID_FEDERATION_CONFIG_FILE=<absolute-private-service-file> \
 TEAMGRID_FEDERATION_DEPLOYMENT_FILE=<absolute-private-deployment-file> \

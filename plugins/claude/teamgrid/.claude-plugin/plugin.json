@@ -11,6 +11,6 @@
   "repository": "https://github.com/TeamGrid/developer-platform",
   "license": "MIT",
   "icon": "./assets/icon.png",
-  "privacyPolicyUrl": "https://web.teamgrid.app/privacy",
-  "termsOfServiceUrl": "https://web.teamgrid.app/terms"
+  "privacyPolicyUrl": "https://web.teamgrid.app/legal/public/privacy/en",
+  "termsOfServiceUrl": "https://web.teamgrid.app/legal/public/account-terms/en"
 }

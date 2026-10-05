@@ -6,8 +6,8 @@
   "developer": {
     "name": "Foundster",
     "websiteUrl": "https://teamgrid.app",
-    "privacyUrl": "https://web.teamgrid.app/privacy",
-    "termsOfUseUrl": "https://web.teamgrid.app/terms"
+    "privacyUrl": "https://web.teamgrid.app/legal/public/privacy/en",
+    "termsOfUseUrl": "https://web.teamgrid.app/legal/public/account-terms/en"
   },
   "name": {
     "short": "TeamGrid",

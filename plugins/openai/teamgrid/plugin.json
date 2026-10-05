@@ -5,6 +5,7 @@
   "description": "Work with TeamGrid projects, tasks, planning, content, CRM and workspace administration.",
   "author": {
     "name": "Foundster Corporate Services FZCO",
+    "email": "support@teamgridapp.com",
     "url": "https://teamgrid.app"
   },
   "homepage": "https://teamgrid.app",
@@ -14,7 +15,7 @@
     "com.openai": {
       "interface": {
         "displayName": "TeamGrid",
-        "shortDescription": "Projects, tasks, planning and team operations",
+        "shortDescription": "Manage projects and team work",
         "longDescription": "Work with TeamGrid projects, tasks, planning, content, CRM and workspace administration.",
         "developerName": "Foundster Corporate Services FZCO",
         "category": "Productivity",
@@ -23,8 +24,9 @@
           "Write"
         ],
         "websiteURL": "https://teamgrid.app",
-        "privacyPolicyURL": "https://web.teamgrid.app/privacy",
-        "termsOfServiceURL": "https://web.teamgrid.app/terms",
+        "supportURL": "https://teamgrid.app/contact",
+        "privacyPolicyURL": "https://web.teamgrid.app/legal/public/privacy/en",
+        "termsOfServiceURL": "https://web.teamgrid.app/legal/public/account-terms/en",
         "defaultPrompt": [
           "Summarize the current TeamGrid project status.",
           "Create the TeamGrid task I describe."

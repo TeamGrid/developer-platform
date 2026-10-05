@@ -3,6 +3,7 @@
 Work with TeamGrid projects, tasks, planning, content, CRM and workspace administration.
 
 Publisher: Foundster Corporate Services FZCO. OpenAI business verification is approved. Other vendor enrollment and verification remain pending. This does not establish approval of this plugin.
+Support: support@teamgridapp.com
 
 Connect one TeamGrid workspace through OAuth. The full business catalog contains 208 tools (84 reads and 124 writes). Current workspace roles, sharing, locks and separately approved scopes apply to every call. No API key belongs in this package or in chat.
 
@@ -12,4 +13,4 @@ The remote connector sends the selected tool name and arguments to https://mcp.t
 
 The proposed global gateway processes request and response payloads in Germany before routing to the workspace's DE or US cell. US regional storage therefore does not mean US-only processing. OAuth routing and browser state use private gateway storage with bounded lifetimes; existing TeamGrid records follow TeamGrid retention. This package contains no local executable, hooks or additional data destinations. Actual hosting, retention and MCP-specific legal disclosures must be confirmed before submission.
 
-This is a generated, unqualified development package. Its proposed global endpoint is not deployed by this build. Existing public TeamGrid privacy and account terms URLs are configured. Their MCP-specific disclosures still require review. Microsoft OAuth registration remains unresolved; UNREGISTERED values are deliberate blockers. Read integrations/README.md in the source repository before testing or preparing a submission. This package is not ready to publish.
+This is a generated, unqualified development package. Its proposed global endpoint is not deployed by this build. Server-readable privacy and account terms pages, including a separate AI integration disclosure supplement, are prepared but require deployment and verification. Microsoft OAuth registration remains unresolved; UNREGISTERED values are deliberate blockers. Read integrations/README.md in the source repository before testing or preparing a submission. This package is not ready to publish.
