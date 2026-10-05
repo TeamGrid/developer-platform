@@ -6,6 +6,11 @@
     "displayName": "Foundster",
     "identityStatus": "openai-business-approved-other-vendors-pending"
   },
+  "legalUrls": {
+    "privacy": "https://web.teamgrid.app/privacy",
+    "terms": "https://web.teamgrid.app/terms",
+    "status": "existing-public-pages-mcp-disclosure-review-pending"
+  },
   "proposedEndpoint": "https://mcp.teamgrid.app/mcp",
   "apiSource": {
     "schemaVersion": 1,
@@ -32,7 +37,7 @@
   "microsoftTarget": "Microsoft 365 Copilot including Cowork",
   "blockers": [
     "Global MCP endpoint and issuer are proposed; DE/US routing and old-grant compatibility are unqualified.",
-    "Publisher registrations, legal URLs and the full review workspace require verification.",
+    "Remaining publisher registrations, MCP-specific legal disclosures and the full review workspace require verification.",
     "Microsoft OAuth client/reference registration and public package eligibility are unresolved.",
     "Real-host OAuth escalation, file/export behavior and all 208 operations require acceptance evidence.",
     "Claude hosted CIMD URL/client_id currently differ; resolve with Anthropic or register an explicit approved client."
@@ -60,11 +65,11 @@
     },
     {
       "path": "plugins/openai/teamgrid/README.md",
-      "sha256": "9fd2a90143eca7b147da6320043674db6fd5dce60d62c4113e5b1508d21dd4ba"
+      "sha256": "a71608fafafe8b4ff75d8d94d4c21fdb8437e8ef024371961334be246555044a"
     },
     {
       "path": "plugins/openai/teamgrid/plugin.json",
-      "sha256": "4de739ab7b16775f37d4bd909aedf1fe1026f0633967d2f50b9f544ae77a7837"
+      "sha256": "0a23e96a2655b5a9ea7791b4bd3abf91050e5176c0ef147b6faf0fcdf4fcbcb3"
     },
     {
       "path": "plugins/openai/teamgrid/mcp.json",
@@ -96,11 +101,11 @@
     },
     {
       "path": "plugins/claude/teamgrid/README.md",
-      "sha256": "9fd2a90143eca7b147da6320043674db6fd5dce60d62c4113e5b1508d21dd4ba"
+      "sha256": "a71608fafafe8b4ff75d8d94d4c21fdb8437e8ef024371961334be246555044a"
     },
     {
       "path": "plugins/claude/teamgrid/.claude-plugin/plugin.json",
-      "sha256": "5d4eb40396f48100ee2ee63f6ca4321ec09c0747f95dd665906aa9877b891fb7"
+      "sha256": "864172cc87620ed45a5ffca2fae725ab4664c96b2d77af67efaf1e82aba6bbff"
     },
     {
       "path": "plugins/claude/teamgrid/.mcp.json",
@@ -132,11 +137,11 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/README.md",
-      "sha256": "9fd2a90143eca7b147da6320043674db6fd5dce60d62c4113e5b1508d21dd4ba"
+      "sha256": "a71608fafafe8b4ff75d8d94d4c21fdb8437e8ef024371961334be246555044a"
     },
     {
       "path": "plugins/microsoft365/teamgrid/manifest.json",
-      "sha256": "9190c0c106ff6c88f0f6875d1ff6d118ab1e2267c7597059cedc6ff477c2cdf9"
+      "sha256": "020bb696acba87891e2858faa220fb4f7cd70c2edfaa2f18f29a783844cf7271"
     },
     {
       "path": "plugins/microsoft365/teamgrid/declarativeAgent.json",

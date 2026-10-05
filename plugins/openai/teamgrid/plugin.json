@@ -23,8 +23,8 @@
           "Write"
         ],
         "websiteURL": "https://teamgrid.app",
-        "privacyPolicyURL": "https://example.invalid/teamgrid/privacy-not-configured",
-        "termsOfServiceURL": "https://example.invalid/teamgrid/terms-not-configured",
+        "privacyPolicyURL": "https://web.teamgrid.app/privacy",
+        "termsOfServiceURL": "https://web.teamgrid.app/terms",
         "defaultPrompt": [
           "Summarize the current TeamGrid project status.",
           "Create the TeamGrid task I describe."

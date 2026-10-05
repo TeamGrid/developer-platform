@@ -28,6 +28,17 @@ identity rather than renaming it to avoid that review. These observations do not
 establish real-host acceptance. No vendor terms were accepted or plugin published
 in this inspection.
 
+Existing public legal pages are confirmed on 2026-10-05:
+[Privacy Notice](https://web.teamgrid.app/privacy) and
+[Account and User Terms](https://web.teamgrid.app/terms). Both open without a
+login and resolve to the current version `2026-07-14.2`, with German and English
+documents naming Foundster. The Sign-up acceptance component links these same
+versioned documents. Their existing integration/third-party clauses are the
+starting point; the remaining review concerns the specific AI hosts, authorized
+tool arguments/results, OAuth access/revocation, retention and DE processing of
+US gateway payloads. Public accessibility is confirmed, not complete legal
+coverage of the proposed integration. No existing legal version was edited.
+
 ## Current implementation
 
 - Verified OAuth client identities select consent and annotation presentation.
@@ -45,9 +56,9 @@ in this inspection.
   with agent skills; all 208 explicit tools remain represented.
 - Claude includes the directory icon and legal-link fields. Each package README
   describes tool arguments, returned data, authorized changes and the proposed
-  Germany gateway processing for both DE and US workspaces. Unverified legal
-  URLs remain deliberately blocked; CLI validation does not establish directory
-  acceptance or real-host behavior.
+  Germany gateway processing for both DE and US workspaces. Existing public
+  legal URLs are configured; MCP-specific disclosures remain under review.
+  CLI validation does not establish directory acceptance or real-host behavior.
 - The corresponding TeamGrid app change accepts Claude Code's exact registered
   `localhost`/IP-loopback callbacks without a registration port. An ephemeral
   request port is permitted, while the code exchange binds the actual selected
@@ -114,9 +125,9 @@ metadata checks are not successful live calls or host acceptance.
    in TeamGrid and put the real Enterprise Token Store reference ID in config.
    Cowork and declarative plugin fields are different (`referenceId` vs
    `reference_id`) and both must reference that actual registration.
-3. Verify the legal URLs for this TeamGrid product and review global gateway
-   processing. Existing regional storage does not imply entirely regional data
-   processing when a global TLS gateway handles payloads.
+3. Review the existing TeamGrid legal documents for the proposed MCP data flow
+   and global gateway processing. Existing regional storage does not imply
+   entirely regional data processing when a global TLS gateway handles payloads.
 4. Resolve the hosted Claude identity mismatch or register an explicit approved
    client. On 2026-10-04, the document at
    `https://claude.ai/api/oauth/mcp-oauth-client-metadata` returned the client ID
