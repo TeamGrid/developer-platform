@@ -237,6 +237,16 @@ entry remains regional. The new CI image job tests but does not publish or deplo
 the global service. Operator inputs and actual database/hosting still require
 provisioning through the admitted release path.
 
+The selected hosting model is TeamGrid-owned infrastructure, with the proposed
+first global process in DE and fixed DE/US regional authorities. The
+[self-hosting preparer](../developer-platform/hosting/federated/self-hosting.md)
+produces two bounded replicas, isolated external ingress/DB networks, an exact
+Caddy site and a review-only Caddy network patch from disabled private inputs.
+It exposes no host ports or credentials and performs no external mutation. The
+dedicated metadata DB lifecycle remains separate from application release and
+rollback. A DE gateway processes US MCP payloads in DE; actual data-flow/legal
+and HA/restore qualification still precede public activation.
+
 ## Credential routing directory
 
 Choose a bounded hash directory instead of changing existing opaque credentials

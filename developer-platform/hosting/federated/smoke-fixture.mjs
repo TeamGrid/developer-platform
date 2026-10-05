@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import { createHash, randomBytes } from 'node:crypto'
 import { chmodSync, chownSync, readFileSync, writeFileSync } from 'node:fs'
 import { request as nodeRequest } from 'node:http'
-import { createServer } from 'node:https'
+import { createServer, request as httpsRequest } from 'node:https'
 import { createRequire } from 'node:module'
 import { supportedOAuthScopes } from '/opt/teamgrid/developer-platform/packages/mcp-server/dist/toolScopes.js'
 
@@ -21,12 +21,16 @@ const save = (name, value) => {
   chmodSync(file(name), 0o600)
   if (process.getuid() === 0) chownSync(file(name), 1000, 1000)
 }
-async function request(port, path, { method = 'GET', body, headers } = {}) {
+async function request(port, path, { method = 'GET', body, headers, localAddress } = {}) {
   return new Promise((resolve, reject) => {
-    const req = nodeRequest(
-      `http://127.0.0.1:${port}${path}`,
+    const req = (port === 8443 ? httpsRequest : nodeRequest)(
+      `${port === 8443 ? 'https' : 'http'}://127.0.0.1:${port}${path}`,
       {
         method,
+        localAddress,
+        ...(port === 8443
+          ? { ca: readFileSync(`${root}/ca.pem`), servername: 'mcp.example.test' }
+          : {}),
         headers: { Host: 'mcp.example.test', ...headers },
         signal: AbortSignal.timeout(12000),
       },
@@ -43,7 +47,16 @@ async function request(port, path, { method = 'GET', body, headers } = {}) {
         )
       },
     )
-    req.on('error', reject)
+    req.on('error', (cause) =>
+      reject(
+        new Error(
+          `Fixture request failed: ${mode} port=${port} path=${new URL(path, issuer).pathname}`,
+          {
+            cause,
+          },
+        ),
+      ),
+    )
     req.end(body)
   })
 }
@@ -74,6 +87,9 @@ if (mode === 'seed') {
     Buffer.concat([readFileSync(`${root}/key.pem`), readFileSync(`${root}/ca.pem`)]),
   )
   privateRootFile('mongo-ca.pem', readFileSync(`${root}/ca.pem`))
+  const { createSelfHostedArtifacts, caddyRuntimeRedaction } = await import(
+    '/opt/teamgrid/developer-platform/hosting/federated/selfHosting.mjs'
+  )
   // Local fixture only: the initial root identity provisions exactly one isolated DB/role.
   privateRootFile(
     'mongo-bootstrap.js',
@@ -146,6 +162,37 @@ roles: [{role: 'federatedService', db: auth.database}], mechanisms: ['SCRAM-SHA-
       },
     ],
   })
+  const artifacts = createSelfHostedArtifacts(
+    {
+      ...config,
+      listen: { host: '0.0.0.0', port: 8080 },
+      clientPolicyFile: '/run/teamgrid-federation/clients.json',
+    },
+    {
+      version: 1,
+      project: 'teamgrid-federation-staging',
+      sourceRevision: 'a'.repeat(40),
+      image: `ghcr.io/teamgrid/teamgrid-federated-mcp@sha256:${'b'.repeat(64)}`,
+      runtimeDirectory: process.env.HOST_FIXTURE_DIR,
+      databaseNetwork: 'teamgrid-federation-staging-db',
+      browserServiceIps: ['127.0.0.1'],
+    },
+  )
+  // This fixture artifact contains no credentials and must be readable by host Compose.
+  writeFileSync(`${root}/compose.json`, JSON.stringify(artifacts.compose), { mode: 0o644 })
+  const site = artifacts.caddySite
+    .replace(
+      'mcp.example.test {',
+      'https://mcp.example.test:8443 {\n  tls /fixture/ca.pem /fixture/key.pem',
+    )
+    .replaceAll('teamgrid-federation-staging-a:8080', '127.0.0.1:8080')
+    .replaceAll('teamgrid-federation-staging-b:8080', '127.0.0.1:8081')
+  writeFileSync(
+    `${root}/Caddyfile`,
+    `{\n  admin off\n  auto_https off\n  ${caddyRuntimeRedaction()}\n}\n${site}`,
+    { mode: 0o600 },
+  )
+  chownSync(`${root}/Caddyfile`, 1000, 1000)
 } else if (mode === 'provider') {
   const metadata = {
     issuer,
@@ -239,6 +286,10 @@ roles: [{role: 'federatedService', db: auth.database}], mechanisms: ['SCRAM-SHA-
         ),
       )
     }
+    // Earlier checks may have used the preceding quota window. TTL retains its counters.
+    if (Date.now() % 60000 > 40000)
+      await new Promise((resolve) => setTimeout(resolve, 60000 - (Date.now() % 60000) + 50))
+    const quotaWindow = Math.floor(Date.now() / 60000)
     const results = await Promise.all(
       Array.from({ length: 32 }, (_, i) =>
         request(i % 2 ? 8080 : 8081, '/.well-known/oauth-authorization-server'),
@@ -246,9 +297,18 @@ roles: [{role: 'federatedService', db: auth.database}], mechanisms: ['SCRAM-SHA-
     )
     assert.ok(results.some((value) => value.status === 200))
     assert.ok(results.some((value) => value.status === 429))
-    assert.ok(results.filter((value) => value.status === 200).length < 25)
-    assert.ok(results.every((value) => [200, 429].includes(value.status)))
-    assert.equal(await db.collection('admission').countDocuments(), 2)
+    assert.ok(results.filter((value) => value.status === 200).length <= 25)
+    assert.ok(
+      results.every((value) => [200, 429].includes(value.status)),
+      JSON.stringify(results.map((value) => ({ status: value.status, text: value.text }))),
+    )
+    assert.equal(Math.floor(Date.now() / 60000), quotaWindow)
+    assert.equal(
+      await db.collection('admission').countDocuments({
+        expiresAt: new Date((quotaWindow + 3) * 60000),
+      }),
+      2,
+    )
   } finally {
     await client.close()
   }
@@ -267,6 +327,63 @@ roles: [{role: 'federatedService', db: auth.database}], mechanisms: ['SCRAM-SHA-
   process.stdout.write(
     'Federated image qualification passed: authenticated TLS replica-set stores with a collection-scoped service role, TLS private readiness, two-instance quotas, fresh policy revocation, hashed browser storage and independent global closure.\n',
   )
+} else if (mode === 'ingress') {
+  // The previous native quota probe intentionally exhausts this minute's public allowance.
+  await new Promise((resolve) => setTimeout(resolve, 60000 - (Date.now() % 60000) + 50))
+  assert.equal((await request(8443, '/.well-known/oauth-authorization-server')).status, 200)
+  assert.equal((await request(8443, '/.well-known/oauth-protected-resource/mcp')).status, 200)
+  assert.equal((await request(8443, '/mcp', { method: 'POST', body: '{}' })).status, 401)
+  for (const path of ['/healthz', '/readyz', '/internal/developer/oauth/access', '/unknown'])
+    assert.equal((await request(8443, path)).status, 404)
+  const secret = 'b'.repeat(48)
+  const privateRequest = {
+    method: 'POST',
+    body: JSON.stringify({ requestId: 'x'.repeat(43) }),
+    headers: {
+      'Content-Type': 'application/json',
+      'X-TeamGrid-OAuth-Browser-Service-Authorization': `Bearer ${secret}`,
+    },
+  }
+  const untrusted = await request(8443, '/internal/oauth/browser/details', {
+    ...privateRequest,
+    localAddress: '127.0.0.2',
+    headers: { ...privateRequest.headers, 'X-Forwarded-For': '127.0.0.1' },
+  })
+  assert.equal(untrusted.status, 403)
+  const trusted = await request(8443, '/internal/oauth/browser/details', privateRequest)
+  assert.equal(trusted.status, 400) // Passed ingress/service authentication; unknown request handle.
+  const large = await request(8443, '/oauth/token', { method: 'POST', body: 'x'.repeat(16385) })
+  assert.equal(large.status, 413)
+  process.stdout.write(
+    'Federated Caddy qualification passed: canonical discovery/MCP, private source restriction without forwarded-header trust, hidden health/internal paths and OAuth body limits.\n',
+  )
+} else if (mode === 'proxy-outage') {
+  const result = await request(8443, '/oauth/token?code=tg_log_probe_code', {
+    method: 'POST',
+    body: 'grant_type=authorization_code',
+    headers: {
+      Authorization: 'Bearer tg_log_probe_bearer',
+      Cookie: 'tg_log_probe_cookie',
+      'X-TeamGrid-OAuth-Service-Authorization': 'tg_log_probe_service',
+      'X-TeamGrid-OAuth-Browser-Service-Authorization': 'tg_log_probe_browser',
+      'X-TeamGrid-OAuth-Browser-Context': 'tg_log_probe_context',
+      'X-TeamGrid-OAuth-Exchange-ID': 'tg_log_probe_exchange',
+    },
+  })
+  assert.ok(result.status >= 500)
+  process.stdout.write('Federated ingress unavailable-upstream qualification passed.\n')
+} else if (mode === 'audit') {
+  const log = readFileSync(`${root}/ingress-audit.log`, 'utf8')
+  assert.equal(log.includes('tg_log_probe'), false)
+  const entries = log
+    .split('\n')
+    .filter((line) => line.startsWith('{'))
+    .map((line) => JSON.parse(line))
+  assert.ok(
+    entries.some((entry) => entry.status >= 500 && entry.request?.uri === '[redacted]'),
+    'The unavailable-upstream runtime log must contain a redacted request.',
+  )
+  process.stdout.write('Federated ingress runtime-log redaction qualification passed.\n')
 } else if (mode === 'outage') {
   const result = await request(8080, '/.well-known/oauth-authorization-server')
   assert.equal(result.status, 503)

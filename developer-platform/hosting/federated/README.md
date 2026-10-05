@@ -11,6 +11,9 @@ regional configuration, real client registrations, vendor acceptance and release
 admission still require qualification. The image CI builds and tests this service;
 it does not publish or deploy it. See [global authority/routing design](../../../integrations/global-oauth-federation.md).
 
+For the chosen TeamGrid-owned deployment model, see [self-hosting preparation](self-hosting.md).
+It supplies digest-pinned Compose/Caddy artifacts without deploying them.
+
 ## Private inputs
 
 Set `TEAMGRID_FEDERATION_CONFIG_FILE` to an absolute path. Both this file and its

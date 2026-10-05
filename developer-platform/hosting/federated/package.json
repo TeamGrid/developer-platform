@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node main.mjs",
-    "test": "node --test config.node-test.mjs admission.node-test.mjs service.node-test.mjs",
+    "test": "node --test config.node-test.mjs admission.node-test.mjs service.node-test.mjs selfHosting.node-test.mjs",
     "audit": "npm audit --omit=dev --audit-level=low"
   },
   "dependencies": {
