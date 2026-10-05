@@ -25,19 +25,22 @@ docker run --rm --user 0:0 --entrypoint node --volume "$fixture_dir:/fixture" "$
   -e "const fs=require('node:fs');fs.chmodSync('/fixture',0o755);for(const name of fs.readdirSync('/fixture')){fs.chownSync('/fixture/'+name,1000,1000);fs.chmodSync('/fixture/'+name,0o600)}" >/dev/null
 docker run --rm --user 0:0 --entrypoint node --volume "$fixture_dir:/fixture" "$image" \
   /fixture/smoke-fixture.mjs seed
-docker run -d --name "$mongo" mongo:8.3.8 --replSet rs0 --bind_ip_all >/dev/null
+docker run -d --name "$mongo" --user 0:0 --volume "$fixture_dir:/fixture:ro" \
+  --entrypoint mongod mongo:8.3.8 --replSet rs0 --bind_ip_all \
+  --keyFile /fixture/mongo-key --tlsMode requireTLS --tlsCertificateKeyFile /fixture/mongod.pem \
+  --tlsCAFile /fixture/mongo-ca.pem --tlsAllowConnectionsWithoutCertificates >/dev/null
 for attempt in {1..45}; do
-  if docker exec "$mongo" mongosh --quiet --eval 'db.adminCommand({ping:1}).ok' >/dev/null 2>&1; then break; fi
+  if docker exec "$mongo" mongosh --quiet --tls --tlsCAFile /fixture/mongo-ca.pem --eval 'db.adminCommand({ping:1}).ok' >/dev/null 2>&1; then break; fi
   sleep 1
 done
-docker exec "$mongo" mongosh --quiet --eval \
+docker exec "$mongo" mongosh --quiet --tls --tlsCAFile /fixture/mongo-ca.pem --eval \
   'rs.initiate({_id:"rs0",members:[{_id:0,host:"127.0.0.1:27017"}]})' >/dev/null
 for attempt in {1..45}; do
-  if docker exec "$mongo" mongosh --quiet --eval 'if(!db.hello().isWritablePrimary)quit(1)' >/dev/null 2>&1; then break; fi
+  if docker exec "$mongo" mongosh --quiet --tls --tlsCAFile /fixture/mongo-ca.pem --eval 'if(!db.hello().isWritablePrimary)quit(1)' >/dev/null 2>&1; then break; fi
   sleep 1
 done
-docker exec "$mongo" mongosh --quiet --eval \
-  'db.adminCommand({setFeatureCompatibilityVersion:"8.0",confirm:true})' >/dev/null
+docker exec "$mongo" mongosh --quiet --tls --tlsCAFile /fixture/mongo-ca.pem \
+  --file /fixture/mongo-bootstrap.js >/dev/null
 docker run -d --name "$provider" --network "container:$mongo" --read-only --cap-drop ALL \
   --security-opt no-new-privileges --volume "$fixture_dir:/fixture:ro" --entrypoint node "$image" \
   /fixture/smoke-fixture.mjs provider >/dev/null
@@ -46,7 +49,6 @@ for name in "$service_a" "$service_b"; do
   if [[ "$name" == "$service_b" ]]; then config=service-b; fi
   docker run -d --name "$name" --network "container:$mongo" --read-only --cap-drop ALL \
     --security-opt no-new-privileges --volume "$fixture_dir:/fixture:ro" \
-    --env NODE_ENV=test --env TEAMGRID_FEDERATION_LOCAL_TEST=true \
     --env NODE_EXTRA_CA_CERTS=/fixture/ca.pem \
     --env "TEAMGRID_FEDERATION_CONFIG_FILE=/fixture/$config.json" "$image" >/dev/null
 done

@@ -159,8 +159,7 @@ test('real driver configuration pins TLS/replica set, pool/budgets and disabled 
     mongo: { ...fixture().mongo, uri: 'mongodb://127.0.0.1:27017/?replicaSet=rs0' },
   }
   assert.throws(() => createMongoConnection(local))
-  const testClient = createMongoConnection(local, { localTest: true })
-  await testClient.close()
+  assert.throws(() => createMongoConnection(local, { localTest: true }))
   assert.throws(() =>
     createMongoConnection(
       { ...local, mongo: { ...local.mongo, uri: 'mongodb://localhost/?replicaSet=rs0' } },

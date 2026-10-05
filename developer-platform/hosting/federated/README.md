@@ -114,7 +114,10 @@ pool are bounded. See the [driver connection options](https://www.mongodb.com/do
 Precreate five collections: `control`, `routes`, `browsers`, `admission`, `probes`.
 Give the dedicated service identity only find/insert/update/createIndex/listIndexes
 on these collections; grant no regional grant/business-data access and no database
-administration or collection-drop rights. Qualify that role against the bootstrap.
+administration or collection-drop rights. The native fixture qualifies this exact
+collection-scoped role and checks rejection of deletes, drops, collection creation
+and access to a regional grant collection. Qualify actual provisioned credentials
+and topology before deployment. See [Mongo privilege actions](https://www.mongodb.com/docs/manual/reference/privilege-actions/).
 `hello` must identify the configured writable primary with session support.
 All stored authority remains in the regional App; the global collections contain
 routing hashes, confidential bounded browser metadata, HMAC quota counters and
@@ -169,17 +172,20 @@ bash developer-platform/hosting/federated/smoke-image.sh teamgrid-federated-mcp:
 `npm run verify` includes the independent private lockfile installation, production
 audit and Node tests on the supported CI Node versions. The image qualification
 uses two non-root read-only service containers, an ephemeral certificate-verified
-HTTPS metadata provider and a disposable MongoDB 8.3.8/FCV 8.0 replica set. It
-checks native TTL/consistency behavior, shared quotas, client revocation without
+HTTPS metadata provider and a disposable authenticated TLS MongoDB 8.3.8/FCV 8.0
+replica set with a dedicated collection-scoped service role. The service runs in
+the normal Production image mode. It checks native TTL/consistency behavior,
+shared quotas, client revocation without
 restart, hashed browser storage, independent closure, storage outage and graceful
 SIGTERM exit. Cleanup
 removes only its random containers/files. On this Mac use `DOCKER_CONTEXT=colima`.
 It changes no existing local database and contacts no vendor account.
 
-Only this local fixture may set `NODE_ENV=test` and
-`TEAMGRID_FEDERATION_LOCAL_TEST=true` to allow an unauthenticated/non-TLS literal
-loopback Mongo endpoint. The Production image default rejects that configuration.
-The fixture provider does not issue tokens or approve consent. Pair this check
+The bootstrap requires authenticated TLS Mongo connections in every mode. Fixture
+admin/keyfile credentials exist only in root-owned private temporary files for
+initial provisioning; the service receives only its limited identity. Its ephemeral
+CA validates the database and metadata provider without certificate bypasses. The
+fixture provider does not issue tokens or approve consent. Pair this check
 with the existing actual SDK/App/Mongo browser/token qualification, then perform
 the required real Meteor UI/DDP, Passkey, OpenAI, Claude and M365/Cowork acceptance.
 Deploy only through the admitted release path with verified regional/client parity.

@@ -1,7 +1,7 @@
 // Disposable local image qualification only; not a deployer or a real OAuth provider.
 
 import assert from 'node:assert/strict'
-import { createHash } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
 import { chmodSync, chownSync, readFileSync, writeFileSync } from 'node:fs'
 import { request as nodeRequest } from 'node:http'
 import { createServer } from 'node:https'
@@ -53,6 +53,47 @@ if (mode === 'seed') {
     .update(root + Date.now())
     .digest('hex')
     .slice(0, 12)
+  const database = `teamgrid_federation_${suffix}`
+  const credentials = {
+    database,
+    adminUser: 'fixture-admin',
+    adminPassword: randomBytes(32).toString('base64url'),
+    serviceUser: 'fixture-service',
+    servicePassword: randomBytes(32).toString('base64url'),
+  }
+  const privateRootFile = (name, value) => {
+    const path = `${root}/${name}`
+    writeFileSync(path, value, { mode: 0o400 })
+    chownSync(path, 0, 0)
+    chmodSync(path, 0o400)
+  }
+  privateRootFile('mongo-auth.json', JSON.stringify(credentials))
+  privateRootFile('mongo-key', randomBytes(512).toString('base64'))
+  privateRootFile(
+    'mongod.pem',
+    Buffer.concat([readFileSync(`${root}/key.pem`), readFileSync(`${root}/ca.pem`)]),
+  )
+  privateRootFile('mongo-ca.pem', readFileSync(`${root}/ca.pem`))
+  // Local fixture only: the initial root identity provisions exactly one isolated DB/role.
+  privateRootFile(
+    'mongo-bootstrap.js',
+    `(async () => {
+const auth = JSON.parse(require('node:fs').readFileSync('/fixture/mongo-auth.json', 'utf8'));
+const admin = db.getSiblingDB('admin');
+await admin.createUser({user: auth.adminUser, pwd: auth.adminPassword, roles: ['root']});
+if (!(await admin.auth(auth.adminUser, auth.adminPassword))) throw new Error('Fixture authentication failed');
+await admin.runCommand({setFeatureCompatibilityVersion: '8.0', confirm: true});
+const target = db.getSiblingDB(auth.database);
+const names = ['control', 'routes', 'browsers', 'admission', 'probes'];
+for (const name of names) await target.createCollection(name);
+await target.createRole({role: 'federatedService', roles: [], privileges: names.map(collection => ({
+resource: {db: auth.database, collection}, actions: ['find', 'insert', 'update', 'createIndex', 'listIndexes']
+}))});
+await target.createUser({user: auth.serviceUser, pwd: auth.servicePassword,
+roles: [{role: 'federatedService', db: auth.database}], mechanisms: ['SCRAM-SHA-256']});
+})()
+`,
+  )
   const config = {
     version: 1,
     issuer,
@@ -64,8 +105,8 @@ if (mode === 'seed') {
     selectionServiceSecret: 'b'.repeat(48),
     clientPolicyFile: file('clients'),
     mongo: {
-      uri: 'mongodb://127.0.0.1:27017/?replicaSet=rs0',
-      database: `teamgrid_federation_${suffix}`,
+      uri: `mongodb://${credentials.serviceUser}:${credentials.servicePassword}@127.0.0.1:27017/?replicaSet=rs0&tls=true&authSource=${database}&authMechanism=SCRAM-SHA-256&tlsCAFile=/fixture/ca.pem`,
+      database,
     },
     admission: {
       hmacSecret: 'h'.repeat(48),
@@ -179,6 +220,14 @@ if (mode === 'seed') {
   try {
     await client.connect()
     const db = client.db(read('service-a').mongo.database)
+    for (const forbidden of [
+      () => db.collection('browsers').deleteMany({}),
+      () => db.collection('routes').drop(),
+      () => db.createCollection('unapproved'),
+      () => client.db('teamgrid_regional_fixture').collection('grants').findOne({}),
+    ]) {
+      await assert.rejects(forbidden(), (error) => error.code === 13)
+    }
     const browsers = await db.collection('browsers').find({}).toArray()
     assert.equal(browsers.length, 1)
     assert.equal(JSON.stringify(browsers).includes(cookie), false)
@@ -216,7 +265,7 @@ if (mode === 'seed') {
     save(name, config)
   }
   process.stdout.write(
-    'Federated image qualification passed: native replica-set stores, TLS private readiness, two-instance quotas, fresh policy revocation, hashed browser storage and independent global closure.\n',
+    'Federated image qualification passed: authenticated TLS replica-set stores with a collection-scoped service role, TLS private readiness, two-instance quotas, fresh policy revocation, hashed browser storage and independent global closure.\n',
   )
 } else if (mode === 'outage') {
   const result = await request(8080, '/.well-known/oauth-authorization-server')

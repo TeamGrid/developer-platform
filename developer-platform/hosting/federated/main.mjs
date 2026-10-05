@@ -4,11 +4,8 @@ import { createFederatedService } from './service.mjs'
 async function main() {
   const file = process.env.TEAMGRID_FEDERATION_CONFIG_FILE
   if (!file) throw new Error('Missing service configuration.')
-  const localTest =
-    process.env.NODE_ENV === 'test' && process.env.TEAMGRID_FEDERATION_LOCAL_TEST === 'true'
   const service = await createFederatedService({
     readConfig: () => readPrivateJson(file),
-    localTest,
   })
   try {
     await service.listen()

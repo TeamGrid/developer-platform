@@ -23,7 +23,7 @@ const unavailable = () => {
 }
 
 /** No default DB. TLS, authenticated replica set, fixed pool/budgets and no driver logging. */
-export function createMongoConnection(config, { localTest = false, Client = MongoClient } = {}) {
+export function createMongoConnection(config, { Client = MongoClient } = {}) {
   const query = new URLSearchParams(config.mongo.uri.split('?')[1] ?? '')
   const keys = [...query.keys()].map((key) => key.toLowerCase())
   if (
@@ -51,15 +51,13 @@ export function createMongoConnection(config, { localTest = false, Client = Mong
     mongodbLogComponentSeverities: { default: 'off' },
   })
   const options = client.options
-  const loopback =
-    options.hosts.length > 0 &&
-    options.hosts.every((host) => ['127.0.0.1', '::1'].includes(host.host))
   if (
     !options.replicaSet ||
     options.directConnection ||
     options.loadBalanced ||
-    (!options.tls && !(localTest && loopback)) ||
-    ((!options.credentials?.username || !options.credentials?.password) && !(localTest && loopback))
+    !options.tls ||
+    !options.credentials?.username ||
+    !options.credentials?.password
   )
     unavailable()
   return client
@@ -81,7 +79,6 @@ export async function createFederatedService({
   readPolicy = readPrivateJson,
   fetcher = fetch,
   Client = MongoClient,
-  localTest = false,
 }) {
   const config = parseServiceConfig(readConfig())
   const fixed = immutableConfig(config)
@@ -105,7 +102,7 @@ export async function createFederatedService({
   } catch (error) {
     if (!(error instanceof OAuthBrokerInvalidClientError)) throw error
   }
-  const connection = createMongoConnection(config, { Client, localTest })
+  const connection = createMongoConnection(config, { Client })
   let runtime,
     server,
     closed = false,
