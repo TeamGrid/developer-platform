@@ -41,6 +41,7 @@ test('self-hosted artifacts isolate two bounded replicas, expose no host port an
     assert.equal(service.read_only, true)
     assert.equal(service.ports, undefined)
     assert.equal(service.network_mode, undefined)
+    assert.deepEqual(service.networks.egress, {})
     assert.equal(service.mem_limit, '512m')
     assert.equal(service.volumes[0].bind.create_host_path, false)
     assert.equal(

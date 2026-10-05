@@ -99,7 +99,7 @@ export function createSelfHostedArtifacts(input, specification) {
     networks: {
       ingress: { aliases: [`${project}-${replica}`] },
       database: {},
-      egress: { external: true, name: `${project}-egress` },
+      egress: {},
     },
     healthcheck: {
       test: [
