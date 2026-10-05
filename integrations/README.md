@@ -35,9 +35,12 @@ and separately approved OAuth scopes still apply.
   to that exact cell. Private recovery reads a one-minute encrypted receipt,
   rechecks current authority and never repeats issuance. Token transactions commit
   their hash outbox and receipt atomically; consent commits the code hash outbox.
-  See the [global OAuth decision](global-oauth-federation.md). Browser request
-  persistence, authenticated workspace selection, consent resume, global client
-  registry/discovery wiring and the deployed endpoint remain outstanding.
+  `createFederatedOAuthBrowserBroker` and `createMongoOAuthBrowserStore` now add
+  persisted browser requests, authenticated workspace selection and consent resume.
+  The App derives fresh workspace placement and retains sensitive-scope Passkey
+  consent. Exact cookie/request/workspace/callback binding and code publication
+  precede the host redirect. See the [global OAuth decision](global-oauth-federation.md).
+  Global client registry/discovery wiring and the deployed endpoint remain outstanding.
 
 ```sh
 cd developer-platform

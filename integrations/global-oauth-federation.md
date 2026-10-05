@@ -2,8 +2,9 @@
 
 Decision date: 2026-10-04. Implementation update: 2026-10-05. Regional transport,
 MCP routing, a Mongo directory adapter, public token/revocation broker and private
-transactional exchange recovery are implemented in draft PRs. Browser request
-persistence, workspace selection, consent resume, client/discovery wiring,
+transactional exchange recovery are implemented in draft PRs. Persisted browser
+requests, authenticated App workspace selection and consent resume with prior
+code-route publication are also implemented. Global client/discovery wiring,
 deployment and host qualification are outstanding. This document does
 not authorize a Production release or claim a working public endpoint.
 
@@ -37,6 +38,7 @@ Each configured cell has a fixed regional service origin. It accepts only:
 | --- | --- |
 | `GET /internal/developer/oauth/integrations/<id>/metadata` | Issuer metadata |
 | `GET /internal/developer/oauth/integrations/<id>/authorize` | Authorization request preparation |
+| `POST /internal/developer/oauth/integrations/<id>/decision` | Fresh browser consent evidence |
 | `POST /internal/developer/oauth/integrations/<id>/token` | Code exchange or refresh |
 | `POST /internal/developer/oauth/integrations/<id>/recover` | Read a committed private exchange receipt |
 | `POST /internal/developer/oauth/integrations/<id>/revoke` | Token revocation |
@@ -92,6 +94,66 @@ unique issuer/resource/ID values, and no `regional` override. Do not install
 this configuration in Production until the public broker and routing-store
 protocol have passed qualification.
 
+## Browser request and authenticated workspace selection
+
+`createFederatedOAuthBrowserBroker` validates a fresh registered client, exact
+callback, resource, scope ceiling and S256 PKCE before persisting a request. Native
+HTTP loopback callbacks allow an ephemeral port only when the registered callback
+omits its port. The actual requested callback remains immutable. Unknown optional
+OAuth hints are ignored; secrets, tokens, codes and verifiers are rejected in the
+initial URL. State remains opaque and bounded.
+
+The public endpoints are `GET /oauth/authorize`, `/oauth/continue` and `/oauth/resume`.
+A per-request `__Host-` cookie is Secure, HttpOnly, SameSite=Lax and host-only with
+Path `/`; parallel flows get distinct names. Only its hash is persisted. The fixed
+selection UI receives a random request handle, never a callback supplied by the
+browser. Its authenticated DDP bridge reads connection details and selects a fresh,
+active server-side membership. Explicit persisted region/cell placement is required;
+no default DE placement is inferred. A disabled account/member, locked workspace,
+invalid slug or missing placement cannot select.
+
+The App uses `TEAMGRID_OAUTH_BROWSER_INTEGRATION_ID` to select the additional
+operator registry entry and `TEAMGRID_OAUTH_BROWSER_BROKER_SECRET` for the separate
+`X-TeamGrid-OAuth-Browser-Service-Authorization` header (32–256 characters).
+Provision it privately; it is distinct from regional service and OAuth client
+credentials. It authorizes only private `POST /internal/oauth/browser/details` and
+`/select`. These endpoints receive no session cookie, token, user email or role.
+Selection binds the fixed cell, workspace ID and canonical slug, returning a
+short-lived random selection ticket whose hash is persisted. The public continuation
+requires both that ticket and the original broker cookie.
+
+Private regional preparation additionally requires the service-authenticated
+`X-TeamGrid-OAuth-Browser-Context`: exact handle, browser hash, selected workspace ID
+and canonical creation/expiry timestamps. The regional App stores the same request
+identity idempotently and returns only its fixed regional binding. Preparation never
+reopens an approved/denied request. The normal regional consent screen independently
+checks membership, policies and sensitive-scope Passkey; it cannot change the selected
+workspace. Login and direct auth handoff continue through the existing session path.
+
+Approval/denial returns to the logical issuer's resume endpoint. The broker verifies
+the original cookie and exact fresh regional decision via `/decision`, including
+client record, callback, state, PKCE, original requested scopes and workspace. Approved
+proof fences against family revocation/code consumption in a regional transaction.
+The immutable code hash route must publish before the actual host callback carries
+the code, original state and logical `iss`. Publication failure returns unavailable
+without Location; resuming the same still-current code is allowed. Fresh revocation,
+consumption or changed client registration prevents the callback. Confirmed denial
+returns `access_denied` with state/issuer and publishes no code route.
+
+`createMongoOAuthBrowserStore` takes a separately supplied native replica-set
+collection and requires TTL initialization. Records transition with immutable
+conditional writes: selecting → selected → prepared → completed. Reads are primary
+linearizable with a five-second bound; writes are journaled majority with the same
+bound. The explicit lifetime is at most ten minutes even before TTL cleanup.
+Records contain hashes of handles/cookies/tickets/codes and bounded client metadata,
+callback, state, scopes and selected workspace ID/slug. These are confidential
+connection metadata and require their own least-privilege access and retention policy;
+this browser collection is distinct from the credential-hash directory. No raw
+cookies, selection tickets, codes, access/refresh tokens or business payloads are stored.
+All browser responses disable caching, referrers and framing. Private responses
+have no browser CORS access. Failed/lost selection requires a fresh connection;
+there is no automatic selection or private preparation retry/fanout.
+
 ## Credential routing directory
 
 Choose a bounded hash directory instead of changing existing opaque credentials
@@ -141,7 +203,7 @@ is suitable as the global store.
 2. The selected regional App prepares the request under the global identity and
    supplies its normal consent, current membership checks and sensitive-scope
    Passkey flow. Region/cell stay bound to that request through central login.
-3. Implemented: approval commits the code and a routing outbox record in the same regional
+3. Approval commits the code and a routing outbox record in the same regional
    transaction. A broker resume step publishes its hash-to-cell mapping with
    conditional insert before returning the callback code to the host. A failed
    publication must not expose a usable unrouteable code.
@@ -165,8 +227,12 @@ Local tests now cover receipt/outbox rollback, lost private reply after commit,
 duplicate private issuance, partial publication, immutable route conflicts,
 receipt expiry/tampering, later rotation, revocation and normal reuse. The optional
 cross-repository qualification uses the actual App private HTTP transport, SDK
-broker and native Mongo directory in one disposable database. It does not exercise
-the global client registry, browser selection/resume or a real provider login.
+browser/token brokers and native Mongo directory/browser store in one disposable
+database. It covers private preparation, failed code publication without redirect,
+resumed publication, exact state/issuer callback, actual code exchange and rejection
+of resume after consumption. Authenticated selection and approval are fixtures;
+it does not exercise the Meteor UI/DDP, a real Passkey, global client registry or
+a real provider login.
 Cross-region outage, DB failover, measured latency and full browser crash-window
 qualification remain required before deployment.
 Claude's documented token exchange/discovery budgets also require measured

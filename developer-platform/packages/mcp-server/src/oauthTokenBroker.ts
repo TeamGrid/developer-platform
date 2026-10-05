@@ -54,7 +54,10 @@ export class OAuthBrokerInvalidClientError extends Error {
 }
 class OAuthBodyTooLargeError extends Error {}
 
-async function boundedText(body: ReadableStream<Uint8Array> | null, signal: AbortSignal) {
+export async function readOAuthBrokerText(
+  body: ReadableStream<Uint8Array> | null,
+  signal: AbortSignal,
+) {
   const reader = body?.getReader()
   if (!reader) throw new Error('Provider unavailable.')
   const chunks: Uint8Array[] = []
@@ -82,7 +85,7 @@ async function boundedText(body: ReadableStream<Uint8Array> | null, signal: Abor
 
 async function boundedJson(response: Response, signal: AbortSignal): Promise<unknown> {
   return JSON.parse(
-    await boundedText(response.body, AbortSignal.any([signal, AbortSignal.timeout(5000)])),
+    await readOAuthBrokerText(response.body, AbortSignal.any([signal, AbortSignal.timeout(5000)])),
   )
 }
 
@@ -222,7 +225,7 @@ export function createFederatedOAuthTokenBroker(options: {
       if (!request.body) return json(400, 'invalid_request')
       let text: string
       try {
-        text = await boundedText(request.body, deadline)
+        text = await readOAuthBrokerText(request.body, deadline)
       } catch (error) {
         if (error instanceof OAuthBodyTooLargeError) return json(413, 'invalid_request')
         if (error instanceof TypeError && !deadline.aborted) return json(400, 'invalid_request')

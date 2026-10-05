@@ -17,8 +17,8 @@ const packages = [
     requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js'],
   },
   {
-    // Federation transport, bounded OAuth broker and Mongo directory add ~32 KiB.
-    maxUnpackedSize: 1_535_000,
+    // The bounded browser broker/store add ~37 KiB to the federation runtime.
+    maxUnpackedSize: 1_575_000,
     name: '@teamgrid/mcp-server',
     requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js', 'COVERAGE.md', 'dist/httpBin.js', 'dist/generated/domainCatalog.json', 'dist/generated/outputDefinitions.json'],
   },

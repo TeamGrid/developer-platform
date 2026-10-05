@@ -311,8 +311,20 @@ exchange, the broker attempts one explicit receipt recovery with the same nonce
 and original body. It never repeats issuance or tries another cell. Both token
 routes must publish before a response containing tokens reaches the client.
 
-These libraries do not deploy the public endpoint or implement the browser
-authorization/consent-resume flow. See the
+`createFederatedOAuthBrowserBroker` implements authorization, authenticated
+workspace selection, browser continuation and consent resume. It requires a fresh
+client-registry adapter, separate selection-service secret, fixed regional cells,
+selection UI origin and workspace domain. `createMongoOAuthBrowserStore` provides
+bounded ten-minute records with hashed handles/cookies/selection tickets, explicit
+expiry, linearizable reads and journaled majority conditional transitions. Initialize
+its TTL index before serving. The authenticated App derives the workspace and cell;
+the regional consent flow independently rechecks current authority and Passkey.
+The broker publishes the approved code hash route before exposing the exact host
+callback with original state and logical issuer. A failed publication can resume
+with the same valid code; a consumed/revoked code cannot resume.
+
+These libraries do not deploy the public endpoint or wire its global client registry,
+discovery and hosting composition. See the
 [global OAuth decision](../../../integrations/global-oauth-federation.md)
 for private service authentication, recovery-key provisioning, operating topology
 and remaining launch requirements.

@@ -18,6 +18,15 @@ export {
 } from './hostProfiles.js'
 export { createTeamGridMcpHttpHandler, type McpAuthorization, type McpHttpOptions } from './http.js'
 export {
+  createFederatedOAuthBrowserBroker,
+  type OAuthBrowserClient,
+} from './oauthBrowserBroker.js'
+export {
+  createMongoOAuthBrowserStore,
+  type OAuthBrowserRecord,
+  type OAuthBrowserStore,
+} from './oauthBrowserStore.js'
+export {
   createMongoOAuthRoutingDirectory,
   type MongoOAuthRoutingCollection,
   type OAuthCredentialKind,
