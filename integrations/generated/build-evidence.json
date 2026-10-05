@@ -1,6 +1,11 @@
 {
   "status": "draft-unqualified",
   "version": "0.1.0",
+  "publisher": {
+    "legalName": "Foundster Corporate Services FZCO",
+    "displayName": "Foundster",
+    "identityStatus": "owner-confirmed-vendor-verification-pending"
+  },
   "proposedEndpoint": "https://mcp.teamgrid.app/mcp",
   "apiSource": {
     "schemaVersion": 1,
@@ -55,11 +60,11 @@
     },
     {
       "path": "plugins/openai/teamgrid/README.md",
-      "sha256": "21fa26dbdf1a8e454d7ae738c11c7c6efb3a69b9a5aaa30b806ee0f6ea688db4"
+      "sha256": "f80e0c5073d9363d4a2e8a3b09e09c990158638a216ea4cb0b97ec0b8898aefa"
     },
     {
       "path": "plugins/openai/teamgrid/plugin.json",
-      "sha256": "30a88b4aca0d3699e19f39fc2e22ac395599b81ebc18582ebcd882adbea21a63"
+      "sha256": "4de739ab7b16775f37d4bd909aedf1fe1026f0633967d2f50b9f544ae77a7837"
     },
     {
       "path": "plugins/openai/teamgrid/mcp.json",
@@ -91,15 +96,19 @@
     },
     {
       "path": "plugins/claude/teamgrid/README.md",
-      "sha256": "21fa26dbdf1a8e454d7ae738c11c7c6efb3a69b9a5aaa30b806ee0f6ea688db4"
+      "sha256": "f80e0c5073d9363d4a2e8a3b09e09c990158638a216ea4cb0b97ec0b8898aefa"
     },
     {
       "path": "plugins/claude/teamgrid/.claude-plugin/plugin.json",
-      "sha256": "7a3526e4617e810ab01fc876921b7728dbac08f641caffbecb29a9d0d4d11da1"
+      "sha256": "5d4eb40396f48100ee2ee63f6ca4321ec09c0747f95dd665906aa9877b891fb7"
     },
     {
       "path": "plugins/claude/teamgrid/.mcp.json",
       "sha256": "ccfe17118ef81ff1ab6e416d65ae2cf17265425b58f807cb659130e934dd3439"
+    },
+    {
+      "path": "plugins/claude/teamgrid/assets/icon.png",
+      "sha256": "83340441794141e1d39f426e6b7da5777d8d8291853c6f601f8c0ccf26be6e96"
     },
     {
       "path": "plugins/microsoft365/teamgrid/LICENSE",
@@ -123,11 +132,11 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/README.md",
-      "sha256": "21fa26dbdf1a8e454d7ae738c11c7c6efb3a69b9a5aaa30b806ee0f6ea688db4"
+      "sha256": "f80e0c5073d9363d4a2e8a3b09e09c990158638a216ea4cb0b97ec0b8898aefa"
     },
     {
       "path": "plugins/microsoft365/teamgrid/manifest.json",
-      "sha256": "b222c6b961954404e528a55e157b229f22a881647e4f37c91ba2c7f9b00655e5"
+      "sha256": "9190c0c106ff6c88f0f6875d1ff6d118ab1e2267c7597059cedc6ff477c2cdf9"
     },
     {
       "path": "plugins/microsoft365/teamgrid/declarativeAgent.json",

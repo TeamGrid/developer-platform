@@ -1,5 +1,10 @@
 {
   "version": "0.1.0",
+  "publisher": {
+    "legalName": "Foundster Corporate Services FZCO",
+    "displayName": "Foundster",
+    "identityStatus": "owner-confirmed-vendor-verification-pending"
+  },
   "mcpUrl": "https://mcp.teamgrid.app/mcp",
   "endpointStatus": "proposed-not-deployed",
   "websiteUrl": "https://teamgrid.app",

@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Work with TeamGrid projects, tasks, planning, content, CRM and workspace administration.",
   "author": {
-    "name": "TeamGrid",
+    "name": "Foundster Corporate Services FZCO",
     "url": "https://teamgrid.app"
   },
   "homepage": "https://teamgrid.app",
@@ -16,7 +16,7 @@
         "displayName": "TeamGrid",
         "shortDescription": "Projects, tasks, planning and team operations",
         "longDescription": "Work with TeamGrid projects, tasks, planning, content, CRM and workspace administration.",
-        "developerName": "TeamGrid",
+        "developerName": "Foundster Corporate Services FZCO",
         "category": "Productivity",
         "capabilities": [
           "Read",

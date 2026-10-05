@@ -6,6 +6,23 @@ Microsoft 365 Copilot, including Cowork, use the same business contract. A full
 catalog does not grant access: current roles, sharing, locks, workspace binding
 and separately approved OAuth scopes still apply.
 
+The owner confirmed **Foundster Corporate Services FZCO** as the legal publisher
+on 2026-10-05. `config.json` supplies that name to OpenAI/Claude and to package
+READMEs. Microsoft's developer name has a 32-character limit, so its manifest
+uses the display name **Foundster**; vendor verification must confirm that
+display name against the full legal entity. Product labels remain TeamGrid.
+This confirmation does not establish vendor business
+verification, Microsoft program enrollment or the applicability of legal URLs.
+
+Publisher portals were inspected on 2026-10-05. OpenAI's available organization
+is individually verified; Foundster business verification is pending. Microsoft
+recognizes Foundster in the existing personal account's publisher information,
+but only Windows Desktop Applications is registered. Its Microsoft 365 and
+Copilot enrollment requires a work account; the owner deferred creation of that
+account. Claude's submission portal is available and accepts the public source
+repository for validation. These observations are account readiness, not review
+approval. No vendor terms were accepted or plugin published in this inspection.
+
 ## Current implementation
 
 - Verified OAuth client identities select consent and annotation presentation.
@@ -21,6 +38,11 @@ and separately approved OAuth scopes still apply.
   actual paginated `tools/list` responses and pinned official JSON schemas.
   Microsoft includes both a declarative agent/action plugin and a Cowork connector
   with agent skills; all 208 explicit tools remain represented.
+- Claude includes the directory icon and legal-link fields. Each package README
+  describes tool arguments, returned data, authorized changes and the proposed
+  Germany gateway processing for both DE and US workspaces. Unverified legal
+  URLs remain deliberately blocked; CLI validation does not establish directory
+  acceptance or real-host behavior.
 - The corresponding TeamGrid app change accepts Claude Code's exact registered
   `localhost`/IP-loopback callbacks without a registration port. An ephemeral
   request port is permitted, while the code exchange binds the actual selected
@@ -63,7 +85,10 @@ The check validates OpenAI's portable manifest/MCP schema, Microsoft's app 1.29,
 declarative agent 1.6 and action plugin 2.4 schemas. It checks byte-for-byte
 generation, full tool/schema/scope consistency, Claude confirmation hints,
 package containment, pinned schema hashes and Microsoft's conditional OAuth
-reference requirement. Claude's local JSON/packaging checks are not a replacement
+reference requirement. The installed Claude Code 2.1.221 validates the package
+with warnings for the directory fields; Anthropic documents warning-free support
+for those fields from 2.1.281. Those fields are retained for the directory.
+Claude's local JSON/packaging checks are not a replacement
 for its own CLI/portal validation. OpenAI extension contents also require portal
 validation beyond the portable schema.
 
@@ -122,13 +147,16 @@ the app runtime. Brand PNGs render the existing TeamGrid vector mark from the ap
 source, at Microsoft's required 192 and 32 pixel sizes. The SVG sources are kept
 under `shared/assets`; regenerate them with `rsvg-convert` when changing assets.
 
-Relevant official documentation, checked 2026-10-04:
+Relevant official documentation, checked 2026-10-04; Claude's directory checklist,
+submission requirements and listing fields rechecked 2026-10-05:
 
 - [OpenAI plugin packaging](https://developers.openai.com/plugins/build/plugins)
 - [OpenAI OAuth](https://developers.openai.com/plugins/build/auth)
 - [Claude connector authentication](https://claude.com/docs/connectors/building/authentication)
 - [Claude connector review criteria](https://claude.com/docs/connectors/building/review-criteria)
 - [Claude plugin packaging](https://claude.com/docs/plugins/build)
+- [Claude directory checklist](https://claude.com/docs/plugins/pre-submission-checklist)
+- [Claude directory fields](https://code.claude.com/docs/en/plugins/manifest-reference#directory-listing-fields)
 - [Microsoft plugin schema 2.4](https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/plugin-manifest-2.4)
 - [Microsoft Cowork packaging](https://learn.microsoft.com/en-us/microsoft-365/copilot/cowork/cowork-plugin-development)
 - [Microsoft dynamic discovery](https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/plugin-dynamic-tool-discovery)
