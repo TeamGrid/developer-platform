@@ -57,6 +57,14 @@ export async function fetchOAuthClientMetadata(
       resolver.resolve6(url.hostname),
     ])
     deadline.throwIfAborted()
+    // An absent record is a client problem; resolver failures are availability failures.
+    if (
+      addresses.some(
+        (result) =>
+          result.status === 'rejected' && !['ENODATA', 'ENOTFOUND'].includes(result.reason?.code),
+      )
+    )
+      throw new Error('OAuth metadata DNS unavailable.')
     const resolved = addresses.flatMap((result, index) =>
       result.status === 'fulfilled'
         ? result.value.map((address) => ({ address, family: index === 0 ? 4 : 6 }))
@@ -87,6 +95,15 @@ export async function fetchOAuthClientMetadata(
           headers: { Accept: 'application/json', 'Accept-Encoding': 'identity' },
         },
         (response) => {
+          if (
+            response.statusCode === 408 ||
+            response.statusCode === 429 ||
+            (response.statusCode !== undefined && response.statusCode >= 500)
+          ) {
+            response.destroy()
+            reject(new Error('OAuth metadata upstream unavailable.'))
+            return
+          }
           const type = response.headers['content-type']?.split(';')[0]?.trim().toLowerCase()
           if (
             response.statusCode !== 200 ||

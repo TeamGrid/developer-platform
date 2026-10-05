@@ -177,7 +177,10 @@ unsupported JWT assertion authentication is never advertised. CIMD record IDs us
 the regional `cimd_` SHA-256 identity. Unknown document fields confer no authority.
 Cache-Control/Age are respected for at most five minutes, with at most 100 cache
 entries and eight coalesced in-flight fetches. Trust/revocation is checked before
-cache use and again after network I/O; failures are never cached.
+cache use and again after network I/O; failures are never cached. Missing DNS
+records, invalid documents and unsafe answers reject the client; resolver failures,
+HTTP 408/429/5xx and transport outages remain unavailable. See
+[Node DNS error semantics](https://nodejs.org/docs/latest-v24.x/api/dns.html#err-codes).
 
 Configure identical static record IDs, client IDs, callbacks, auth methods,
 rotation hashes and CIMD policy in the global registry and each owning regional

@@ -19,7 +19,14 @@ const client = {
   status: 'active' as const,
 }
 function harness(timeout = 30000) {
-  const state = { enabled: true, admitted: true, ready: true, stalled: false, revoked: false }
+  const state = {
+    enabled: true,
+    admitted: true,
+    ready: true,
+    stalled: false,
+    revoked: false,
+    clientUnavailable: false,
+  }
   const records = new Map<string, OAuthBrowserRecord>()
   const directory = {
     register: vi.fn(async () => {}),
@@ -37,7 +44,10 @@ function harness(timeout = 30000) {
     },
   }
   const clients = createOAuthClientRegistry({
-    registeredClients: () => [{ ...client, status: state.revoked ? 'revoked' : 'active' }],
+    registeredClients: () => {
+      if (state.clientUnavailable) throw new Error('Registry fixture unavailable')
+      return [{ ...client, status: state.revoked ? 'revoked' : 'active' }]
+    },
     metadataSupported: () => false,
     allowedMetadataOrigins: () => [],
   })
@@ -235,6 +245,16 @@ describe('composed global MCP/OAuth runtime', () => {
         },
       })
       expect(denied.status).toBe(401)
+      expect(apiCalls()).toBe(before)
+      h.state.revoked = false
+      h.state.clientUnavailable = true
+      const unavailable = await h.request('/mcp', {
+        method: 'POST',
+        body: '{}',
+        headers: { Authorization: `Bearer tg_mcp_at_v1_${'x'.repeat(43)}` },
+      })
+      expect(unavailable.status).toBe(503)
+      expect(unavailable.headers.has('www-authenticate')).toBe(false)
       expect(apiCalls()).toBe(before)
       expect(h.directory.resolve).toHaveBeenCalledWith(
         'access',
