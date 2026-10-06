@@ -153,7 +153,7 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/tools.json",
-      "sha256": "33a08f610c447d83e9d8e6b33ef9264951d062c885e0596064e00d3f6a967acf"
+      "sha256": "36c0890c7257832a196f2ad993a0178cf516a158abea422d5f13acb3836cdcd3"
     },
     {
       "path": "plugins/microsoft365/teamgrid/color.png",

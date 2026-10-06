@@ -10,6 +10,47 @@ import {
 const maximumBytes = 256 * 1024
 const maximumTools = 50
 
+/** Keep output validation intact while avoiding repeated discovery-only prose. */
+export function compactOutputSchemaDescriptions<T>(schema: T): T {
+  const result = structuredClone(schema)
+  const maps = ['properties', 'patternProperties', '$defs', 'definitions', 'dependentSchemas']
+  const singles = [
+    'items',
+    'additionalProperties',
+    'unevaluatedProperties',
+    'propertyNames',
+    'contains',
+    'not',
+    'if',
+    'then',
+    'else',
+    'contentSchema',
+  ]
+  const arrays = ['allOf', 'anyOf', 'oneOf', 'prefixItems']
+  const visit = (value: unknown) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return
+    const node = value as Record<string, unknown>
+    if (typeof node.description === 'string') delete node.description
+    for (const key of maps) {
+      const children = node[key]
+      if (children && typeof children === 'object') Object.values(children).forEach(visit)
+    }
+    for (const key of singles) {
+      const child = node[key]
+      if (Array.isArray(child)) child.forEach(visit)
+      else visit(child)
+    }
+    for (const key of arrays) {
+      const children = node[key]
+      if (Array.isArray(children)) children.forEach(visit)
+    }
+  }
+  // Traverse schema keywords only. Properties named "description", and literal
+  // description values inside const/default/enum/examples, retain their meaning.
+  visit(result)
+  return result
+}
+
 /** Use the public low-level handler; never depend on SDK private registries. */
 export function installBoundedToolDiscovery(
   server: McpServer,
@@ -33,9 +74,11 @@ export function installBoundedToolDiscovery(
         }) ?? { type: 'object' },
         ...(entry.outputSchema
           ? {
-              outputSchema: entry.outputSchema['~standard'].jsonSchema.output({
-                target: 'draft-2020-12',
-              }),
+              outputSchema: compactOutputSchemaDescriptions(
+                entry.outputSchema['~standard'].jsonSchema.output({
+                  target: 'draft-2020-12',
+                }),
+              ),
             }
           : {}),
       })) as Tool[]
