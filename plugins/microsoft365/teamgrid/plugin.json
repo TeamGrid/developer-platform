@@ -68,7 +68,7 @@
     },
     {
       "name": "teamgrid_appointment_archive",
-      "description": "Archive a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
+      "description": "Archive a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Only TeamGrid-managed appointments in the authorized private workspace can be changed. Imported provider-managed calendar events are read-only; this tool cannot write Google or Microsoft calendar events.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -80,7 +80,7 @@
     },
     {
       "name": "teamgrid_appointment_create",
-      "description": "Create a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent.",
+      "description": "Create a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. Only TeamGrid-managed appointments in the authorized private workspace can be changed. Imported provider-managed calendar events are read-only; this tool cannot write Google or Microsoft calendar events.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -96,7 +96,7 @@
     },
     {
       "name": "teamgrid_appointment_restore",
-      "description": "Restore a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
+      "description": "Restore a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Only TeamGrid-managed appointments in the authorized private workspace can be changed. Imported provider-managed calendar events are read-only; this tool cannot write Google or Microsoft calendar events.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -108,7 +108,7 @@
     },
     {
       "name": "teamgrid_appointment_update",
-      "description": "Update a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
+      "description": "Update a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Only TeamGrid-managed appointments in the authorized private workspace can be changed. Imported provider-managed calendar events are read-only; this tool cannot write Google or Microsoft calendar events.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -260,7 +260,7 @@
     },
     {
       "name": "teamgrid_comment_archive",
-      "description": "Archive a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people.",
+      "description": "Archive a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people. Comment targets and mentions are authorized TeamGrid workspace resources and members; this tool has no arbitrary external recipient or service destination.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -272,7 +272,7 @@
     },
     {
       "name": "teamgrid_comment_create",
-      "description": "Create a target comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. May notify other people.",
+      "description": "Create a target comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. May notify other people. Comment targets and mentions are authorized TeamGrid workspace resources and members; this tool has no arbitrary external recipient or service destination.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -288,7 +288,7 @@
     },
     {
       "name": "teamgrid_comment_restore",
-      "description": "Restore a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people.",
+      "description": "Restore a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people. Comment targets and mentions are authorized TeamGrid workspace resources and members; this tool has no arbitrary external recipient or service destination.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -300,7 +300,7 @@
     },
     {
       "name": "teamgrid_comment_update",
-      "description": "Edit a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people.",
+      "description": "Edit a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people. Comment targets and mentions are authorized TeamGrid workspace resources and members; this tool has no arbitrary external recipient or service destination.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -612,7 +612,7 @@
     },
     {
       "name": "teamgrid_group_create",
-      "description": "Create a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. Administrative action: review the exact target and access impact with the user.",
+      "description": "Create a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. This changes TeamGrid workspace access only; it does not create external service groups, publish public internet links or accept arbitrary external destinations. Administrative action: review the exact target and access impact with the user.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -624,7 +624,7 @@
     },
     {
       "name": "teamgrid_group_delete",
-      "description": "Delete a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Administrative action: review the exact target and access impact with the user.",
+      "description": "Delete a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. This changes TeamGrid workspace access only; it does not create external service groups, publish public internet links or accept arbitrary external destinations. Administrative action: review the exact target and access impact with the user.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -640,7 +640,7 @@
     },
     {
       "name": "teamgrid_group_update",
-      "description": "Update a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Administrative action: review the exact target and access impact with the user.",
+      "description": "Update a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. This changes TeamGrid workspace access only; it does not create external service groups, publish public internet links or accept arbitrary external destinations. Administrative action: review the exact target and access impact with the user.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -960,7 +960,7 @@
     },
     {
       "name": "teamgrid_project_sharing_replace",
-      "description": "Replace project sharing. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Administrative action: review the exact target and access impact with the user.",
+      "description": "Replace project sharing. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. This changes TeamGrid workspace access only; it does not create external service groups, publish public internet links or accept arbitrary external destinations. Administrative action: review the exact target and access impact with the user.",
       "capabilities": {
         "confirmation": {
           "type": "AdaptiveCard",
@@ -1508,7 +1508,15 @@
     },
     {
       "name": "teamgrid_task_recurrence_preview_input",
-      "description": "Preview a draft task recurrence Acceptance is not completion. Use the corresponding operation-get tool to inspect the returned operation until terminal."
+      "description": "Preview a draft task recurrence. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. The API has no conditional-write or replay contract for this action. Do not retry an uncertain result automatically; read the current state first. May persist a background preview operation. This does not create a recurrence series or tasks. Inspect the returned operation with teamgrid_task_recurrence_operation_get; never queue an uncertain preview again automatically. Acceptance is not completion. Use the corresponding operation-get tool to inspect the returned operation until terminal.",
+      "capabilities": {
+        "confirmation": {
+          "type": "AdaptiveCard",
+          "title": "Confirm TeamGrid change",
+          "body": "Confirm the requested TeamGrid action: Task Recurrence Preview Input in TeamGrid.",
+          "isNonConsequential": false
+        }
+      }
     },
     {
       "name": "teamgrid_task_recurrence_recheck",

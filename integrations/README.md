@@ -1,7 +1,7 @@
 # TeamGrid AI integrations
 
 Implementation started on 2026-10-04. The first public OpenAI release is scoped
-to the complete 208-tool business catalog (84 reads, 124 writes). Claude and
+to the complete 208-tool business catalog (83 reads, 125 writes). Claude and
 Microsoft 365 Copilot, including Cowork, use the same business contract. A full
 catalog does not grant access: current roles, sharing, locks, workspace binding
 and separately approved OAuth scopes still apply.

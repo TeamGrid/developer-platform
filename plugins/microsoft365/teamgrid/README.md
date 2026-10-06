@@ -5,7 +5,7 @@ Work with TeamGrid projects, tasks, planning, content, CRM and workspace adminis
 Publisher: Foundster Corporate Services FZCO. OpenAI business verification is approved. Other vendor enrollment and verification remain pending. This does not establish approval of this plugin.
 Support: support@teamgridapp.com
 
-Connect one TeamGrid workspace through OAuth. The full business catalog contains 208 tools (84 reads and 124 writes). Current workspace roles, sharing, locks and separately approved scopes apply to every call. No API key belongs in this package or in chat.
+Connect one TeamGrid workspace through OAuth. The full business catalog contains 208 tools (83 reads and 125 writes). Current workspace roles, sharing, locks and separately approved scopes apply to every call. No API key belongs in this package or in chat.
 
 ## Data flow
 

@@ -243,7 +243,7 @@ describe('ChatGPT OAuth permission escalation', () => {
           cursor = message.result.nextCursor
         } while (cursor)
         expect(tools).toHaveLength(208)
-        expect(tools.filter((tool) => tool.annotations.readOnlyHint)).toHaveLength(84)
+        expect(tools.filter((tool) => tool.annotations.readOnlyHint)).toHaveLength(83)
         for (const tool of tools)
           expect(tool.annotations.destructiveHint).toBe(!tool.annotations.readOnlyHint)
         // Scopes and the core create semantics remain unchanged by presentation.

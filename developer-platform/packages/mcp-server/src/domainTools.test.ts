@@ -2,7 +2,12 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { TeamGridApiError, type TeamGridClient } from '@teamgrid/api-client'
 import { describe, expect, it, vi } from 'vitest'
-import { domainCatalog, domainInputSchema, domainToolNames } from './domainTools.js'
+import {
+  domainCatalog,
+  domainInputSchema,
+  domainToolNames,
+  executeDomainTool,
+} from './domainTools.js'
 import { responseFixture } from './fixtures.testSupport.js'
 import { createTeamGridMcpServer } from './server.js'
 import { describeMcpAccess } from './setup.js'
@@ -56,6 +61,30 @@ async function connected() {
 }
 
 describe('complete domain MCP', () => {
+  it('guards queued input previews before dispatch and retains pure stored previews', async () => {
+    const queued = domainCatalog.teamgrid_task_recurrence_preview_input
+    expect(queued.annotations).toEqual({
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: false,
+    })
+    expect(queued.inputSchema.required).toContain('workspaceId')
+    expect(domainCatalog.teamgrid_task_recurrence_preview.annotations.readOnlyHint).toBe(true)
+    const preview = vi.fn()
+    const api = {
+      workspace: { get: vi.fn(async () => ({ data: { id: workspaceId } })) },
+      taskRecurrences: { preview },
+    } as unknown as TeamGridClient
+    await expect(
+      executeDomainTool(api, 'teamgrid_task_recurrence_preview_input', {
+        workspaceId: 'another-workspace',
+        data: {},
+      }),
+    ).rejects.toThrow('another workspace')
+    expect(preview).not.toHaveBeenCalled()
+  })
+
   it.each([
     [
       'teamgrid_task_create',

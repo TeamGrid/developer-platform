@@ -1180,7 +1180,7 @@
     "concurrency": "unconditional",
     "idempotency": true,
     "coreCas": false,
-    "description": "Create a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent.",
+    "description": "Create a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. Only TeamGrid-managed appointments in the authorized private workspace can be changed. Imported provider-managed calendar events are read-only; this tool cannot write Google or Microsoft calendar events.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -1723,7 +1723,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Update a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
+    "description": "Update a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Only TeamGrid-managed appointments in the authorized private workspace can be changed. Imported provider-managed calendar events are read-only; this tool cannot write Google or Microsoft calendar events.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -2051,7 +2051,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Archive a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
+    "description": "Archive a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Only TeamGrid-managed appointments in the authorized private workspace can be changed. Imported provider-managed calendar events are read-only; this tool cannot write Google or Microsoft calendar events.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -2296,7 +2296,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Restore a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision.",
+    "description": "Restore a TeamGrid-managed appointment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Only TeamGrid-managed appointments in the authorized private workspace can be changed. Imported provider-managed calendar events are read-only; this tool cannot write Google or Microsoft calendar events.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -4789,7 +4789,7 @@
     "concurrency": "unconditional",
     "idempotency": true,
     "coreCas": false,
-    "description": "Create a target comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. May notify other people.",
+    "description": "Create a target comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. May notify other people. Comment targets and mentions are authorized TeamGrid workspace resources and members; this tool has no arbitrary external recipient or service destination.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -5274,7 +5274,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Archive a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people.",
+    "description": "Archive a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people. Comment targets and mentions are authorized TeamGrid workspace resources and members; this tool has no arbitrary external recipient or service destination.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -5519,7 +5519,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Edit a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people.",
+    "description": "Edit a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people. Comment targets and mentions are authorized TeamGrid workspace resources and members; this tool has no arbitrary external recipient or service destination.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -5781,7 +5781,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Restore a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people.",
+    "description": "Restore a comment. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. May notify other people. Comment targets and mentions are authorized TeamGrid workspace resources and members; this tool has no arbitrary external recipient or service destination.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -13488,7 +13488,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": true,
-    "description": "Replace project sharing. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Administrative action: review the exact target and access impact with the user.",
+    "description": "Replace project sharing. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. This changes TeamGrid workspace access only; it does not create external service groups, publish public internet links or accept arbitrary external destinations. Administrative action: review the exact target and access impact with the user.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -46545,7 +46545,7 @@
     "concurrency": "unconditional",
     "idempotency": true,
     "coreCas": false,
-    "description": "Create a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. Administrative action: review the exact target and access impact with the user.",
+    "description": "Create a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. This changes TeamGrid workspace access only; it does not create external service groups, publish public internet links or accept arbitrary external destinations. Administrative action: review the exact target and access impact with the user.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -47034,7 +47034,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Update a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Administrative action: review the exact target and access impact with the user.",
+    "description": "Update a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. This changes TeamGrid workspace access only; it does not create external service groups, publish public internet links or accept arbitrary external destinations. Administrative action: review the exact target and access impact with the user.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -47315,7 +47315,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Delete a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Administrative action: review the exact target and access impact with the user.",
+    "description": "Delete a workspace group. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. This changes TeamGrid workspace access only; it does not create external service groups, publish public internet links or accept arbitrary external destinations. Administrative action: review the exact target and access impact with the user.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -56081,15 +56081,21 @@
     "method": "POST",
     "path": "/task-recurrences/preview",
     "domain": "tasks-write",
-    "write": false,
-    "concurrency": "read",
+    "write": true,
+    "concurrency": "unconditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Preview a draft task recurrence Acceptance is not completion. Use the corresponding operation-get tool to inspect the returned operation until terminal.",
+    "description": "Preview a draft task recurrence. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. The API has no conditional-write or replay contract for this action. Do not retry an uncertain result automatically; read the current state first. May persist a background preview operation. This does not create a recurrence series or tasks. Inspect the returned operation with teamgrid_task_recurrence_operation_get; never queue an uncertain preview again automatically. Acceptance is not completion. Use the corresponding operation-get tool to inspect the returned operation until terminal.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "Workspace returned by teamgrid_workspace_get and selected for this exact action."
+        },
         "data": {
           "additionalProperties": false,
           "properties": {
@@ -57115,6 +57121,7 @@
         }
       },
       "required": [
+        "workspaceId",
         "data"
       ],
       "$defs": {
@@ -59732,9 +59739,9 @@
       ]
     },
     "annotations": {
-      "readOnlyHint": true,
+      "readOnlyHint": false,
       "destructiveHint": false,
-      "idempotentHint": true,
+      "idempotentHint": false,
       "openWorldHint": false
     }
   },

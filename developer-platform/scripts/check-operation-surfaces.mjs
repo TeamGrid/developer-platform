@@ -370,15 +370,20 @@ for (const profile of Object.keys(toolsByProfile)) {
     const { tools } = await listAllMcpTools(mcpClient)
     const advertised = new Set(tools.map((tool) => tool.name))
     for (const tool of tools) {
-      const policy = ledger.operationPolicy.find((operation) => operation.mcp.tool === tool.name)?.mcp
+      const operationPolicy = ledger.operationPolicy.find((operation) => operation.mcp.tool === tool.name)
+      const policy = operationPolicy?.mcp
       if (!policy || policy.exposure === 'forbidden' || (policy.profiles && !policy.profiles.includes(profile) && tool.name !== 'teamgrid_workspace_get')) {
         fail(`${profile} advertises ${tool.name} without explicit capability permission`)
       }
-      const write = policy.exposure === 'gated-write'
+      // The cell may persist a preview job; the MCP surface deliberately applies
+      // stronger mutation safeguards without changing the immutable API wire.
+      const queuedPreview = operationPolicy.operationId === 'previewTaskRecurrence'
+      const write = policy.exposure === 'gated-write' || queuedPreview
       if (tool.annotations?.readOnlyHint !== !write || (write && profile !== 'work' && profile !== 'full' && !profile.endsWith('-write'))) {
         fail(`${profile}/${tool.name} has incorrect read/write metadata`)
       }
-      if (write && !policy.requiredArguments.every((name) => tool.inputSchema.required?.includes(name))) {
+      const requiredArguments = queuedPreview ? ['workspaceId'] : policy.requiredArguments
+      if (write && !requiredArguments.every((name) => tool.inputSchema.required?.includes(name))) {
         fail(`${tool.name} lacks required workspace/revision/idempotency arguments`)
       }
     }
