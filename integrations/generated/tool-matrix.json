@@ -5513,25 +5513,25 @@
       "tasks:write",
       "workspace:read"
     ],
-    "concurrency": "read",
+    "concurrency": "unconditional",
     "idempotency": false,
     "annotations": {
       "openai": {
-        "readOnlyHint": true,
+        "readOnlyHint": false,
         "destructiveHint": false,
-        "idempotentHint": true,
+        "idempotentHint": false,
         "openWorldHint": false
       },
       "anthropic": {
-        "readOnlyHint": true,
-        "destructiveHint": false,
-        "idempotentHint": true,
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
         "openWorldHint": false
       },
       "microsoft365": {
-        "readOnlyHint": true,
+        "readOnlyHint": false,
         "destructiveHint": false,
-        "idempotentHint": true,
+        "idempotentHint": false,
         "openWorldHint": false
       }
     },

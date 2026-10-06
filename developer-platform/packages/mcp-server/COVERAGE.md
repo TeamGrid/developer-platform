@@ -2,7 +2,7 @@
 
 Generated from the reviewed canonical API contract. Not a publication or live qualification claim.
 
-The full profile contains 208 tools: 84 reads and 124 writes. 30 API operations use other connection or transfer surfaces.
+The full profile contains 208 tools: 83 reads and 125 writes. 30 API operations use other connection or transfer surfaces.
 
 All writes require workspaceId and current API authorization. Conditional tools accept the exact quoted meta.etag returned by the preceding read. Per-item revision uses data.items[].revision. Unconditional means the API has no revision precondition. Idempotency keys protect repetition of one intent, not concurrent edits.
 
@@ -181,7 +181,7 @@ Domain profiles include their listed tools plus workspace, user, task/project lo
 | `teamgrid_task_recurrence_owner_transfer` | tasks-write | write | conditional | — |
 | `teamgrid_task_recurrence_pause` | tasks-write | write | conditional | — |
 | `teamgrid_task_recurrence_preview` | tasks-write | read | read | — |
-| `teamgrid_task_recurrence_preview_input` | tasks-write | read | read | — |
+| `teamgrid_task_recurrence_preview_input` | tasks-write | write | unconditional | — |
 | `teamgrid_task_recurrence_recheck` | tasks-write | write | unconditional | — |
 | `teamgrid_task_recurrence_remove_from_tasks` | tasks-write | write | conditional | — |
 | `teamgrid_task_recurrence_restore` | tasks-write | write | conditional | — |

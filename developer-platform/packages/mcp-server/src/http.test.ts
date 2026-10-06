@@ -326,7 +326,7 @@ describe('regional HTTP MCP authorization boundary', () => {
 
   it.each([
     ['work', 34],
-    ['full', 84],
+    ['full', 83],
     ['time-write', 9],
   ] as const)(
     'serves %s reads with writes disabled, isolated delegation and fresh revocation checks',

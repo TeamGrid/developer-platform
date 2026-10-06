@@ -42,7 +42,10 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
   cyclicRefs = new Set()
   const operation = api.paths[entry.path][entry.method.toLowerCase()]
   const parameters = resolve(operation.parameters || [])
-  const write = entry.mcp.exposure === 'gated-write'
+  // Input previews can persist an asynchronous preview operation in the owning
+  // cell. Treat that route as a write even though its canonical exposure is read.
+  const queuedPreview = entry.operationId === 'previewTaskRecurrence'
+  const write = entry.mcp.exposure === 'gated-write' || queuedPreview
   let methodType = clientType
   for (const key of entry.sdk.split('.')) {
     const symbol = methodType.getProperty(key)
@@ -129,7 +132,11 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
   if (write && !ifMatch && !idempotent && !perItemRevision) description += ' The API has no conditional-write or replay contract for this action. Do not retry an uncertain result automatically; read the current state first.'
   if (idempotent) description += ' Reuse the same idempotencyKey and payload for the same intent.'
   if (write && (entry.sdk.startsWith('invitations.') || entry.sdk.startsWith('comments.'))) description += ' May notify other people.'
-  if (write && (entry.sdk.startsWith('automation') || entry.sdk.startsWith('taskRecurrence'))) description += ' Changes can affect future automated actions; inspect the definition and schedule first.'
+  if (entry.sdk.startsWith('appointments.') && write) description += ' Only TeamGrid-managed appointments in the authorized private workspace can be changed. Imported provider-managed calendar events are read-only; this tool cannot write Google or Microsoft calendar events.'
+  if (entry.sdk.startsWith('comments.') && write) description += ' Comment targets and mentions are authorized TeamGrid workspace resources and members; this tool has no arbitrary external recipient or service destination.'
+  if ((entry.sdk.startsWith('groups.') && write) || entry.operationId === 'replaceProjectSharing') description += ' This changes TeamGrid workspace access only; it does not create external service groups, publish public internet links or accept arbitrary external destinations.'
+  if (queuedPreview) description += ' May persist a background preview operation. This does not create a recurrence series or tasks. Inspect the returned operation with teamgrid_task_recurrence_operation_get; never queue an uncertain preview again automatically.'
+  if (write && !queuedPreview && (entry.sdk.startsWith('automation') || entry.sdk.startsWith('taskRecurrence'))) description += ' Changes can affect future automated actions; inspect the definition and schedule first.'
   if (write && (entry.mcp.domain === 'admin-write' || entry.operationId === 'replaceProjectSharing')) description += ' Administrative action: review the exact target and access impact with the user.'
   if (operation.responses?.['202']) description += ' Acceptance is not completion. Use the corresponding operation-get tool to inspect the returned operation until terminal.'
   const { $defs: outputDefinitions, ...outputSchema } = mcpOutputSchema(api, { ...operation,
@@ -146,7 +153,7 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
     ...(write && operation['x-teamgrid-snapshot-cas'] === 'resource-snapshot-cas-v1'
       ? { snapshotCas: true } : {}),
     description, inputSchema: compactMcpInputSchema(shape), outputSchema,
-    annotations: { readOnlyHint: !write, destructiveHint: write && !/^create/.test(entry.operationId),
+    annotations: { readOnlyHint: !write, destructiveHint: write && !queuedPreview && !/^create/.test(entry.operationId),
       idempotentHint: !write || idempotent || Boolean(ifMatch),
       // Bounded workspace reads never contact the configured recipients or targets.
       // These domains can reach external entities when a mutation changes or sends work.
