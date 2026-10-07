@@ -22,7 +22,7 @@
       "sha256": "5aa5f66921cded858a7121cea3ef3e7b135d283b0d48417c878cc62253d6689c"
     }
   },
-  "catalogSha256": "233d502db5c61b4c67e73e8d0c31100e270776ae4cbf29d1de0c46bdf289e283",
+  "catalogSha256": "e5849f081b8102043abe14b02107a4b8123ae7357974d3d1f414689edef01fbb",
   "counts": {
     "tools": 208,
     "reads": 83,
@@ -149,11 +149,11 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/plugin.json",
-      "sha256": "8d2a6bcf9c17ff63f16cdb694cdbd9615b3f846a0a4a1a92c311416b51e998b8"
+      "sha256": "69d8727151a7036953716a83d471655b8e7b607dff3ec3df853ec5c76b7bdc45"
     },
     {
       "path": "plugins/microsoft365/teamgrid/tools.json",
-      "sha256": "1fbe144a8aa4cfb776f236179cc5e998463eb672b3d77f73010ae62bd27d027c"
+      "sha256": "b85662ad70ccebe3e42eab004cbf8f33305ce8d3e26241d28cf6e9d3289528d0"
     },
     {
       "path": "plugins/microsoft365/teamgrid/color.png",
@@ -165,7 +165,7 @@
     },
     {
       "path": "integrations/generated/tool-matrix.json",
-      "sha256": "a1d4ac2bcdf64bd8e56cdbb660883a73e064cd949b2e9a02705b94c227f00383"
+      "sha256": "5f39aae98ba2641a45fbf469c4c8dc09b14755f6285380a2519d371f3680b3d7"
     }
   ]
 }

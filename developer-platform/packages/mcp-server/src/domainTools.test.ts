@@ -61,6 +61,64 @@ async function connected() {
 }
 
 describe('complete domain MCP', () => {
+  it('rejects private automation executors before dispatch and preserves activation errors', async () => {
+    const c = await connected()
+    try {
+      for (const actionId of ['httpRequest', 'mongoUpdate', 'teamgrid_task_create']) {
+        const result = await c.client.callTool({
+          name: 'teamgrid_automation_definition_create',
+          arguments: {
+            workspaceId,
+            idempotencyKey: 'workflow-config-1',
+            data: {
+              name: 'Workflow configuration',
+              trigger: { data: { type: 'tasks' }, event: 'create' },
+              flow: [{ actionId }],
+            },
+          },
+        })
+        expect(result.isError).toBe(true)
+        expect(c.calls.size).toBe(0)
+      }
+      expect(domainCatalog.teamgrid_automation_actions_list.annotations.readOnlyHint).toBe(true)
+      expect(domainCatalog.teamgrid_automation_definition_create.annotations.destructiveHint).toBe(
+        true,
+      )
+    } finally {
+      await c.close()
+    }
+    const create = vi.fn(async () => {
+      throw new TeamGridApiError({
+        status: 403,
+        errors: [
+          {
+            code: 'developer-api-automation-execution-unavailable',
+            status: '403',
+            title: 'Automation activation unavailable',
+            detail:
+              'OAuth automation execution requires the qualified source-grant effect protocol.',
+          },
+        ],
+      })
+    })
+    const api = {
+      workspace: { get: vi.fn(async () => ({ data: { id: workspaceId } })) },
+      automationDefinitions: { create },
+    } as unknown as TeamGridClient
+    await expect(
+      executeDomainTool(api, 'teamgrid_automation_definition_create', {
+        workspaceId,
+        idempotencyKey: 'workflow-config-1',
+        data: {
+          name: 'Workflow configuration',
+          flow: [],
+          trigger: { data: { type: 'tasks' }, event: 'create' },
+        },
+      }),
+    ).rejects.toMatchObject({ status: 403 })
+    expect(create).toHaveBeenCalledOnce()
+  })
+
   it('guards queued input previews before dispatch and retains pure stored previews', async () => {
     const queued = domainCatalog.teamgrid_task_recurrence_preview_input
     expect(queued.annotations).toEqual({

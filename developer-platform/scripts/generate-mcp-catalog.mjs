@@ -121,6 +121,9 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
   const perItemRevision = entry.operationId === 'bulkUpdateTasks'
   const concurrency = perItemRevision ? 'per-item revision' : ifMatch ? 'conditional' : write ? 'unconditional' : 'read'
   let description = operation.summary || entry.operationId
+  if (entry.operationId === 'listAutomationActions') description = 'Read the saved TeamGrid workflow step catalog and its parameter constraints. This is a read-only configuration reference, not discovery of callable tools. It does not execute a step, start a run or grant permissions. Immediate workspace changes use the individually exposed task, project, list, service, project-statement and time-entry tools.'
+  const automationDefinitionWrite = ['createAutomationDefinition', 'updateAutomationDefinition', 'restoreAutomationDefinition'].includes(entry.operationId)
+  if (automationDefinitionWrite) description += '. Stores declarative workflow configuration, not a command to execute the supplied flow. The finite actionId enum contains TeamGrid workflow steps and control flow; arbitrary tool names, scripts, HTTP requests and private actions are rejected. Future runs can change tasks, projects, lists, services, project statements and time entries. OAuth activation is currently unavailable until the background executor qualifies source-grant permission checks; an API error is not a saved definition. Immediate changes use the corresponding individually exposed resource tools.'
   if (entry.operationId === 'getDocument') description += '. Content is a bounded chunk, not necessarily the whole document. Continue with contentOffset=meta.contentPage.nextOffset and expectedRevision=meta.etag until nextOffset is null. Never infer omitted content or overwrite a document from an incomplete read.'
   if (entry.operationId === 'getContact') description += '. Notes are a bounded chunk. Continue with notesOffset=meta.notesPage.nextOffset and expectedRevision=meta.etag until nextOffset is null. Never infer omitted notes or overwrite them from an incomplete read.'
   if (entry.operationId === 'listContacts') description += '. Notes are omitted; use teamgrid_contact_get to read them with revision-checked continuation.'
@@ -153,7 +156,7 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
     ...(write && operation['x-teamgrid-snapshot-cas'] === 'resource-snapshot-cas-v1'
       ? { snapshotCas: true } : {}),
     description, inputSchema: compactMcpInputSchema(shape), outputSchema,
-    annotations: { readOnlyHint: !write, destructiveHint: write && !queuedPreview && !/^create/.test(entry.operationId),
+    annotations: { readOnlyHint: !write, destructiveHint: write && !queuedPreview && (automationDefinitionWrite || !/^create/.test(entry.operationId)),
       idempotentHint: !write || idempotent || Boolean(ifMatch),
       // Bounded workspace reads never contact the configured recipients or targets.
       // These domains can reach external entities when a mutation changes or sends work.

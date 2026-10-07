@@ -524,7 +524,7 @@
     "annotations": {
       "openai": {
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": true
       },
@@ -536,7 +536,7 @@
       },
       "microsoft365": {
         "readOnlyHint": false,
-        "destructiveHint": false,
+        "destructiveHint": true,
         "idempotentHint": true,
         "openWorldHint": true
       }
