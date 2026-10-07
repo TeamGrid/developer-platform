@@ -48427,7 +48427,7 @@
     "concurrency": "read",
     "idempotency": false,
     "coreCas": false,
-    "description": "List public automation actions",
+    "description": "Read the saved TeamGrid workflow step catalog and its parameter constraints. This is a read-only configuration reference, not discovery of callable tools. It does not execute a step, start a run or grant permissions. Immediate workspace changes use the individually exposed task, project, list, service, project-statement and time-entry tools.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -48872,7 +48872,7 @@
     "concurrency": "unconditional",
     "idempotency": true,
     "coreCas": false,
-    "description": "Create an automation definition. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. Changes can affect future automated actions; inspect the definition and schedule first.",
+    "description": "Create an automation definition. Stores declarative workflow configuration, not a command to execute the supplied flow. The finite actionId enum contains TeamGrid workflow steps and control flow; arbitrary tool names, scripts, HTTP requests and private actions are rejected. Future runs can change tasks, projects, lists, services, project statements and time entries. OAuth activation is currently unavailable until the background executor qualifies source-grant permission checks; an API error is not a saved definition. Immediate changes use the corresponding individually exposed resource tools.. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. Changes can affect future automated actions; inspect the definition and schedule first.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -49480,7 +49480,7 @@
     },
     "annotations": {
       "readOnlyHint": false,
-      "destructiveHint": false,
+      "destructiveHint": true,
       "idempotentHint": true,
       "openWorldHint": true
     }
@@ -49705,7 +49705,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Update an automation definition. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Changes can affect future automated actions; inspect the definition and schedule first.",
+    "description": "Update an automation definition. Stores declarative workflow configuration, not a command to execute the supplied flow. The finite actionId enum contains TeamGrid workflow steps and control flow; arbitrary tool names, scripts, HTTP requests and private actions are rejected. Future runs can change tasks, projects, lists, services, project statements and time entries. OAuth activation is currently unavailable until the background executor qualifies source-grant permission checks; an API error is not a saved definition. Immediate changes use the corresponding individually exposed resource tools.. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Changes can affect future automated actions; inspect the definition and schedule first.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
@@ -50573,7 +50573,7 @@
     "concurrency": "conditional",
     "idempotency": false,
     "coreCas": false,
-    "description": "Restore an automation definition. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Changes can affect future automated actions; inspect the definition and schedule first.",
+    "description": "Restore an automation definition. Stores declarative workflow configuration, not a command to execute the supplied flow. The finite actionId enum contains TeamGrid workflow steps and control flow; arbitrary tool names, scripts, HTTP requests and private actions are rejected. Future runs can change tasks, projects, lists, services, project statements and time entries. OAuth activation is currently unavailable until the background executor qualifies source-grant permission checks; an API error is not a saved definition. Immediate changes use the corresponding individually exposed resource tools.. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Changes can affect future automated actions; inspect the definition and schedule first.",
     "inputSchema": {
       "type": "object",
       "additionalProperties": false,
