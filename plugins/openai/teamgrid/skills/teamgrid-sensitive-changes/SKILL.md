@@ -9,9 +9,11 @@ requested before/after change and any material effect on access, money or
 external notifications. Ask for missing specifics or authorization before the
 mutation; preserve an explicit authorization already given for that exact action.
 
-Discover the dedicated action and use its required revision, workspace argument
+Use the dedicated action already exposed by the host and its required revision, workspace argument
 and idempotency key. Tool visibility and a full tool catalog grant no additional
-permission. Missing OAuth scopes require the host consent flow. A sharing, role,
+permission. The saved native permission checkbox selection also limits the
+current TeamGrid role. Missing OAuth scopes require the host consent flow; an
+unselected native permission requires an explicit new user choice. A sharing, role,
 membership or workspace-lock denial is an access denial, not a reason to widen
 scopes or use a different identity.
 

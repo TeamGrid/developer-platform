@@ -1,6 +1,6 @@
 {
   "status": "draft-unqualified",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": {
     "legalName": "Foundster Corporate Services FZCO",
     "displayName": "Foundster",
@@ -49,27 +49,27 @@
     },
     {
       "path": "plugins/openai/teamgrid/skills/teamgrid-planning-automation/SKILL.md",
-      "sha256": "fbe816ecda54d653c58e44cf110fb8efa5044ce27bd557aeba33b07dcd1b0779"
+      "sha256": "a455ea3b63e849d9b53d448225beaf25961be9e3814f3d8ed96e4847cd72dd71"
     },
     {
       "path": "plugins/openai/teamgrid/skills/teamgrid-project-content/SKILL.md",
-      "sha256": "659cf734578f3fa78c6696effcf1b131b35a01159a124f143bed1960ea297759"
+      "sha256": "cf4b84367d2576b50db52f50eb14f648ce2bec6aa850c03eb566005aefc38f27"
     },
     {
       "path": "plugins/openai/teamgrid/skills/teamgrid-sensitive-changes/SKILL.md",
-      "sha256": "6034cd5f9bb330b3d1c764e630d42f3436fb013455525403faf27a38bc93341e"
+      "sha256": "3642b2d97c61a73d8639254a78d949585eb026051e099bc5a19079ea5469e9e2"
     },
     {
       "path": "plugins/openai/teamgrid/skills/teamgrid-workspace-context/SKILL.md",
-      "sha256": "52c510e75e3da06f53d55a7837d81ad72daccd2601617295a8f6b323d02ebb94"
+      "sha256": "062a4de8ff011aaee296da177a66713215b46edc1d4bdc942f77280624ff359b"
     },
     {
       "path": "plugins/openai/teamgrid/README.md",
-      "sha256": "a6d84f34bb9b8b4d153945940e2ce6198087930d95680249bd058bbca848b3dd"
+      "sha256": "7b6c8ff821205398d6625840cbd58bd6d03b8c473c324a5ccd6ec20eaf2f48d5"
     },
     {
       "path": "plugins/openai/teamgrid/plugin.json",
-      "sha256": "75503c1743effdf9d614f98ae5953a247c965cfc1124275718561d9141d469f8"
+      "sha256": "e47baebc211e894df5abd215e3086fd27dc905c7941e31112563b619b5fc1eb5"
     },
     {
       "path": "plugins/openai/teamgrid/mcp.json",
@@ -85,27 +85,27 @@
     },
     {
       "path": "plugins/claude/teamgrid/skills/teamgrid-planning-automation/SKILL.md",
-      "sha256": "fbe816ecda54d653c58e44cf110fb8efa5044ce27bd557aeba33b07dcd1b0779"
+      "sha256": "a455ea3b63e849d9b53d448225beaf25961be9e3814f3d8ed96e4847cd72dd71"
     },
     {
       "path": "plugins/claude/teamgrid/skills/teamgrid-project-content/SKILL.md",
-      "sha256": "659cf734578f3fa78c6696effcf1b131b35a01159a124f143bed1960ea297759"
+      "sha256": "cf4b84367d2576b50db52f50eb14f648ce2bec6aa850c03eb566005aefc38f27"
     },
     {
       "path": "plugins/claude/teamgrid/skills/teamgrid-sensitive-changes/SKILL.md",
-      "sha256": "6034cd5f9bb330b3d1c764e630d42f3436fb013455525403faf27a38bc93341e"
+      "sha256": "3642b2d97c61a73d8639254a78d949585eb026051e099bc5a19079ea5469e9e2"
     },
     {
       "path": "plugins/claude/teamgrid/skills/teamgrid-workspace-context/SKILL.md",
-      "sha256": "52c510e75e3da06f53d55a7837d81ad72daccd2601617295a8f6b323d02ebb94"
+      "sha256": "062a4de8ff011aaee296da177a66713215b46edc1d4bdc942f77280624ff359b"
     },
     {
       "path": "plugins/claude/teamgrid/README.md",
-      "sha256": "0765fb19847fcdb8b8175efe21f4c035e6ce2745a42a74826919384665083b24"
+      "sha256": "e542116cd49091af2ad0130525f1fe9485684d339366dfb40a7bd7897840bfe2"
     },
     {
       "path": "plugins/claude/teamgrid/.claude-plugin/plugin.json",
-      "sha256": "4f759c3330a425a4a005872c2ba87207959b2901b6cfc3d137baf30464ea6ed0"
+      "sha256": "0bd19df063f73693f2219309c99c3f6592c9d6c0b5f1460ebed1ec004fd6e392"
     },
     {
       "path": "plugins/claude/teamgrid/.mcp.json",
@@ -121,27 +121,27 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/skills/teamgrid-planning-automation/SKILL.md",
-      "sha256": "fbe816ecda54d653c58e44cf110fb8efa5044ce27bd557aeba33b07dcd1b0779"
+      "sha256": "a455ea3b63e849d9b53d448225beaf25961be9e3814f3d8ed96e4847cd72dd71"
     },
     {
       "path": "plugins/microsoft365/teamgrid/skills/teamgrid-project-content/SKILL.md",
-      "sha256": "659cf734578f3fa78c6696effcf1b131b35a01159a124f143bed1960ea297759"
+      "sha256": "cf4b84367d2576b50db52f50eb14f648ce2bec6aa850c03eb566005aefc38f27"
     },
     {
       "path": "plugins/microsoft365/teamgrid/skills/teamgrid-sensitive-changes/SKILL.md",
-      "sha256": "6034cd5f9bb330b3d1c764e630d42f3436fb013455525403faf27a38bc93341e"
+      "sha256": "3642b2d97c61a73d8639254a78d949585eb026051e099bc5a19079ea5469e9e2"
     },
     {
       "path": "plugins/microsoft365/teamgrid/skills/teamgrid-workspace-context/SKILL.md",
-      "sha256": "52c510e75e3da06f53d55a7837d81ad72daccd2601617295a8f6b323d02ebb94"
+      "sha256": "062a4de8ff011aaee296da177a66713215b46edc1d4bdc942f77280624ff359b"
     },
     {
       "path": "plugins/microsoft365/teamgrid/README.md",
-      "sha256": "0765fb19847fcdb8b8175efe21f4c035e6ce2745a42a74826919384665083b24"
+      "sha256": "e542116cd49091af2ad0130525f1fe9485684d339366dfb40a7bd7897840bfe2"
     },
     {
       "path": "plugins/microsoft365/teamgrid/manifest.json",
-      "sha256": "337a033c5d06d3ef17c4ed1b8c8a235e7dbb6e1779c657eafcc6c094bd5711ae"
+      "sha256": "f36bfe285793720d631031fdd9ef5bcd5649d1256dbc298c988cbd083efbc321"
     },
     {
       "path": "plugins/microsoft365/teamgrid/declarativeAgent.json",
