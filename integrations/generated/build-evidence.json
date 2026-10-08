@@ -22,14 +22,14 @@
       "sha256": "5aa5f66921cded858a7121cea3ef3e7b135d283b0d48417c878cc62253d6689c"
     }
   },
-  "catalogSha256": "e5849f081b8102043abe14b02107a4b8123ae7357974d3d1f414689edef01fbb",
+  "catalogSha256": "12102611fcbd15e75d135b3f35b6f2f498c2a7eaf0847e9a344cf3649c2e72a9",
   "counts": {
-    "tools": 208,
-    "reads": 83,
-    "writes": 125
+    "tools": 197,
+    "reads": 77,
+    "writes": 120
   },
   "skills": [
-    "teamgrid-planning-automation",
+    "teamgrid-planning",
     "teamgrid-project-content",
     "teamgrid-sensitive-changes",
     "teamgrid-workspace-context"
@@ -39,8 +39,8 @@
     "Global MCP endpoint and issuer are proposed; DE/US routing and old-grant compatibility are unqualified.",
     "Remaining publisher registrations, MCP-specific legal disclosures and the full review workspace require verification.",
     "Microsoft OAuth client/reference registration and public package eligibility are unresolved.",
-    "Real-host OAuth escalation, file/export behavior and all 208 operations require acceptance evidence.",
-    "Claude hosted CIMD URL/client_id currently differ; resolve with Anthropic or register an explicit approved client."
+    "Real-host OAuth escalation, file/export behavior and all 197 published operations require acceptance evidence.",
+    "Claude hosted CIMD metadata must be verified from the actual gateway network or an explicit approved client registered."
   ],
   "files": [
     {
@@ -48,8 +48,8 @@
       "sha256": "16fd83942e3a5c8be3860e8f9e3a36c138e8f8fb303bb9af90782e8359a24415"
     },
     {
-      "path": "plugins/openai/teamgrid/skills/teamgrid-planning-automation/SKILL.md",
-      "sha256": "a455ea3b63e849d9b53d448225beaf25961be9e3814f3d8ed96e4847cd72dd71"
+      "path": "plugins/openai/teamgrid/skills/teamgrid-planning/SKILL.md",
+      "sha256": "51d0e10de67df9f9db02787b0711953728bc69120dc4ce96f393aec7f736b86f"
     },
     {
       "path": "plugins/openai/teamgrid/skills/teamgrid-project-content/SKILL.md",
@@ -57,7 +57,7 @@
     },
     {
       "path": "plugins/openai/teamgrid/skills/teamgrid-sensitive-changes/SKILL.md",
-      "sha256": "3642b2d97c61a73d8639254a78d949585eb026051e099bc5a19079ea5469e9e2"
+      "sha256": "e4d80c651201bc52a45332d3efd040795ae460f90db4ac861235df5ea6a9b38a"
     },
     {
       "path": "plugins/openai/teamgrid/skills/teamgrid-workspace-context/SKILL.md",
@@ -65,7 +65,7 @@
     },
     {
       "path": "plugins/openai/teamgrid/README.md",
-      "sha256": "7b6c8ff821205398d6625840cbd58bd6d03b8c473c324a5ccd6ec20eaf2f48d5"
+      "sha256": "da90565d5b247f547e58f7fb58e3a5e0cdcf0954a2680e419e5e70c3f1c4e51a"
     },
     {
       "path": "plugins/openai/teamgrid/plugin.json",
@@ -84,8 +84,8 @@
       "sha256": "16fd83942e3a5c8be3860e8f9e3a36c138e8f8fb303bb9af90782e8359a24415"
     },
     {
-      "path": "plugins/claude/teamgrid/skills/teamgrid-planning-automation/SKILL.md",
-      "sha256": "a455ea3b63e849d9b53d448225beaf25961be9e3814f3d8ed96e4847cd72dd71"
+      "path": "plugins/claude/teamgrid/skills/teamgrid-planning/SKILL.md",
+      "sha256": "51d0e10de67df9f9db02787b0711953728bc69120dc4ce96f393aec7f736b86f"
     },
     {
       "path": "plugins/claude/teamgrid/skills/teamgrid-project-content/SKILL.md",
@@ -93,7 +93,7 @@
     },
     {
       "path": "plugins/claude/teamgrid/skills/teamgrid-sensitive-changes/SKILL.md",
-      "sha256": "3642b2d97c61a73d8639254a78d949585eb026051e099bc5a19079ea5469e9e2"
+      "sha256": "e4d80c651201bc52a45332d3efd040795ae460f90db4ac861235df5ea6a9b38a"
     },
     {
       "path": "plugins/claude/teamgrid/skills/teamgrid-workspace-context/SKILL.md",
@@ -101,7 +101,7 @@
     },
     {
       "path": "plugins/claude/teamgrid/README.md",
-      "sha256": "e542116cd49091af2ad0130525f1fe9485684d339366dfb40a7bd7897840bfe2"
+      "sha256": "92e46de58965f1aa600585150c2a0e25ec57f901c28993b50a423bdd149fc4ce"
     },
     {
       "path": "plugins/claude/teamgrid/.claude-plugin/plugin.json",
@@ -120,8 +120,8 @@
       "sha256": "16fd83942e3a5c8be3860e8f9e3a36c138e8f8fb303bb9af90782e8359a24415"
     },
     {
-      "path": "plugins/microsoft365/teamgrid/skills/teamgrid-planning-automation/SKILL.md",
-      "sha256": "a455ea3b63e849d9b53d448225beaf25961be9e3814f3d8ed96e4847cd72dd71"
+      "path": "plugins/microsoft365/teamgrid/skills/teamgrid-planning/SKILL.md",
+      "sha256": "51d0e10de67df9f9db02787b0711953728bc69120dc4ce96f393aec7f736b86f"
     },
     {
       "path": "plugins/microsoft365/teamgrid/skills/teamgrid-project-content/SKILL.md",
@@ -129,7 +129,7 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/skills/teamgrid-sensitive-changes/SKILL.md",
-      "sha256": "3642b2d97c61a73d8639254a78d949585eb026051e099bc5a19079ea5469e9e2"
+      "sha256": "e4d80c651201bc52a45332d3efd040795ae460f90db4ac861235df5ea6a9b38a"
     },
     {
       "path": "plugins/microsoft365/teamgrid/skills/teamgrid-workspace-context/SKILL.md",
@@ -137,11 +137,11 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/README.md",
-      "sha256": "e542116cd49091af2ad0130525f1fe9485684d339366dfb40a7bd7897840bfe2"
+      "sha256": "92e46de58965f1aa600585150c2a0e25ec57f901c28993b50a423bdd149fc4ce"
     },
     {
       "path": "plugins/microsoft365/teamgrid/manifest.json",
-      "sha256": "f36bfe285793720d631031fdd9ef5bcd5649d1256dbc298c988cbd083efbc321"
+      "sha256": "d781f96f99a8235f72e286e1d293d17f1c496c3dd7fd0a36f7954082f6b71bc9"
     },
     {
       "path": "plugins/microsoft365/teamgrid/declarativeAgent.json",
@@ -149,11 +149,11 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/plugin.json",
-      "sha256": "69d8727151a7036953716a83d471655b8e7b607dff3ec3df853ec5c76b7bdc45"
+      "sha256": "d6c539a645f87e6d82872edfeb5488c08ed15fef80d10ead4c14c32fbd831ca1"
     },
     {
       "path": "plugins/microsoft365/teamgrid/tools.json",
-      "sha256": "b85662ad70ccebe3e42eab004cbf8f33305ce8d3e26241d28cf6e9d3289528d0"
+      "sha256": "37f1a7de83aef6b2f47d78b0d3782b15138d14cc4a263ac389a2d29f9cf66e0c"
     },
     {
       "path": "plugins/microsoft365/teamgrid/color.png",
@@ -165,7 +165,7 @@
     },
     {
       "path": "integrations/generated/tool-matrix.json",
-      "sha256": "5f39aae98ba2641a45fbf469c4c8dc09b14755f6285380a2519d371f3680b3d7"
+      "sha256": "6c396ff8c46856ffb86b5c9885880fbfb81b96663bf16e103d4be1b53796806a"
     }
   ]
 }

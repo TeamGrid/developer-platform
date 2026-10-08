@@ -52,44 +52,6 @@ export const toolScopes = {
   "teamgrid_audit_events_list": [
     "audit:read"
   ],
-  "teamgrid_automation_actions_list": [
-    "automations:read"
-  ],
-  "teamgrid_automation_definition_archive": [
-    "automations:write",
-    "workspace:read"
-  ],
-  "teamgrid_automation_definition_create": [
-    "automations:write",
-    "workspace:read"
-  ],
-  "teamgrid_automation_definition_get": [
-    "automations:read"
-  ],
-  "teamgrid_automation_definition_restore": [
-    "automations:write",
-    "workspace:read"
-  ],
-  "teamgrid_automation_definition_update": [
-    "automations:write",
-    "workspace:read"
-  ],
-  "teamgrid_automation_definition_versions_list": [
-    "automations:read"
-  ],
-  "teamgrid_automation_definitions_list": [
-    "automations:read"
-  ],
-  "teamgrid_automation_run_abort": [
-    "automations:run",
-    "workspace:read"
-  ],
-  "teamgrid_automation_run_get": [
-    "automations:read"
-  ],
-  "teamgrid_automation_runs_list": [
-    "automations:read"
-  ],
   "teamgrid_availability_list": [
     "availability:read"
   ],
@@ -812,9 +774,6 @@ export const supportedOAuthScopes = [
   "appointments:read",
   "appointments:write",
   "audit:read",
-  "automations:read",
-  "automations:run",
-  "automations:write",
   "availability:delegated:read",
   "availability:read",
   "call-notes:read",

@@ -127,90 +127,6 @@
       "description": "List developer audit events"
     },
     {
-      "name": "teamgrid_automation_actions_list",
-      "description": "Read the saved TeamGrid workflow step catalog and its parameter constraints. This is a read-only configuration reference, not discovery of callable tools. It does not execute a step, start a run or grant permissions. Immediate workspace changes use the individually exposed task, project, list, service, project-statement and time-entry tools."
-    },
-    {
-      "name": "teamgrid_automation_definition_archive",
-      "description": "Archive an automation definition. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Changes can affect future automated actions; inspect the definition and schedule first.",
-      "capabilities": {
-        "confirmation": {
-          "type": "AdaptiveCard",
-          "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Automation Definition Archive in TeamGrid.",
-          "isNonConsequential": false
-        }
-      }
-    },
-    {
-      "name": "teamgrid_automation_definition_create",
-      "description": "Create an automation definition. Stores declarative workflow configuration, not a command to execute the supplied flow. The finite actionId enum contains TeamGrid workflow steps and control flow; arbitrary tool names, scripts, HTTP requests and private actions are rejected. Future runs can change tasks, projects, lists, services, project statements and time entries. OAuth activation is currently unavailable until the background executor qualifies source-grant permission checks; an API error is not a saved definition. Immediate changes use the corresponding individually exposed resource tools.. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Reuse the same idempotencyKey and payload for the same intent. Changes can affect future automated actions; inspect the definition and schedule first.",
-      "capabilities": {
-        "confirmation": {
-          "type": "AdaptiveCard",
-          "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Automation Definition Create in TeamGrid.",
-          "isNonConsequential": false
-        }
-      }
-    },
-    {
-      "name": "teamgrid_automation_definition_get",
-      "description": "Get an automation definition"
-    },
-    {
-      "name": "teamgrid_automation_definition_restore",
-      "description": "Restore an automation definition. Stores declarative workflow configuration, not a command to execute the supplied flow. The finite actionId enum contains TeamGrid workflow steps and control flow; arbitrary tool names, scripts, HTTP requests and private actions are rejected. Future runs can change tasks, projects, lists, services, project statements and time entries. OAuth activation is currently unavailable until the background executor qualifies source-grant permission checks; an API error is not a saved definition. Immediate changes use the corresponding individually exposed resource tools.. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Changes can affect future automated actions; inspect the definition and schedule first.",
-      "capabilities": {
-        "confirmation": {
-          "type": "AdaptiveCard",
-          "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Automation Definition Restore in TeamGrid.",
-          "isNonConsequential": false
-        }
-      }
-    },
-    {
-      "name": "teamgrid_automation_definition_update",
-      "description": "Update an automation definition. Stores declarative workflow configuration, not a command to execute the supplied flow. The finite actionId enum contains TeamGrid workflow steps and control flow; arbitrary tool names, scripts, HTTP requests and private actions are rejected. Future runs can change tasks, projects, lists, services, project statements and time entries. OAuth activation is currently unavailable until the background executor qualifies source-grant permission checks; an API error is not a saved definition. Immediate changes use the corresponding individually exposed resource tools.. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Changes can affect future automated actions; inspect the definition and schedule first.",
-      "capabilities": {
-        "confirmation": {
-          "type": "AdaptiveCard",
-          "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Automation Definition Update in TeamGrid.",
-          "isNonConsequential": false
-        }
-      }
-    },
-    {
-      "name": "teamgrid_automation_definition_versions_list",
-      "description": "List immutable automation definition versions"
-    },
-    {
-      "name": "teamgrid_automation_definitions_list",
-      "description": "List automation definitions"
-    },
-    {
-      "name": "teamgrid_automation_run_abort",
-      "description": "Abort a running automation. Changes the selected workspace under current API permissions. Large results return mutationReceipt; inspect meta.outcome and resource IDs. Read the target first; submit its exact ETag. On conflict, review the current state before making a new decision. Changes can affect future automated actions; inspect the definition and schedule first.",
-      "capabilities": {
-        "confirmation": {
-          "type": "AdaptiveCard",
-          "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Automation Run Abort in TeamGrid.",
-          "isNonConsequential": false
-        }
-      }
-    },
-    {
-      "name": "teamgrid_automation_run_get",
-      "description": "Get an automation run"
-    },
-    {
-      "name": "teamgrid_automation_runs_list",
-      "description": "List automation runs"
-    },
-    {
       "name": "teamgrid_availability_list",
       "description": "List user availability"
     },
@@ -1861,17 +1777,6 @@
         "teamgrid_appointment_update",
         "teamgrid_appointments_list",
         "teamgrid_audit_events_list",
-        "teamgrid_automation_actions_list",
-        "teamgrid_automation_definition_archive",
-        "teamgrid_automation_definition_create",
-        "teamgrid_automation_definition_get",
-        "teamgrid_automation_definition_restore",
-        "teamgrid_automation_definition_update",
-        "teamgrid_automation_definition_versions_list",
-        "teamgrid_automation_definitions_list",
-        "teamgrid_automation_run_abort",
-        "teamgrid_automation_run_get",
-        "teamgrid_automation_runs_list",
         "teamgrid_availability_list",
         "teamgrid_call_note_archive",
         "teamgrid_call_note_create",

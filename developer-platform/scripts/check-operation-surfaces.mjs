@@ -1,4 +1,5 @@
 import { listAllMcpTools } from './lib/mcp-tool-discovery.mjs'
+import { mcpOperationPolicy } from './lib/mcp-exposure-policy.mjs'
 import { readFile } from 'node:fs/promises'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
@@ -62,7 +63,7 @@ function hasFunction(root, dottedPath) {
   return typeof current === 'function'
 }
 
-const [openapi, ledger, manifest, scopes] = await Promise.all([
+const [openapi, capabilities, manifest, scopes] = await Promise.all([
   readFile(new URL('../../openapi/v1.json', import.meta.url), 'utf8').then(JSON.parse),
   readFile(new URL('../../openapi/developer-capabilities.json', import.meta.url), 'utf8').then(
     JSON.parse,
@@ -72,6 +73,7 @@ const [openapi, ledger, manifest, scopes] = await Promise.all([
   ),
   readFile(new URL('../../openapi/developer-scopes.json', import.meta.url), 'utf8').then(JSON.parse),
 ])
+const ledger = { ...capabilities, operationPolicy: mcpOperationPolicy(capabilities.operationPolicy) }
 
 const expectedOperations = openApiOperations(openapi)
 const policyOperations = ledger.operationPolicy

@@ -1,8 +1,9 @@
 import { readFile, writeFile } from 'node:fs/promises'
+import { mcpOperationPolicy } from './lib/mcp-exposure-policy.mjs'
 
 const ledger = JSON.parse(await readFile(new URL('../../openapi/developer-capabilities.json', import.meta.url), 'utf8'))
 const scopeCatalog = JSON.parse(await readFile(new URL('../../openapi/developer-scopes.json', import.meta.url), 'utf8'))
-const entries = ledger.operationPolicy.filter((operation) => operation.mcp.exposure !== 'forbidden')
+const entries = mcpOperationPolicy(ledger.operationPolicy).filter((operation) => operation.mcp.exposure !== 'forbidden')
 const scopes = Object.fromEntries(entries.map((operation) => [operation.mcp.tool, [
   ...new Set([operation.scope, ...(operation.additionalScopes || []),
     ...(operation.mcp.exposure === 'gated-write' ? ['workspace:read'] : [])].filter(Boolean)),
@@ -11,7 +12,7 @@ const scopes = Object.fromEntries(entries.map((operation) => [operation.mcp.tool
 // credential, service-account, grant administration and change-feed scopes.
 const supported = new Set([
   ...Object.values(scopes).flat(),
-  ...scopeCatalog.dynamicPolicies.flatMap(policy => policy.scopes),
+  ...scopeCatalog.dynamicPolicies.filter(policy => policy.id !== 'automation-action-domain').flatMap(policy => policy.scopes),
 ])
 const issuable = new Set(scopeCatalog.scopes.filter(scope => scope.availability === 'issuable').map(scope => scope.name))
 if ([...supported].some(scope => !issuable.has(scope))) {

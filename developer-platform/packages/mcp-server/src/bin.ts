@@ -14,8 +14,7 @@ Options:
   --profile <name>  Use a TeamGrid CLI keychain profile
   --tool-profile    core (default), collaboration, governance, all, context, work, full,
                     tasks-write, projects-write, schedule-write, time-write, content-write,
-                    crm-write, catalog-write, finance-write, admin-write, automation-write,
-                    integrations-write
+                    crm-write, catalog-write, finance-write, admin-write, integrations-write
   --allow-tool      Narrow the profile to an exact tool; repeat or comma-separate
   --deny-tool       Remove an exact tool; repeat or comma-separate
   --explain-scopes  Print exact required permissions without reading credentials or contacting TeamGrid

@@ -18,7 +18,6 @@ export type McpToolProfile =
   | 'catalog-write'
   | 'finance-write'
   | 'admin-write'
-  | 'automation-write'
   | 'integrations-write'
 
 const coreTools = [

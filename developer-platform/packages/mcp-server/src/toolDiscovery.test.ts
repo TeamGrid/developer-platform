@@ -93,7 +93,7 @@ describe('bounded tool discovery metadata', () => {
     })
   })
 
-  it('publishes all 208 tools within the verified discovery metadata budget', async () => {
+  it('publishes all 197 tools within the verified discovery metadata budget', async () => {
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
     const server = serveStdio(
       () => createTeamGridMcpServer({} as TeamGridClient, { toolProfile: 'full' }),
@@ -103,8 +103,8 @@ describe('bounded tool discovery metadata', () => {
     try {
       await client.connect(clientTransport)
       const tools = (await client.listTools()).tools
-      expect(tools).toHaveLength(208)
-      expect(new Set(tools.map((tool) => tool.name)).size).toBe(208)
+      expect(tools).toHaveLength(197)
+      expect(new Set(tools.map((tool) => tool.name)).size).toBe(197)
       // Internal regression budget established by the successful native full
       // catalog probe; this does not assert a documented vendor byte limit.
       expect(Buffer.byteLength(JSON.stringify(tools))).toBeLessThan(1_800_000)

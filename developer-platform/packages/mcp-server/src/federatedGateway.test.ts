@@ -141,7 +141,7 @@ describe('federated OAuth MCP gateway', () => {
 
   // Both complete paginated catalogs exercise fresh HTTP setup; slower CI hosts need
   // more than Vitest's default 5 seconds. Request-deadline tests keep their own limits.
-  it('executes concurrent DE/US calls through separate verified delegations and all 208 tools', async () => {
+  it('executes concurrent DE/US calls through separate verified delegations and all 197 tools', async () => {
     const h = harness()
     const clients = [
       new Client({ name: 'de', version: '1.0.0' }),
@@ -164,7 +164,7 @@ describe('federated OAuth MCP gateway', () => {
             tools.push(...page.tools.map((tool) => tool.name))
             cursor = page.nextCursor
           } while (cursor)
-          expect(tools).toHaveLength(208)
+          expect(tools).toHaveLength(197)
           const result = await client.callTool({ name: 'teamgrid_workspace_get', arguments: {} })
           expect(result.isError).toBeFalsy()
           expect(JSON.stringify(result)).toContain(`team-${region}`)

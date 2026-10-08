@@ -231,7 +231,7 @@ describe('ChatGPT OAuth permission escalation', () => {
     ['https://claude.ai/oauth/mcp-oauth-client-metadata', false],
     ['operator-registered-claude', true],
   ] as const)(
-    'keeps all 208 tools and requests confirmation for every Claude write: %s',
+    'keeps all 197 tools and requests confirmation for every Claude write: %s',
     async (id, registered) => {
       const test = setup(id, registered)
       try {
@@ -242,8 +242,8 @@ describe('ChatGPT OAuth permission escalation', () => {
           tools.push(...message.result.tools)
           cursor = message.result.nextCursor
         } while (cursor)
-        expect(tools).toHaveLength(208)
-        expect(tools.filter((tool) => tool.annotations.readOnlyHint)).toHaveLength(83)
+        expect(tools).toHaveLength(197)
+        expect(tools.filter((tool) => tool.annotations.readOnlyHint)).toHaveLength(77)
         for (const tool of tools)
           expect(tool.annotations.destructiveHint).toBe(!tool.annotations.readOnlyHint)
         // Scopes and the core create semantics remain unchanged by presentation.
@@ -376,11 +376,7 @@ describe('ChatGPT OAuth permission escalation', () => {
       ).toContain('tasks:read')
       // Outbound mutations retain their safety declaration after read metadata
       // is corrected; annotations never replace authorization or user consent.
-      for (const name of [
-        'teamgrid_webhook_delivery_test',
-        'teamgrid_invitation_create',
-        'teamgrid_automation_definition_create',
-      ]) {
+      for (const name of ['teamgrid_webhook_delivery_test', 'teamgrid_invitation_create']) {
         expect(tools.find((tool) => tool.name === name).annotations).toMatchObject({
           readOnlyHint: false,
           openWorldHint: true,

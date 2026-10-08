@@ -10,7 +10,7 @@ describe('Developer Platform conformance inventory', () => {
       schemaVersion: 1,
       summary: {
         byVersion: { v0: 87, v1: 238 },
-        mcp: { forbidden: 30, 'gated-write': 124, read: 84, total: 238 },
+        mcp: { forbidden: 41, 'gated-write': 119, read: 78, total: 238 },
         total: 325,
       },
     })
@@ -134,7 +134,7 @@ describe('Developer Platform conformance inventory', () => {
     const summary = formatInventorySummary(await buildConformanceInventory())
     expect(summary).toContain('325 API operations (87 V0, 238 V1)')
     expect(summary).toContain(
-      '84 MCP reads; 124 opt-in writes; 30 operations intentionally forbidden',
+      '78 MCP reads; 119 opt-in writes; 41 operations intentionally forbidden',
     )
   })
 })

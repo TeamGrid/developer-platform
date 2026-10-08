@@ -1,7 +1,9 @@
 # TeamGrid AI integrations
 
 Implementation started on 2026-10-04. The first public OpenAI release is scoped
-to the complete 208-tool business catalog (83 reads, 125 writes). Claude and
+to the complete 197-tool business catalog (77 reads, 120 writes). Legacy automation
+workflows are excluded from MCP pending their separate product rebuild. This
+MCP-specific narrowing preserves the canonical API and SDK/CLI contracts. Claude and
 Microsoft 365 Copilot, including Cowork, use the same business contract. A full
 catalog does not grant access: current roles, sharing, locks, workspace binding
 and separately approved OAuth scopes still apply.
@@ -53,7 +55,7 @@ coverage of the proposed integration. No existing legal version was edited.
 - Three self-contained draft packages are generated from four shared workflows,
   actual paginated `tools/list` responses and pinned official JSON schemas.
   Microsoft includes both a declarative agent/action plugin and a Cowork connector
-  with agent skills; all 208 explicit tools remain represented.
+  with agent skills; all 197 explicit tools remain represented.
 - Claude includes the directory icon and legal-link fields. Each package README
   describes tool arguments, returned data, authorized changes and the proposed
   Germany gateway processing for both DE and US workspaces. Existing public
@@ -80,7 +82,7 @@ coverage of the proposed integration. No existing legal version was edited.
   precede the host redirect. See the [global OAuth decision](global-oauth-federation.md).
   `createOAuthClientRegistry` supplies bounded, DNS-pinned CIMD and current static
   public/Basic/POST authentication. `createFederatedMcpRuntime` composes discovery,
-  both OAuth channels and all 208 tools; its Node transport bounds OAuth bytes before
+  both OAuth channels and all 197 tools; its Node transport bounds OAuth bytes before
   processing. Global client revocation stops API use even before a regional policy
   rollout completes. A [private global service](../developer-platform/hosting/federated/README.md)
   now supplies executable bootstrap, private configuration/policy loading, native
@@ -140,7 +142,7 @@ metadata checks are not successful live calls or host acceptance.
    sensitive consent without weakening customer Passkey policies.
 6. Test each real host: login, two scope expansions, refusal, refresh, revocation,
    wrong workspace/issuer/resource/region, membership loss and workspace locks.
-   Test private files/exports and all 208 operations, including uncertain writes.
+   Test private files/exports and all 197 operations, including uncertain writes.
    Microsoft tool selection with the full inventory requires evaluation; schema
    validity does not prove that the model reaches every operation reliably.
 7. Validate each exact package in its vendor tooling and allowed public channel.

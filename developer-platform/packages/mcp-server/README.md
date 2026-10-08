@@ -61,7 +61,7 @@ in [AI integrations](../../../integrations/README.md).
 | `all` | 36 | Existing read-only union including search |
 | `context` | 34 | Core, users, search, comments, documents, file metadata, calendar, one custom-field value |
 | `work` | 41 | Context plus seven guarded mutations |
-| `full` | 208 | 84 reads and 124 writes across all reviewed business domains |
+| `full` | 197 | 77 reads and 120 writes across the included business domains |
 | `tasks-write` | 39 | Tasks, subtasks, bulk updates and recurrence lifecycle |
 | `projects-write` | 20 | Projects, sharing, lifecycle and templates |
 | `schedule-write` | 18 | Appointments, absences, availability and planned work |
@@ -71,8 +71,12 @@ in [AI integrations](../../../integrations/README.md).
 | `catalog-write` | 39 | Lists, tags, services, products and custom fields |
 | `finance-write` | 9 | Project statements and time-entry billing |
 | `admin-write` | 25 | Workspace settings, members, roles, groups and invitations |
-| `automation-write` | 12 | Automation definitions, versions, runs and export jobs |
 | `integrations-write` | 10 | Webhooks, delivery inspection/tests and installation metadata |
+
+Legacy automation definitions, actions and runs are excluded from MCP until the
+separate automation product rebuild. Their tools and scopes cannot be enabled
+through a profile or allow filter. The canonical API and SDK/CLI contracts remain
+available under their existing authorization rules.
 
 Each domain includes `teamgrid_workspace_get`. Prefer a domain profile for a focused
 workflow; `full` is the complete reviewed inventory. The generated
@@ -331,7 +335,7 @@ cache; HTTP age/cache directives cap metadata reuse at five minutes. Use the sam
 static IDs/secret hashes and CIMD origin policy in each regional App.
 
 `createFederatedMcpRuntime` composes OAuth discovery, browser/token brokers and
-all 208 tools under one public origin. Both global client policy and the owning
+all 197 tools under one public origin. Both global client policy and the owning
 regional authority must remain valid before API use. `createFederatedMcpNodeServer`
 serves the composed handler with OAuth bodies bounded to 16 KiB before processing,
 separate liveness/readiness and clean shutdown. Supply initialized native stores,

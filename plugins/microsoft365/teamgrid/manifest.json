@@ -24,7 +24,7 @@
   "accentColor": "#355CFD",
   "agentSkills": [
     {
-      "folder": "./skills/teamgrid-planning-automation"
+      "folder": "./skills/teamgrid-planning"
     },
     {
       "folder": "./skills/teamgrid-project-content"
