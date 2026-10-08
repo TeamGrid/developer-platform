@@ -262,7 +262,7 @@ describe('composed global MCP/OAuth runtime', () => {
       await h.runtime.close()
     }
   })
-  it('discovers all 208 tools through the composed runtime', async () => {
+  it('discovers all 197 tools through the composed runtime', async () => {
     const h = harness()
     h.directory.resolve.mockResolvedValue('de-test')
     const connection = new Client({ name: 'runtime-test', version: '1' })
@@ -281,8 +281,8 @@ describe('composed global MCP/OAuth runtime', () => {
         names.push(...page.tools.map((tool) => tool.name))
         cursor = page.nextCursor
       } while (cursor)
-      expect(names).toHaveLength(208)
-      expect(new Set(names).size).toBe(208)
+      expect(names).toHaveLength(197)
+      expect(new Set(names).size).toBe(197)
       const apiCalls = () =>
         h.fetcher.mock.calls.filter(([input]) =>
           (input instanceof Request ? input.url : String(input)).startsWith(

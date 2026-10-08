@@ -2,7 +2,7 @@
 
 Generated from the reviewed canonical API contract. Not a publication or live qualification claim.
 
-The full profile contains 208 tools: 83 reads and 125 writes. 30 API operations use other connection or transfer surfaces.
+The full profile contains 197 tools: 77 reads and 120 writes. 41 API operations are deliberately outside MCP; reasons are listed below. Legacy automation workflows are excluded pending their separate product rebuild.
 
 All writes require workspaceId and current API authorization. Conditional tools accept the exact quoted meta.etag returned by the preceding read. Per-item revision uses data.items[].revision. Unconditional means the API has no revision precondition. Idempotency keys protect repetition of one intent, not concurrent edits.
 
@@ -24,17 +24,6 @@ Domain profiles include their listed tools plus workspace, user, task/project lo
 | `teamgrid_appointment_update` | schedule-write | write | conditional | — |
 | `teamgrid_appointments_list` | schedule-write | read | read | — |
 | `teamgrid_audit_events_list` | admin-write | read | read | — |
-| `teamgrid_automation_actions_list` | automation-write | read | read | — |
-| `teamgrid_automation_definition_archive` | automation-write | write | conditional | — |
-| `teamgrid_automation_definition_create` | automation-write | write | unconditional | yes |
-| `teamgrid_automation_definition_get` | automation-write | read | read | — |
-| `teamgrid_automation_definition_restore` | automation-write | write | conditional | — |
-| `teamgrid_automation_definition_update` | automation-write | write | conditional | — |
-| `teamgrid_automation_definition_versions_list` | automation-write | read | read | — |
-| `teamgrid_automation_definitions_list` | automation-write | read | read | — |
-| `teamgrid_automation_run_abort` | automation-write | write | conditional | — |
-| `teamgrid_automation_run_get` | automation-write | read | read | — |
-| `teamgrid_automation_runs_list` | automation-write | read | read | — |
 | `teamgrid_availability_list` | schedule-write | read | read | — |
 | `teamgrid_call_note_archive` | crm-write | write | unconditional | — |
 | `teamgrid_call_note_create` | crm-write | write | unconditional | yes |
@@ -253,3 +242,14 @@ Domain profiles include their listed tools plus workspace, user, task/project lo
 | `rotateWebhookSecret` | Reveal-once signing secrets require human-controlled integration setup. |
 | `createExportDownloadIntent` | Signed export credentials must not enter a model transcript. |
 | `downloadExport` | Bulk export bytes require a host-managed download, not tool text. |
+| `listAutomationActions` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |
+| `listAutomationDefinitions` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |
+| `createAutomationDefinition` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |
+| `getAutomationDefinition` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |
+| `updateAutomationDefinition` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |
+| `archiveAutomationDefinition` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |
+| `restoreAutomationDefinition` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |
+| `listAutomationDefinitionVersions` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |
+| `listAutomationRuns` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |
+| `getAutomationRun` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |
+| `abortAutomationRun` | Legacy automation workflows are excluded from MCP until the separate product rebuild. |

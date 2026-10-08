@@ -125,11 +125,20 @@ async function discover(clientId) {
 const openaiTools = await discover('https://chatgpt.com/oauth/client.json')
 const claudeTools = await discover('https://claude.ai/oauth/claude-code-client-metadata')
 const microsoftTools = await discover('microsoft365-package-fixture')
+const readCount = openaiTools.filter((tool) => tool.annotations.readOnlyHint).length
+const writeCount = openaiTools.length - readCount
 if (
-  catalogNames.length !== 208 ||
-  openaiTools.filter((tool) => tool.annotations.readOnlyHint).length !== 83
+  catalogNames.length !== 197 ||
+  readCount !== 77 ||
+  writeCount !== 120 ||
+  catalogNames.some((name) => name.startsWith('teamgrid_automation_')) ||
+  openaiTools.some((tool) =>
+    tool.securitySchemes.some((scheme) =>
+      scheme.scopes?.some((scope) => scope.startsWith('automations:')),
+    ),
+  )
 )
-  throw new Error('Review the full integration baseline before changing its 208/83/125 inventory.')
+  throw new Error('Review the 197/77/120 integration baseline without legacy automation workflows.')
 for (let i = 0; i < openaiTools.length; i++) {
   const a = openaiTools[i],
     c = claudeTools[i],
@@ -196,7 +205,7 @@ async function common(path, host = 'other') {
     )
   put(
     `${path}/README.md`,
-    `# TeamGrid integration draft\n\n${description}\n\nPublisher: ${publisher}. ${host === 'openai' ? 'OpenAI business verification is approved; plugin approval is pending.' : publisherIdentityNotice}\nSupport: ${config.supportEmail}\n\nConnect one TeamGrid workspace through OAuth. The full business catalog contains 208 tools (83 reads and 125 writes). Current workspace roles, sharing, locks and separately approved scopes apply to every call. Native OAuth permission consent also bounds calls by the saved TeamGrid checkbox selection; OAuth cannot grant additional role permissions. An unqualified automation activation is rejected explicitly, and tool visibility is not execution availability. No API key belongs in this package or in chat.\n\n## Data flow\n\nThe remote connector sends the selected tool name and arguments to ${config.mcpUrl}; the host receives the permitted TeamGrid response. Arguments and responses can contain workspace, project, task, contact, planning, time, content and file/export data, including personal data. An authorized write changes TeamGrid records. Returned data becomes available to the AI host under that host's account and data settings.\n\nThe proposed global gateway processes request and response payloads in Germany before routing to the workspace's DE or US cell. US regional storage therefore does not mean US-only processing. OAuth routing and browser state use private gateway storage with bounded lifetimes; existing TeamGrid records follow TeamGrid retention. This package contains no local executable, hooks or additional data destinations. Actual hosting, retention and MCP-specific legal disclosures must be confirmed before submission.\n\nThis is a generated, unqualified development package. Its proposed global endpoint is not deployed by this build. ${legalUrlNotice}${host === 'openai' ? '' : ' Microsoft OAuth registration remains unresolved; UNREGISTERED values are deliberate blockers.'} Read integrations/README.md in the source repository before testing or preparing a submission. This package is not ready to publish.\n`,
+    `# TeamGrid integration draft\n\n${description}\n\nPublisher: ${publisher}. ${host === 'openai' ? 'OpenAI business verification is approved; plugin approval is pending.' : publisherIdentityNotice}\nSupport: ${config.supportEmail}\n\nConnect one TeamGrid workspace through OAuth. The full business catalog contains ${catalogNames.length} tools (${readCount} reads and ${writeCount} writes). Legacy automation workflows are excluded pending their separate product rebuild. Current workspace roles, sharing, locks and separately approved scopes apply to every call. Native OAuth permission consent also bounds calls by the saved TeamGrid checkbox selection; OAuth cannot grant additional role permissions. Tool visibility is not execution availability. No API key belongs in this package or in chat.\n\n## Data flow\n\nThe remote connector sends the selected tool name and arguments to ${config.mcpUrl}; the host receives the permitted TeamGrid response. Arguments and responses can contain workspace, project, task, contact, planning, time, content and file/export data, including personal data. An authorized write changes TeamGrid records. Returned data becomes available to the AI host under that host's account and data settings.\n\nThe proposed global gateway processes request and response payloads in Germany before routing to the workspace's DE or US cell. US regional storage therefore does not mean US-only processing. OAuth routing and browser state use private gateway storage with bounded lifetimes; existing TeamGrid records follow TeamGrid retention. This package contains no local executable, hooks or additional data destinations. Actual hosting, retention and MCP-specific legal disclosures must be confirmed before submission.\n\nThis is a generated, unqualified development package. Its proposed global endpoint is not deployed by this build. ${legalUrlNotice}${host === 'openai' ? '' : ' Microsoft OAuth registration remains unresolved; UNREGISTERED values are deliberate blockers.'} Read integrations/README.md in the source repository before testing or preparing a submission. This package is not ready to publish.\n`,
   )
 }
 
@@ -375,8 +384,8 @@ const blockers = [
   'Global MCP endpoint and issuer are proposed; DE/US routing and old-grant compatibility are unqualified.',
   'Remaining publisher registrations, MCP-specific legal disclosures and the full review workspace require verification.',
   'Microsoft OAuth client/reference registration and public package eligibility are unresolved.',
-  'Real-host OAuth escalation, file/export behavior and all 208 operations require acceptance evidence.',
-  'Claude hosted CIMD URL/client_id currently differ; resolve with Anthropic or register an explicit approved client.',
+  `Real-host OAuth escalation, file/export behavior and all ${catalogNames.length} published operations require acceptance evidence.`,
+  'Claude hosted CIMD metadata must be verified from the actual gateway network or an explicit approved client registered.',
 ]
 put('integrations/generated/build-evidence.json', {
   status: 'draft-unqualified',
@@ -390,7 +399,7 @@ put('integrations/generated/build-evidence.json', {
   proposedEndpoint: config.mcpUrl,
   apiSource: contractSource,
   catalogSha256: sha256(catalogBytes),
-  counts: { tools: 208, reads: 83, writes: 125 },
+  counts: { tools: catalogNames.length, reads: readCount, writes: writeCount },
   skills: skillNames,
   microsoftTarget: 'Microsoft 365 Copilot including Cowork',
   blockers,
@@ -426,5 +435,5 @@ for (const path of [oa, cl, ms]) {
     throw new Error(`Unexpected files in package: ${path}.`)
 }
 console.log(
-  `${checking ? 'Verified' : 'Built'} 3 draft integrations: 208 tools, 83 reads, 125 writes, ${skillNames.length} shared workflows. Public release remains unqualified.`,
+  `${checking ? 'Verified' : 'Built'} 3 draft integrations: ${catalogNames.length} tools, ${readCount} reads, ${writeCount} writes, ${skillNames.length} shared workflows. Public release remains unqualified.`,
 )

@@ -211,7 +211,7 @@ The preserved read-only profiles are core (22), collaboration (29), governance (
 and all (36).
 
 Version 1.2.2 adds `context` (34 bounded reads) and explicit `work` (41 tools,
-including seven guarded writes), `full` (208 tools: 84 reads and 124 writes), and
+including seven guarded writes), `full` (197 tools: 77 reads and 120 writes), and
 11 domain write profiles, plus protocol 2026-07-28 and legacy stdio compatibility.
 Writes require the confirmed workspace. Conditional writes use a reviewed ETag;
 replay-safe creates use a stable intent key. Actions without those API contracts

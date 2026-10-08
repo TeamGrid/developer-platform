@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
+import { mcpOperationPolicy } from '../lib/mcp-exposure-policy.mjs'
 
 const httpMethods = new Set(['delete', 'get', 'head', 'options', 'patch', 'post', 'put', 'trace'])
 const privilegedOperationPattern =
@@ -149,7 +150,10 @@ function compareStringArrays(left, right) {
 
 function bindV1Operations(operations, capabilities, bindings) {
   const policies = new Map(
-    capabilities.operationPolicy.map((operation) => [operation.operationId, operation]),
+    mcpOperationPolicy(capabilities.operationPolicy).map((operation) => [
+      operation.operationId,
+      operation,
+    ]),
   )
   const executionBindings = new Map(
     bindings.operations.map((operation) => [operation.operationId, operation]),

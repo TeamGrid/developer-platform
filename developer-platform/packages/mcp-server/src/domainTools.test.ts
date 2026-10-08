@@ -11,6 +11,8 @@ import {
 import { responseFixture } from './fixtures.testSupport.js'
 import { createTeamGridMcpServer } from './server.js'
 import { describeMcpAccess } from './setup.js'
+import { parseMcpToolFilter, parseMcpToolProfile } from './toolProfiles.js'
+import { supportedOAuthScopes } from './toolScopes.js'
 
 const revision = (prefix: string) => `"${prefix}-${'a'.repeat(64)}"`
 const workspaceId = 'workspace-a'
@@ -61,62 +63,38 @@ async function connected() {
 }
 
 describe('complete domain MCP', () => {
-  it('rejects private automation executors before dispatch and preserves activation errors', async () => {
+  it('neither advertises nor dispatches any disabled legacy automation tool', async () => {
     const c = await connected()
     try {
-      for (const actionId of ['httpRequest', 'mongoUpdate', 'teamgrid_task_create']) {
-        const result = await c.client.callTool({
-          name: 'teamgrid_automation_definition_create',
-          arguments: {
-            workspaceId,
-            idempotencyKey: 'workflow-config-1',
-            data: {
-              name: 'Workflow configuration',
-              trigger: { data: { type: 'tasks' }, event: 'create' },
-              flow: [{ actionId }],
-            },
-          },
+      const excluded = [
+        'teamgrid_automation_actions_list',
+        'teamgrid_automation_definitions_list',
+        'teamgrid_automation_definition_create',
+        'teamgrid_automation_definition_get',
+        'teamgrid_automation_definition_update',
+        'teamgrid_automation_definition_archive',
+        'teamgrid_automation_definition_restore',
+        'teamgrid_automation_definition_versions_list',
+        'teamgrid_automation_runs_list',
+        'teamgrid_automation_run_get',
+        'teamgrid_automation_run_abort',
+      ]
+      expect(domainToolNames.some((name) => name.startsWith('teamgrid_automation_'))).toBe(false)
+      expect(supportedOAuthScopes.some((scope) => scope.startsWith('automations:'))).toBe(false)
+      expect(() => parseMcpToolProfile('automation-write')).toThrow('MCP tool profile')
+      for (const name of excluded) {
+        expect(() => parseMcpToolFilter(name, 'allowTools')).toThrow('registered TeamGrid MCP tool')
+        await expect(c.client.callTool({ name, arguments: {} })).rejects.toMatchObject({
+          code: -32602,
         })
-        expect(result.isError).toBe(true)
-        expect(c.calls.size).toBe(0)
       }
-      expect(domainCatalog.teamgrid_automation_actions_list.annotations.readOnlyHint).toBe(true)
-      expect(domainCatalog.teamgrid_automation_definition_create.annotations.destructiveHint).toBe(
-        true,
-      )
+      expect(c.calls.size).toBe(0)
+      const workspace = await c.client.callTool({ name: 'teamgrid_workspace_get', arguments: {} })
+      expect(workspace.isError).not.toBe(true)
+      expect(c.calls.get('workspace.get')).toHaveBeenCalledOnce()
     } finally {
       await c.close()
     }
-    const create = vi.fn(async () => {
-      throw new TeamGridApiError({
-        status: 403,
-        errors: [
-          {
-            code: 'developer-api-automation-execution-unavailable',
-            status: '403',
-            title: 'Automation activation unavailable',
-            detail:
-              'OAuth automation execution requires the qualified source-grant effect protocol.',
-          },
-        ],
-      })
-    })
-    const api = {
-      workspace: { get: vi.fn(async () => ({ data: { id: workspaceId } })) },
-      automationDefinitions: { create },
-    } as unknown as TeamGridClient
-    await expect(
-      executeDomainTool(api, 'teamgrid_automation_definition_create', {
-        workspaceId,
-        idempotencyKey: 'workflow-config-1',
-        data: {
-          name: 'Workflow configuration',
-          flow: [],
-          trigger: { data: { type: 'tasks' }, event: 'create' },
-        },
-      }),
-    ).rejects.toMatchObject({ status: 403 })
-    expect(create).toHaveBeenCalledOnce()
   })
 
   it('guards queued input previews before dispatch and retains pure stored previews', async () => {
@@ -640,7 +618,7 @@ describe('complete domain MCP', () => {
 
   it('includes all writes and exact compound scopes in setup diagnostics', () => {
     const plan = describeMcpAccess({ toolProfile: 'full' })
-    expect(plan.tools).toHaveLength(208)
+    expect(plan.tools).toHaveLength(197)
     expect(plan.writeTools).toHaveLength(
       domainToolNames.filter((n) => domainCatalog[n].write).length,
     )

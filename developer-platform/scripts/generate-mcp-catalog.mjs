@@ -3,11 +3,12 @@ import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
 import { compactMcpInputSchema } from './mcp-input-schema.mjs'
 import { mcpOutputSchema } from './mcp-output-schema.mjs'
+import { mcpOperationPolicy } from './lib/mcp-exposure-policy.mjs'
 
 const root = new URL('../', import.meta.url)
 const read = async (path) => JSON.parse(await readFile(new URL(path, root), 'utf8'))
 const api = await read('../openapi/v1.json')
-const policy = (await read('../openapi/developer-capabilities.json')).operationPolicy
+const policy = mcpOperationPolicy((await read('../openapi/developer-capabilities.json')).operationPolicy)
 const clientPath = fileURLToPath(new URL('packages/api-client/src/client.ts', root))
 const program = ts.createProgram([clientPath], {
   strict: true, target: ts.ScriptTarget.ES2023, module: ts.ModuleKind.NodeNext,
@@ -121,9 +122,6 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
   const perItemRevision = entry.operationId === 'bulkUpdateTasks'
   const concurrency = perItemRevision ? 'per-item revision' : ifMatch ? 'conditional' : write ? 'unconditional' : 'read'
   let description = operation.summary || entry.operationId
-  if (entry.operationId === 'listAutomationActions') description = 'Read the saved TeamGrid workflow step catalog and its parameter constraints. This is a read-only configuration reference, not discovery of callable tools. It does not execute a step, start a run or grant permissions. Immediate workspace changes use the individually exposed task, project, list, service, project-statement and time-entry tools.'
-  const automationDefinitionWrite = ['createAutomationDefinition', 'updateAutomationDefinition', 'restoreAutomationDefinition'].includes(entry.operationId)
-  if (automationDefinitionWrite) description += '. Stores declarative workflow configuration, not a command to execute the supplied flow. The finite actionId enum contains TeamGrid workflow steps and control flow; arbitrary tool names, scripts, HTTP requests and private actions are rejected. Future runs can change tasks, projects, lists, services, project statements and time entries. OAuth activation is currently unavailable until the background executor qualifies source-grant permission checks; an API error is not a saved definition. Immediate changes use the corresponding individually exposed resource tools.'
   if (entry.operationId === 'getDocument') description += '. Content is a bounded chunk, not necessarily the whole document. Continue with contentOffset=meta.contentPage.nextOffset and expectedRevision=meta.etag until nextOffset is null. Never infer omitted content or overwrite a document from an incomplete read.'
   if (entry.operationId === 'getContact') description += '. Notes are a bounded chunk. Continue with notesOffset=meta.notesPage.nextOffset and expectedRevision=meta.etag until nextOffset is null. Never infer omitted notes or overwrite them from an incomplete read.'
   if (entry.operationId === 'listContacts') description += '. Notes are omitted; use teamgrid_contact_get to read them with revision-checked continuation.'
@@ -139,7 +137,7 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
   if (entry.sdk.startsWith('comments.') && write) description += ' Comment targets and mentions are authorized TeamGrid workspace resources and members; this tool has no arbitrary external recipient or service destination.'
   if ((entry.sdk.startsWith('groups.') && write) || entry.operationId === 'replaceProjectSharing') description += ' This changes TeamGrid workspace access only; it does not create external service groups, publish public internet links or accept arbitrary external destinations.'
   if (queuedPreview) description += ' May persist a background preview operation. This does not create a recurrence series or tasks. Inspect the returned operation with teamgrid_task_recurrence_operation_get; never queue an uncertain preview again automatically.'
-  if (write && !queuedPreview && (entry.sdk.startsWith('automation') || entry.sdk.startsWith('taskRecurrence'))) description += ' Changes can affect future automated actions; inspect the definition and schedule first.'
+  if (write && !queuedPreview && entry.sdk.startsWith('taskRecurrence')) description += ' Changes can affect future automated actions; inspect the definition and schedule first.'
   if (write && (entry.mcp.domain === 'admin-write' || entry.operationId === 'replaceProjectSharing')) description += ' Administrative action: review the exact target and access impact with the user.'
   if (operation.responses?.['202']) description += ' Acceptance is not completion. Use the corresponding operation-get tool to inspect the returned operation until terminal.'
   const { $defs: outputDefinitions, ...outputSchema } = mcpOutputSchema(api, { ...operation,
@@ -156,11 +154,11 @@ for (const entry of policy.filter((entry) => entry.mcp.exposure !== 'forbidden')
     ...(write && operation['x-teamgrid-snapshot-cas'] === 'resource-snapshot-cas-v1'
       ? { snapshotCas: true } : {}),
     description, inputSchema: compactMcpInputSchema(shape), outputSchema,
-    annotations: { readOnlyHint: !write, destructiveHint: write && !queuedPreview && (automationDefinitionWrite || !/^create/.test(entry.operationId)),
+    annotations: { readOnlyHint: !write, destructiveHint: write && !queuedPreview && !/^create/.test(entry.operationId),
       idempotentHint: !write || idempotent || Boolean(ifMatch),
       // Bounded workspace reads never contact the configured recipients or targets.
       // These domains can reach external entities when a mutation changes or sends work.
-      openWorldHint: write && (entry.sdk.startsWith('webhooks.') || entry.sdk.startsWith('automation') || entry.sdk.startsWith('invitations.')) },
+      openWorldHint: write && (entry.sdk.startsWith('webhooks.') || entry.sdk.startsWith('invitations.')) },
   }
 }
 const source = `// Generated by scripts/generate-mcp-catalog.mjs from the reviewed canonical contract.\nimport type { TeamGridClient } from '@teamgrid/api-client'\n\nexport const domainToolNames = ${JSON.stringify(Object.keys(catalog).sort())} as const\nexport type DomainToolName = (typeof domainToolNames)[number]\n\nexport const domainDispatch: Record<DomainToolName, (client: TeamGridClient, input: Record<string, unknown>) => Promise<unknown>> = {\n${dispatch.join('\n')}\n}\n`
@@ -169,7 +167,7 @@ const excluded = policy.filter((entry) => entry.mcp.exposure === 'forbidden')
 const coverage = [
   '# Candidate MCP coverage', '',
   'Generated from the reviewed canonical API contract. Not a publication or live qualification claim.', '',
-  `The full profile contains ${rows.length} tools: ${rows.filter(([, entry]) => !entry.write).length} reads and ${rows.filter(([, entry]) => entry.write).length} writes. ${excluded.length} API operations use other connection or transfer surfaces.`, '',
+  `The full profile contains ${rows.length} tools: ${rows.filter(([, entry]) => !entry.write).length} reads and ${rows.filter(([, entry]) => entry.write).length} writes. ${excluded.length} API operations are deliberately outside MCP; reasons are listed below. Legacy automation workflows are excluded pending their separate product rebuild.`, '',
   'All writes require workspaceId and current API authorization. Conditional tools accept the exact quoted meta.etag returned by the preceding read. Per-item revision uses data.items[].revision. Unconditional means the API has no revision precondition. Idempotency keys protect repetition of one intent, not concurrent edits.', '',
   'Domain profiles include their listed tools plus workspace, user, task/project lookup and search tools. Scope reports list base/compound scopes; optional finance, sharing and cross-resource fields can require additional server-side scopes. A listed tool does not grant roles, scopes or product entitlements.', '',
   '| Tool | Domain profile | Mode | Concurrency | Stable key required |',

@@ -37,7 +37,7 @@ const responseHeaders = {
   'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'",
 }
 
-/** Complete 208-tool global HTTP composition. Storage/index initialization remains operator-owned. */
+/** Complete 197-tool global HTTP composition. Storage/index initialization remains operator-owned. */
 export function createFederatedMcpRuntime(options: FederatedMcpRuntimeOptions) {
   const resource = new URL(options.resourceUrl),
     issuer = new URL(options.issuerUrl)

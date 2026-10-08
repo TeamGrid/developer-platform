@@ -105,7 +105,7 @@ try {
     `tg_pat_v2_de_de-nbg-001_${'a'.repeat(24)}_${'b'.repeat(64)}`
   const mcpProtocols = []
   for (const era of ['modern', 'legacy']) {
-    for (const [profile, count] of [['core', 22], ['work', 41], ['full', 208]]) {
+    for (const [profile, count] of [['core', 22], ['work', 41], ['full', 197]]) {
       const client = new Client({ name: 'packed-install', version: '1.0.0' }, {
         versionNegotiation: { mode: era === 'modern' ? { pin: '2026-07-28' } : 'legacy' },
       })

@@ -197,7 +197,7 @@ challenge.
 
 `createFederatedMcpRuntime` publishes exact OAuth discovery and delegates protected
 resource metadata/MCP, browser authorization and token/revocation to the implemented
-handlers. It selects the `full` 208-tool profile with operator-controlled write
+handlers. It selects the `full` 197-tool profile with operator-controlled write
 activation. One canonical public origin is required and reserved OAuth/private/
 discovery paths cannot be used as the MCP resource. Discovery advertises only
 implemented auth methods, S256, issuer-bearing replies and CIMD availability.
@@ -361,7 +361,7 @@ global grants but must not invalidate legacy regional grants.
 Local tests cover exact authority registry matching, unchanged legacy handling,
 global authorization preparation, issuer-bearing callbacks, client/service auth
 separation, cross-authority code/refresh/access/revocation rejection, concurrent
-DE/US MCP transport, complete 208-tool discovery, private destinations, wrong
+DE/US MCP transport, complete 197-tool discovery, private destinations, wrong
 cell/issuer/resource/workspace/expiry, admission, unknown routing and bounded
 lookup failures. These are local protocol tests, not real OpenAI/Claude/M365
 host acceptance or deployed cross-region latency evidence.
