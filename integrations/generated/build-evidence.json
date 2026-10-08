@@ -145,11 +145,11 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/declarativeAgent.json",
-      "sha256": "b6c7fb2be82cddda750422e360dcee90fb839f27ec2a2b256f5492f8db0ca30f"
+      "sha256": "be26160d030efbd1003b1448ec6fffff09d6617a5d07dfdae818086b201a8251"
     },
     {
       "path": "plugins/microsoft365/teamgrid/plugin.json",
-      "sha256": "d6c539a645f87e6d82872edfeb5488c08ed15fef80d10ead4c14c32fbd831ca1"
+      "sha256": "5ae30aee7fa0a44d9a647d4d5939f2a6a8e26666c263232ff77885c6ee25ea4c"
     },
     {
       "path": "plugins/microsoft365/teamgrid/tools.json",
