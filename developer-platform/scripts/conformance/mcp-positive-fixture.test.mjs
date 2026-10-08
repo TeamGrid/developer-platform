@@ -22,7 +22,8 @@ function setup() {
     project,
     origin: `https://${project}-mcp.teamgrid.app`,
     databaseName: `fixture_${'a'.repeat(24)}`,
-    cellId: project,
+    cellId: 'de-nbg-001',
+    region: 'de',
     customerData: false,
     workspaceId: 'owned-workspace',
     sdkSourceRevision: 'b'.repeat(40),
@@ -146,6 +147,22 @@ describe('complete positive MCP fixture execution', () => {
       expect(input.callTool).not.toHaveBeenCalled()
     },
   )
+
+  it.each([
+    { cellId: `teamgrid-native-oauth-${'a'.repeat(24)}` },
+    { cellId: 'us-mnz-001' },
+    { region: 'us' },
+    { region: undefined },
+    { databaseName: 'teamgrid' },
+    { customerData: true },
+  ])('rejects a misbound physical fixture before I/O: %j', async (changes) => {
+    const input = setup()
+    Object.assign(input.fixture, changes)
+    await expect(executeMcpPositiveFixture(input)).rejects.toThrow('isolation differs')
+    expect(input.inspectFixture).not.toHaveBeenCalled()
+    expect(input.callTool).not.toHaveBeenCalled()
+    expect(input.writeIntent).not.toHaveBeenCalled()
+  })
 
   it('requires an independent current fixture identity before each tool', async () => {
     const input = setup()

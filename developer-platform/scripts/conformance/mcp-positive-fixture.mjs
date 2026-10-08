@@ -24,7 +24,8 @@ function identity(value, now) {
   assert(
     value.origin === `https://${value.project}-mcp.teamgrid.app` &&
       value.databaseName === `fixture_${value.project.slice(-24)}` &&
-      value.cellId === value.project &&
+      value.cellId === 'de-nbg-001' &&
+      value.region === 'de' &&
       value.customerData === false,
     'Positive MCP fixture isolation differs',
   )
