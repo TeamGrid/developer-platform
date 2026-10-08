@@ -17,6 +17,10 @@ export const oauthBrowserRecordSchema = z
     redirectUri: z.string().max(2048),
     codeChallenge: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
     scopes: z.array(z.string().min(1).max(128)).min(1).max(100),
+    nonce: z
+      .string()
+      .regex(/^[\x20-\x7e]{1,256}$/)
+      .optional(),
     state: z.string().max(2048).optional(),
     createdAt: z.date(),
     expiresAt: z.date(),
@@ -95,6 +99,8 @@ export function createMongoOAuthBrowserStore(options: {
       +record.expiresAt > +record.createdAt + OAUTH_BROWSER_TTL_MS ||
       !record.scopes.includes('workspace:read') ||
       new Set(record.scopes).size !== record.scopes.length ||
+      (record.scopes.includes('email') && !record.scopes.includes('openid')) ||
+      (record.nonce !== undefined && !record.scopes.includes('openid')) ||
       (record.status === 'selecting') !== (record.selection === undefined) ||
       (record.status === 'completed') !== (record.completion !== undefined) ||
       (record.selection && cells.get(record.selection.cellId) !== record.selection.region) ||

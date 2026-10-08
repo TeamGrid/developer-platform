@@ -54,6 +54,10 @@ const decisionSchema = z
     redirectUri: z.string(),
     codeChallenge: z.string(),
     requestedScopes: z.array(z.string()),
+    nonce: z
+      .string()
+      .regex(/^[\x20-\x7e]{1,256}$/)
+      .optional(),
     state: z.string().optional(),
     workspaceId: z.string(),
     status: z.enum(['approved', 'denied']),
@@ -420,6 +424,23 @@ export function createFederatedOAuthBrowserBroker(options: {
           scopes.some((scope) => !scopeCeiling.has(scope))
         )
           throw new BrowserRequestError('invalid_scope')
+        if (scopes.includes('email') && !scopes.includes('openid'))
+          throw new BrowserRequestError('invalid_scope')
+        if (
+          scopes.includes('openid') &&
+          ((query.nonce !== undefined && !/^[\x20-\x7e]{1,256}$/.test(query.nonce)) ||
+            ['max_age', 'claims'].some((key) => query[key] !== undefined) ||
+            (query.prompt !== undefined && query.prompt !== 'consent') ||
+            (query.id_token_hint !== undefined &&
+              (query.id_token_hint.length < 1 ||
+                query.id_token_hint.length > 8192 ||
+                Array.from(query.id_token_hint).some(
+                  (character) => character < ' ' || character === '\u007f',
+                ))))
+        )
+          throw new BrowserRequestError()
+        // Hints are optional navigation context, never authentication. This broker
+        // uses the current TeamGrid browser login and does not decode/store the JWT.
         if (
           query.state !== undefined &&
           (query.state.length > 2048 ||
@@ -443,6 +464,9 @@ export function createFederatedOAuthBrowserBroker(options: {
               redirectUri: query.redirect_uri,
               codeChallenge: query.code_challenge ?? '',
               scopes,
+              ...(scopes.includes('openid') && query.nonce !== undefined
+                ? { nonce: query.nonce }
+                : {}),
               createdAt: time,
               expiresAt: new Date(+time + OAUTH_BROWSER_TTL_MS),
               status: 'selecting',
@@ -488,6 +512,7 @@ export function createFederatedOAuthBrowserBroker(options: {
           scope: record.scopes.join(' '),
           code_challenge: record.codeChallenge,
           code_challenge_method: 'S256',
+          ...(record.nonce === undefined ? {} : { nonce: record.nonce }),
           ...(record.state === undefined ? {} : { state: record.state }),
         })
         const prepared = await provider(
@@ -577,6 +602,7 @@ export function createFederatedOAuthBrowserBroker(options: {
         decision.redirectUri !== record.redirectUri ||
         decision.codeChallenge !== record.codeChallenge ||
         decision.state !== record.state ||
+        decision.nonce !== record.nonce ||
         decision.requestedScopes.join(' ') !== record.scopes.join(' ')
       )
         throw new Error('Invalid OAuth consent binding.')

@@ -89,6 +89,17 @@ test('strict complete configuration, canonical public/private identities and exp
   }
 })
 
+test('OpenID activation requires an explicit absolute private-key file without embedding keys in service config', () => {
+  const config = { ...fixture(), oidcKeyFile: '/run/teamgrid-federation/oidc-keys.json' }
+  assert.deepEqual(parseServiceConfig(config), config)
+  assert.notEqual(immutableConfig(config), immutableConfig(fixture()))
+  for (const value of ['relative.json', '', null, true, { privateKeyPem: 'never-inline' }]) {
+    assert.throws(() => parseServiceConfig({ ...config, oidcKeyFile: value }), {
+      message: 'Federated configuration unavailable.',
+    })
+  }
+})
+
 test('API origin credentials preserve the regional visible-ASCII contract and reject header injection', () => {
   for (const value of ['a'.repeat(32), `${'a'.repeat(60)}+/==`, 'b'.repeat(512)]) {
     const config = fixture()

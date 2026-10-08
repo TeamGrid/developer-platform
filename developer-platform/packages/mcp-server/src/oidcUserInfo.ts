@@ -21,6 +21,10 @@ const identitySchema = z
     expiresAt: z.iso.datetime(),
     email: z.string().min(3).max(254).optional(),
     emailVerified: z.boolean().optional(),
+    nonce: z
+      .string()
+      .regex(/^[\x20-\x7e]{1,256}$/)
+      .optional(),
   })
   .strict()
 const headers = {
@@ -73,7 +77,7 @@ export function createOidcSubject(issuer: string, secret: Uint8Array) {
 
 /** One strongly resolved cell, fresh regional consent and live client registration.
  * No global email search, token cache, fallback cell or identity from URL hints. */
-export function createFederatedOidcUserInfo(options: {
+export type FederatedOidcIdentityOptions = {
   issuer: string
   resource: string
   cells: readonly FederatedOAuthBrokerCell[]
@@ -89,7 +93,9 @@ export function createFederatedOidcUserInfo(options: {
   fetch?: typeof fetch
   now?: () => Date
   requestTimeoutMs?: number
-}) {
+}
+
+export function createFederatedOidcIdentityReader(options: FederatedOidcIdentityOptions) {
   const issuer = canonicalHttps(options.issuer),
     resource = canonicalHttps(options.resource)
   const budget = options.requestTimeoutMs ?? 30000
@@ -146,32 +152,11 @@ export function createFederatedOidcUserInfo(options: {
         },
       },
     )
-  return async (request: Request): Promise<Response> => {
-    const signal = AbortSignal.any([request.signal, AbortSignal.timeout(budget)])
+  return async (token: string, callerSignal: AbortSignal) => {
+    const signal = AbortSignal.any([callerSignal, AbortSignal.timeout(budget)])
     try {
-      const url = new URL(request.url)
-      if (
-        url.origin !== issuer.origin ||
-        url.username ||
-        url.password ||
-        url.search ||
-        url.hash ||
-        (request.headers.has('host') && request.headers.get('host') !== issuer.host)
-      )
-        return failure(421, 'invalid_request')
-      if (url.pathname !== '/oauth/userinfo') return failure(404, 'invalid_request')
       if (!options.enabled()) return failure(503, 'temporarily_unavailable')
-      if (!(await withinSignal(options.admit(request), signal)))
-        return new Response(null, { status: 429, headers: { ...headers, 'Retry-After': '60' } })
-      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers })
-      if (!['GET', 'POST'].includes(request.method)) return failure(405, 'invalid_request')
-      // Bearer values are accepted only in the header, never URLs or form data.
-      if (request.body && (await readOAuthBrokerText(request.body, signal)))
-        return failure(400, 'invalid_request')
-      const authorization = request.headers.get('authorization')
-      if (!authorization || !/^Bearer tg_mcp_at_v1_[A-Za-z0-9_-]{43}$/.test(authorization))
-        return failure(401, 'invalid_token')
-      const token = authorization.slice(7)
+      if (!/^tg_mcp_at_v1_[A-Za-z0-9_-]{43}$/.test(token)) return failure(401, 'invalid_token')
       const cellId = await withinSignal(
         options.directory.resolve(
           'access',
@@ -189,7 +174,7 @@ export function createFederatedOidcUserInfo(options: {
           signal,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${cell.serviceSecret}`,
+            'X-TeamGrid-OAuth-Service-Authorization': `Bearer ${cell.serviceSecret}`,
           },
           body: JSON.stringify({ access_token: token }),
         }),
@@ -248,17 +233,73 @@ export function createFederatedOidcUserInfo(options: {
         return failure(401, 'invalid_token')
       const subject = options.subject(identity.subjectId)
       if (!/^[A-Za-z0-9_-]{32,128}$/.test(subject)) return failure(503, 'temporarily_unavailable')
-      return Response.json(
-        {
-          sub: subject,
-          ...(emailRequested ? { email: identity.email, email_verified: true } : {}),
-        },
-        { headers },
-      )
+      return { ...identity, subject }
     } catch (error) {
       return error instanceof OAuthBrokerInvalidClientError
         ? failure(401, 'invalid_token')
         : failure(503, 'temporarily_unavailable')
+    }
+  }
+}
+
+export function createFederatedOidcUserInfo(options: FederatedOidcIdentityOptions) {
+  const readIdentity = createFederatedOidcIdentityReader(options)
+  const issuer = canonicalHttps(options.issuer)
+  const budget = options.requestTimeoutMs ?? 30000
+  const failure = (status: number, error: string) =>
+    Response.json(
+      { error },
+      {
+        status,
+        headers: {
+          ...headers,
+          ...([401, 403].includes(status)
+            ? { 'WWW-Authenticate': `Bearer realm="TeamGrid UserInfo", error="${error}"` }
+            : {}),
+        },
+      },
+    )
+  return async (request: Request): Promise<Response> => {
+    const signal = AbortSignal.any([request.signal, AbortSignal.timeout(budget)])
+    try {
+      const url = new URL(request.url)
+      if (
+        url.origin !== issuer.origin ||
+        url.username ||
+        url.password ||
+        url.search ||
+        url.hash ||
+        (request.headers.has('host') && request.headers.get('host') !== issuer.host)
+      ) {
+        return failure(421, 'invalid_request')
+      }
+      if (url.pathname !== '/oauth/userinfo') return failure(404, 'invalid_request')
+      if (!options.enabled()) return failure(503, 'temporarily_unavailable')
+      if (!(await withinSignal(options.admit(request), signal))) {
+        return new Response(null, { status: 429, headers: { ...headers, 'Retry-After': '60' } })
+      }
+      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers })
+      if (!['GET', 'POST'].includes(request.method)) return failure(405, 'invalid_request')
+      if (request.body && (await readOAuthBrokerText(request.body, signal))) {
+        return failure(400, 'invalid_request')
+      }
+      const authorization = request.headers.get('authorization')
+      if (!authorization || !/^Bearer tg_mcp_at_v1_[A-Za-z0-9_-]{43}$/.test(authorization)) {
+        return failure(401, 'invalid_token')
+      }
+      const identity = await readIdentity(authorization.slice(7), signal)
+      if (identity instanceof Response) return identity
+      return Response.json(
+        {
+          sub: identity.subject,
+          ...(identity.scopes.includes('email')
+            ? { email: identity.email, email_verified: true }
+            : {}),
+        },
+        { headers },
+      )
+    } catch {
+      return failure(503, 'temporarily_unavailable')
     }
   }
 }

@@ -93,6 +93,30 @@ private `TEAMGRID_OAUTH_BROWSER_BROKER_SECRET` configuration. Provision the
 regional recovery key and additional authority through the App release path.
 No default central origin or DE placement is inferred.
 
+OpenID identity is explicitly enabled by `oidcKeyFile`, an absolute path in the
+same private read-only mount. Its bounded JSON contains `privateKeyPem` (PKCS8
+RSA, 2048–4096 bits), a separate 32-byte base64url `subjectSecret`, and optionally
+up to two `previousPublicKeys`. Never reuse service/admission credentials. Keys
+are read at startup and errors reveal no key material. Rotate signing keys with
+a reviewed service restart and retain previous public keys for in-flight token
+verification; keep the subject secret stable so account identifiers do not change.
+
+Every owning App cell must independently enable `TEAMGRID_OIDC_ENABLED=true`
+and keep `EMAIL_VERIFICATION_OFF` unset. Identity scopes `openid` and `email`
+remain separate from business principals and native role ceilings. The owner can
+decline either disclosure during consent. UserInfo checks current access/grant,
+account, client, membership, cell and verified primary email on every request.
+Code/refresh responses with `openid` include a short-lived RS256 ID Token bound
+to the actual account, client, issuer and original nonce. No authentication time
+is invented from consent or token issuance. Discovery and public JWKS are served
+only with valid explicit OpenID configuration; readiness requires both identity
+scopes in every cell. `prompt=consent` follows ordinary approval. Unsupported
+fresh/silent authentication and requested claims modes are rejected. Bounded
+`id_token_hint` values are ignored as optional context, never decoded, persisted
+or used as authentication; the existing TeamGrid browser session still requires
+normal consent. This source implementation still needs real-image and
+real-client qualification before activation.
+
 The client-policy file is:
 
 ```json

@@ -4,7 +4,7 @@ type PublicSigningKey = { kty: 'RSA'; n: string; e: string; kid: string; alg: 'R
 export type OidcAuthentication = {
   subject: string
   clientId: string
-  authenticatedAt: number
+  authenticatedAt?: number
   accessExpiresAt: number
   authorizationExpiresAt: number
   nonce?: string
@@ -126,9 +126,10 @@ export function createOidcSigner(options: {
         Array.from(authentication.clientId).some(
           (character) => character < ' ' || character === '\u007f',
         ) ||
-        !Number.isSafeInteger(authentication.authenticatedAt) ||
-        authentication.authenticatedAt < 0 ||
-        authentication.authenticatedAt > now ||
+        (authentication.authenticatedAt !== undefined &&
+          (!Number.isSafeInteger(authentication.authenticatedAt) ||
+            authentication.authenticatedAt < 0 ||
+            authentication.authenticatedAt > now)) ||
         !Number.isSafeInteger(authentication.accessExpiresAt) ||
         !Number.isSafeInteger(authentication.authorizationExpiresAt) ||
         (authentication.nonce !== undefined &&
@@ -150,7 +151,9 @@ export function createOidcSigner(options: {
         aud: authentication.clientId,
         iat: now,
         exp: expiresAt,
-        auth_time: authentication.authenticatedAt,
+        ...(authentication.authenticatedAt === undefined
+          ? {}
+          : { auth_time: authentication.authenticatedAt }),
         ...(authentication.nonce === undefined ? {} : { nonce: authentication.nonce }),
       })
       const input = `${header}.${payload}`

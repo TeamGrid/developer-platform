@@ -73,7 +73,7 @@ describe('federated OpenID UserInfo', () => {
     expect(init?.redirect).toBe('error')
     expect(init?.headers).toEqual({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${f.cells[0]?.serviceSecret}`,
+      'X-TeamGrid-OAuth-Service-Authorization': `Bearer ${f.cells[0]?.serviceSecret}`,
     })
     expect(JSON.parse(String(init?.body))).toEqual({ access_token: token })
     expect(response.headers.get('cache-control')).toBe('no-store')

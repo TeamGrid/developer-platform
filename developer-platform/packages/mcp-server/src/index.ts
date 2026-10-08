@@ -48,6 +48,8 @@ export {
   type FederatedOAuthBrokerCell,
   OAuthBrokerInvalidClientError,
 } from './oauthTokenBroker.js'
+export { createOidcSigner, type OidcAuthentication } from './oidcSigning.js'
+export { createOidcSubject } from './oidcUserInfo.js'
 export { createReadOnlyHandlers, createTeamGridMcpServer } from './server.js'
 export { checkMcpAccess, describeMcpAccess } from './setup.js'
 export {

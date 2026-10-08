@@ -17,10 +17,11 @@ const packages = [
     requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js'],
   },
   {
-    // Browser/store, pinned CIMD registry and global HTTP composition add ~70 KiB.
-    maxUnpackedSize: 1_610_000,
+    // OpenID signing/UserInfo add 18,928 bytes plus issuer/browser composition.
+    // Measured candidate: 1,626,042 bytes; keep a bounded packaging margin.
+    maxUnpackedSize: 1_640_000,
     name: '@teamgrid/mcp-server',
-    requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js', 'COVERAGE.md', 'dist/httpBin.js', 'dist/generated/domainCatalog.json', 'dist/generated/outputDefinitions.json'],
+    requiredFiles: ['dist/bin.js', 'dist/index.d.ts', 'dist/index.js', 'COVERAGE.md', 'dist/httpBin.js', 'dist/generated/domainCatalog.json', 'dist/generated/outputDefinitions.json', 'dist/oidcSigning.js', 'dist/oidcSigning.d.ts', 'dist/oidcUserInfo.js', 'dist/oidcUserInfo.d.ts'],
   },
 ]
 
