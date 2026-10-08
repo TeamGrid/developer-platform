@@ -42,12 +42,12 @@
     "node": ">=22.14 <25"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.2.0",
+    "@modelcontextprotocol/server": "2.3.0",
     "@teamgrid/api-client": "1.2.2",
     "@teamgrid/cli": "1.2.2",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
-    "zod": "4.4.3"
+    "zod": "4.6.5"
   },
   "publishConfig": {
     "access": "public",
