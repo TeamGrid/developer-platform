@@ -195,7 +195,11 @@ describe('Mongo OAuth browser store', () => {
   })
 })
 
-async function harness(timeout = 30000, workspaceUiMode?: 'subdomain' | 'path') {
+async function harness(
+  timeout = 30000,
+  workspaceUiMode?: 'subdomain' | 'path',
+  scopes = ['workspace:read', 'tasks:read'],
+) {
   const m = memory(),
     publications: OAuthRoutingRecord[][] = [],
     calls: { url: string; init: RequestInit }[] = []
@@ -259,6 +263,7 @@ async function harness(timeout = 30000, workspaceUiMode?: 'subdomain' | 'path') 
         redirectUri: record.redirectUri,
         codeChallenge: record.codeChallenge,
         requestedScopes: record.scopes,
+        ...(record.nonce === undefined ? {} : { nonce: record.nonce }),
         ...(record.state === undefined ? {} : { state: record.state }),
         workspaceId: record.selection?.workspaceId,
         status: denied ? 'denied' : 'approved',
@@ -276,7 +281,7 @@ async function harness(timeout = 30000, workspaceUiMode?: 'subdomain' | 'path') 
     issuer,
     resource,
     cells,
-    scopes: ['workspace:read', 'tasks:read'],
+    scopes,
     selectionUiOrigin: 'https://login.example.test/',
     workspaceRootDomain: 'example.test',
     workspaceUiMode,
@@ -311,11 +316,11 @@ async function harness(timeout = 30000, workspaceUiMode?: 'subdomain' | 'path') 
       body: JSON.stringify(input),
       headers: { 'Content-Type': 'application/json', [OAUTH_BROWSER_SERVICE_HEADER]: header },
     })
-  const start = async (
+  const authorize = (
     patch: Record<string, string> = {},
     redirectUri = client.redirectUris[0] ?? '',
-  ) => {
-    const result = await request(
+  ) =>
+    request(
       `/oauth/authorize?${new URLSearchParams({
         client_id: client.clientId,
         redirect_uri: redirectUri,
@@ -328,6 +333,8 @@ async function harness(timeout = 30000, workspaceUiMode?: 'subdomain' | 'path') 
         ...patch,
       })}`,
     )
+  const start = async (patch: Record<string, string> = {}, redirectUri?: string) => {
+    const result = await authorize(patch, redirectUri)
     expect(result.status).toBe(303)
     const target = new URL(required(result.headers.get('location')))
     return {
@@ -336,8 +343,8 @@ async function harness(timeout = 30000, workspaceUiMode?: 'subdomain' | 'path') 
       cookie: required(required(result.headers.get('set-cookie')).split(';')[0]),
     }
   }
-  const prepare = async (region = 'de') => {
-    const started = await start()
+  const prepare = async (region = 'de', patch: Record<string, string> = {}) => {
+    const started = await start(patch)
     const selected = await internal('select', {
       requestId: started.handle,
       cellId: `${region}-test`,
@@ -360,6 +367,7 @@ async function harness(timeout = 30000, workspaceUiMode?: 'subdomain' | 'path') 
     store,
     request,
     internal,
+    authorize,
     start,
     prepare,
     calls,
@@ -391,6 +399,57 @@ async function harness(timeout = 30000, workspaceUiMode?: 'subdomain' | 'path') 
   }
 }
 describe('Federated OAuth browser broker', () => {
+  it('keeps optional OpenID hints out of persistence, preparation and authentication', async () => {
+    const h = await harness(30000, undefined, ['workspace:read', 'openid', 'email'])
+    const flow = await h.start({
+      scope: 'workspace:read openid email',
+      prompt: 'consent',
+      id_token_hint: 'untrusted-hint',
+    })
+    expect(JSON.stringify([...h.m.rows.values()])).not.toContain('untrusted-hint')
+    const selected = await h.internal('select', {
+      requestId: flow.handle,
+      cellId: 'de-test',
+      workspaceId: 'workspace1',
+      workspaceSlug: 'workspace',
+    })
+    const { continueUrl } = await selected.json()
+    expect((await h.request(continueUrl, { headers: { Cookie: flow.cookie } })).status).toBe(303)
+    expect(h.calls[0]?.url).not.toContain('id_token_hint')
+    const invalid: Record<string, string>[] = [
+      { prompt: 'none' },
+      { max_age: '0' },
+      { claims: '{}' },
+      { id_token_hint: '' },
+      { id_token_hint: 'a'.repeat(8193) },
+      { id_token_hint: 'bad\nhint' },
+    ]
+    for (const patch of invalid) {
+      expect((await h.authorize({ scope: 'workspace:read openid email', ...patch })).status).toBe(
+        400,
+      )
+    }
+  })
+
+  it('binds the original OpenID nonce across selection, private preparation and consent resume', async () => {
+    const h = await harness(30000, undefined, ['workspace:read', 'openid', 'email'])
+    const prepared = await h.prepare('de', {
+      scope: 'email openid workspace:read',
+      nonce: 'original-openid-nonce',
+    })
+    const authorize = h.calls.find((call) => new URL(call.url).pathname.endsWith('/authorize'))
+    expect(new URL(authorize?.url ?? '').searchParams.get('nonce')).toBe('original-openid-nonce')
+    h.decision((value) => ({ ...value, nonce: 'changed-nonce' }))
+    expect(
+      (await h.request(prepared.resume, { headers: { Cookie: prepared.cookie } })).status,
+    ).toBe(503)
+    expect(h.publications).toHaveLength(0)
+    h.decision((value) => value)
+    expect(
+      (await h.request(prepared.resume, { headers: { Cookie: prepared.cookie } })).status,
+    ).toBe(303)
+    expect(h.publications).toHaveLength(1)
+  })
   it('rejects unsupported routing modes before accepting browser requests', async () => {
     await expect(harness(30000, 'remote' as 'path')).rejects.toThrow('Invalid OAuth browser policy')
   })

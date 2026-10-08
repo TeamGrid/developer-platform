@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { generateKeyPairSync } from 'node:crypto'
 import { request as nodeRequest } from 'node:http'
 import { test } from 'node:test'
 import { MongoClient } from 'mongodb'
@@ -18,6 +19,7 @@ function harness() {
     providerPatch: {},
     failProvider: false,
     stallProvider: false,
+    identityKeys: undefined,
   }
   const collections = new Map()
   const collection = (name) => {
@@ -63,6 +65,7 @@ function harness() {
       Client,
       readConfig: () => structuredClone(state.config),
       readPolicy: () => structuredClone(state.policy),
+      readIdentityKeys: () => structuredClone(state.identityKeys),
       fetcher: async (url, options) => {
         state.providerCalls.push([String(url), options])
         if (state.stallProvider) return new Promise(() => {})
@@ -72,6 +75,65 @@ function harness() {
     })
   return { state, collections, collection, start }
 }
+
+test('OpenID key material is private and invalid keys stop startup before database access', async () => {
+  for (const identityKeys of [
+    undefined,
+    {},
+    { privateKeyPem: 'not-a-key', subjectSecret: Buffer.alloc(32, 8).toString('base64url') },
+    { privateKeyPem: 'not-a-key', subjectSecret: 'bad' },
+    { privateKeyPem: 'not-a-key', subjectSecret: 'a'.repeat(43), unknown: true },
+  ]) {
+    const h = harness()
+    h.state.config.oidcKeyFile = '/run/teamgrid-federation/oidc-keys.json'
+    h.state.identityKeys = identityKeys
+    await assert.rejects(h.start(), { message: 'Federated bootstrap unavailable.' })
+    assert.equal(h.state.connected, 0)
+  }
+})
+
+test('OpenID service publishes public JWKS and requires identity scopes in every owning cell', async () => {
+  const identityKeys = {
+    privateKeyPem: generateKeyPairSync('rsa', { modulusLength: 2048 })
+      .privateKey.export({ type: 'pkcs8', format: 'pem' })
+      .toString(),
+    subjectSecret: Buffer.alloc(32, 8).toString('base64url'),
+  }
+  const h = harness()
+  h.state.config.oidcKeyFile = '/run/teamgrid-federation/oidc-keys.json'
+  h.state.identityKeys = identityKeys
+  const service = await h.start()
+  try {
+    assert.equal(await service.ready(), false)
+    await withServer(service, async (request) => {
+      const discovery = await (await request('/.well-known/openid-configuration')).json()
+      assert.equal(discovery.issuer, h.state.config.issuer)
+      assert.deepEqual(discovery.subject_types_supported, ['public'])
+      assert.equal(discovery.userinfo_endpoint, `${h.state.config.issuer}oauth/userinfo`)
+      const keys = await (await request('/oauth/jwks')).json()
+      assert.equal(keys.keys.length, 1)
+      assert.equal(keys.keys[0].alg, 'RS256')
+      assert.deepEqual(Object.keys(keys.keys[0]).sort(), ['alg', 'e', 'kid', 'kty', 'n', 'use'])
+      assert.equal(JSON.stringify(keys).includes(identityKeys.subjectSecret), false)
+    })
+  } finally {
+    await service.close()
+  }
+  const qualified = harness()
+  qualified.state.config.oidcKeyFile = h.state.config.oidcKeyFile
+  qualified.state.identityKeys = identityKeys
+  qualified.state.providerPatch.scopes_supported = [
+    ...metadata(qualified.state.config).scopes_supported,
+    'openid',
+    'email',
+  ]
+  const ready = await qualified.start()
+  try {
+    assert.equal(await ready.ready(), true)
+  } finally {
+    await ready.close()
+  }
+})
 async function withServer(service, action) {
   await new Promise((resolve) => service.server.listen(0, '127.0.0.1', resolve))
   const port = service.server.address().port

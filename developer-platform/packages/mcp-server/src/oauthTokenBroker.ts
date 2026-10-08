@@ -104,6 +104,12 @@ export function createFederatedOAuthTokenBroker(options: {
     signal: AbortSignal,
   ): Promise<void>
   scopes: readonly string[]
+  issueIdToken?(input: {
+    accessToken: string
+    clientId: string
+    scopes: readonly string[]
+    signal: AbortSignal
+  }): Promise<string>
   fetch?: typeof fetch
   requestTimeoutMs?: number
 }) {
@@ -360,6 +366,8 @@ export function createFederatedOAuthTokenBroker(options: {
       const grantedScopes = result.tokenResponse.scope.split(' ')
       if (
         !grantedScopes.includes('workspace:read') ||
+        new Set(grantedScopes).size !== grantedScopes.length ||
+        (grantedScopes.includes('email') && !grantedScopes.includes('openid')) ||
         grantedScopes.some((scope) => !scopes.has(scope)) ||
         new Set(result.routes.map((route) => route.kind)).size !== 2 ||
         result.routes.some(
@@ -381,7 +389,32 @@ export function createFederatedOAuthTokenBroker(options: {
         throw new Error('Invalid provider publication.')
       }
       await withinSignal(options.directory.register(result.routes, deadline), deadline)
-      return Response.json(result.tokenResponse, { status: 200, headers })
+      const issuedScopes = result.tokenResponse.scope.split(' ')
+      let idToken: string | undefined
+      if (issuedScopes.includes('openid')) {
+        if (!options.issueIdToken) throw new Error('OpenID signing is unavailable.')
+        idToken = await withinSignal(
+          options.issueIdToken({
+            accessToken: result.tokenResponse.access_token,
+            clientId: parameters.client_id ?? '',
+            scopes: issuedScopes,
+            signal: deadline,
+          }),
+          deadline,
+        )
+        if (
+          typeof idToken !== 'string' ||
+          idToken.length > 16384 ||
+          !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(idToken)
+        ) {
+          throw new Error('OpenID signing is unavailable.')
+        }
+      }
+      deadline.throwIfAborted()
+      return Response.json(
+        { ...result.tokenResponse, ...(idToken === undefined ? {} : { id_token: idToken }) },
+        { status: 200, headers },
+      )
     } catch {
       return json(503, 'temporarily_unavailable')
     }

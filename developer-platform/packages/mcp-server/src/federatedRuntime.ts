@@ -9,6 +9,8 @@ import {
   createFederatedOAuthTokenBroker,
   OAuthBrokerInvalidClientError,
 } from './oauthTokenBroker.js'
+import type { createOidcSigner } from './oidcSigning.js'
+import { createFederatedOidcIdentityReader, createFederatedOidcUserInfo } from './oidcUserInfo.js'
 import { supportedOAuthScopes } from './toolScopes.js'
 
 export type FederatedMcpRuntimeOptions = Omit<
@@ -24,6 +26,7 @@ export type FederatedMcpRuntimeOptions = Omit<
   workspaceUiMode?: 'subdomain' | 'path'
   selectionServiceSecret: string
   ready(): Promise<boolean>
+  oidc?: { signer: ReturnType<typeof createOidcSigner>; subject(subjectId: string): string }
 }
 const responseHeaders = {
   'Cache-Control': 'no-store',
@@ -54,6 +57,10 @@ export function createFederatedMcpRuntime(options: FederatedMcpRuntimeOptions) {
     providerBaseUrl: new URL('./', cell.providerUrl).href,
   }))
   const budget = options.requestTimeoutMs ?? 30000
+  const authorizationScopes = [
+    ...supportedOAuthScopes,
+    ...(options.oidc ? ['openid', 'email'] : []),
+  ]
   const gateway = createFederatedMcpGateway({
     ...options,
     toolProfile: 'full',
@@ -72,7 +79,7 @@ export function createFederatedMcpRuntime(options: FederatedMcpRuntimeOptions) {
     resource: resource.href,
     cells,
     directory: options.directory,
-    scopes: supportedOAuthScopes,
+    scopes: authorizationScopes,
     enabled: options.enabled,
     admit: options.admitRequest,
     fetch: options.fetch,
@@ -87,10 +94,42 @@ export function createFederatedMcpRuntime(options: FederatedMcpRuntimeOptions) {
     store: options.browserStore,
     client: (clientId, signal) => options.clients.resolve(clientId, signal),
   })
+  const oidc = options.oidc
+  const identityOptions = options.oidc
+    ? {
+        ...brokerOptions,
+        subject: options.oidc.subject,
+        client: (clientId: string, signal: AbortSignal) =>
+          options.clients.resolve(clientId, signal),
+      }
+    : undefined
+  const readIdentity = identityOptions && createFederatedOidcIdentityReader(identityOptions)
+  const userInfo = identityOptions && createFederatedOidcUserInfo(identityOptions)
   const tokens = createFederatedOAuthTokenBroker({
     ...brokerOptions,
     authenticateClient: (parameters, authorization, signal) =>
       options.clients.authenticate(parameters, authorization, signal),
+    ...(oidc && readIdentity
+      ? {
+          issueIdToken: async (input) => {
+            const identity = await readIdentity(input.accessToken, input.signal)
+            if (
+              identity instanceof Response ||
+              identity.clientId !== input.clientId ||
+              [...identity.scopes].sort().join(' ') !== [...input.scopes].sort().join(' ')
+            ) {
+              throw new Error('OpenID identity is unavailable.')
+            }
+            return oidc.signer.sign({
+              subject: identity.subject,
+              clientId: identity.clientId,
+              accessExpiresAt: Date.parse(identity.expiresAt) / 1000,
+              authorizationExpiresAt: Date.parse(identity.expiresAt) / 1000,
+              ...(identity.nonce === undefined ? {} : { nonce: identity.nonce }),
+            })
+          },
+        }
+      : {}),
   })
   let closed = false
   const failure = (status: number, error: string) =>
@@ -107,7 +146,12 @@ export function createFederatedMcpRuntime(options: FederatedMcpRuntimeOptions) {
     ) {
       return failure(421, 'invalid_request')
     }
-    if (url.pathname === '/.well-known/oauth-authorization-server') {
+    const openidMetadata = url.pathname === '/.well-known/openid-configuration'
+    const jwks = url.pathname === '/oauth/jwks'
+    if (
+      url.pathname === '/.well-known/oauth-authorization-server' ||
+      (options.oidc && (openidMetadata || jwks))
+    ) {
       if (request.method !== 'GET' || url.search) return failure(405, 'invalid_request')
       if (!options.enabled()) return failure(503, 'temporarily_unavailable')
       const signal = AbortSignal.any([request.signal, AbortSignal.timeout(budget)])
@@ -119,6 +163,7 @@ export function createFederatedMcpRuntime(options: FederatedMcpRuntimeOptions) {
           })
         }
         signal.throwIfAborted()
+        if (jwks && oidc) return Response.json(oidc.signer.jwks(), { headers: responseHeaders })
         return Response.json(
           {
             issuer: issuer.href,
@@ -140,7 +185,25 @@ export function createFederatedMcpRuntime(options: FederatedMcpRuntimeOptions) {
             client_id_metadata_document_supported: options.clients.metadataSupported(),
             code_challenge_methods_supported: ['S256'],
             authorization_response_iss_parameter_supported: true,
-            scopes_supported: [...supportedOAuthScopes],
+            scopes_supported: authorizationScopes,
+            ...(options.oidc
+              ? {
+                  userinfo_endpoint: new URL('/oauth/userinfo', issuer).href,
+                  jwks_uri: new URL('/oauth/jwks', issuer).href,
+                  subject_types_supported: ['public'],
+                  id_token_signing_alg_values_supported: ['RS256'],
+                  claims_supported: [
+                    'iss',
+                    'sub',
+                    'aud',
+                    'iat',
+                    'exp',
+                    'nonce',
+                    'email',
+                    'email_verified',
+                  ],
+                }
+              : {}),
           },
           { headers: responseHeaders },
         )
@@ -148,6 +211,7 @@ export function createFederatedMcpRuntime(options: FederatedMcpRuntimeOptions) {
         return failure(503, 'temporarily_unavailable')
       }
     }
+    if (userInfo && url.pathname === '/oauth/userinfo') return userInfo(request)
     if (['/oauth/token', '/oauth/revoke'].includes(url.pathname)) return tokens(request)
     if (
       [

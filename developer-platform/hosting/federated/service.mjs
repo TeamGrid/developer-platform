@@ -6,6 +6,8 @@ import {
   createMongoOAuthBrowserStore,
   createMongoOAuthRoutingDirectory,
   createOAuthClientRegistry,
+  createOidcSigner,
+  createOidcSubject,
   OAuthBrokerInvalidClientError,
 } from '../../packages/mcp-server/dist/index.js'
 import { supportedOAuthScopes } from '../../packages/mcp-server/dist/toolScopes.js'
@@ -77,11 +79,51 @@ function checkPrimary(hello, replicaSet) {
 export async function createFederatedService({
   readConfig,
   readPolicy = readPrivateJson,
+  readIdentityKeys = readPrivateJson,
   fetcher = fetch,
   Client = MongoClient,
 }) {
   const config = parseServiceConfig(readConfig())
   const fixed = immutableConfig(config)
+  let oidc
+  if (config.oidcKeyFile) {
+    try {
+      const keys = readIdentityKeys(config.oidcKeyFile, 32768)
+      if (
+        !keys ||
+        typeof keys !== 'object' ||
+        Array.isArray(keys) ||
+        Object.keys(keys).some(
+          (key) => !['privateKeyPem', 'subjectSecret', 'previousPublicKeys'].includes(key),
+        ) ||
+        typeof keys.subjectSecret !== 'string' ||
+        !/^[A-Za-z0-9_-]{43}$/.test(keys.subjectSecret)
+      )
+        unavailable()
+      const secret = Buffer.from(keys.subjectSecret, 'base64url')
+      if (
+        secret.byteLength !== 32 ||
+        secret.toString('base64url') !== keys.subjectSecret ||
+        [
+          config.selectionServiceSecret,
+          config.admission.hmacSecret,
+          ...config.cells.flatMap((cell) => [cell.serviceSecret, cell.apiOriginSecret]),
+        ].includes(keys.subjectSecret)
+      )
+        unavailable()
+      oidc = {
+        signer: createOidcSigner({
+          issuer: config.issuer,
+          privateKeyPem: keys.privateKeyPem,
+          previousPublicKeys: keys.previousPublicKeys,
+        }),
+        subject: createOidcSubject(config.issuer, secret),
+      }
+    } catch {
+      return unavailable()
+    }
+  }
+  const authorizationScopes = [...supportedOAuthScopes, ...(oidc ? ['openid', 'email'] : [])]
   const state = () => {
     try {
       const current = parseServiceConfig(readConfig())
@@ -262,9 +304,7 @@ export async function createFederatedService({
                 !['none', 'client_secret_basic', 'client_secret_post'].every((method) =>
                   metadata.token_endpoint_auth_methods_supported?.includes(method),
                 ) ||
-                !supportedOAuthScopes.every((scope) =>
-                  metadata.scopes_supported?.includes(scope),
-                ) ||
+                !authorizationScopes.every((scope) => metadata.scopes_supported?.includes(scope)) ||
                 (policy().cimdEnabled && metadata.client_id_metadata_document_supported !== true)
               )
                 unavailable()
@@ -301,6 +341,7 @@ export async function createFederatedService({
       admitRequest: (request) => admission.admit(request),
       ready: probe,
       fetch: fetcher,
+      ...(oidc ? { oidc } : {}),
     })
     server = createFederatedMcpNodeServer(config.resource, runtime)
     return {

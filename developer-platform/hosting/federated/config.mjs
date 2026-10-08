@@ -95,6 +95,7 @@ export function parseServiceConfig(input) {
       'selectionServiceSecret',
       'cells',
       'clientPolicyFile',
+      'oidcKeyFile',
       'mongo',
       'admission',
       'allowedOrigins',
@@ -220,6 +221,7 @@ export function parseServiceConfig(input) {
       allowedOrigins,
       hostClients: parseMcpHostClients(JSON.stringify(input.hostClients)),
       clientPolicyFile: filePath(input.clientPolicyFile),
+      ...(input.oidcKeyFile === undefined ? {} : { oidcKeyFile: filePath(input.oidcKeyFile) }),
       listen: { ...input.listen },
     }
   } catch {
