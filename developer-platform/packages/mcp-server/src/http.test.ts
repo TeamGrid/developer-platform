@@ -90,7 +90,7 @@ describe('regional HTTP MCP authorization boundary', () => {
       const unauthorized = await handler.fetch(request())
       expect(unauthorized.status).toBe(401)
       expect(unauthorized.headers.get('www-authenticate')).toContain(
-        'scope="workspace:read projects:read tasks:read time-entries:read"',
+        `scope="${supportedOAuthScopes.join(' ')}"`,
       )
       expect(unauthorized.headers.get('www-authenticate')).toContain(
         '/.well-known/oauth-protected-resource/mcp',
