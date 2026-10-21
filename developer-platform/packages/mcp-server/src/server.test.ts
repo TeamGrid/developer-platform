@@ -3,7 +3,11 @@ import { Client, InMemoryTransport } from '@modelcontextprotocol/client'
 import { TeamGridApiError, TeamGridClientError } from '@teamgrid/api-client'
 import { describe, expect, it, vi } from 'vitest'
 import { responseFixture } from './fixtures.testSupport.js'
-import { createReadOnlyHandlers, createTeamGridMcpServer } from './server.js'
+import {
+  createReadOnlyHandlers,
+  createTeamGridMcpServer,
+  maximumToolInputElements,
+} from './server.js'
 
 const secretCanary =
   // gitleaks:allow -- synthetic fixed-format test credential
@@ -600,5 +604,36 @@ describe('TeamGrid read-only MCP adapter', () => {
         denyTools: ['teamgrid_workspace_get'],
       }),
     ).toThrow('allow and deny filters overlap')
+  })
+
+  it('rejects a tool call with more array elements and members than any tool needs', async () => {
+    const query = vi.fn(async () => ({ data: [], meta: { requestId: 'fixture' } }))
+    const server = createTeamGridMcpServer(
+      {
+        search: { query },
+        workspace: { get: vi.fn(async () => responseFixture('getWorkspace', 'team-1')) },
+      } as never,
+      { toolProfile: 'all' },
+    )
+    const client = new Client({ name: 'test-client', version: '1.0.0' })
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
+    await Promise.all([server.connect(serverTransport), client.connect(clientTransport)])
+    try {
+      const result = await client.callTool({
+        name: 'teamgrid_search',
+        arguments: {
+          limit: 5,
+          term: 'invoice',
+          types: Array.from({ length: maximumToolInputElements + 1 }, () => 'tasks'),
+        },
+      })
+
+      expect(JSON.stringify(result.content)).toContain('more than the maximum of 20000 elements')
+      expect(result.isError).toBe(true)
+      expect(query).not.toHaveBeenCalled()
+    } finally {
+      await client.close()
+      await server.close()
+    }
   })
 })
