@@ -14,7 +14,13 @@ import { workWriteTools } from './workTools.js'
 /** Valid authority blocked by workspace policy; another login cannot repair it. */
 export class McpAccessDeniedError extends Error {}
 
-const initialScopes = ['workspace:read', 'projects:read', 'tasks:read', 'time-entries:read']
+/**
+ * The first challenge asks for the complete business scope list. The owner decides on one consent
+ * screen what to keep (sensitive areas stay off unless turned on), so a client does not return
+ * with one more consent per capability. A narrower grant still works: a tool that needs a scope
+ * the grant lacks is answered with an `insufficient_scope` challenge.
+ */
+const initialScopes = supportedOAuthScopes
 
 /** Safe transport signal: keep the provider's wait time without prompting another login. */
 export class McpRateLimitError extends Error {
