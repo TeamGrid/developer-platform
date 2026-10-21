@@ -15,6 +15,8 @@ cleanup() {
   if [[ "$result" != 0 ]]; then
     for name in "$mongo" "$provider" "$service_a" "$service_b" "$ingress"; do
       docker inspect --format '{{.Name}}: exit={{.State.ExitCode}} oom={{.State.OOMKilled}} status={{.State.Status}}' "$name" 2>/dev/null || true
+      # The last lines show why a container stopped; the exit code alone does not.
+      docker logs --tail 40 "$name" 2>&1 | sed "s/^/  [$name] /" || true
     done
   fi
   docker unpause "$mongo" >/dev/null 2>&1 || true
