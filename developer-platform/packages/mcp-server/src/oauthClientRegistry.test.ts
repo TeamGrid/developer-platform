@@ -83,6 +83,37 @@ describe('global OAuth client registry', () => {
       )
     }
   })
+  it('accepts the verbatim Claude hosted-app metadata document', () => {
+    const claudeId = 'https://claude.ai/oauth/mcp-oauth-client-metadata'
+    const parsed = parseOAuthClientMetadata(claudeId, {
+      client_id: claudeId,
+      client_name: 'Claude',
+      client_uri: 'https://claude.ai',
+      redirect_uris: ['https://claude.ai/api/mcp/auth_callback'],
+      grant_types: [
+        'authorization_code',
+        'refresh_token',
+        'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      ],
+      response_types: ['code'],
+      token_endpoint_auth_method: 'none',
+    })
+    expect(parsed.redirectUris).toEqual(['https://claude.ai/api/mcp/auth_callback'])
+    expect(parsed.tokenEndpointAuthMethod).toBe('none')
+    for (const grant_types of [
+      ['urn:ietf:params:oauth:grant-type:jwt-bearer'],
+      ['authorization_code', 'client_credentials'],
+    ]) {
+      expect(() =>
+        parseOAuthClientMetadata(claudeId, {
+          client_id: claudeId,
+          client_name: 'Claude',
+          redirect_uris: ['https://claude.ai/api/mcp/auth_callback'],
+          grant_types,
+        }),
+      ).toThrow(OAuthBrokerInvalidClientError)
+    }
+  })
   it('retains regional deterministic CIMD identity, supported public auth and native callbacks', () => {
     const metadata = {
       ...document(),

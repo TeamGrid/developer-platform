@@ -8,6 +8,16 @@ import { OAuthBrokerInvalidClientError } from './oauthTokenBroker.js'
 function invalid(): never {
   throw new OAuthBrokerInvalidClientError()
 }
+/**
+ * Grant types a metadata document may list. Claude's published document also
+ * lists the JWT-bearer grant; this server never issues it, so it is tolerated
+ * in the document but not advertised or accepted at the token endpoint.
+ */
+const metadataGrantTypes = [
+  'authorization_code',
+  'refresh_token',
+  'urn:ietf:params:oauth:grant-type:jwt-bearer',
+]
 export const oauthClientRegistrationSchema = z
   .object({
     _id: z.string().regex(/^[A-Za-z0-9_-]{16,128}$/),
@@ -116,9 +126,7 @@ export function parseOAuthClientMetadata(clientId: string, body: unknown) {
       (input.grant_types !== undefined &&
         (!Array.isArray(input.grant_types) ||
           !input.grant_types.includes('authorization_code') ||
-          input.grant_types.some(
-            (value) => !['authorization_code', 'refresh_token'].includes(value),
-          ))) ||
+          input.grant_types.some((value) => !metadataGrantTypes.includes(value)))) ||
       (input.response_types !== undefined &&
         (!Array.isArray(input.response_types) ||
           input.response_types.length !== 1 ||
