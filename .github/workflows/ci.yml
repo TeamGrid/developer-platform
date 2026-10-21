@@ -111,7 +111,10 @@ jobs:
   federated-image:
     name: Verify federated MCP image
     needs: verify
-    runs-on: ubuntu-latest
+    # MongoDB 8 refuses to start on Linux kernels 6.19 and newer (SERVER-121912, tcmalloc rseq).
+    # ubuntu-latest runners move to such a kernel gradually, which made this job fail intermittently.
+    # Stay on the 22.04 image until the pinned MongoDB version supports the newer kernel.
+    runs-on: ubuntu-22.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -132,7 +135,9 @@ jobs:
       - name: Qualify two instances against a disposable replica set
         env:
           SOURCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: bash developer-platform/hosting/federated/smoke-image.sh "teamgrid-federated-mcp:$SOURCE_REVISION"
+        run: |
+          uname -r
+          bash developer-platform/hosting/federated/smoke-image.sh "teamgrid-federated-mcp:$SOURCE_REVISION"
       - name: Publish verified global image only from protected main
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
