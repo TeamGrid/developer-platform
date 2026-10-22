@@ -220,8 +220,8 @@ roles, scopes, locks and sharing rules still apply. The generated coverage table
 also accounts for the 30 operations deliberately outside MCP.
 
 See [the MCP package guide](packages/mcp-server/README.md) for exact tools,
-scopes, setup and limitations. Hosted OAuth is available at
-`https://mcp-de.teamgrid.app/mcp` and `https://mcp-us.teamgrid.app/mcp`.
+scopes, setup and limitations. Hosted OAuth is available at the one global
+address `https://mcp.teamgrid.app/mcp`, for workspaces in every region.
 Each connection selects one workspace and requires user consent; sensitive
 permissions require a personal Passkey. The release owner's acceptance applies
 to this exact deployed release; additional regional exercises were waived and

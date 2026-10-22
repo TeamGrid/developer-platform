@@ -21,9 +21,11 @@ share the profile's keychain contents.
 
 The stdio entry point serves protocol 2026-07-28 and legacy 2025 clients
 from the same registry. Packed-install CI tests both eras against the actual
-installed binary. Hosted OAuth uses `https://mcp-de.teamgrid.app/mcp` in DE and
-`https://mcp-us.teamgrid.app/mcp` in US. A connection selects one Workspace and
-remains subject to its current permissions.
+installed binary. Hosted OAuth uses the one global address
+`https://mcp.teamgrid.app/mcp` for workspaces in every region (the earlier
+regional addresses `mcp-de` and `mcp-us` are legacy and only keep existing
+connections working). A connection selects one Workspace and remains subject
+to its current permissions.
 
 Hosted presentation is selected only from the freshly verified OAuth client ID.
 ChatGPT receives tool-result consent metadata; other clients receive HTTP 403

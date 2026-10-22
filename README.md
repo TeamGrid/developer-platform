@@ -19,7 +19,7 @@ credential handling, regional routing, and development instructions.
 ## Install
 
 Version 1.2.2 is the stable release for the default `latest` dist-tag. It includes
-browser login, explicit MCP write profiles and the regional hosted MCP service.
+browser login, explicit MCP write profiles and the hosted MCP service at `https://mcp.teamgrid.app/mcp`.
 Hosted access is available across Production workspaces, subject to the user's
 membership, permissions and approved OAuth scopes.
 
