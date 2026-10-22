@@ -149,11 +149,11 @@
     },
     {
       "path": "plugins/microsoft365/teamgrid/plugin.json",
-      "sha256": "5ae30aee7fa0a44d9a647d4d5939f2a6a8e26666c263232ff77885c6ee25ea4c"
+      "sha256": "1d7110c1e57ef5b815d3bc18c43826962cf7e476df024a51b7a002dbc04f5f1b"
     },
     {
       "path": "plugins/microsoft365/teamgrid/tools.json",
-      "sha256": "37f1a7de83aef6b2f47d78b0d3782b15138d14cc4a263ac389a2d29f9cf66e0c"
+      "sha256": "7e472d7f67e49144a9350741ae48392f846d028653cbfee7a6f58bbf03e66e92"
     },
     {
       "path": "plugins/microsoft365/teamgrid/color.png",
