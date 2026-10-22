@@ -3,13 +3,14 @@ import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { TeamGridApiError, type TeamGridClient } from '@teamgrid/api-client'
 import { describe, expect, it, vi } from 'vitest'
 import {
+  describeInputIssue,
   domainCatalog,
   domainInputSchema,
   domainToolNames,
   executeDomainTool,
 } from './domainTools.js'
 import { responseFixture } from './fixtures.testSupport.js'
-import { createTeamGridMcpServer } from './server.js'
+import { createTeamGridMcpServer, toolTitle } from './server.js'
 import { describeMcpAccess } from './setup.js'
 import { parseMcpToolFilter, parseMcpToolProfile } from './toolProfiles.js'
 import { supportedOAuthScopes } from './toolScopes.js'
@@ -377,6 +378,48 @@ describe('complete domain MCP', () => {
       }
     },
   )
+
+  it('gives every reviewed tool a readable, unique title that names TeamGrid', () => {
+    const titles = domainToolNames.map((name) => toolTitle(name, domainCatalog[name].description))
+    expect(new Set(titles).size).toBe(domainToolNames.length)
+    for (const title of titles) {
+      expect(title).toContain('TeamGrid')
+      expect(title.length).toBeLessThanOrEqual(110)
+      expect(title).not.toMatch(/[_.]$/)
+    }
+    expect(toolTitle('teamgrid_task_create', domainCatalog.teamgrid_task_create.description)).toBe(
+      'Create a task in TeamGrid',
+    )
+    expect(toolTitle('teamgrid_workspace_get', 'Get the authenticated TeamGrid workspace.')).toBe(
+      'Get the authenticated TeamGrid workspace',
+    )
+    expect(toolTitle('teamgrid_task_create')).toBe('Task Create in TeamGrid')
+  })
+
+  it('names the field and the rule of a schema failure without echoing the value', () => {
+    const validate = (name: (typeof domainToolNames)[number], value: Record<string, unknown>) => {
+      const result = domainInputSchema(name)['~standard'].validate(value)
+      return (result as { issues?: { message: string }[] }).issues?.[0]?.message
+    }
+    expect(validate('teamgrid_tasks_list', { limit: 500 })).toBe(
+      'Invalid operation input: limit must be at most 200.',
+    )
+    expect(validate('teamgrid_tasks_list', { limit: 0 })).toBe(
+      'Invalid operation input: limit must be at least 1.',
+    )
+    expect(validate('teamgrid_tasks_list', { limit: 'secret-value' })).toBe(
+      'Invalid operation input: limit must be of type integer.',
+    )
+    expect(validate('teamgrid_tasks_list', { bogus: 'secret-value' })).toBe(
+      'Invalid operation input: bogus is not an accepted field.',
+    )
+    expect(validate('teamgrid_task_get', {})).toBe('Invalid operation input: id is required.')
+    expect(validate('teamgrid_contacts_list', { category: 'secret-value' })).toBe(
+      'Invalid operation input: category must be one of: customer, supplier, team.',
+    )
+    expect(validate('teamgrid_tasks_list', { limit: 'secret-value' })).not.toContain('secret-value')
+    expect(describeInputIssue(undefined)).toBe('Invalid operation input.')
+  })
 
   it('blocks wrong workspace and unknown transport fields before a mutation', async () => {
     const c = await connected()

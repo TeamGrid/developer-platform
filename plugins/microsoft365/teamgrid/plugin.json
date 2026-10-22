@@ -13,7 +13,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Absence Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive an absence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -25,7 +25,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Absence Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create an absence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -41,7 +41,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Absence Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore an absence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -53,7 +53,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Absence Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update an absence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -73,7 +73,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Appointment Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a TeamGrid-managed appointment.",
           "isNonConsequential": false
         }
       }
@@ -85,7 +85,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Appointment Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a TeamGrid-managed appointment.",
           "isNonConsequential": false
         }
       }
@@ -101,7 +101,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Appointment Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore a TeamGrid-managed appointment.",
           "isNonConsequential": false
         }
       }
@@ -113,7 +113,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Appointment Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a TeamGrid-managed appointment.",
           "isNonConsequential": false
         }
       }
@@ -137,7 +137,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Call Note Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a call note in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -149,7 +149,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Call Note Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a call note in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -165,7 +165,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Call Note Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore an archived call note in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -181,7 +181,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Comment Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a comment in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -193,7 +193,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Comment Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a target comment in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -209,7 +209,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Comment Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore a comment in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -221,7 +221,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Comment Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Edit a comment in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -237,7 +237,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Contact Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a contact in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -253,7 +253,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Contact Group Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a contact group in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -265,7 +265,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Contact Group Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a contact group in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -281,7 +281,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Contact Group Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore an archived contact group in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -293,7 +293,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Contact Group Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a contact group in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -309,7 +309,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Contact Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a contact in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -325,7 +325,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Custom Field Definition Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a custom-field definition in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -337,7 +337,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Custom Field Definition Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a custom-field definition in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -353,7 +353,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Custom Field Definition Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore an archived custom-field definition in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -365,7 +365,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Custom Field Definition Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a custom-field definition in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -381,7 +381,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Custom Field Value Clear in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Clear a custom-field value in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -397,7 +397,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Custom Field Value Set in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Set a custom-field value in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -413,7 +413,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Document Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a document in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -425,7 +425,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Document Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a document in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -441,7 +441,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Document Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore a document in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -453,7 +453,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Document Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a document in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -473,7 +473,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Export Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create an asynchronous export in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -489,7 +489,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: File Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a file in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -505,7 +505,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: File Rename in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Rename a file in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -517,7 +517,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: File Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore a file in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -533,7 +533,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Group Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a workspace group in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -545,7 +545,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Group Delete in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Delete a workspace group in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -561,7 +561,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Group Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a workspace group in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -581,7 +581,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Invitation Cancel in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Cancel a pending invitation in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -593,7 +593,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Invitation Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Invite a workspace member in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -609,7 +609,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Invitation Resend in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Resend a pending invitation in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -625,7 +625,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: List Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a list in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -637,7 +637,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: List Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a list in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -653,7 +653,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: List Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore an archived list in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -665,7 +665,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: List Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a list in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -685,7 +685,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Member Remove in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Remove a workspace member in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -697,7 +697,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Member Role Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Change a member role in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -721,7 +721,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Product Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a product in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -733,7 +733,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Product Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a product in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -749,7 +749,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Product Group Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a product group in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -761,7 +761,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Product Group Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a product group in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -777,7 +777,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Product Group Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a product group in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -793,7 +793,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Product Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a product in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -809,7 +809,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a project asynchronously in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -821,7 +821,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Complete in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Complete a project asynchronously in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -833,7 +833,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a project in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -853,7 +853,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Reopen in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Reopen a project asynchronously in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -865,7 +865,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore a project asynchronously in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -881,7 +881,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Sharing Replace in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Replace project sharing in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -893,7 +893,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Statement Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a project statement in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -905,7 +905,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Statement Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a project statement in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -921,7 +921,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Statement Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore a project statement in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -933,7 +933,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Statement Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a project statement in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -949,7 +949,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Template Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a project template in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -961,7 +961,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Template Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Capture a project as a template in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -977,7 +977,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Template Instantiate in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Instantiate a project template asynchronously in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -993,7 +993,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Template Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore an archived project template in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1005,7 +1005,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Template Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update project-template metadata in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1021,7 +1021,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Project Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a project in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1037,7 +1037,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Role Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a workspace role in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1049,7 +1049,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Role Delete in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Delete a workspace role in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1065,7 +1065,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Role Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a workspace role in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1085,7 +1085,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Service Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a service in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1097,7 +1097,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Service Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a service in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1113,7 +1113,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Service Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore an archived service in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1125,7 +1125,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Service Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a service in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1141,7 +1141,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Tag Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a tag in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1153,7 +1153,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Tag Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a tag in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1169,7 +1169,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Tag Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore an archived tag in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1181,7 +1181,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Tag Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a tag in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1197,7 +1197,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a task in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1209,7 +1209,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Complete in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Complete a task in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1221,7 +1221,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a task in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1233,7 +1233,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Duplicate in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Duplicate a task in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1249,7 +1249,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Move in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Move or reorder a task in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1265,7 +1265,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Planned Work Replace in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Replace task planned work asynchronously in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1277,7 +1277,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Apply Task Template in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Replace a recurrence template from a task in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1289,7 +1289,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a task recurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1301,7 +1301,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a task recurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1313,7 +1313,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence End in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: End a task recurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1325,7 +1325,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Event Submit in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Submit an event to a task recurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1345,7 +1345,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Occurrence Override in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Override a task recurrence occurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1357,7 +1357,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Occurrence Override Clear in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Clear a task recurrence occurrence override in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1369,7 +1369,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Occurrence Retry in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Retry a failed task recurrence occurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1385,7 +1385,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Operation Cancel in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Cancel a task recurrence operation in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1401,7 +1401,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Owner Transfer in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Transfer task recurrence ownership in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1413,7 +1413,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Pause in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Pause a task recurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1429,7 +1429,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Preview Input in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Preview a draft task recurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1441,7 +1441,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Recheck in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Recheck a task recurrence asynchronously in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1453,7 +1453,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Remove From Tasks in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Remove a task recurrence from its tasks in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1465,7 +1465,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore a task recurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1477,7 +1477,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Resume in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Resume a task recurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1489,7 +1489,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a task recurrence in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1505,7 +1505,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Recurrence Version Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore a task recurrence version in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1525,7 +1525,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Reopen in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Reopen a completed task in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1537,7 +1537,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore an archived task in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1549,7 +1549,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Subtasks Replace in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Replace a task checklist in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1561,7 +1561,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Timer Start in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Start task time tracking in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1573,7 +1573,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Timer Stop in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Stop task time tracking in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1585,7 +1585,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Task Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a task in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1597,7 +1597,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Tasks Bulk Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update multiple tasks safely in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1617,7 +1617,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Time Entry Archive in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Archive a time entry in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1633,7 +1633,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Time Entry Billing Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update time-entry billing state in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1645,7 +1645,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Time Entry Create in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Create a time entry in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1661,7 +1661,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Time Entry Restore in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Restore an archived time entry in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1673,7 +1673,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Time Entry Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update a time entry in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1697,7 +1697,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Webhook Delivery Test in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Send a signed test webhook delivery in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1713,7 +1713,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Webhook Remove in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Remove a webhook in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1725,7 +1725,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Webhook Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update or reactivate a webhook in TeamGrid.",
           "isNonConsequential": false
         }
       }
@@ -1749,7 +1749,7 @@
         "confirmation": {
           "type": "AdaptiveCard",
           "title": "Confirm TeamGrid change",
-          "body": "Confirm the requested TeamGrid action: Workspace Settings Update in TeamGrid.",
+          "body": "Confirm the requested TeamGrid action: Update public workspace settings in TeamGrid.",
           "isNonConsequential": false
         }
       }
