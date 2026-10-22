@@ -1,6 +1,6 @@
 import type { StandardSchemaWithJSON } from '@modelcontextprotocol/server'
 import { type TeamGridClient, TeamGridClientError } from '@teamgrid/api-client'
-import { Ajv2020, type ValidateFunction } from 'ajv/dist/2020.js'
+import { Ajv2020, type ErrorObject, type ValidateFunction } from 'ajv/dist/2020.js'
 import { fullFormats } from 'ajv-formats/dist/formats.js'
 import { projectContactNotes } from './contactNotes.js'
 import { projectDocumentContent } from './documentContent.js'
@@ -109,6 +109,63 @@ function boundedJson(value: unknown, depth = 0, remaining = { count: 20000 }): b
   )
 }
 
+function inputFieldPath(error: ErrorObject, extra?: unknown) {
+  const segments = error.instancePath.split('/').filter(Boolean)
+  if (typeof extra === 'string' && extra) segments.push(extra)
+  // Field names are the caller's own input; keep them short and printable, never their values.
+  return segments
+    .map((segment) => segment.replace(/[^A-Za-z0-9_$.-]/g, '').slice(0, 48))
+    .filter(Boolean)
+    .join('.')
+}
+
+/** One actionable sentence about the first schema failure; it names the field and rule, never a value. */
+export function describeInputIssue(error: ErrorObject | undefined) {
+  if (!error) return 'Invalid operation input.'
+  const params = error.params as Record<string, unknown>
+  const field = inputFieldPath(error) || 'input'
+  switch (error.keyword) {
+    case 'required':
+      return `Invalid operation input: ${inputFieldPath(error, params.missingProperty)} is required.`
+    case 'additionalProperties':
+      return `Invalid operation input: ${inputFieldPath(error, params.additionalProperty)} is not an accepted field.`
+    case 'maximum':
+      return `Invalid operation input: ${field} must be at most ${String(params.limit)}.`
+    case 'minimum':
+      return `Invalid operation input: ${field} must be at least ${String(params.limit)}.`
+    case 'maxLength':
+      return `Invalid operation input: ${field} must be at most ${String(params.limit)} characters.`
+    case 'minLength':
+      return `Invalid operation input: ${field} must be at least ${String(params.limit)} characters.`
+    case 'maxItems':
+      return `Invalid operation input: ${field} must have at most ${String(params.limit)} items.`
+    case 'minItems':
+      return `Invalid operation input: ${field} must have at least ${String(params.limit)} items.`
+    case 'enum': {
+      const allowed = Array.isArray(params.allowedValues) ? params.allowedValues : []
+      const shown = allowed
+        .slice(0, 12)
+        .map((value) => String(value).slice(0, 40))
+        .join(', ')
+      return `Invalid operation input: ${field} must be one of: ${shown}${allowed.length > 12 ? ', ...' : ''}.`
+    }
+    case 'type':
+      return `Invalid operation input: ${field} must be of type ${String(params.type)}.`
+    case 'format':
+      return `Invalid operation input: ${field} must match the ${String(params.format)} format.`
+    case 'pattern':
+      return `Invalid operation input: ${field} has an invalid format.`
+    case 'const':
+      return `Invalid operation input: ${field} has an unsupported value.`
+    case 'oneOf':
+    case 'anyOf':
+    case 'not':
+      return `Invalid operation input: ${field} does not match an accepted combination of fields.`
+    default:
+      return `Invalid operation input: ${field} violates the ${error.keyword} rule.`
+  }
+}
+
 export function domainInputSchema(
   name: DomainToolName,
 ): StandardSchemaWithJSON<Record<string, unknown>> {
@@ -138,9 +195,7 @@ export function domainInputSchema(
         if (!validate(value)) {
           // Error messages describe schema failures without echoing customer data.
           return {
-            issues: [
-              { message: `Invalid operation input: ${validate.errors?.[0]?.keyword || 'schema'}.` },
-            ],
+            issues: [{ message: describeInputIssue(validate.errors?.[0]) }],
           }
         }
         if (!semanticInputValid(name, value as Record<string, unknown>)) {

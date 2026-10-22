@@ -140,7 +140,11 @@ function safeRequestId(value: unknown) {
   return typeof value === 'string' && /^[A-Za-z0-9._:-]{1,128}$/.test(value) ? value : undefined
 }
 
-function toolTitle(name: string) {
+/** The reviewed one-sentence summary of a tool as its title, so tool lists read like actions. */
+export function toolTitle(name: string, description?: string) {
+  const summary = description?.split(/\.(?:\s|$)/, 1)[0]?.trim()
+  if (summary && summary.length >= 3 && summary.length <= 90)
+    return summary.includes('TeamGrid') ? summary : `${summary} in TeamGrid`
   const parts = name.replace(/^teamgrid_/, '').split('_')
   const operation = parts.at(-1)
   const resource = (operation === 'get' || operation === 'list' ? parts.slice(0, -1) : parts)
@@ -639,7 +643,7 @@ export function createTeamGridMcpServer(
           name,
           ['core', 'collaboration', 'governance', 'all'].includes(toolProfile),
         ),
-        title: toolTitle(name),
+        title: toolTitle(name, config.description),
         ...(requireGrantedScopes ? { _meta: { securitySchemes: toolSecuritySchemes(name) } } : {}),
         ...(requireGrantedScopes && scopeChallengeTransport === 'http' ? { scopeChallenge } : {}),
       },
