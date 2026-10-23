@@ -1,4 +1,9 @@
-FROM node:24.21.0-bookworm-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6 AS build
+FROM node:24.22.1-bookworm-slim@sha256:55fb5f5a527ea2c5c4a95f963e48ef90aa38c7b346054fdc8ee9957a2b55d205 AS patched-runtime
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM patched-runtime AS build
 WORKDIR /opt/teamgrid/developer-platform
 COPY developer-platform/package.json developer-platform/package-lock.json ./
 COPY developer-platform/packages/api-client/package.json packages/api-client/package.json
@@ -9,7 +14,7 @@ COPY openapi /opt/teamgrid/openapi
 COPY developer-platform ./
 RUN npm run build && npm prune --omit=dev --ignore-scripts --no-audit --no-fund
 
-FROM node:24.21.0-bookworm-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+FROM patched-runtime
 ARG SOURCE_REVISION
 LABEL org.opencontainers.image.source="https://github.com/TeamGrid/developer-platform"
 LABEL org.opencontainers.image.revision="${SOURCE_REVISION}"
