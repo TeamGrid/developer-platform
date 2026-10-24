@@ -251,10 +251,101 @@ jobs:
         if: always()
         run: docker logout ghcr.io
 
+  legacy-dependency-security-image:
+    name: Verify legacy MCP dependency security image
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out security build source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Check out frozen regional application for Linux compatibility tests
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: a40140bc74e3056b698b0a50cf886d690d9dbb9f
+          path: legacy-source
+      - name: Set up exact patched Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.22.1"
+      - name: Verify the dependency overlay against the frozen application
+        working-directory: legacy-source/developer-platform
+        run: |
+          cp -R ../../developer-platform/hosting/legacy-dependency-security/manifests/. .
+          npm ci --ignore-scripts
+          npm run verify
+          npm audit --audit-level=low
+      - name: Authenticate exact legacy base reads
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY_USER: ${{ github.actor }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$REGISTRY_USER" --password-stdin
+      - name: Build the frozen application with patched dependencies
+        env:
+          SECURITY_BUILD_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          docker build --pull --no-cache --file developer-platform/hosting/legacy-dependency-security/Dockerfile \
+            --build-arg SECURITY_BUILD_REVISION="$SECURITY_BUILD_REVISION" \
+            --tag "teamgrid-mcp-legacy-dependency-security:$SECURITY_BUILD_REVISION" .
+      - name: Prove unchanged compiled application bytes and exercise patched dependencies
+        env:
+          SECURITY_BUILD_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          image="teamgrid-mcp-legacy-dependency-security:$SECURITY_BUILD_REVISION"
+          baseline="ghcr.io/teamgrid/teamgrid-mcp@sha256:ac21142267ccd1a3cae587fd681aa0ce3dbde0bb95dd38a5a5a5f69e2d869818"
+          proof=developer-platform/hosting/legacy-dependency-security/application-code-proof.mjs
+          docker run --rm -i --network none --entrypoint node "$baseline" --input-type=module < "$proof" > legacy-tree-before.json
+          docker run --rm -i --network none --entrypoint node "$image" --input-type=module < "$proof" > legacy-tree-after.json
+          cmp legacy-tree-before.json legacy-tree-after.json
+          test "$(docker run --rm --network none --entrypoint node "$image" --version)" = v24.22.1
+          bash developer-platform/hosting/smoke-image.sh "$image"
+      - name: Publish only from protected main with separate build and application provenance
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          SECURITY_BUILD_REVISION: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          image="ghcr.io/teamgrid/teamgrid-mcp-legacy-dependency-security:$SECURITY_BUILD_REVISION"
+          docker tag "teamgrid-mcp-legacy-dependency-security:$SECURITY_BUILD_REVISION" "$image"
+          docker push "$image"
+          docker pull "$image"
+          export PUBLISHED_IMAGE="$(docker inspect --format '{{index .RepoDigests 0}}' "$image")"
+          python3 - <<'PYPROOF'
+          import json, os
+          from pathlib import Path
+          proof = {'contract': 'teamgrid-legacy-mcp-dependency-security-image-v1',
+                   'buildSourceRevision': os.environ['SECURITY_BUILD_REVISION'],
+                   'applicationSourceRevision': 'a40140bc74e3056b698b0a50cf886d690d9dbb9f',
+                   'baseImage': 'ghcr.io/teamgrid/teamgrid-mcp@sha256:ac21142267ccd1a3cae587fd681aa0ce3dbde0bb95dd38a5a5a5f69e2d869818',
+                   'image': os.environ['PUBLISHED_IMAGE'], 'node': '24.22.1',
+                   'applicationCode': json.loads(Path('legacy-tree-after.json').read_text()),
+                   'buildRunUrl': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"}
+          Path('legacy-mcp-dependency-security-image-proof.json').write_text(json.dumps(proof, sort_keys=True) + '\n')
+          PYPROOF
+      - name: Preserve exact runtime security image proof
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: legacy-mcp-dependency-security-image-proof
+          path: legacy-mcp-dependency-security-image-proof.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Remove registry authentication
+        if: always()
+        run: docker logout ghcr.io
+
   verification-gate:
     name: Verify packages
     if: always()
-    needs: [verify, hosted-image, federated-image, legacy-security-image]
+    needs: [verify, hosted-image, federated-image, legacy-security-image, legacy-dependency-security-image]
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -264,8 +355,10 @@ jobs:
           HOSTED_IMAGE_RESULT: ${{ needs.hosted-image.result }}
           FEDERATED_IMAGE_RESULT: ${{ needs.federated-image.result }}
           LEGACY_SECURITY_RESULT: ${{ needs.legacy-security-image.result }}
+          LEGACY_DEPENDENCY_RESULT: ${{ needs.legacy-dependency-security-image.result }}
         run: |
           test "$PACKAGE_RESULT" = success
           test "$HOSTED_IMAGE_RESULT" = success
           test "$FEDERATED_IMAGE_RESULT" = success
           test "$LEGACY_SECURITY_RESULT" = success
+          test "$LEGACY_DEPENDENCY_RESULT" = success

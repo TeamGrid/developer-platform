@@ -1,0 +1,24 @@
+{
+  "contract": "teamgrid-legacy-mcp-dependency-source-v1",
+  "applicationSourceRevision": "a40140bc74e3056b698b0a50cf886d690d9dbb9f",
+  "changedSourceFiles": [
+    {
+      "path": "developer-platform/package.json",
+      "beforeSha256": "4976a96ea8558a7973a53d408fe66d675b22635a81928365e55c84a7abeb374d",
+      "afterSha256": "663b480d5d0411e78d0796a24ee497e2f1d379cb0e72b453098fd798447b45f5"
+    },
+    {
+      "path": "developer-platform/package-lock.json",
+      "beforeSha256": "e55043590cc2feb5cc0f10d19c300a70ab5b3ea02f36ba84f8357fc2d8ffbb0b",
+      "afterSha256": "a66d513a5c77bdbdd695f93568e1d78c88e816c8f7c65830b0700207013f4ce2"
+    },
+    {
+      "path": "developer-platform/packages/mcp-server/package.json",
+      "beforeSha256": "70d78bf1cd23c29bbceb72e6cfb0313147f08efdfdde89e1099b78f8d6f7fbc7",
+      "afterSha256": "8e8e7e5064f4c26a6088462e05a0987d0dde1b1cdef7df28296ab626c78785b8"
+    }
+  ],
+  "unchangedApplicationSource": true,
+  "localFullVerify": "passed; see CI for fresh Linux verification",
+  "npmAuditFindings": 0
+}
