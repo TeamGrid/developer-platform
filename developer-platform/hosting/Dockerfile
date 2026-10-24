@@ -15,6 +15,9 @@ COPY developer-platform ./
 RUN npm run build && npm prune --omit=dev --ignore-scripts --no-audit --no-fund
 
 FROM patched-runtime
+# Keep package managers in build stages only.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack /opt/yarn-v* \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/yarn /usr/local/bin/yarnpkg /usr/local/bin/corepack
 ARG SOURCE_REVISION
 LABEL org.opencontainers.image.source="https://github.com/TeamGrid/developer-platform"
 LABEL org.opencontainers.image.revision="${SOURCE_REVISION}"

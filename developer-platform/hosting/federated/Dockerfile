@@ -16,6 +16,9 @@ RUN npm run build && npm prune --omit=dev --ignore-scripts --no-audit --no-fund
 RUN npm ci --prefix hosting/federated --ignore-scripts --no-audit --no-fund
 
 FROM patched-runtime
+# Keep package managers in build stages only.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack /opt/yarn-v* \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/yarn /usr/local/bin/yarnpkg /usr/local/bin/corepack
 ARG SOURCE_REVISION
 LABEL org.opencontainers.image.source="https://github.com/TeamGrid/developer-platform"
 LABEL org.opencontainers.image.revision="${SOURCE_REVISION}"
@@ -34,4 +37,5 @@ COPY --from=build --chown=node:node /opt/teamgrid/developer-platform/hosting/fed
 COPY --from=build --chown=node:node /opt/teamgrid/developer-platform/hosting/federated/main.mjs /opt/teamgrid/developer-platform/hosting/federated/config.mjs /opt/teamgrid/developer-platform/hosting/federated/service.mjs /opt/teamgrid/developer-platform/hosting/federated/io.mjs /opt/teamgrid/developer-platform/hosting/federated/admission.mjs /opt/teamgrid/developer-platform/hosting/federated/selfHosting.mjs ./hosting/federated/
 USER node
 EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 CMD ["node", "-e", "fetch('http://127.0.0.1:'+(process.env.PORT||8080)+'/healthz',{signal:AbortSignal.timeout(3000)}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
 ENTRYPOINT ["node", "hosting/federated/main.mjs"]
