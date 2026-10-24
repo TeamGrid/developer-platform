@@ -15,5 +15,8 @@ ARG SECURITY_BUILD_REVISION
 LABEL org.opencontainers.image.revision="a40140bc74e3056b698b0a50cf886d690d9dbb9f"
 LABEL com.teamgrid.dependency-security-build-revision="${SECURITY_BUILD_REVISION}"
 LABEL com.teamgrid.dependency-security-base-image="ghcr.io/teamgrid/teamgrid-mcp@sha256:ac21142267ccd1a3cae587fd681aa0ce3dbde0bb95dd38a5a5a5f69e2d869818"
+# Remove inherited global package managers after copying the patched Node tree.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack /opt/yarn-v* \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/yarn /usr/local/bin/yarnpkg /usr/local/bin/corepack
 RUN test "$(node --version)" = v24.22.1
 USER node
