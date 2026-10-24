@@ -33,7 +33,12 @@ def call(args, **kwargs):
 
 def verify_scan(report, database, now=None):
     now = now or dt.datetime.now(dt.timezone.utc)
-    updated = dt.datetime.fromisoformat(database['UpdatedAt'].replace('Z', '+00:00'))
+    stamp = database['UpdatedAt']
+    if not re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,9})?Z', stamp):
+        raise ValueError('Database timestamp must use UTC RFC3339')
+    # Python 3.10 rejects Go's nanoseconds; truncate only sub-microsecond precision.
+    stamp = re.sub(r'(\.[0-9]{6})[0-9]+Z$', r'\1Z', stamp)
+    updated = dt.datetime.fromisoformat(stamp.replace('Z', '+00:00'))
     age = (now - updated).total_seconds()
     if not -300 <= age <= 24 * 3600:
         raise ValueError('Vulnerability database is stale or has a future timestamp')

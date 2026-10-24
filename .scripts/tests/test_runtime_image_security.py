@@ -21,7 +21,7 @@ class RuntimeImageSecurityTests(unittest.TestCase):
 
     def verify(self, report, age=0):
         now = dt.datetime(2026, 10, 24, 18, tzinfo=dt.timezone.utc)
-        db = {'UpdatedAt': (now - dt.timedelta(seconds=age)).isoformat()}
+        db = {'UpdatedAt': (now - dt.timedelta(seconds=age)).isoformat().replace('+00:00', 'Z')}
         return module.verify_scan(report, db, now)
 
     def test_clean_detected_package_graph(self):
@@ -43,6 +43,15 @@ class RuntimeImageSecurityTests(unittest.TestCase):
         self.assertEqual(len(result['unresolvedVendorOsFindings']), 1)
         self.assertEqual(result['blockingFindings'], [])
         self.assertEqual(len(result['allFindings']), 1)
+
+    def test_go_nanosecond_database_timestamp_accepted(self):
+        now = dt.datetime(2026, 10, 24, 18, tzinfo=dt.timezone.utc)
+        result = module.verify_scan(self.report(), {'UpdatedAt': '2026-10-24T13:07:23.340317483Z'}, now)
+        self.assertEqual(result['blockingFindings'], [])
+
+    def test_timezone_less_database_timestamp_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'UTC'):
+            module.verify_scan(self.report(), {'UpdatedAt': '2026-10-24T13:07:23'})
 
     def test_stale_database_rejected(self):
         with self.assertRaisesRegex(ValueError, 'stale'):
