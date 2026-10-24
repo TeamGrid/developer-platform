@@ -1,0 +1,56 @@
+{
+  "name": "@teamgrid/developer-platform-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run generate:types && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server",
+    "check": "node scripts/generate-mcp-catalog.mjs --check && node scripts/generate-mcp-scopes.mjs --check && node scripts/check-contract-manifest.mjs && node scripts/check-release-documentation.mjs && npm run generate:types && git diff --exit-code -- packages/api-client/src/generated/schema.ts && npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && npm run build -w @teamgrid/mcp-server && npm run typecheck -w @teamgrid/api-client && npm run typecheck -w @teamgrid/cli && npm run typecheck -w @teamgrid/mcp-server && npm run typecheck:staging-e2e && npm run contract:surfaces && node scripts/check-client-version.mjs && biome check packages scripts",
+    "check:edge-client": "npm run build -w @teamgrid/api-client && node scripts/check-edge-client.mjs",
+    "conformance:credential": "npm run build && node scripts/conformance/credential.mjs",
+    "conformance:certification": "npm run build && node scripts/conformance/run.mjs --mode certification",
+    "conformance:certification:recover": "npm run build && node scripts/conformance/run.mjs --mode certification --recover",
+    "conformance:redaction": "npm run build && node scripts/redaction-conformance.mjs",
+    "conformance:plan": "node scripts/conformance/run.mjs --mode plan",
+    "conformance:read-only": "npm run build && node scripts/conformance/run.mjs --mode read-only",
+    "conformance:route-smoke": "npm run build && node scripts/conformance/run.mjs --mode route-smoke",
+    "conformance:safe-mutation-smoke": "npm run build && node scripts/conformance/run.mjs --mode safe-mutation-smoke",
+    "contract:surfaces": "node scripts/check-operation-surfaces.mjs",
+    "e2e:staging": "node scripts/staging-e2e.mjs",
+    "e2e:staging:load": "node scripts/staging-load.mjs",
+    "generate:types": "openapi-typescript ../openapi/v1.json -o packages/api-client/src/generated/schema.ts",
+    "sync:contracts": "node scripts/sync-contracts.mjs",
+    "test": "npm run build -w @teamgrid/api-client && npm run build -w @teamgrid/cli && vitest run",
+    "typecheck:staging-e2e": "tsc -p tsconfig.staging-e2e.json",
+    "pack:check": "node scripts/check-package-artifacts.mjs",
+    "pack:install-check": "node scripts/verify-packed-install.mjs",
+    "audit:production": "node scripts/check-production-audit.mjs",
+    "verify": "npm run audit:production && npm run check && npm run check:edge-client && npm test && npm run build && npm run conformance:redaction && npm run pack:check && npm run pack:install-check",
+    "generate:mcp-scopes": "node scripts/generate-mcp-scopes.mjs",
+    "generate:mcp-catalog": "node scripts/generate-mcp-catalog.mjs"
+  },
+  "packageManager": "npm@11.18.0",
+  "engines": {
+    "node": ">=22.14 <25"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.5",
+    "@inquirer/prompts": "8.5.2",
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.12",
+    "@modelcontextprotocol/client": "2.4.0",
+    "@modelcontextprotocol/sdk": "1.32.2"
+  },
+  "overrides": {
+    "brace-expansion": "5.0.12",
+    "fast-uri": "3.1.9",
+    "hono": "4.13.13",
+    "minimatch": "10.2.5",
+    "js-yaml": "4.3.2",
+    "postcss": "8.5.31"
+  }
+}
