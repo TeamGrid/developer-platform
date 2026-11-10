@@ -14,6 +14,10 @@ CI does not publish, and CI does not deploy it. See [global authority/routing de
 
 For the chosen TeamGrid-owned deployment model, see [self-hosting preparation](self-hosting.md).
 It supplies digest-pinned Compose/Caddy artifacts without deploying them.
+The generated proxy retries GET, HEAD and OPTIONS requests against a healthy
+peer for up to five seconds. It does not replay OAuth/MCP POST requests after
+an ambiguous upstream response failure; connection failures before delivery can
+still select another peer. Active readiness checks remain enabled.
 
 ## Private inputs
 

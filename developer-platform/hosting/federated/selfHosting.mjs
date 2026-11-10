@@ -131,7 +131,11 @@ export function createSelfHostedArtifacts(input, specification) {
   }
   const proxy = `reverse_proxy ${project}-a:8080 ${project}-b:8080 {
     lb_policy round_robin
-    lb_try_duration 0s
+    lb_try_duration 5s
+    lb_try_interval 100ms
+    lb_retry_match {
+      method GET HEAD OPTIONS
+    }
     flush_interval -1
     health_uri /readyz
     health_headers {
