@@ -139,6 +139,63 @@ function harness(timeout = 30000) {
 }
 
 describe('Federated OAuth token broker', () => {
+  it.each([undefined, resource])(
+    'refreshes the bound resource when resource is %s',
+    async (target) => {
+      const h = harness()
+      const parameters = new URLSearchParams({
+        grant_type: 'refresh_token',
+        client_id: 'host1',
+        refresh_token: tokenResponse.refresh_token,
+      })
+      if (target !== undefined) parameters.set('resource', target)
+      const result = await h.request({}, { body: parameters })
+      expect(result.status).toBe(200)
+      expect(await result.json()).toEqual(tokenResponse)
+      expect(h.lookups).toEqual([{ kind: 'refresh', hash: hash(tokenResponse.refresh_token) }])
+      expect(h.calls[0]?.options.body).toBe(parameters.toString())
+      expect(h.registered[0]).toHaveLength(2)
+    },
+  )
+  it.each(['', 'https://evil.example.test/mcp'])(
+    'rejects an explicit wrong refresh resource before looking up the token: %s',
+    async (target) => {
+      const h = harness()
+      const result = await h.request(
+        {},
+        {
+          body: new URLSearchParams({
+            grant_type: 'refresh_token',
+            client_id: 'host1',
+            refresh_token: tokenResponse.refresh_token,
+            resource: target,
+          }),
+        },
+      )
+      expect(result.status).toBe(400)
+      expect(await result.json()).toEqual({ error: 'invalid_target' })
+      expect(h.lookups).toHaveLength(0)
+      expect(h.calls).toHaveLength(0)
+    },
+  )
+  it('still requires the exact resource for code exchange', async () => {
+    const h = harness()
+    const result = await h.request(
+      {},
+      {
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          client_id: 'host1',
+          code,
+          code_verifier: 'v'.repeat(64),
+          redirect_uri: 'https://host.example.test/callback',
+        }),
+      },
+    )
+    expect(result.status).toBe(400)
+    expect(await result.json()).toEqual({ error: 'invalid_target' })
+    expect(h.lookups).toHaveLength(0)
+  })
   it('routes only the credential hash and returns tokens only after both routes are published', async () => {
     const h = harness()
     const result = await h.request({}, { headers: { Authorization: 'Basic aG9zdDE6c2VjcmV0' } })

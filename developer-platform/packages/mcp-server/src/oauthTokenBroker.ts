@@ -278,7 +278,15 @@ export function createFederatedOAuthTokenBroker(options: {
       ) {
         return json(400, 'unsupported_grant_type')
       }
-      if (!revoke && parameters.resource !== resource.href) return json(400, 'invalid_target')
+      // A refresh keeps the resource bound to its grant when RFC 8707's optional
+      // resource parameter is omitted. Explicit resources and code exchanges must
+      // still match this broker; the owning cell rechecks the grant binding.
+      if (
+        !revoke &&
+        (kind === 'code' || parameters.resource !== undefined) &&
+        parameters.resource !== resource.href
+      )
+        return json(400, 'invalid_target')
       try {
         await withinSignal(
           options.authenticateClient(Object.freeze({ ...parameters }), authorization, deadline),
