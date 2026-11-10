@@ -65,7 +65,13 @@ test('self-hosted artifacts isolate two bounded replicas, expose no host port an
     },
   ])
   assert.match(caddySite, /health_headers \{\s+Host mcp.example.test/)
-  assert.match(caddySite, /lb_try_duration 0s/)
+  assert.equal((caddySite.match(/lb_try_duration 5s/g) ?? []).length, 3)
+  assert.equal((caddySite.match(/lb_try_interval 100ms/g) ?? []).length, 3)
+  // Retry read requests on another peer; do not replay ambiguous OAuth/MCP POSTs.
+  assert.equal(
+    (caddySite.match(/lb_retry_match \{\s+method GET HEAD OPTIONS\s+\}/g) ?? []).length,
+    3,
+  )
 })
 test('self-hosted preparation rejects mutable images, implicit/legacy networks and malformed inputs', () => {
   for (const patch of [
