@@ -5,12 +5,12 @@
     {
       "path": "developer-platform/package.json",
       "beforeSha256": "4976a96ea8558a7973a53d408fe66d675b22635a81928365e55c84a7abeb374d",
-      "afterSha256": "663b480d5d0411e78d0796a24ee497e2f1d379cb0e72b453098fd798447b45f5"
+      "afterSha256": "d268486ad97b22cd8302131f9ff0b0bfff7420aa57548c62f40b6fcd1cad3889"
     },
     {
       "path": "developer-platform/package-lock.json",
       "beforeSha256": "e55043590cc2feb5cc0f10d19c300a70ab5b3ea02f36ba84f8357fc2d8ffbb0b",
-      "afterSha256": "a66d513a5c77bdbdd695f93568e1d78c88e816c8f7c65830b0700207013f4ce2"
+      "afterSha256": "a9086ad6a4eaa2165d369d6b3cf1a4617b701058d49b6331e4a2d697bd264c0a"
     },
     {
       "path": "developer-platform/packages/mcp-server/package.json",
@@ -19,6 +19,6 @@
     }
   ],
   "unchangedApplicationSource": true,
-  "localFullVerify": "passed; see CI for fresh Linux verification",
+  "localFullVerify": "Fresh Linux verification is required by CI for this dependency overlay.",
   "npmAuditFindings": 0
 }
