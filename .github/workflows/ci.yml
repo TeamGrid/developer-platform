@@ -23,7 +23,9 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
+          # The hosted arm64 pool repeatedly fails runner acquisition. Keep the
+          # same macOS release and complete test matrix on the supported Intel pool.
+          - macos-26-intel
           - windows-latest
         node-version:
           - "22.14.0"

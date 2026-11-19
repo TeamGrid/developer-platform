@@ -4,6 +4,7 @@ import { type OAuthRoutingRecord, oauthRoutingRecordId } from './oauthRoutingDir
 import {
   createFederatedOAuthTokenBroker,
   OAuthBrokerInvalidClientError,
+  type OAuthTokenExchangeObservation,
 } from './oauthTokenBroker.js'
 
 const issuer = 'https://mcp.example.test/'
@@ -44,6 +45,7 @@ function harness(timeout = 30000) {
   const calls: { url: string; options: RequestInit }[] = []
   const lookups: { kind: string; hash: string }[] = []
   const registered: OAuthRoutingRecord[][] = []
+  const observations: OAuthTokenExchangeObservation[] = []
   let enabled = true,
     admitted = true,
     route: string | null = 'de-test'
@@ -54,6 +56,7 @@ function harness(timeout = 30000) {
   }
   const broker = createFederatedOAuthTokenBroker({
     requestTimeoutMs: timeout,
+    observeExchange: (event) => observations.push(event),
     issuer,
     resource,
     scopes: ['workspace:read'],
@@ -117,6 +120,7 @@ function harness(timeout = 30000) {
     calls,
     lookups,
     registered,
+    observations,
     route: (value: string | null) => {
       route = value
     },
@@ -228,14 +232,114 @@ describe('Federated OAuth token broker', () => {
       new Headers(h.calls[index]?.options.headers).get('X-TeamGrid-OAuth-Exchange-ID')
     expect(operation(0)).toBe(operation(1))
   })
+  it('waits for the original receipt when a timed-out rotation commits after the first recovery read', async () => {
+    const h = harness(2000)
+    let calls = 0
+    h.fetch(async () => {
+      calls += 1
+      if (calls === 1) throw new Error('The response deadline elapsed while commit is pending')
+      if (calls === 2) return Response.json({ error: 'temporarily_unavailable' }, { status: 503 })
+      return Response.json(publication())
+    })
+    const result = await h.request()
+    expect(result.status).toBe(200)
+    expect(await result.json()).toEqual(tokenResponse)
+    expect(h.calls.map((call) => new URL(call.url).pathname.split('/').at(-1))).toEqual([
+      'token',
+      'recover',
+      'recover',
+    ])
+    expect(new Set(h.calls.map((call) => call.options.body)).size).toBe(1)
+    expect(
+      new Set(
+        h.calls.map((call) =>
+          new Headers(call.options.headers).get('X-TeamGrid-OAuth-Exchange-ID'),
+        ),
+      ).size,
+    ).toBe(1)
+  })
   it('does not retry issuance or switch cells when recovery is missing or unavailable', async () => {
-    const h = harness()
+    const h = harness(400)
     h.fetch(async () => Response.json({ error: 'temporarily_unavailable' }, { status: 503 }))
     const result = await h.request()
     expect(result.status).toBe(503)
-    expect(h.calls).toHaveLength(2)
+    expect(h.calls.length).toBeGreaterThanOrEqual(2)
+    expect(h.calls.length).toBeLessThanOrEqual(3)
+    expect(h.calls.filter((call) => call.url.endsWith('/token'))).toHaveLength(1)
     expect(h.calls.every((call) => call.url.startsWith('https://mcp-de.'))).toBe(true)
     expect(h.registered).toHaveLength(0)
+  })
+  it.each([400, 401, 429])(
+    'stops recovery on a definitive regional rejection (%s)',
+    async (status) => {
+      const h = harness(2000)
+      h.fetch(async () => {
+        if (h.calls.length === 1) throw new Error('Ambiguous issue response')
+        return Response.json(
+          {
+            error:
+              status === 401
+                ? 'invalid_client'
+                : status === 429
+                  ? 'temporarily_unavailable'
+                  : 'invalid_grant',
+          },
+          { status },
+        )
+      })
+      const result = await h.request()
+      expect(result.status).toBe(status)
+      expect(h.calls).toHaveLength(2)
+      expect(h.registered).toHaveLength(0)
+    },
+  )
+  it('cancels pending recovery when the original client disconnects', async () => {
+    const h = harness(2000)
+    const controller = new AbortController()
+    h.fetch(async () => Response.json({ error: 'temporarily_unavailable' }, { status: 503 }))
+    const pending = h.request({}, { signal: controller.signal })
+    const timer = setTimeout(() => controller.abort(), 30)
+    try {
+      expect((await pending).status).toBe(503)
+      expect(h.calls).toHaveLength(2)
+      expect(h.calls.every((call) => call.options.signal?.aborted)).toBe(true)
+      expect(h.registered).toHaveLength(0)
+    } finally {
+      clearTimeout(timer)
+    }
+  })
+  it('correlates issue/recovery without logging raw credentials, hashes, bodies or provider errors', async () => {
+    const h = harness(2000)
+    h.fetch(async () => {
+      if (h.calls.length === 1) throw new Error(`private diagnostic ${code}`)
+      return Response.json(publication())
+    })
+    expect((await h.request()).status).toBe(200)
+    const requestId = new Headers(h.calls[0]?.options.headers).get('X-Request-Id')
+    expect(requestId).toMatch(/^mcp-[a-f0-9-]{36}$/)
+    expect(
+      h.calls.every((call) => new Headers(call.options.headers).get('X-Request-Id') === requestId),
+    ).toBe(true)
+    expect(h.observations.map((event) => event.phase)).toEqual(['token', 'recover', 'response'])
+    expect(h.observations.every((event) => event.requestId === requestId)).toBe(true)
+    for (const event of h.observations) {
+      expect(
+        Object.keys(event).every((key) =>
+          ['requestId', 'phase', 'outcome', 'statusCode', 'durationMs'].includes(key),
+        ),
+      ).toBe(true)
+    }
+    const output = JSON.stringify(h.observations)
+    for (const value of [
+      code,
+      hash(code),
+      tokenResponse.access_token,
+      tokenResponse.refresh_token,
+      'private diagnostic',
+      'https://',
+      'Bearer',
+    ])
+      expect(output).not.toContain(value)
   })
   it('never returns token material on route publication failure or wrong provider binding', async () => {
     const h = harness()

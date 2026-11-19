@@ -142,6 +142,21 @@ redacts raw URIs, ordinary credentials and all federation service/context/nonce
 headers from runtime logs. Review existing access-log writers separately; keep
 raw OAuth queries, cookies, bearers and private headers out of all log sinks.
 The site adds no raw access logger.
+
+After an ambiguous token exchange, the broker reads the original regional recovery
+receipt with bounded backoff inside the existing request deadline. It never repeats
+issuance, switches cells, revives a revoked grant or extends refresh-token reuse.
+Definitive authorization and rate-limit responses stop recovery immediately. This
+also covers a commit that is not yet visible to the first recovery read.
+
+Failed readiness results are cached for one second; successful results retain the
+ten-second cache. A recovered instance must pass every existing dependency and
+authority check before becoming ready again. The service logs readiness transitions
+with fixed stage names, and token exchange phases with a server-generated request ID,
+status and duration. The same request ID reaches the regional App. These diagnostics
+contain no tokens, hashes, bodies, URLs or raw dependency errors. A completed response
+phase means the response was prepared, not proof that an external client received it.
+
 The disposable image check renders Compose and runs this site on Caddy 2.8.4
 with certificate verification, direct-peer denial, exact public/private paths,
 body limits and unavailable-upstream runtime-log redaction. Its shared fixture

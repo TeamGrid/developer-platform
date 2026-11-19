@@ -8,6 +8,7 @@ import type { OAuthRoutingDirectory } from './oauthRoutingDirectory.js'
 import {
   createFederatedOAuthTokenBroker,
   OAuthBrokerInvalidClientError,
+  type OAuthTokenExchangeObservation,
 } from './oauthTokenBroker.js'
 import type { createOidcSigner } from './oidcSigning.js'
 import { createFederatedOidcIdentityReader, createFederatedOidcUserInfo } from './oidcUserInfo.js'
@@ -26,6 +27,7 @@ export type FederatedMcpRuntimeOptions = Omit<
   workspaceUiMode?: 'subdomain' | 'path'
   selectionServiceSecret: string
   ready(): Promise<boolean>
+  observeTokenExchange?(event: OAuthTokenExchangeObservation): void
   oidc?: { signer: ReturnType<typeof createOidcSigner>; subject(subjectId: string): string }
 }
 const responseHeaders = {
@@ -107,6 +109,7 @@ export function createFederatedMcpRuntime(options: FederatedMcpRuntimeOptions) {
   const userInfo = identityOptions && createFederatedOidcUserInfo(identityOptions)
   const tokens = createFederatedOAuthTokenBroker({
     ...brokerOptions,
+    observeExchange: options.observeTokenExchange,
     authenticateClient: (parameters, authorization, signal) =>
       options.clients.authenticate(parameters, authorization, signal),
     ...(oidc && readIdentity

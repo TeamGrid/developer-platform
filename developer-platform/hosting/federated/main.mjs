@@ -6,6 +6,12 @@ async function main() {
   if (!file) throw new Error('Missing service configuration.')
   const service = await createFederatedService({
     readConfig: () => readPrivateJson(file),
+    observeReadiness: (event) =>
+      process.stderr.write(
+        `${JSON.stringify({ event: 'teamgrid.federation.readiness', ...event })}\n`,
+      ),
+    observeTokenExchange: (event) =>
+      process.stderr.write(`${JSON.stringify({ event: 'teamgrid.oauth.exchange', ...event })}\n`),
   })
   try {
     await service.listen()

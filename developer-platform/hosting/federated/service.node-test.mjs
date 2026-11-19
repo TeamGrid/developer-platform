@@ -20,6 +20,7 @@ function harness() {
     failProvider: false,
     stallProvider: false,
     identityKeys: undefined,
+    observations: [],
   }
   const collections = new Map()
   const collection = (name) => {
@@ -63,6 +64,7 @@ function harness() {
   const start = () =>
     createFederatedService({
       Client,
+      observeReadiness: (event) => state.observations.push(event),
       readConfig: () => structuredClone(state.config),
       readPolicy: () => structuredClone(state.policy),
       readIdentityKeys: () => structuredClone(state.identityKeys),
@@ -75,6 +77,34 @@ function harness() {
     })
   return { state, collections, collection, start }
 }
+
+test('a transient readiness failure is rechecked promptly and stays closed until every check passes', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: Date.now() })
+  const h = harness()
+  const service = await h.start()
+  try {
+    h.state.failStorage = true
+    assert.equal(await service.ready(), false)
+    h.state.failStorage = false
+    assert.equal(await service.ready(), false)
+    t.mock.timers.tick(1001)
+    assert.equal(await service.ready(), true)
+    assert.deepEqual(
+      h.state.observations.map(({ ready, stage }) => ({ ready, stage })),
+      [
+        { ready: false, stage: 'metadata-primary' },
+        { ready: true, stage: 'ready' },
+      ],
+    )
+    assert.ok(
+      h.state.observations.every(
+        (event) => Object.keys(event).sort().join(',') === 'durationMs,ready,stage',
+      ),
+    )
+  } finally {
+    await service.close()
+  }
+})
 
 test('OpenID key material is private and invalid keys stop startup before database access', async () => {
   for (const identityKeys of [
