@@ -5,12 +5,12 @@
     {
       "path": "developer-platform/package.json",
       "beforeSha256": "4976a96ea8558a7973a53d408fe66d675b22635a81928365e55c84a7abeb374d",
-      "afterSha256": "d268486ad97b22cd8302131f9ff0b0bfff7420aa57548c62f40b6fcd1cad3889"
+      "afterSha256": "1133daaecfb1c99feed08fa8d09287855d24d0d828e631fb9ff3866eb33c77e4"
     },
     {
       "path": "developer-platform/package-lock.json",
       "beforeSha256": "e55043590cc2feb5cc0f10d19c300a70ab5b3ea02f36ba84f8357fc2d8ffbb0b",
-      "afterSha256": "a9086ad6a4eaa2165d369d6b3cf1a4617b701058d49b6331e4a2d697bd264c0a"
+      "afterSha256": "e3e2940365547af4fa9a46e39b1bfd3248e50186a9a0eb69426e64af2057685f"
     },
     {
       "path": "developer-platform/packages/mcp-server/package.json",
