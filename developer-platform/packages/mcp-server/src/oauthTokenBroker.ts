@@ -1,4 +1,5 @@
-import { createHash, randomBytes } from 'node:crypto'
+import { createHash, randomBytes, randomUUID } from 'node:crypto'
+import { setTimeout as delay } from 'node:timers/promises'
 import { z } from 'zod'
 import { withinSignal } from './http.js'
 import { type OAuthRoutingDirectory, oauthRoutingRecordSchema } from './oauthRoutingDirectory.js'
@@ -45,6 +46,14 @@ export type FederatedOAuthBrokerCell = {
   /** Exact operator-owned private integration base, ending in /<id>/. */
   providerBaseUrl: string
   serviceSecret: string
+}
+
+export type OAuthTokenExchangeObservation = {
+  requestId: string
+  phase: 'token' | 'recover' | 'response'
+  outcome: 'completed' | 'failed' | 'aborted'
+  durationMs: number
+  statusCode?: number
 }
 
 export class OAuthBrokerInvalidClientError extends Error {
@@ -112,6 +121,7 @@ export function createFederatedOAuthTokenBroker(options: {
   }): Promise<string>
   fetch?: typeof fetch
   requestTimeoutMs?: number
+  observeExchange?(event: OAuthTokenExchangeObservation): void
 }) {
   const issuer = new URL(options.issuer)
   const resource = new URL(options.resource)
@@ -198,6 +208,15 @@ export function createFederatedOAuthTokenBroker(options: {
   }
   return async (request: Request): Promise<Response> => {
     const deadline = AbortSignal.any([request.signal, AbortSignal.timeout(timeout)])
+    const requestId = `mcp-${randomUUID()}`
+    const started = performance.now()
+    const observe = (event: Omit<OAuthTokenExchangeObservation, 'requestId'>) => {
+      try {
+        options.observeExchange?.({ requestId, ...event })
+      } catch {
+        // Optional diagnostics must never affect token issuance or its security checks.
+      }
+    }
     try {
       const url = new URL(request.url)
       if (
@@ -339,6 +358,7 @@ export function createFederatedOAuthTokenBroker(options: {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
               'X-TeamGrid-OAuth-Service-Authorization': `Bearer ${cell.serviceSecret}`,
+              'X-Request-Id': requestId,
               ...(!revoke ? { 'X-TeamGrid-OAuth-Exchange-ID': operationId } : {}),
               ...(authorization ? { Authorization: authorization } : {}),
             },
@@ -352,20 +372,53 @@ export function createFederatedOAuthTokenBroker(options: {
         if (response.status === 200) return new Response(null, { status: 200, headers })
         return providerError(response, await boundedJson(response, deadline))
       }
-      let response: Response
-      let value: unknown
-      let recovered = false
-      try {
-        response = await provider('token')
-        value = await boundedJson(response, deadline)
-      } catch {
-        recovered = true
-        response = await provider('recover')
-        value = await boundedJson(response, deadline)
+      const readProvider = async (operation: 'token' | 'recover') => {
+        const began = performance.now()
+        try {
+          const response = await provider(operation)
+          const value = await boundedJson(response, deadline)
+          observe({
+            phase: operation,
+            outcome: 'completed',
+            statusCode: response.status,
+            durationMs: Math.round(performance.now() - began),
+          })
+          return { response, value }
+        } catch (error) {
+          observe({
+            phase: operation,
+            outcome: deadline.aborted ? 'aborted' : 'failed',
+            durationMs: Math.round(performance.now() - began),
+          })
+          throw error
+        }
       }
-      if (response.status === 503 && !recovered) {
-        response = await provider('recover')
-        value = await boundedJson(response, deadline)
+      let response: Response | undefined
+      let value: unknown
+      try {
+        ;({ response, value } = await readProvider('token'))
+      } catch {
+        response = undefined
+      }
+      if (!response || response.status >= 500) {
+        // A timeout can precede the owning cell's commit. A missing receipt on the first
+        // recovery read does not prove that issuance failed. Keep reading that exact
+        // operation within the original deadline; never submit token issuance again.
+        for (let attempt = 0; ; attempt += 1) {
+          deadline.throwIfAborted()
+          if (attempt > 0) {
+            await delay(Math.min(250 * 2 ** Math.min(attempt - 1, 3), 2000), undefined, {
+              signal: deadline,
+            })
+          }
+          try {
+            ;({ response, value } = await readProvider('recover'))
+            // Authentication, revocation and rate-limit rejections are final, not outages.
+            if (response.status < 500) break
+          } catch {
+            deadline.throwIfAborted()
+          }
+        }
       }
       if (!response.ok) {
         return providerError(response, value)
@@ -419,11 +472,23 @@ export function createFederatedOAuthTokenBroker(options: {
         }
       }
       deadline.throwIfAborted()
+      observe({
+        phase: 'response',
+        outcome: 'completed',
+        statusCode: 200,
+        durationMs: Math.round(performance.now() - started),
+      })
       return Response.json(
         { ...result.tokenResponse, ...(idToken === undefined ? {} : { id_token: idToken }) },
         { status: 200, headers },
       )
     } catch {
+      observe({
+        phase: 'response',
+        outcome: deadline.aborted ? 'aborted' : 'failed',
+        statusCode: 503,
+        durationMs: Math.round(performance.now() - started),
+      })
       return json(503, 'temporarily_unavailable')
     }
   }

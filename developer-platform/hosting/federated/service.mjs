@@ -82,6 +82,8 @@ export async function createFederatedService({
   readIdentityKeys = readPrivateJson,
   fetcher = fetch,
   Client = MongoClient,
+  observeReadiness = () => {},
+  observeTokenExchange = () => {},
 }) {
   const config = parseServiceConfig(readConfig())
   const fixed = immutableConfig(config)
@@ -231,17 +233,22 @@ export async function createFederatedService({
     const probeId = createHash('sha256').update(randomBytes(32)).digest('hex')
     let pending,
       expires = 0,
-      lastReady = false
+      lastReady = false,
+      lastReadinessObservation
     const probe = async () => {
       if (closed || !state()?.enabled) return false
       if (expires > Date.now()) return lastReady
       if (pending) return pending
       pending = (async () => {
         const signal = AbortSignal.timeout(4000)
+        const started = performance.now()
+        let stage = 'client-policy',
+          ready = false
         try {
           await clients.resolve('bootstrap-policy-validation', signal).catch((error) => {
             if (!(error instanceof OAuthBrokerInvalidClientError)) throw error
           })
+          stage = 'metadata-primary'
           checkPrimary(
             await underSignal(db.command({ hello: 1 }, { ...commandOptions, signal }), signal),
             connection.options.replicaSet,
@@ -252,6 +259,7 @@ export async function createFederatedService({
             maxTimeMS: 5000,
             signal,
           }
+          stage = 'deployment-binding'
           const recorded = await underSignal(
             control.findOne({ _id: binding._id }, readOptions),
             signal,
@@ -263,6 +271,7 @@ export async function createFederatedService({
           )
             unavailable()
           const canary = { _id: probeId, expiresAt: new Date(Date.now() + 60000) }
+          stage = 'probe-write'
           await underSignal(
             probes.updateOne(
               { _id: probeId },
@@ -271,9 +280,11 @@ export async function createFederatedService({
             ),
             signal,
           )
+          stage = 'probe-read'
           const confirmed = await underSignal(probes.findOne({ _id: probeId }, readOptions), signal)
           if (confirmed?._id !== probeId || +confirmed.expiresAt !== +canary.expiresAt)
             unavailable()
+          stage = 'regional-metadata'
           await Promise.all(
             config.cells.map(async (cell) => {
               const url = new URL('./metadata', cell.providerUrl)
@@ -310,14 +321,33 @@ export async function createFederatedService({
                 unavailable()
             }),
           )
-          return !closed && state()?.enabled === true
+          stage = 'runtime-gate'
+          ready = !closed && state()?.enabled === true
+          return ready
         } catch {
           return false
+        } finally {
+          // Transitions only, with fixed stage names. No URLs, credentials or raw errors.
+          const observation = { ready, stage: ready ? 'ready' : stage }
+          const identity = JSON.stringify(observation)
+          if (identity !== lastReadinessObservation) {
+            lastReadinessObservation = identity
+            try {
+              observeReadiness({
+                ...observation,
+                durationMs: Math.round(performance.now() - started),
+              })
+            } catch {
+              // Diagnostics cannot change admission or fail an otherwise valid probe.
+            }
+          }
         }
       })()
       try {
         lastReady = await pending
-        expires = Date.now() + 10000
+        // A failed check remains closed, but must not prolong a recovered dependency outage.
+        // Successful checks retain the existing cache and concurrent probes stay coalesced.
+        expires = Date.now() + (lastReady ? 10000 : 1000)
         return lastReady
       } finally {
         pending = undefined
@@ -340,6 +370,7 @@ export async function createFederatedService({
       writesEnabled: () => state()?.writesEnabled === true,
       admitRequest: (request) => admission.admit(request),
       ready: probe,
+      observeTokenExchange,
       fetch: fetcher,
       ...(oidc ? { oidc } : {}),
     })
